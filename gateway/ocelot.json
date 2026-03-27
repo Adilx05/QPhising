@@ -18,7 +18,7 @@
         "role": "Admin"
       },
       "RateLimitOptions": {
-        "EnableRateLimiting": true,
+        "EnableRateLimiting": false,
         "Period": "1m",
         "PeriodTimespan": 60,
         "Limit": 30
@@ -42,7 +42,7 @@
         "role": "Admin"
       },
       "RateLimitOptions": {
-        "EnableRateLimiting": true,
+        "EnableRateLimiting": false,
         "Period": "1m",
         "PeriodTimespan": 60,
         "Limit": 30
@@ -66,7 +66,7 @@
         "role": "Operator"
       },
       "RateLimitOptions": {
-        "EnableRateLimiting": true,
+        "EnableRateLimiting": false,
         "Period": "1m",
         "PeriodTimespan": 60,
         "Limit": 60
@@ -90,7 +90,7 @@
         "role": "Operator"
       },
       "RateLimitOptions": {
-        "EnableRateLimiting": true,
+        "EnableRateLimiting": false,
         "Period": "1m",
         "PeriodTimespan": 60,
         "Limit": 60
@@ -114,7 +114,7 @@
         "role": "Viewer"
       },
       "RateLimitOptions": {
-        "EnableRateLimiting": true,
+        "EnableRateLimiting": false,
         "Period": "1m",
         "PeriodTimespan": 60,
         "Limit": 120
@@ -138,7 +138,7 @@
         "role": "Viewer"
       },
       "RateLimitOptions": {
-        "EnableRateLimiting": true,
+        "EnableRateLimiting": false,
         "Period": "1m",
         "PeriodTimespan": 60,
         "Limit": 120
