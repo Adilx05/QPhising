@@ -159,3 +159,5 @@ app.MapHealthChecks("/health", new HealthCheckOptions());
 
 await app.UseOcelot();
 await app.RunAsync();
+
+public partial class Program;
