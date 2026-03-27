@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-kpi-card',
   templateUrl: './kpi-card.component.html'
 })

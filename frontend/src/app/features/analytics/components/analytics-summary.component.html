@@ -1,0 +1,7 @@
+<div class="space-y-6">
+  <div class="grid gap-4 md:grid-cols-3">
+    <app-kpi-card *ngFor="let item of kpis" [title]="item.title" [value]="item.value"></app-kpi-card>
+  </div>
+
+  <app-entity-table title="Behavior Trend" [rows]="trendRows"></app-entity-table>
+</div>
