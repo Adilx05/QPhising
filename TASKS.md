@@ -668,7 +668,7 @@
 - Add real-time update channel (SignalR or equivalent).
 
 ### Subtasks (planned)
-- [ ] **Define KPI contracts and filter dimensions**
+- [x] **Define KPI contracts and filter dimensions**
   - **Description:** Specify response models and filters for campaign, click, conversion, and throughput metrics.
   - **Expected output:** Stable analytics contracts consumable by dashboard components.
   - **Related layer:** Backend
@@ -688,6 +688,16 @@
   - **Description:** Add API endpoints for analytics widgets with role-based access enforcement.
   - **Expected output:** JWT/RBAC-protected analytics API surface ready for frontend integration.
   - **Related layer:** Backend
+
+### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Added analytics KPI query contract `GetDashboardKpisQuery` with stable dashboard response models for campaign, click, conversion, and task-throughput metrics.
+  - Added explicit filter dimensions (`From`, `To`, `TimeGrain`, `TimeZone`, campaign/template/status filters) and typed trend/breakdown contracts for frontend dashboard consumption.
+  - Added FluentValidation rules for analytics filter boundaries (valid date window, max range, bounded filter cardinality).
+  - Reproducible command evidence:
+    - `rg -n "GetDashboardKpisQuery|DashboardKpisResponse|AnalyticsFilterDimensions|AnalyticsTrendPoint" backend/Application/Features/Analytics/GetDashboardKpis/GetDashboardKpisQuery.cs`
+    - `rg -n "GetDashboardKpisQueryValidator|Date window cannot exceed|CampaignIds cannot contain" backend/Application/Features/Analytics/GetDashboardKpis/GetDashboardKpisQueryValidator.cs`
+
 
 ## 10. [ ] Export subsystem
 - StartedAt:
