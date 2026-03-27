@@ -872,7 +872,7 @@
   - **Description:** Define modules for dashboard, campaigns, templates, tracking, tasks, analytics, and exports with smart/dumb separation.
   - **Expected output:** Scalable Angular feature structure and reusable shared UI components.
   - **Related layer:** Frontend
-- [ ] **Implement global state strategy**
+- [x] **Implement global state strategy**
   - **Description:** Introduce NgRx or Signals for auth/session, dashboard data, and feature-level view state.
   - **Expected output:** Predictable frontend state flows with typed selectors/actions.
   - **Related layer:** Frontend
@@ -905,6 +905,15 @@
   - Feature-based structure (`features/dashboard`) and shared dumb component (`shared/components/kpi-card`).
   - Dashboard smart container rendering KPI cards and chart component.
 - Remaining scope for this task: state management, guards, role-based menus, and full enterprise UI feature set.
+
+- Subtask completion update (2026-03-27):
+  - Implemented a Signals-based global frontend state store (`AppStateStore`) to centralize auth/session state, dashboard KPI/trend datasets, and typed feature-level view state for dashboard/campaigns/templates/tracking/tasks/analytics/exports.
+  - Wired layout and feature container components to consume global signals/computed selectors instead of embedding dashboard/session state directly in component classes.
+  - Added role-aware computed navigation source and consistent filter-state projection in page headers to establish predictable state flow across feature modules.
+  - Reproducible command evidence:
+    - `rg -n "class AppStateStore|sessionState|dashboardKpisState|featureState|computed\(" frontend/src/app/core/state/app-state.store.ts`
+    - `rg -n "inject\(AppStateStore\)|viewState|dashboardKpis|dashboardTrendRows" frontend/src/app/core/layout/layout-shell.component.ts frontend/src/app/features/*/containers/*.ts`
+    - `npm run build` (from `frontend/`)
 
 ## 12. [-] Gateway implementation
 - StartedAt: 2026-03-27T16:49:00Z

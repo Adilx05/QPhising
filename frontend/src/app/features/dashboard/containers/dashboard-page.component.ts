@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+
+import { AppStateStore } from '../../../core/state/app-state.store';
 
 @Component({
   standalone: false,
@@ -6,11 +8,9 @@ import { Component } from '@angular/core';
   templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent {
-  protected readonly trendRows = [
-    { day: 'Mon', clicks: '120' },
-    { day: 'Tue', clicks: '145' },
-    { day: 'Wed', clicks: '98' },
-    { day: 'Thu', clicks: '173' },
-    { day: 'Fri', clicks: '160' }
-  ];
+  private readonly appStateStore = inject(AppStateStore);
+
+  protected readonly kpis = this.appStateStore.dashboardKpis;
+  protected readonly trendRows = this.appStateStore.dashboardTrendRows;
+  protected readonly viewState = computed(() => this.appStateStore.featureViewState().dashboard);
 }

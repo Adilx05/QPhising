@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+
+import { AppStateStore } from '../../../core/state/app-state.store';
 
 @Component({
   standalone: false,
@@ -6,6 +8,9 @@ import { Component } from '@angular/core';
   templateUrl: './analytics-page.component.html'
 })
 export class AnalyticsPageComponent {
+  private readonly appStateStore = inject(AppStateStore);
+
+  protected readonly viewState = computed(() => this.appStateStore.featureViewState().analytics);
   protected readonly kpis = [
     { title: 'Open Rate', value: '72.6%' },
     { title: 'Click Rate', value: '18.3%' },

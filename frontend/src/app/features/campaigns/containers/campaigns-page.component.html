@@ -1,7 +1,7 @@
 <section class="space-y-6">
   <app-page-header
     title="Campaigns"
-    description="Manage campaign lifecycle, ownership, and delivery readiness.">
+    [description]="'Manage campaign lifecycle, ownership, and delivery readiness · Filter: ' + viewState().activeFilter">
   </app-page-header>
 
   <app-campaigns-table [rows]="campaigns"></app-campaigns-table>
