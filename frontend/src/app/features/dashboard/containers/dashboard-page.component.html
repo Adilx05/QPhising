@@ -4,12 +4,39 @@
     [description]="'Operational overview of campaign performance · Filter: ' + viewState().activeFilter">
   </app-page-header>
 
-  <div class="grid gap-4 md:grid-cols-3">
-    <app-kpi-card
-      *ngFor="let kpi of kpis()"
-      [title]="kpi.title"
-      [value]="kpi.value"></app-kpi-card>
+  <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm text-slate-500">Date scope</p>
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let filter of filters"
+          type="button"
+          class="rounded-md border px-3 py-1.5 text-sm font-medium transition"
+          [ngClass]="
+            viewState().activeFilter === filter
+              ? 'border-sky-200 bg-sky-50 text-sky-700'
+              : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+          "
+          (click)="applyFilter(filter)">
+          {{ filter }}
+        </button>
+      </div>
+    </div>
   </div>
 
-  <app-entity-table title="Click Trend (Daily)" [rows]="trendRows()"></app-entity-table>
+  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <app-kpi-card *ngFor="let kpi of kpis()" [title]="kpi.title" [value]="kpi.value"></app-kpi-card>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-5">
+    <div class="xl:col-span-3">
+      <app-dashboard-trend-chart title="Click trend (last 7 days)" [points]="trend()"></app-dashboard-trend-chart>
+    </div>
+
+    <div class="xl:col-span-2">
+      <app-entity-table title="Daily click detail" [rows]="trendRows()"></app-entity-table>
+    </div>
+  </div>
+
+  <app-dashboard-campaigns-table [rows]="campaignRows()"></app-dashboard-campaigns-table>
 </section>

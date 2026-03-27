@@ -23,6 +23,21 @@ export interface DashboardKpi {
   value: string;
 }
 
+export interface DashboardTrendPoint {
+  day: string;
+  clicks: number;
+}
+
+export interface DashboardCampaignRow {
+  name: string;
+  owner: string;
+  status: 'Draft' | 'Scheduled' | 'Active' | 'Ended';
+  templateType: 'CredentialHarvest' | 'Attachment' | 'LandingPage';
+  startDate: string;
+  endDate: string;
+  clickRate: number;
+}
+
 export type DashboardTrendRow = Record<string, string>;
 
 export interface FeatureViewState {
@@ -44,17 +59,68 @@ export class AppStateStore {
   });
 
   private readonly dashboardKpisState = signal<DashboardKpi[]>([
-    { title: 'Campaigns', value: '24' },
+    { title: 'Total Campaigns', value: '24' },
     { title: 'Clicks (24h)', value: '696' },
-    { title: 'Conversion Rate', value: '18.3%' }
+    { title: 'Conversion Rate', value: '18.3%' },
+    { title: 'Tasks Queued', value: '11' }
   ]);
 
-  private readonly dashboardTrendRowsState = signal<DashboardTrendRow[]>([
-    { day: 'Mon', clicks: '120' },
-    { day: 'Tue', clicks: '145' },
-    { day: 'Wed', clicks: '98' },
-    { day: 'Thu', clicks: '173' },
-    { day: 'Fri', clicks: '160' }
+  private readonly dashboardTrendState = signal<DashboardTrendPoint[]>([
+    { day: 'Mon', clicks: 120 },
+    { day: 'Tue', clicks: 145 },
+    { day: 'Wed', clicks: 98 },
+    { day: 'Thu', clicks: 173 },
+    { day: 'Fri', clicks: 160 },
+    { day: 'Sat', clicks: 134 },
+    { day: 'Sun', clicks: 155 }
+  ]);
+
+  private readonly dashboardCampaignsState = signal<DashboardCampaignRow[]>([
+    {
+      name: 'Q2 Finance Wire Transfer',
+      owner: 'Alice Warren',
+      status: 'Active',
+      templateType: 'CredentialHarvest',
+      startDate: '2026-03-18',
+      endDate: '2026-04-02',
+      clickRate: 22.4
+    },
+    {
+      name: 'Vendor Invoice Follow-up',
+      owner: 'Omar Delgado',
+      status: 'Scheduled',
+      templateType: 'Attachment',
+      startDate: '2026-03-29',
+      endDate: '2026-04-07',
+      clickRate: 0
+    },
+    {
+      name: 'Benefits Enrollment Alert',
+      owner: 'Rina Cho',
+      status: 'Draft',
+      templateType: 'LandingPage',
+      startDate: '2026-04-04',
+      endDate: '2026-04-18',
+      clickRate: 0
+    },
+    {
+      name: 'SSO Password Rotation',
+      owner: 'Mason Reid',
+      status: 'Ended',
+      templateType: 'CredentialHarvest',
+      startDate: '2026-02-10',
+      endDate: '2026-02-25',
+      clickRate: 15.1
+    },
+    {
+      name: 'Executive Travel Security',
+      owner: 'Nia Patel',
+      status: 'Active',
+      templateType: 'LandingPage',
+      startDate: '2026-03-20',
+      endDate: '2026-04-05',
+      clickRate: 19.8
+    }
   ]);
 
   private readonly featureState = signal<Record<FeatureKey, FeatureViewState>>({
@@ -69,7 +135,13 @@ export class AppStateStore {
 
   readonly session = this.sessionState.asReadonly();
   readonly dashboardKpis = this.dashboardKpisState.asReadonly();
-  readonly dashboardTrendRows = this.dashboardTrendRowsState.asReadonly();
+  readonly dashboardTrend = this.dashboardTrendState.asReadonly();
+  readonly dashboardCampaigns = this.dashboardCampaignsState.asReadonly();
+
+  readonly dashboardTrendRows = computed<DashboardTrendRow[]>(() =>
+    this.dashboardTrend().map((entry) => ({ day: entry.day, clicks: entry.clicks.toString() }))
+  );
+
   readonly isAuthenticated = computed(() => this.session().authenticated);
   readonly currentRole = computed(() => this.session().role);
   readonly featureViewState: Signal<Record<FeatureKey, FeatureViewState>> = this.featureState.asReadonly();
