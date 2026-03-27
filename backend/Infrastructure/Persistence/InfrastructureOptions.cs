@@ -2,7 +2,6 @@ namespace QPhising.Infrastructure.Persistence;
 
 public sealed class InfrastructureOptions
 {
-    public const string SectionName = "Infrastructure";
-    public required string ConnectionString { get; init; }
-    public required string RedisConnectionString { get; init; }
+    public string DatabaseConnectionString { get; init; } = string.Empty;
+    public string RedisConnectionString { get; init; } = string.Empty;
 }
