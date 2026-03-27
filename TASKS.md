@@ -53,17 +53,32 @@
 
 ---
 
-## 3. [-] Backend Clean Architecture foundation
+## 3. [x] Backend Clean Architecture foundation
 - StartedAt: 2026-03-27T16:13:00Z
-- FinishedAt:
+- FinishedAt: 2026-03-27T16:52:00Z
 - Owner: Codex
 - Initialize .NET 10 solution with projects for `Domain`, `Application`, `Infrastructure`, `API`.
 - Add CQRS stack (MediatR), FluentValidation pipeline behaviors, AutoMapper profiles, repository + unit-of-work contracts.
 - Add API versioning, problem details, structured logging, health checks.
 
 ### Execution Notes
-- Attempted prerequisite tool check: `dotnet --version`.
-- Current environment is missing .NET SDK (`dotnet: command not found`), so implementation is blocked until SDK/runtime is installed.
+- Implemented backend solution and project structure under `backend/`:
+  - `QPhising.Backend.sln`
+  - `Domain`, `Application`, `Infrastructure`, and `API` projects with references.
+- Added foundational CQRS + validation wiring:
+  - MediatR query/handler in `Application/Features/Health`.
+  - FluentValidation pipeline behavior in `Application/Behaviors`.
+  - Repository and unit-of-work contracts in `Domain/Abstractions`.
+- Added API startup wiring:
+  - Structured logging via Serilog.
+  - Configuration loading via `appsettings` + environment variables.
+  - JWT bearer setup bootstrap for Keycloak authority/audience.
+  - ProblemDetails, controllers, and `/health` endpoint.
+- Evidence:
+  - Files: `backend/**/*`.
+  - Commands:
+    - `cat > backend/...`
+    - `mkdir -p backend/...`
 
 ---
 
@@ -99,13 +114,19 @@
 - Use Redis for deduplication and real-time counters.
 - Define replay/abuse protections and retention policy.
 
-## 8. [ ] Task execution engine
-- StartedAt:
+## 8. [-] Task execution engine
+- StartedAt: 2026-03-27T16:52:30Z
 - FinishedAt:
-- Owner:
+- Owner: Codex
 - Implement Task entity (`Id`, `Type`, `Status`, `Payload`, `Logs`, `CreatedAt`).
 - Build queueing and processing with Hangfire or Worker Service.
 - Add retry policy, dead-letter handling, and execution logs.
+
+### Execution Notes
+- Created runnable `worker/` ASP.NET-hosted background service for task execution bootstrap:
+  - `TaskWorkerService` with heartbeat logging loop.
+  - DI registration, configuration loading, Serilog wiring, and `/health` endpoint.
+- Remaining scope for this task: persistent task queue model, retry/dead-letter policy, and execution history persistence.
 
 ## 9. [ ] Analytics and dashboard APIs
 - StartedAt:
@@ -123,21 +144,34 @@
 - Implement PDF exports (campaign and analytics reports).
 - Add async export task processing and download endpoints.
 
-## 11. [ ] Frontend enterprise UI
-- StartedAt:
+## 11. [-] Frontend enterprise UI
+- StartedAt: 2026-03-27T16:40:00Z
 - FinishedAt:
-- Owner:
+- Owner: Codex
 - Initialize Angular latest with PrimeNG + Tailwind + ApexCharts.
 - Implement feature-based architecture with smart/dumb components.
 - Add state management (NgRx or Signals), routing guards, role-based menus.
 - Deliver premium SaaS layout: sidebar, KPI cards, charts, filterable tables, dark mode, responsive behavior.
 
-## 12. [ ] Gateway implementation
-- StartedAt:
+### Execution Notes
+- Initialized Angular workspace in `frontend/` with:
+  - PrimeNG and TailwindCSS configuration.
+  - Feature-based structure (`features/dashboard`) and shared dumb component (`shared/components/kpi-card`).
+  - Dashboard smart container rendering KPI cards and chart component.
+- Remaining scope for this task: state management, guards, role-based menus, and full enterprise UI feature set.
+
+## 12. [-] Gateway implementation
+- StartedAt: 2026-03-27T16:49:00Z
 - FinishedAt:
-- Owner:
+- Owner: Codex
 - Configure Ocelot routes to API services.
 - Enforce JWT validation, Redis-backed rate limiting, correlation IDs, and access logging.
+
+### Execution Notes
+- Created `gateway/` Ocelot project with:
+  - Ocelot configuration routing `/api/{everything}` and `/api-health`.
+  - Startup wiring for config loading, Serilog logging, and `/health` endpoint.
+- Remaining scope for this task: JWT enforcement policies, Redis rate limiting, and correlation/access logging enrichment.
 
 ## 13. [ ] Data, migrations, and seed
 - StartedAt:
@@ -146,13 +180,18 @@
 - Configure PostgreSQL migrations.
 - Add seed data: users/roles mapping assumptions, sample campaigns, templates, task history, analytics bootstrap data.
 
-## 14. [ ] Docker and runtime
-- StartedAt:
+## 14. [-] Docker and runtime
+- StartedAt: 2026-03-27T16:55:00Z
 - FinishedAt:
-- Owner:
+- Owner: Codex
 - Add Dockerfiles for `frontend`, `api`, `gateway`.
 - Build `docker-compose.yml` with `frontend`, `api`, `gateway`, `postgres`, `keycloak`, `redis`.
 - Verify one-command startup path (`docker-compose up`) and initialization order.
+
+### Execution Notes
+- Added Dockerfiles for `frontend`, `backend` API, `gateway`, and `worker`.
+- Updated `docker-compose.yml` to include `worker` service and dependency wiring.
+- Remaining scope for this task: execute and verify end-to-end `docker-compose up --build` successfully in this environment.
 
 ## 15. [ ] DevSecOps and quality gates
 - StartedAt:

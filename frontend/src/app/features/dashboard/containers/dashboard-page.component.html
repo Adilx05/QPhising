@@ -1,0 +1,16 @@
+<section class="space-y-6">
+  <header>
+    <h2 class="text-2xl font-semibold">Dashboard</h2>
+    <p class="text-sm text-slate-500">Operational overview of campaign performance.</p>
+  </header>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <app-kpi-card title="Campaigns" value="24"></app-kpi-card>
+    <app-kpi-card title="Clicks (24h)" value="696"></app-kpi-card>
+    <app-kpi-card title="Conversion Rate" value="18.3%"></app-kpi-card>
+  </div>
+
+  <p-card header="Click Trend">
+    <p-chart type="line" [data]="chartData" [options]="chartOptions"></p-chart>
+  </p-card>
+</section>
