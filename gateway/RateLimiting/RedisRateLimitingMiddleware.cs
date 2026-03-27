@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using Gateway.Configuration;
+using Gateway.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
@@ -32,6 +33,9 @@ public sealed class RedisRateLimitingMiddleware(RequestDelegate next)
             await next(context);
             return;
         }
+
+        context.Items[AccessLoggingContext.RateLimitAppliedKey] = true;
+        context.Items[AccessLoggingContext.RateLimitRuleKey] = $"{matchedRule.PathPrefix}:{string.Join(",", matchedRule.Methods)}";
 
         var database = connectionMultiplexer.GetDatabase();
         var clientId = ResolveClientId(context);
@@ -67,6 +71,7 @@ public sealed class RedisRateLimitingMiddleware(RequestDelegate next)
 
         if (currentCount > matchedRule.Limit)
         {
+            context.Items[AccessLoggingContext.RateLimitExceededKey] = true;
             context.Response.Headers[RetryAfterHeader] = ttlSeconds.ToString(CultureInfo.InvariantCulture);
             logger.LogWarning(
                 "Rate limit exceeded for client {ClientId} on {Method} {Path}. Limit={Limit} WindowSeconds={WindowSeconds}",

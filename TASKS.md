@@ -964,7 +964,7 @@
   - **Description:** Generate/forward correlation IDs from gateway to downstream APIs and include them in logs.
   - **Expected output:** End-to-end request traceability across gateway and backend logs.
   - **Related layer:** Infra
-- [ ] **Harden structured access logging**
+- [x] **Harden structured access logging**
   - **Description:** Enrich logs with route, principal, status code, latency, and throttling/security outcomes.
   - **Expected output:** Operationally useful access/audit logs for incident analysis.
   - **Related layer:** Infra
@@ -995,6 +995,13 @@
   - Enriched Serilog request diagnostics with `CorrelationId` via `EnrichDiagnosticContext` to improve cross-service traceability in structured logs.
   - Reproducible command evidence:
     - `rg -n "CorrelationIdMiddleware|X-Correlation-ID|CorrelationIdItemKey|UseMiddleware<CorrelationIdMiddleware>|EnrichDiagnosticContext" gateway/Program.cs gateway/Correlation/CorrelationIdMiddleware.cs`
+- Subtask completion update (2026-03-27):
+  - Added dedicated `AccessLoggingMiddleware` in gateway pipeline to emit structured access/audit events for every request with route, method, status code, latency, correlation ID, and UTC start timestamp.
+  - Enriched access logs with principal/auth context and security outcomes (`authorized`, `anonymous`, `unauthenticated`, `forbidden`) plus throttling metadata (`rateLimitApplied`, `rateLimitRule`, `throttled`).
+  - Integrated rate-limiter context propagation so throttling decisions are captured consistently in access logs for incident analysis.
+  - Reproducible command evidence:
+    - `rg -n "AccessLoggingMiddleware|securityOutcome|throttled|LatencyMs|principal" gateway/Logging/AccessLoggingMiddleware.cs gateway/Program.cs`
+    - `rg -n "AccessLoggingContext|RateLimitAppliedKey|RateLimitExceededKey|RateLimitRuleKey" gateway/Logging/AccessLoggingContext.cs gateway/RateLimiting/RedisRateLimitingMiddleware.cs`
 - Enforced route-level Ocelot authentication/authorization by requiring Bearer JWTs and role claims (`Admin`, `Operator`, `Viewer`) for access endpoints.
 - Applied route-level rate limits with gateway-wide rate limit headers and 429 handling.
 - Created `gateway/` Ocelot project with:
@@ -1005,7 +1012,7 @@
   - Startup-time validation (`ValidateOnStart`) with explicit error messages for missing/invalid required keys.
 - Removed hardcoded compose runtime values where applicable by introducing environment-variable expansion defaults in `docker-compose.yml`.
 - Documented configuration keys and production-safe templates in `README.md`.
-- Remaining scope for this task: structured access logging hardening and gateway behavior verification.
+- Remaining scope for this task: gateway behavior verification.
 
 ## 13. [ ] Data, migrations, and seed
 - StartedAt:

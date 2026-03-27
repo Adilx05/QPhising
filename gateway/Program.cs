@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using Gateway.Configuration;
 using Gateway.Correlation;
+using Gateway.Logging;
 using Gateway.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -138,6 +139,7 @@ builder.Services.AddOcelot(builder.Configuration);
 var app = builder.Build();
 
 app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<AccessLoggingMiddleware>();
 app.UseSerilogRequestLogging(options =>
 {
     options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
