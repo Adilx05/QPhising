@@ -10,6 +10,7 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
 {
     public const string Scheme = "Test";
     public const string RolesHeader = "X-Test-Roles";
+    public const string UserIdHeader = "X-Test-UserId";
 
     public TestAuthHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
@@ -27,7 +28,17 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var claims = new List<Claim> { new(ClaimTypes.Name, "integration-user") };
+        string userId = Request.Headers.TryGetValue(UserIdHeader, out var userIdHeader) &&
+                        !string.IsNullOrWhiteSpace(userIdHeader)
+            ? userIdHeader.ToString().Trim()
+            : "integration-user";
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name, userId),
+            new(ClaimTypes.NameIdentifier, userId),
+            new("sub", userId)
+        };
         if (Request.Headers.TryGetValue(RolesHeader, out var rolesHeader))
         {
             var roles = rolesHeader.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);

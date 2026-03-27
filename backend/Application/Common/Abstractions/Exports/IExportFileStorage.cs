@@ -6,8 +6,16 @@ public interface IExportFileStorage
         Guid exportJobId,
         ExportBinaryFile file,
         CancellationToken cancellationToken = default);
+
+    Task<ExportFileContent?> TryReadAsync(
+        string storagePath,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed record StoredExportFile(
     string StoragePath,
+    long SizeBytes);
+
+public sealed record ExportFileContent(
+    byte[] Content,
     long SizeBytes);
