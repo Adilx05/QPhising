@@ -29,6 +29,7 @@ public sealed class ProcessTrackingClickCommandHandler(
                 TrackingTokenValidationFailure.Expired => "Tracking token has expired.",
                 TrackingTokenValidationFailure.CampaignMismatch => "Tracking token campaign mismatch.",
                 TrackingTokenValidationFailure.SignatureMismatch => "Tracking token signature is invalid.",
+                TrackingTokenValidationFailure.InvalidIssuedAt => "Tracking token issued-at window is invalid.",
                 _ => "Tracking token is malformed or unsupported."
             };
 
@@ -46,8 +47,21 @@ public sealed class ProcessTrackingClickCommandHandler(
                 request.CampaignId,
                 validationResult.Claims.RecipientEmail,
                 validationResult.Claims.Nonce,
-                clickedAtUtc),
+                validationResult.Claims.IssuedAtUtc,
+                validationResult.Claims.ExpiresAtUtc,
+                clickedAtUtc,
+                request.IpAddress,
+                request.Fingerprint),
             cancellationToken);
+
+        if (realtimeResult.IsRejected)
+        {
+            string reason = string.IsNullOrWhiteSpace(realtimeResult.DecisionReason)
+                ? "abuse protection policy"
+                : realtimeResult.DecisionReason;
+
+            return Result<ProcessTrackingClickResponse>.Failure($"Tracking click rejected by abuse protection ({reason}).");
+        }
 
         if (realtimeResult.IsDuplicate)
         {
@@ -59,7 +73,8 @@ public sealed class ProcessTrackingClickCommandHandler(
                 request.UserAgent,
                 request.Fingerprint,
                 clickedAtUtc,
-                Accepted: false);
+                Accepted: false,
+                FlaggedForReview: realtimeResult.IsFlagged);
 
             return Result<ProcessTrackingClickResponse>.Success(duplicateResponse);
         }
@@ -83,7 +98,8 @@ public sealed class ProcessTrackingClickCommandHandler(
             clickEvent.UserAgent,
             clickEvent.Fingerprint,
             clickedAtUtc,
-            Accepted: true);
+            Accepted: true,
+            FlaggedForReview: realtimeResult.IsFlagged);
 
         return Result<ProcessTrackingClickResponse>.Success(response);
     }

@@ -12,6 +12,18 @@ public sealed class RedisOptions
     [Range(1, 1440)]
     public int TrackingDeduplicationWindowMinutes { get; init; } = 15;
 
+    [Range(0, 300)]
+    public int TrackingTokenClockSkewSeconds { get; init; } = 30;
+
+    [Range(1, 1440)]
+    public int TrackingAbuseWindowMinutes { get; init; } = 1;
+
+    [Range(1, 100000)]
+    public int TrackingSuspiciousIpThreshold { get; init; } = 20;
+
+    [Range(1, 100000)]
+    public int TrackingIpRejectionThreshold { get; init; } = 50;
+
     [Required(AllowEmptyStrings = false)]
     public string KeyPrefix { get; init; } = "qphising";
 }

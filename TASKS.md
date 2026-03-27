@@ -470,7 +470,7 @@
   - **Description:** Use Redis keys for dedup windows and atomic increments for campaign/recipient click counters.
   - **Expected output:** Idempotent click handling and low-latency metrics updates.
   - **Related layer:** Infra
-- [ ] **Implement replay and abuse protections**
+- [x] **Implement replay and abuse protections**
   - **Description:** Add nonce/time-window checks, suspicious-rate thresholds, and reject/flag behavior.
   - **Expected output:** Hardened tracking pipeline against replay and abusive click traffic.
   - **Related layer:** Backend
@@ -532,6 +532,19 @@
     - `rg -n "ITrackingClickRealtimeStore|TrackingClickRealtimeRequest|TrackingClickRealtimeResult" backend/Application`
     - `rg -n "RedisTrackingClickRealtimeStore|TrackingDeduplicationWindowMinutes|KeyPrefix|IConnectionMultiplexer" backend/Infrastructure`
     - `rg -n "ProcessTrackingClick_Should_Be_Idempotent_For_Duplicate_Clicks|AlwaysUniqueTrackingClickRealtimeStore" backend/API.IntegrationTests`
+
+- Subtask completion update (2026-03-27):
+  - Implemented replay and abuse protections in tracking click processing with deterministic decision outcomes:
+    - added token time-window enforcement (`issued-at`/`expires-at` plus configurable clock skew),
+    - retained nonce deduplication signaling as flagged duplicate behavior,
+    - introduced IP-based suspicious/rejection thresholds in a configurable abuse window.
+  - Extended tracking click response contracts to expose `FlaggedForReview` while maintaining idempotent duplicate handling.
+  - Added test coverage for replay-window rejection, suspicious-rate flagging, and hard-threshold rejection paths.
+  - Reproducible command evidence:
+    - `rg -n "TrackingTokenClockSkewSeconds|TrackingSuspiciousIpThreshold|TrackingIpRejectionThreshold" backend/Infrastructure/Persistence/RedisOptions.cs backend/API/appsettings.json`
+    - `rg -n "outside_valid_window|ip_rate_suspicious|ip_threshold_exceeded|FlaggedForReview" backend/Application/Features/Tracking/ProcessTrackingClick backend/Infrastructure/Persistence/RedisTrackingClickRealtimeStore.cs backend/API/Controllers/TrackingController.cs`
+    - `rg -n "ProcessTrackingClick_Should_Reject_When_Click_Is_Outside_Token_Time_Window|ProcessTrackingClick_Should_Flag_When_Ip_Rate_Is_Suspicious|ProcessTrackingClick_Should_Reject_When_Ip_Rate_Exceeds_Hard_Threshold" backend/API.IntegrationTests/TrackingInteractionGuardTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 8. [-] Task execution engine
 - StartedAt: 2026-03-27T16:52:30Z

@@ -11,9 +11,16 @@ public sealed record TrackingClickRealtimeRequest(
     Guid CampaignId,
     string RecipientEmail,
     string TokenNonce,
-    DateTimeOffset ClickedAtUtc);
+    DateTimeOffset TokenIssuedAtUtc,
+    DateTimeOffset TokenExpiresAtUtc,
+    DateTimeOffset ClickedAtUtc,
+    string IpAddress,
+    string? Fingerprint);
 
 public sealed record TrackingClickRealtimeResult(
     bool IsDuplicate,
+    bool IsRejected,
+    bool IsFlagged,
+    string? DecisionReason,
     long CampaignClickCount,
     long RecipientClickCount);

@@ -79,7 +79,8 @@ public sealed class TrackingController(IMediator mediator, IOptions<BaseUrlOptio
             result.Value.IpAddress,
             result.Value.UserAgent,
             result.Value.Fingerprint,
-            result.Value.Accepted);
+            result.Value.Accepted,
+            result.Value.FlaggedForReview);
 
         return Ok(response);
     }
@@ -115,4 +116,5 @@ public sealed record ProcessTrackingClickApiResponse(
     string IpAddress,
     string UserAgent,
     string? Fingerprint,
-    bool Accepted);
+    bool Accepted,
+    bool FlaggedForReview);
