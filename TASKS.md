@@ -772,7 +772,7 @@
   - **Description:** Queue export jobs to background worker with retry/dead-letter support and status updates.
   - **Expected output:** Non-blocking export execution with reliable job tracking.
   - **Related layer:** Backend
-- [ ] **Provide secured export APIs and file delivery**
+- [x] **Provide secured export APIs and file delivery**
   - **Description:** Add create/status/download endpoints with JWT/RBAC and ownership checks.
   - **Expected output:** Secure, auditable export workflow from request to file retrieval.
   - **Related layer:** Backend
@@ -812,6 +812,24 @@
     - `rg -n "class QuestPdfExportService|GeneratePdf|application/pdf" backend/Infrastructure/Exports/QuestPdfExportService.cs`
     - `rg -n "AddScoped<IPdfExportService" backend/Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs`
     - `rg -n "PdfExportPipelineTests|%PDF-|BuildCampaignReportAsync_Should_CreatePdfBinary|BuildAnalyticsReportAsync_Should_CreatePdfBinary" backend/API.IntegrationTests/PdfExportPipelineTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Added thin, versioned `ExportsController` endpoints for secured export workflows:
+    - `POST /api/exports` and `/api/v{version}/exports` to queue export jobs,
+    - `GET /api/exports/{exportJobId}` and versioned variant for status retrieval,
+    - `GET /api/exports/{exportJobId}/download` and versioned variant for file delivery.
+  - Enforced JWT/RBAC + ownership controls:
+    - all endpoints require authenticated `Viewer` policy,
+    - create uses authenticated user claims as owner,
+    - status/download enforce owner-only access unless caller has `Admin` role.
+  - Added Application CQRS read flows (`GetExportJobStatusQuery`, `DownloadExportFileQuery`) and validators, keeping controller business-logic free and returning deterministic ProblemDetails/403 responses.
+  - Extended export storage abstraction with safe read support and added local storage path-bound checks before file reads.
+  - Added integration coverage for unauthenticated rejection, successful queueing with claim-derived owner identity, non-owner status forbidden, and owner download success with attachment metadata.
+  - Reproducible command evidence:
+    - `rg -n "class ExportsController|/download|QueueExportJobApiRequest|TryGetCurrentUserId" backend/API/Controllers/ExportsController.cs`
+    - `rg -n "GetExportJobStatusQuery|DownloadExportFileQuery|TryReadAsync" backend/Application/Features/Exports backend/Application/Common/Abstractions/Exports/IExportFileStorage.cs`
+    - `rg -n "ExportEndpointsAuthorizationTests|X-Test-UserId|Exports_Download_Should_Return_File_For_Owner_When_Completed" backend/API.IntegrationTests`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 - Subtask completion update (2026-03-27):
   - Added application CQRS entrypoint for asynchronous export requests (`QueueExportJobCommand`) that creates `ExportJob` records and enqueues `TaskType.ExportGeneration` queued tasks with deterministic payload schema (`exportJobId`, export type/format, owner, request time).

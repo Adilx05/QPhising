@@ -39,6 +39,30 @@ public sealed class LocalExportFileStorage(IOptions<ExportStorageOptions> option
             SizeBytes: file.Content.LongLength);
     }
 
+    public async Task<ExportFileContent?> TryReadAsync(string storagePath, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(storagePath))
+        {
+            return null;
+        }
+
+        string normalizedBasePath = Path.GetFullPath(_options.BasePath);
+        string normalizedStoragePath = Path.GetFullPath(storagePath);
+
+        if (!normalizedStoragePath.StartsWith(normalizedBasePath, StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        if (!File.Exists(normalizedStoragePath))
+        {
+            return null;
+        }
+
+        byte[] content = await File.ReadAllBytesAsync(normalizedStoragePath, cancellationToken);
+        return new ExportFileContent(content, content.LongLength);
+    }
+
     private static string SanitizeFileName(string fileName)
     {
         string candidate = string.IsNullOrWhiteSpace(fileName) ? "export.bin" : fileName.Trim();
