@@ -18,10 +18,12 @@
   - Latency SLO: p95 API latency < 250ms for reads and < 500ms for writes.
   - Observability: structured logs, distributed tracing, metrics for API, worker, Redis, Postgres.
   - Security baseline: JWT via Keycloak, RBAC, input validation, TLS termination at edge.
-- Evidence:
-  - Commit: `41f4116`
+- Evidence (audited):
+  - Commit: `525e6ff`
   - File: `TASKS.md`
-  - Commands: `cat > TASKS.md ...`
+  - Reproducible commands:
+    - `git show --name-only --oneline 525e6ff`
+    - `git show 525e6ff:TASKS.md | sed -n '1,120p'`
 
 ---
 
@@ -40,20 +42,21 @@
   - `.prettierrc.json`
   - `.eslintrc.json`
   - `QPhising.code-workspace`
-- Evidence:
-  - Commit: `41f4116`
-  - File paths listed above.
-  - Commands:
-    - `mkdir -p frontend backend Domain Application Infrastructure API gateway docker`
-    - `cat > .editorconfig ...`
-    - `cat > .gitignore ...`
-    - `cat > .prettierrc.json ...`
-    - `cat > .eslintrc.json ...`
-    - `cat > QPhising.code-workspace ...`
+- Evidence (audited):
+  - Commits:
+    - `da8f27a` (project/service scaffolding including top-level service folders)
+    - `525e6ff` (shared conventions and workspace files)
+  - Concrete files:
+    - `.editorconfig`, `.gitignore`, `.prettierrc.json`, `.eslintrc.json`, `QPhising.code-workspace`
+    - `frontend/`, `backend/`, `gateway/`, `worker/`
+  - Reproducible commands:
+    - `git show --name-only --oneline da8f27a`
+    - `git show --name-only --oneline 525e6ff`
+    - `test -d frontend && test -d backend && test -d gateway && test -d worker`
 
 ---
 
-## 3. [x] Backend Clean Architecture foundation
+## 3. [-] Backend Clean Architecture foundation
 - StartedAt: 2026-03-27T16:13:00Z
 - FinishedAt: 2026-03-27T16:52:00Z
 - Owner: Codex
@@ -79,6 +82,11 @@
   - Commands:
     - `cat > backend/...`
     - `mkdir -p backend/...`
+- Audit adjustment:
+  - Downgraded to `[-] in progress` because API versioning and explicit AutoMapper profiles are not implemented yet, so completion criteria are not fully met.
+  - Reproducible command evidence:
+    - `rg -n "AddApiVersioning|ApiVersion" backend/API backend/Application`
+    - `rg -n "Profile\\b|CreateMap\\(" backend/Application`
 
 ---
 
@@ -106,6 +114,19 @@
 | `/api/access/admin` | GET | `Admin` | Admin |
 | `/api/access/operator` | GET | `Operator` | Operator, Admin |
 | `/api/access/viewer` | GET | `Viewer` | Viewer, Operator, Admin |
+
+### Evidence (audited)
+- Commit: `70ceb90`
+- Concrete files:
+  - `backend/API/Program.cs`
+  - `backend/API/AuthorizationPolicies.cs`
+  - `backend/API/Controllers/AccessController.cs`
+  - `backend/API.IntegrationTests/AuthorizationFlowTests.cs`
+  - `gateway/ocelot.json`
+- Reproducible commands:
+  - `git show --name-only --oneline 70ceb90`
+  - `rg -n "AddAuthentication|AddAuthorization|RequireAuthorization|RealmAccessRoles" backend/API/Program.cs backend/API/AuthorizationPolicies.cs`
+  - `rg -n "Admin|Operator|Viewer" backend/API/Controllers/AccessController.cs gateway/ocelot.json backend/API.IntegrationTests/AuthorizationFlowTests.cs`
 
 ## 5. [ ] Campaign management module
 - StartedAt:
@@ -204,7 +225,7 @@
 - Configure PostgreSQL migrations.
 - Add seed data: users/roles mapping assumptions, sample campaigns, templates, task history, analytics bootstrap data.
 
-## 14. [x] Docker and runtime
+## 14. [-] Docker and runtime
 - StartedAt: 2026-03-27T16:55:00Z
 - FinishedAt: 2026-03-27T17:20:00Z
 - Owner: Codex
@@ -227,6 +248,11 @@
   - Files: `docker-compose.yml`, `frontend/Dockerfile`, `backend/Dockerfile`, `gateway/Dockerfile`, `worker/Dockerfile`, `TASKS.md`.
   - Commands:
     - `docker compose config`
+- Audit adjustment:
+  - Downgraded to `[-] in progress` because full one-command startup verification (`docker compose up` healthy stack validation) is not recorded yet.
+  - Reproducible command evidence:
+    - `git show --name-only --oneline ad5cc79`
+    - `docker compose config`
 
 ## 15. [ ] DevSecOps and quality gates
 - StartedAt:
@@ -248,3 +274,28 @@
 - [ ] Dashboard populated with seed data.
 - [ ] Full stack runs via compose.
 - [ ] TASKS.md updated after each completed task with evidence links (commit hash, file paths, command outputs).
+
+## 17. [x] Task status audit hardening
+- StartedAt: 2026-03-27T17:50:00Z
+- FinishedAt: 2026-03-27T18:05:00Z
+- Owner: Codex
+- Audit every task status against committed artifacts.
+- Downgrade overstated statuses when required deliverables are missing.
+- Add strict completion checklist requiring buildable evidence.
+
+### Execution Notes
+- Completed audit pass across all task entries.
+- Downgraded tasks with overstated completion:
+  - Task 3 -> `[-]` (missing API versioning / explicit AutoMapper profile evidence).
+  - Task 14 -> `[-]` (missing recorded end-to-end `docker compose up` verification evidence).
+- Added reproducible evidence metadata for completed tasks (commit hashes, concrete files, commands).
+
+## Strict Completion Checklist (required before switching any task to `[x]`)
+- [ ] All acceptance criteria in the task entry map to committed code/config artifacts (no narrative-only completion).
+- [ ] At least one reproducible build/check command succeeds for the changed scope (examples: `dotnet build`, `npm run build`, `docker compose config`, `docker compose up` health validation).
+- [ ] TASKS.md entry contains:
+  - [ ] exact commit hash,
+  - [ ] concrete file paths,
+  - [ ] reproducible command evidence.
+- [ ] Security/validation requirements for touched endpoints are enforced and test-covered where applicable.
+- [ ] No placeholder code, TODO markers, or empty stubs remain in touched scope.
