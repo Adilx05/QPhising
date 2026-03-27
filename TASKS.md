@@ -246,7 +246,7 @@
   - **Expected output:** Concrete repository implementation + entity configuration compatible with existing DbContext and migration-ready schema mapping.
   - **Related layer:** Backend/Infra
 
-- [ ] **Expose secured campaign API endpoints (controller thin layer)**
+- [x] **Expose secured campaign API endpoints (controller thin layer)**
   - **Description:** Add API endpoints for campaign CRUD, activation, and scheduling; controllers delegate only to MediatR and enforce JWT/RBAC policies without business logic.
   - **Expected output:** Versioned, policy-protected endpoints with request/response contracts and ProblemDetails-compatible error responses.
   - **Related layer:** Backend (API)
@@ -257,6 +257,18 @@
   - **Related layer:** Backend (Domain/Application/Infra test scope)
 
 ### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Exposed versioned campaign API endpoints via thin `CampaignsController` (`/api/campaigns` and `/api/v{version}/campaigns`) for list/get/create/update/schedule/activate operations.
+  - Enforced JWT/RBAC policies at endpoint level:
+    - read operations (`GET`) require `Viewer` policy,
+    - write and lifecycle transitions (`POST`/`PUT`) require `Operator` policy.
+  - Kept API layer business-logic free by delegating all operations to MediatR CQRS requests and returning ProblemDetails-compatible error responses for failure paths.
+  - Added explicit request/response contracts for campaign create/update payloads and wired deterministic API status behavior (201 for create, 200 for successful reads/updates/transitions, 400/404 ProblemDetails on failure).
+  - Reproducible command evidence:
+    - `rg -n "class CampaignsController|\\[Authorize\\(Policy = AuthorizationPolicies\\.(Viewer|Operator)\\)\\]|Problem\\(" backend/API/Controllers/CampaignsController.cs`
+    - `rg -n "\\[Route\\(\"api/\\[controller\\]\"\\)|\\[Route\\(\"api/v\\{version:apiVersion\\}/\\[controller\\]\"\\)\\]" backend/API/Controllers/CampaignsController.cs`
+    - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
+
 - Subtask completion update (2026-03-27):
   - Implemented EF Core campaign persistence in Infrastructure with `QPhisingDbContext`, campaign entity configuration, and PostgreSQL provider wiring.
   - Added `CampaignRepository` implementation for identity lookup, filtered list queries, date-window overlap queries, and write operations using the domain repository contract.
