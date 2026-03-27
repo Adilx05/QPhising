@@ -210,7 +210,7 @@
   - **Expected output:** Domain entities, enums, and domain-specific exceptions/events in the Domain layer with no framework dependencies; compile-ready and reusable by Application CQRS handlers.
   - **Related layer:** Backend (Domain)
 
-- [ ] **Design persistence contract and write-side abstractions**
+- [x] **Design persistence contract and write-side abstractions**
   - **Description:** Extend repository and unit-of-work contracts for campaign write operations (create/update/status changes) and read access by identity/date window without leaking infrastructure concerns.
   - **Expected output:** Clean repository + unit-of-work interfaces and method signatures in Domain abstractions aligned with campaign lifecycle use cases.
   - **Related layer:** Backend (Domain/Application boundary)
@@ -258,6 +258,14 @@
 ### Execution Notes
 - Subtask completion update (2026-03-27):
   - Added a pure Domain campaign aggregate with explicit invariants for required `Name`, non-empty `HtmlContent`, and `StartDate <= EndDate`.
+- Subtask completion update (2026-03-27):
+  - Introduced explicit campaign persistence boundary contracts in Domain abstractions for write-side operations and read-side access by identity/date windows.
+  - Added `ICampaignRepository` methods for add/update, campaign lookup by id, filtered reads, and overlapping date-window retrieval without infrastructure-specific types.
+  - Added `CampaignReadCriteria` as a reusable, framework-agnostic contract for status/template/date-window and pagination-oriented query inputs used by upcoming CQRS handlers.
+  - Reproducible command evidence:
+    - `rg -n "interface ICampaignRepository|CampaignReadCriteria|ListOverlappingWindowAsync|AddAsync\(|void Update\(" backend/Domain/Abstractions`
+
+
   - Added campaign lifecycle enum and transition guard enforcing allowed flow `Draft -> Scheduled -> Active -> Ended/Archived`.
   - Added domain-specific exceptions and a status-change domain event contract for downstream application handling.
   - Reproducible command evidence:
