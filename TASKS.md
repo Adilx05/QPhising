@@ -221,7 +221,7 @@
   - **Expected output:** `CreateCampaign` command flow that validates inputs, persists through repository/unit-of-work, and returns a typed response contract.
   - **Related layer:** Backend (Application)
 
-- [ ] **Add campaign update command + validation + mapping**
+- [x] **Add campaign update command + validation + mapping**
   - **Description:** Implement CQRS update flow for editable fields (`Name`, `TemplateType`, `HtmlContent`, dates) with immutable/audit-safe constraints and validator coverage for update-specific rules.
   - **Expected output:** `UpdateCampaign` command flow with conflict-safe updates and deterministic mapping profile usage.
   - **Related layer:** Backend (Application)
@@ -281,6 +281,15 @@
     - `rg -n "class Campaign|AllowedStatusTransitions|ValidateDateRange|ChangeStatus" backend/Domain/Campaigns/Campaign.cs`
     - `rg -n "enum CampaignStatus|enum TemplateType|CampaignValidationException|InvalidCampaignStatusTransitionException|CampaignStatusChangedDomainEvent" backend/Domain/Campaigns`
     - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Implemented `UpdateCampaign` CQRS flow with MediatR command/handler returning `Result<UpdateCampaignResponse>` and using `ICampaignRepository` + `IUnitOfWork` for conflict-safe write persistence.
+  - Added update-specific FluentValidation rules for `CampaignId`, editable fields, enum validity, and `StartDate <= EndDate` guard.
+  - Added deterministic AutoMapper profile (`Campaign` -> `UpdateCampaignResponse`) and expanded mapping integration coverage to assert campaign update response projection.
+  - Reproducible command evidence:
+    - `rg -n "UpdateCampaignCommand|UpdateCampaignCommandHandler|UpdateCampaignCommandValidator|UpdateCampaignMappingProfile" backend/Application/Features/Campaigns/UpdateCampaign`
+    - `rg -n "UpdateCampaignResponse|Campaign.Create\(|TemplateType.Email" backend/API.IntegrationTests/AutoMapperConfigurationTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 6. [ ] Template module
 - StartedAt:
