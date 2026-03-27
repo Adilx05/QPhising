@@ -44,6 +44,7 @@ public static class ServiceCollectionExtensions
                 npgsqlOptions.MigrationsAssembly(typeof(QPhisingDbContext).Assembly.FullName)));
 
         services.AddScoped<ICampaignRepository, CampaignRepository>();
+        services.AddScoped<ITemplateRepository, TemplateRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddHealthChecks().AddCheck<InfrastructureOptionsHealthCheck>(
