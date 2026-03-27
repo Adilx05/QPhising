@@ -672,7 +672,7 @@
   - **Description:** Specify response models and filters for campaign, click, conversion, and throughput metrics.
   - **Expected output:** Stable analytics contracts consumable by dashboard components.
   - **Related layer:** Backend
-- [ ] **Implement analytics CQRS query handlers**
+- [x] **Implement analytics CQRS query handlers**
   - **Description:** Add efficient aggregation queries for totals, trends, and grouped breakdowns.
   - **Expected output:** Performant analytics read handlers with deterministic pagination/time-window behavior.
   - **Related layer:** Backend
@@ -697,6 +697,16 @@
   - Reproducible command evidence:
     - `rg -n "GetDashboardKpisQuery|DashboardKpisResponse|AnalyticsFilterDimensions|AnalyticsTrendPoint" backend/Application/Features/Analytics/GetDashboardKpis/GetDashboardKpisQuery.cs`
     - `rg -n "GetDashboardKpisQueryValidator|Date window cannot exceed|CampaignIds cannot contain" backend/Application/Features/Analytics/GetDashboardKpis/GetDashboardKpisQueryValidator.cs`
+
+- Subtask completion update (2026-03-27):
+  - Implemented `GetDashboardKpisQueryHandler` to execute analytics CQRS read flow with deterministic filtering, time-grain bucket aggregation, and typed KPI response shaping.
+  - Added `IAnalyticsReadRepository` abstraction and Infrastructure `AnalyticsReadRepository` with aggregate queries for campaign counts, click/unique-click metrics, conversion proxy counts, task throughput, and grouped trend/breakdown datasets.
+  - Registered analytics read repository in infrastructure DI and added handler unit coverage validating KPI/rate derivation and trend bucketing behavior.
+  - Reproducible command evidence:
+    - `rg -n "GetDashboardKpisQueryHandler|ResolveBucketStart|AnalyticsTimeGrain" backend/Application/Features/Analytics/GetDashboardKpis/GetDashboardKpisQueryHandler.cs`
+    - `rg -n "IAnalyticsReadRepository|AnalyticsDashboardReadModel|AnalyticsReadCriteria" backend/Application/Common/Abstractions/IAnalyticsReadRepository.cs`
+    - `rg -n "class AnalyticsReadRepository|GetDashboardReadModelAsync|CampaignStatusBreakdownReadModel|TemplateTypeBreakdownReadModel" backend/Infrastructure/Persistence/Repositories/AnalyticsReadRepository.cs`
+    - `rg -n "AnalyticsQueryHandlerTests|Handle_Should_Map_Read_Model_To_Kpi_Response_With_Derived_Rates" backend/API.IntegrationTests/AnalyticsQueryHandlerTests.cs`
 
 
 ## 10. [ ] Export subsystem
