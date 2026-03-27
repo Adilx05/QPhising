@@ -458,7 +458,7 @@
   - **Description:** Specify token payload, signature method, expiration semantics, and validation flow.
   - **Expected output:** Deterministic token contract for tamper-resistant tracking URLs.
   - **Related layer:** Backend
-- [ ] **Implement tracking link generation CQRS**
+- [x] **Implement tracking link generation CQRS**
   - **Description:** Add command handler to issue unique tracking links bound to campaign and recipient context.
   - **Expected output:** Unique, signed tracking links generated via application layer.
   - **Related layer:** Backend
@@ -481,6 +481,15 @@
 
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-27):
+  - Added versioned, policy-protected `TrackingController` endpoint for tracking-link issuance (`POST /api/tracking/links` and `/api/v{version}/tracking/links`) with thin MediatR delegation to `GenerateTrackingLinkCommand`.
+  - Returned API-facing tracking link payloads including absolute gateway URL composition from validated `BaseUrls:Gateway` configuration while preserving application-layer token issuance logic.
+  - Added endpoint authorization/integration coverage for unauthenticated (401), viewer-forbidden (403), and operator-created (201) outcomes.
+  - Reproducible command evidence:
+    - `rg -n "class TrackingController|GenerateTrackingLink\(|/api/\[controller\]|Operator" backend/API/Controllers/TrackingController.cs`
+    - `rg -n "TrackingEndpointsTests|GenerateTrackingLink_Should_" backend/API.IntegrationTests/TrackingEndpointsTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 - Subtask completion update (2026-03-27):
   - Defined deterministic signed tracking token contract via `ITrackingTokenService` with explicit payload claims (`CampaignId`, `RecipientEmail`, `iat`, `exp`, `nonce`, `version`) and validation failure taxonomy for predictable error handling.
