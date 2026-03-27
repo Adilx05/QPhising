@@ -1,5 +1,6 @@
 using AutoMapper;
 using QPhising.Application.Common;
+using QPhising.Application.Common.Abstractions;
 using QPhising.Application.Features.Templates.ArchiveTemplate;
 using QPhising.Application.Features.Templates.CreateTemplate;
 using QPhising.Application.Features.Templates.GetTemplateById;
@@ -16,6 +17,7 @@ public sealed class TemplateModuleUnitTests
 {
     private readonly IMapper _mapper;
     private readonly TemplateHtmlSanitizer _templateHtmlSanitizer = new();
+    private readonly ITemplateVariableSubstitutionEngine _templateVariableSubstitutionEngine = new TemplateVariableSubstitutionEngine();
 
     public TemplateModuleUnitTests()
     {
@@ -186,6 +188,53 @@ public sealed class TemplateModuleUnitTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal("<div><a href=\"https://example.com\">link</a></div>", result.Value);
+    }
+
+    [Fact]
+    public void TemplateVariableSubstitutionEngine_Should_Render_Html_With_Encoded_Values()
+    {
+        var result = _templateVariableSubstitutionEngine.Render(
+            "<h1>Hello {{first_name}}</h1><p>{{company_name}}</p>",
+            ["first_name", "company_name"],
+            new Dictionary<string, string>
+            {
+                ["first_name"] = "Alice <Admin>",
+                ["company_name"] = "QPhising"
+            });
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("<h1>Hello Alice &lt;Admin&gt;</h1><p>QPhising</p>", result.Value);
+    }
+
+    [Fact]
+    public void TemplateVariableSubstitutionEngine_Should_Fail_When_Placeholder_Value_Is_Missing()
+    {
+        var result = _templateVariableSubstitutionEngine.Render(
+            "<h1>Hello {{first_name}}</h1><p>{{company_name}}</p>",
+            ["first_name", "company_name"],
+            new Dictionary<string, string>
+            {
+                ["first_name"] = "Alice"
+            });
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains("Missing values for placeholders: company_name.", result.Errors.Single());
+    }
+
+    [Fact]
+    public void TemplateVariableSubstitutionEngine_Should_Fail_When_Template_Contains_Undeclared_Placeholder()
+    {
+        var result = _templateVariableSubstitutionEngine.Render(
+            "<h1>Hello {{first_name}}</h1><p>{{department}}</p>",
+            ["first_name", "company_name"],
+            new Dictionary<string, string>
+            {
+                ["first_name"] = "Alice",
+                ["company_name"] = "QPhising"
+            });
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains("undeclared placeholder", result.Errors.Single(), StringComparison.OrdinalIgnoreCase);
     }
 
     private sealed class RecordingUnitOfWork : IUnitOfWork

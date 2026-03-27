@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped<ICampaignInteractionGuard, CampaignInteractionGuard>();
         services.AddSingleton<ITemplateHtmlSanitizer, TemplateHtmlSanitizer>();
+        services.AddSingleton<ITemplateVariableSubstitutionEngine, TemplateVariableSubstitutionEngine>();
         return services;
     }
 }
