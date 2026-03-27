@@ -2,10 +2,10 @@ using QPhising.Domain.Abstractions;
 
 namespace QPhising.Infrastructure.Persistence;
 
-public sealed class UnitOfWork : IUnitOfWork
+public sealed class UnitOfWork(QPhisingDbContext dbContext) : IUnitOfWork
 {
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(0);
+        return dbContext.SaveChangesAsync(cancellationToken);
     }
 }

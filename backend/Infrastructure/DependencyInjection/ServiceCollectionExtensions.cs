@@ -1,7 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using QPhising.Domain.Abstractions;
 using QPhising.Infrastructure.Persistence;
+using QPhising.Infrastructure.Persistence.Repositories;
 
 namespace QPhising.Infrastructure.DependencyInjection;
 
@@ -34,7 +36,16 @@ public static class ServiceCollectionExtensions
             .Validate(options => !string.IsNullOrWhiteSpace(options.RedisConnectionString), "Infrastructure Redis configuration is missing.")
             .ValidateOnStart();
 
-        services.AddSingleton<IUnitOfWork, UnitOfWork>();
+        string connectionString = configuration.GetRequiredSection(DatabaseOptions.SectionName)[nameof(DatabaseOptions.ConnectionString)]
+            ?? throw new InvalidOperationException("Database:ConnectionString is required.");
+
+        services.AddDbContext<QPhisingDbContext>(options =>
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+                npgsqlOptions.MigrationsAssembly(typeof(QPhisingDbContext).Assembly.FullName)));
+
+        services.AddScoped<ICampaignRepository, CampaignRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         services.AddHealthChecks().AddCheck<InfrastructureOptionsHealthCheck>(
             "infrastructure-config",
             tags: ["ready"]);
