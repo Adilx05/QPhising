@@ -74,15 +74,17 @@ export class AppStateStore {
   readonly currentRole = computed(() => this.session().role);
   readonly featureViewState: Signal<Record<FeatureKey, FeatureViewState>> = this.featureState.asReadonly();
 
-  readonly hasViewerAccess = computed(() => {
-    const role = this.currentRole();
-    return role === 'Viewer' || role === 'Operator' || role === 'Admin';
-  });
+  readonly hasViewerAccess = computed(() => this.canAccessAnyRole(['Viewer', 'Operator', 'Admin']));
 
-  readonly hasOperatorAccess = computed(() => {
-    const role = this.currentRole();
-    return role === 'Operator' || role === 'Admin';
-  });
+  readonly hasOperatorAccess = computed(() => this.canAccessAnyRole(['Operator', 'Admin']));
+
+  canAccessAnyRole(roles: readonly AppRole[]): boolean {
+    if (!this.isAuthenticated()) {
+      return false;
+    }
+
+    return roles.includes(this.currentRole());
+  }
 
   updateFeatureFilter(feature: FeatureKey, activeFilter: string): void {
     this.featureState.update((state) => ({

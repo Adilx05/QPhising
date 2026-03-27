@@ -1,6 +1,12 @@
 import { Component, computed, inject } from '@angular/core';
 
-import { AppStateStore } from '../state/app-state.store';
+import { AppRole, AppStateStore } from '../state/app-state.store';
+
+interface NavigationItem {
+  label: string;
+  route: string;
+  allowedRoles: readonly AppRole[];
+}
 
 @Component({
   standalone: false,
@@ -11,24 +17,18 @@ import { AppStateStore } from '../state/app-state.store';
 export class LayoutShellComponent {
   private readonly appStateStore = inject(AppStateStore);
 
+  private readonly navigationItems: readonly NavigationItem[] = [
+    { label: 'Dashboard', route: '/dashboard', allowedRoles: ['Viewer', 'Operator', 'Admin'] },
+    { label: 'Campaigns', route: '/campaigns', allowedRoles: ['Viewer', 'Operator', 'Admin'] },
+    { label: 'Templates', route: '/templates', allowedRoles: ['Viewer', 'Operator', 'Admin'] },
+    { label: 'Tracking', route: '/tracking', allowedRoles: ['Viewer', 'Operator', 'Admin'] },
+    { label: 'Tasks', route: '/tasks', allowedRoles: ['Operator', 'Admin'] },
+    { label: 'Analytics', route: '/analytics', allowedRoles: ['Viewer', 'Operator', 'Admin'] },
+    { label: 'Exports', route: '/exports', allowedRoles: ['Viewer', 'Operator', 'Admin'] }
+  ];
+
   protected readonly session = this.appStateStore.session;
-  protected readonly navItems = computed(() => {
-    const role = this.appStateStore.currentRole();
-
-    const baseItems = [
-      { label: 'Dashboard', route: '/dashboard' },
-      { label: 'Campaigns', route: '/campaigns' },
-      { label: 'Templates', route: '/templates' },
-      { label: 'Tracking', route: '/tracking' },
-      { label: 'Tasks', route: '/tasks' },
-      { label: 'Analytics', route: '/analytics' },
-      { label: 'Exports', route: '/exports' }
-    ];
-
-    if (role === 'Viewer') {
-      return baseItems.filter((item) => item.route !== '/tasks');
-    }
-
-    return baseItems;
-  });
+  protected readonly navItems = computed(() =>
+    this.navigationItems.filter((item) => this.appStateStore.canAccessAnyRole(item.allowedRoles))
+  );
 }
