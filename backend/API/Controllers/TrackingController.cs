@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using QPhising.API.Configuration;
 using QPhising.Application.Common;
 using QPhising.Application.Features.Tracking.GenerateTrackingLink;
+using QPhising.Application.Features.Tracking.ProcessTrackingClick;
 
 namespace QPhising.API.Controllers;
 
@@ -45,6 +46,44 @@ public sealed class TrackingController(IMediator mediator, IOptions<BaseUrlOptio
         return Created(response.TrackingUrl, response);
     }
 
+    [HttpGet("click/{campaignId:guid}/{trackingToken}")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ProcessTrackingClickApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ProcessTrackingClick(
+        Guid campaignId,
+        string trackingToken,
+        [FromQuery] string? fingerprint,
+        CancellationToken cancellationToken)
+    {
+        string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        string userAgent = Request.Headers.UserAgent.ToString();
+        if (string.IsNullOrWhiteSpace(userAgent))
+        {
+            userAgent = "unknown";
+        }
+
+        ProcessTrackingClickCommand command = new(campaignId, trackingToken, ipAddress, userAgent, fingerprint);
+        Result<ProcessTrackingClickResponse> result = await mediator.Send(command, cancellationToken);
+
+        if (!result.IsSuccess || result.Value is null)
+        {
+            return ToActionResult(result);
+        }
+
+        ProcessTrackingClickApiResponse response = new(
+            result.Value.ClickId,
+            result.Value.CampaignId,
+            result.Value.ClickedAtUtc,
+            result.Value.IpAddress,
+            result.Value.UserAgent,
+            result.Value.Fingerprint,
+            result.Value.Accepted);
+
+        return Ok(response);
+    }
+
     private IActionResult ToActionResult<T>(Result<T> result)
     {
         var errors = result.Errors.Count == 0 ? new[] { "Tracking request failed." } : result.Errors;
@@ -68,3 +107,12 @@ public sealed record GenerateTrackingLinkApiResponse(
     DateTimeOffset ExpiresAtUtc,
     string SignatureAlgorithm,
     int TokenVersion);
+
+public sealed record ProcessTrackingClickApiResponse(
+    Guid ClickId,
+    Guid CampaignId,
+    DateTimeOffset ClickedAtUtc,
+    string IpAddress,
+    string UserAgent,
+    string? Fingerprint,
+    bool Accepted);

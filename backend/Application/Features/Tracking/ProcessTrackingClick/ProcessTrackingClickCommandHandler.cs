@@ -1,12 +1,16 @@
 using MediatR;
 using QPhising.Application.Common;
 using QPhising.Application.Common.Abstractions;
+using QPhising.Domain.Abstractions;
+using QPhising.Domain.Tracking;
 
 namespace QPhising.Application.Features.Tracking.ProcessTrackingClick;
 
 public sealed class ProcessTrackingClickCommandHandler(
     ICampaignInteractionGuard campaignInteractionGuard,
-    ITrackingTokenService trackingTokenService) : IRequestHandler<ProcessTrackingClickCommand, Result<ProcessTrackingClickResponse>>
+    ITrackingTokenService trackingTokenService,
+    ITrackingClickRepository trackingClickRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<ProcessTrackingClickCommand, Result<ProcessTrackingClickResponse>>
 {
     public async Task<Result<ProcessTrackingClickResponse>> Handle(ProcessTrackingClickCommand request, CancellationToken cancellationToken)
     {
@@ -30,10 +34,26 @@ public sealed class ProcessTrackingClickCommandHandler(
             return Result<ProcessTrackingClickResponse>.Failure(errorMessage);
         }
 
-        ProcessTrackingClickResponse response = new(
+        DateTimeOffset clickedAtUtc = request.ClickedAtUtc ?? DateTimeOffset.UtcNow;
+        TrackingClick clickEvent = TrackingClick.Create(
             request.CampaignId,
             request.TrackingToken,
-            request.ClickedAtUtc ?? DateTimeOffset.UtcNow,
+            request.IpAddress,
+            request.UserAgent,
+            clickedAtUtc,
+            request.Fingerprint);
+
+        await trackingClickRepository.AddAsync(clickEvent, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        ProcessTrackingClickResponse response = new(
+            clickEvent.Id,
+            request.CampaignId,
+            request.TrackingToken,
+            clickEvent.IpAddress,
+            clickEvent.UserAgent,
+            clickEvent.Fingerprint,
+            clickedAtUtc,
             Accepted: true);
 
         return Result<ProcessTrackingClickResponse>.Success(response);

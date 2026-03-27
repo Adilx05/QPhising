@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QPhising.Domain.Campaigns;
+using QPhising.Domain.Tracking;
 using QPhising.Domain.Templates;
 using QPhising.Infrastructure.Persistence.Configurations;
 
@@ -11,10 +12,13 @@ public sealed class QPhisingDbContext(DbContextOptions<QPhisingDbContext> option
 
     public DbSet<Template> Templates => Set<Template>();
 
+    public DbSet<TrackingClick> TrackingClicks => Set<TrackingClick>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new CampaignEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new TemplateEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new TrackingClickEntityTypeConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

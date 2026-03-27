@@ -54,6 +54,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<ICampaignRepository, CampaignRepository>();
         services.AddScoped<ITemplateRepository, TemplateRepository>();
+        services.AddScoped<ITrackingClickRepository, TrackingClickRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddSingleton<ITrackingTokenService, HmacTrackingTokenService>();
 
