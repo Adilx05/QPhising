@@ -2,7 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using QPhising.Application.Common.Abstractions;
+using QPhising.Application.Common.Abstractions.Exports;
 using QPhising.Domain.Abstractions;
+using QPhising.Infrastructure.Exports;
 using QPhising.Infrastructure.Persistence;
 using QPhising.Infrastructure.Persistence.Repositories;
 using QPhising.Infrastructure.Security;
@@ -68,6 +70,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITaskExecutionLogRepository, TaskExecutionLogRepository>();
         services.AddScoped<IAnalyticsReadRepository, AnalyticsReadRepository>();
         services.AddScoped<IAnalyticsDashboardCache, RedisAnalyticsDashboardCache>();
+        services.AddScoped<IExcelExportService, ClosedXmlExcelExportService>();
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
         services.AddScoped<ITrackingClickRealtimeStore, RedisTrackingClickRealtimeStore>();
         services.AddHostedService<TrackingRetentionBackgroundService>();
