@@ -6,16 +6,6 @@ Enterprise-grade phishing simulation platform.
 
 QPhising is a full-stack SaaS application designed for internal security awareness and phishing simulation.
 
-The system enables organizations to:
-
-* Create phishing campaigns
-* Track user interactions
-* Analyze behavior
-* Generate reports
-* Manage tasks and automation
-
----
-
 ## 🧱 Architecture
 
 * **Frontend:** Angular + PrimeNG + TailwindCSS
@@ -26,85 +16,66 @@ The system enables organizations to:
 * **Cache:** Redis
 * **Background Jobs:** Worker Service / Hangfire
 
----
-
 ## ⚙️ Configuration
 
-The system is fully configurable via:
+Backend (`backend/API`) and Gateway (`gateway`) now use strongly typed options with startup validation.  
+Required keys are loaded from `appsettings.json` and can be overridden by environment variables.
 
-```
-appsettings.json
-```
+### Backend configuration keys
 
-No manual setup required.
+| Section | Key | Env override example |
+|---|---|---|
+| `Database` | `ConnectionString` | `Database__ConnectionString` |
+| `Redis` | `ConnectionString` | `Redis__ConnectionString` |
+| `Keycloak` | `Authority`, `Audience`, `RequireHttpsMetadata` | `Keycloak__Authority` |
+| `Smtp` | `Host`, `Port`, `Username`, `Password`, `FromAddress`, `UseSsl` | `Smtp__Host` |
+| `BaseUrls` | `Gateway`, `Frontend` | `BaseUrls__Gateway` |
 
----
+### Gateway configuration keys
+
+| Section | Key | Env override example |
+|---|---|---|
+| `Database` | `ConnectionString` | `Database__ConnectionString` |
+| `Redis` | `ConnectionString` | `Redis__ConnectionString` |
+| `Keycloak` | `Authority`, `Audience`, `RequireHttpsMetadata` | `Keycloak__Authority` |
+| `Smtp` | `Host`, `Port`, `Username`, `Password`, `FromAddress`, `UseSsl` | `Smtp__Host` |
+| `BaseUrls` | `Gateway`, `Api`, `Frontend` | `BaseUrls__Api` |
+
+> The applications fail fast at startup if required keys are missing or invalid.
+
+### Production-safe templates
+
+Copy and fill these templates before production deployment:
+
+* `backend/API/appsettings.Production.Template.json`
+* `gateway/appsettings.Production.Template.json`
 
 ## 🐳 Run with Docker
 
+Use environment overrides (optional) and start the stack:
+
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
----
-
-## 🔐 Authentication
-
-* Managed by Keycloak
-* JWT-based authentication
-* Role-based access control
-
----
-
-## 🧠 Core Features
-
-* Campaign management
-* Tracking & analytics
-* Task execution engine
-* Export (Excel / PDF)
-* Real-time dashboard
-
----
+`docker-compose.yml` now uses `${VAR:-default}` expansion for runtime values (DB, Redis, Keycloak, SMTP, base URLs, exposed ports).
 
 ## 📊 Task System
 
 All development tasks are tracked in:
 
-```
+```text
 TASKS.md
 ```
 
-The system evolves step-by-step based on task execution.
-
----
-
 ## 🤖 AI Development
-
-This project is designed to be built and maintained using AI agents.
 
 Rules for AI are defined in:
 
-```
+```text
 AGENTS.md
 ```
-
----
-
-## 🚨 Important Rules
-
-* Clean Architecture is mandatory
-* CQRS must be used everywhere
-* No business logic in controllers
-* No placeholder code
-
----
 
 ## 🚀 Status
 
 Active development (AI-driven)
-
----
-
-## 👨‍💻 Author
-
-Built as an enterprise internal tool.

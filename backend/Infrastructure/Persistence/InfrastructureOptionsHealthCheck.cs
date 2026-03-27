@@ -14,7 +14,7 @@ public sealed class InfrastructureOptionsHealthCheck : IHealthCheck
 
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var valid = !string.IsNullOrWhiteSpace(_options.ConnectionString) &&
+        var valid = !string.IsNullOrWhiteSpace(_options.DatabaseConnectionString) &&
                     !string.IsNullOrWhiteSpace(_options.RedisConnectionString);
 
         return Task.FromResult(valid

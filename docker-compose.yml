@@ -6,15 +6,15 @@ services:
     container_name: qphising-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: qphising
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-qphising}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d qphising"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-qphising}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -25,7 +25,7 @@ services:
     container_name: qphising-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -39,11 +39,11 @@ services:
     command: ["start-dev", "--http-port=8080"]
     restart: unless-stopped
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
       KC_HEALTH_ENABLED: "true"
     ports:
-      - "8080:8080"
+      - "${KEYCLOAK_PORT:-8080}:8080"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/health/ready"]
       interval: 15s
@@ -58,12 +58,21 @@ services:
     container_name: qphising-api
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: ${API_ASPNETCORE_ENVIRONMENT:-Development}
       ASPNETCORE_URLS: http://+:8080
-      Authentication__Authority: http://keycloak:8080/realms/qphising
-      Authentication__Audience: qphising-api
-      Infrastructure__ConnectionString: Host=postgres;Port=5432;Database=qphising;Username=postgres;Password=postgres
-      Infrastructure__RedisConnectionString: redis:6379
+      Database__ConnectionString: Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      Redis__ConnectionString: ${REDIS_HOST:-redis}:6379
+      Keycloak__Authority: ${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/qphising}
+      Keycloak__Audience: ${KEYCLOAK_AUDIENCE:-qphising-api}
+      Keycloak__RequireHttpsMetadata: ${KEYCLOAK_REQUIRE_HTTPS_METADATA:-false}
+      Smtp__Host: ${SMTP_HOST:-mailhog}
+      Smtp__Port: ${SMTP_PORT:-1025}
+      Smtp__Username: ${SMTP_USERNAME:-qphising}
+      Smtp__Password: ${SMTP_PASSWORD:-qphising}
+      Smtp__FromAddress: ${SMTP_FROM_ADDRESS:-no-reply@qphising.local}
+      Smtp__UseSsl: ${SMTP_USE_SSL:-false}
+      BaseUrls__Gateway: ${BASE_URL_GATEWAY:-http://gateway:8080}
+      BaseUrls__Frontend: ${BASE_URL_FRONTEND:-http://frontend}
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,7 +81,7 @@ services:
       keycloak:
         condition: service_healthy
     ports:
-      - "5000:8080"
+      - "${API_PORT:-5000}:8080"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
       interval: 10s
@@ -87,17 +96,15 @@ services:
     container_name: qphising-worker
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: ${WORKER_ASPNETCORE_ENVIRONMENT:-Development}
       ASPNETCORE_URLS: http://+:8080
-      Infrastructure__ConnectionString: Host=postgres;Port=5432;Database=qphising;Username=postgres;Password=postgres
-      Infrastructure__RedisConnectionString: redis:6379
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     ports:
-      - "5002:8080"
+      - "${WORKER_PORT:-5002}:8080"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
       interval: 15s
@@ -112,13 +119,32 @@ services:
     container_name: qphising-gateway
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: ${GATEWAY_ASPNETCORE_ENVIRONMENT:-Development}
       ASPNETCORE_URLS: http://+:8080
+      Database__ConnectionString: Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      Redis__ConnectionString: ${REDIS_HOST:-redis}:6379
+      Keycloak__Authority: ${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/qphising}
+      Keycloak__Audience: ${KEYCLOAK_AUDIENCE:-qphising-api}
+      Keycloak__RequireHttpsMetadata: ${KEYCLOAK_REQUIRE_HTTPS_METADATA:-false}
+      Smtp__Host: ${SMTP_HOST:-mailhog}
+      Smtp__Port: ${SMTP_PORT:-1025}
+      Smtp__Username: ${SMTP_USERNAME:-qphising}
+      Smtp__Password: ${SMTP_PASSWORD:-qphising}
+      Smtp__FromAddress: ${SMTP_FROM_ADDRESS:-no-reply@qphising.local}
+      Smtp__UseSsl: ${SMTP_USE_SSL:-false}
+      BaseUrls__Gateway: ${BASE_URL_GATEWAY:-http://gateway:8080}
+      BaseUrls__Api: ${BASE_URL_API:-http://api:8080}
+      BaseUrls__Frontend: ${BASE_URL_FRONTEND:-http://frontend}
+      GlobalConfiguration__BaseUrl: ${BASE_URL_GATEWAY:-http://gateway:8080}
+      Routes__0__DownstreamHostAndPorts__0__Host: ${OCEL0_DOWNSTREAM_HOST:-api}
+      Routes__0__DownstreamHostAndPorts__0__Port: ${OCEL0_DOWNSTREAM_PORT:-8080}
+      Routes__1__DownstreamHostAndPorts__0__Host: ${OCEL1_DOWNSTREAM_HOST:-api}
+      Routes__1__DownstreamHostAndPorts__0__Port: ${OCEL1_DOWNSTREAM_PORT:-8080}
     depends_on:
       api:
         condition: service_healthy
     ports:
-      - "5001:8080"
+      - "${GATEWAY_PORT:-5001}:8080"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
       interval: 10s
@@ -136,7 +162,7 @@ services:
       gateway:
         condition: service_healthy
     ports:
-      - "4200:80"
+      - "${FRONTEND_PORT:-4200}:80"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost/ || exit 1"]
       interval: 15s

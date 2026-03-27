@@ -10,8 +10,28 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services
+            .AddOptions<DatabaseOptions>()
+            .Bind(configuration.GetSection(DatabaseOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString), "Database:ConnectionString is required.")
+            .ValidateOnStart();
+
+        services
+            .AddOptions<RedisOptions>()
+            .Bind(configuration.GetSection(RedisOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString), "Redis:ConnectionString is required.")
+            .ValidateOnStart();
+
+        services
             .AddOptions<InfrastructureOptions>()
-            .Bind(configuration.GetSection(InfrastructureOptions.SectionName))
+            .Configure<DatabaseOptions, RedisOptions>((options, database, redis) =>
+            {
+                options.DatabaseConnectionString = database.ConnectionString;
+                options.RedisConnectionString = redis.ConnectionString;
+            })
+            .Validate(options => !string.IsNullOrWhiteSpace(options.DatabaseConnectionString), "Infrastructure database configuration is missing.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.RedisConnectionString), "Infrastructure Redis configuration is missing.")
             .ValidateOnStart();
 
         services.AddSingleton<IUnitOfWork, UnitOfWork>();

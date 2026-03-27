@@ -171,6 +171,11 @@
 - Created `gateway/` Ocelot project with:
   - Ocelot configuration routing `/api/{everything}` and `/api-health`.
   - Startup wiring for config loading, Serilog logging, and `/health` endpoint.
+- Added strongly-typed configuration options in backend and gateway for:
+  - `Database`, `Redis`, `Keycloak`, `Smtp`, and `BaseUrls`.
+  - Startup-time validation (`ValidateOnStart`) with explicit error messages for missing/invalid required keys.
+- Removed hardcoded compose runtime values where applicable by introducing environment-variable expansion defaults in `docker-compose.yml`.
+- Documented configuration keys and production-safe templates in `README.md`.
 - Remaining scope for this task: JWT enforcement policies, Redis rate limiting, and correlation/access logging enrichment.
 
 ## 13. [ ] Data, migrations, and seed
