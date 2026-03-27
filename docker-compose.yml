@@ -4,7 +4,7 @@ services:
   postgres:
     image: postgres:15
     container_name: qphising-postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: qphising
       POSTGRES_USER: postgres
@@ -13,57 +13,136 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d qphising"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   redis:
     image: redis:7
     container_name: qphising-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
     container_name: qphising-keycloak
-    command: start-dev
+    command: ["start-dev", "--http-port=8080"]
+    restart: unless-stopped
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
 
   api:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: qphising-api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      Authentication__Authority: http://keycloak:8080/realms/qphising
+      Authentication__Audience: qphising-api
+      Infrastructure__ConnectionString: Host=postgres;Port=5432;Database=qphising;Username=postgres;Password=postgres
+      Infrastructure__RedisConnectionString: redis:6379
     depends_on:
-      - postgres
-      - redis
-      - keycloak
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
     ports:
       - "5000:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
 
   worker:
-    build: ./worker
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
     container_name: qphising-worker
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      Infrastructure__ConnectionString: Host=postgres;Port=5432;Database=qphising;Username=postgres;Password=postgres
+      Infrastructure__RedisConnectionString: redis:6379
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "5002:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   gateway:
-    build: ./gateway
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
     container_name: qphising-gateway
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     ports:
       - "5001:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: qphising-frontend
+    restart: unless-stopped
+    depends_on:
+      gateway:
+        condition: service_healthy
     ports:
       - "4200:80"
-    depends_on:
-      - gateway
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
 volumes:
   pgdata:
