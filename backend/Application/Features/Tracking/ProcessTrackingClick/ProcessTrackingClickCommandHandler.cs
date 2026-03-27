@@ -9,6 +9,7 @@ namespace QPhising.Application.Features.Tracking.ProcessTrackingClick;
 public sealed class ProcessTrackingClickCommandHandler(
     ICampaignInteractionGuard campaignInteractionGuard,
     ITrackingTokenService trackingTokenService,
+    ITrackingClickRealtimeStore trackingClickRealtimeStore,
     ITrackingClickRepository trackingClickRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<ProcessTrackingClickCommand, Result<ProcessTrackingClickResponse>>
 {
@@ -34,7 +35,35 @@ public sealed class ProcessTrackingClickCommandHandler(
             return Result<ProcessTrackingClickResponse>.Failure(errorMessage);
         }
 
+        if (validationResult.Claims is null)
+        {
+            return Result<ProcessTrackingClickResponse>.Failure("Tracking token is malformed or unsupported.");
+        }
+
         DateTimeOffset clickedAtUtc = request.ClickedAtUtc ?? DateTimeOffset.UtcNow;
+        var realtimeResult = await trackingClickRealtimeStore.RegisterClickAsync(
+            new TrackingClickRealtimeRequest(
+                request.CampaignId,
+                validationResult.Claims.RecipientEmail,
+                validationResult.Claims.Nonce,
+                clickedAtUtc),
+            cancellationToken);
+
+        if (realtimeResult.IsDuplicate)
+        {
+            ProcessTrackingClickResponse duplicateResponse = new(
+                Guid.Empty,
+                request.CampaignId,
+                request.TrackingToken,
+                request.IpAddress,
+                request.UserAgent,
+                request.Fingerprint,
+                clickedAtUtc,
+                Accepted: false);
+
+            return Result<ProcessTrackingClickResponse>.Success(duplicateResponse);
+        }
+
         TrackingClick clickEvent = TrackingClick.Create(
             request.CampaignId,
             request.TrackingToken,

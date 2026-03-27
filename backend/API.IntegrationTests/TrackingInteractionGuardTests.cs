@@ -48,7 +48,12 @@ public sealed class TrackingInteractionGuardTests
 
         var repository = new InMemoryCampaignRepository(campaign);
         var guard = new CampaignInteractionGuard(repository);
-        var handler = new ProcessTrackingClickCommandHandler(guard, CreateTokenService(), new InMemoryTrackingClickRepository(), new NoOpUnitOfWork());
+        var handler = new ProcessTrackingClickCommandHandler(
+            guard,
+            CreateTokenService(),
+            new InMemoryTrackingClickRealtimeStore(),
+            new InMemoryTrackingClickRepository(),
+            new NoOpUnitOfWork());
 
         var result = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, "tracking-token", "127.0.0.1", "integration-test-agent"),
@@ -107,7 +112,12 @@ public sealed class TrackingInteractionGuardTests
         var issueResult = tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee@company.test", Guid.NewGuid().ToString("N")));
 
         string tamperedToken = issueResult.Token[..^1] + (issueResult.Token[^1] == 'a' ? 'b' : 'a');
-        var handler = new ProcessTrackingClickCommandHandler(guard, tokenService, new InMemoryTrackingClickRepository(), new NoOpUnitOfWork());
+        var handler = new ProcessTrackingClickCommandHandler(
+            guard,
+            tokenService,
+            new InMemoryTrackingClickRealtimeStore(),
+            new InMemoryTrackingClickRepository(),
+            new NoOpUnitOfWork());
 
         var result = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, tamperedToken, "127.0.0.1", "integration-test-agent"),
@@ -115,6 +125,46 @@ public sealed class TrackingInteractionGuardTests
 
         Assert.False(result.IsSuccess);
         Assert.Contains("signature is invalid", result.Errors.Single(), StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task ProcessTrackingClick_Should_Be_Idempotent_For_Duplicate_Clicks()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var campaign = Campaign.Create(
+            "Duplicate Guard Campaign",
+            TemplateType.Email,
+            "<h1>Simulation</h1>",
+            now.AddDays(-1),
+            now.AddDays(2));
+
+        var repository = new InMemoryCampaignRepository(campaign);
+        var guard = new CampaignInteractionGuard(repository);
+        var tokenService = CreateTokenService();
+        var issueResult = tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee@company.test", Guid.NewGuid().ToString("N")));
+        var clickRepository = new CountingTrackingClickRepository();
+        var realtimeStore = new InMemoryTrackingClickRealtimeStore();
+        var handler = new ProcessTrackingClickCommandHandler(
+            guard,
+            tokenService,
+            realtimeStore,
+            clickRepository,
+            new NoOpUnitOfWork());
+
+        var first = await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, issueResult.Token, "127.0.0.1", "integration-test-agent"),
+            CancellationToken.None);
+
+        var second = await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, issueResult.Token, "127.0.0.1", "integration-test-agent"),
+            CancellationToken.None);
+
+        Assert.True(first.IsSuccess);
+        Assert.True(first.Value!.Accepted);
+        Assert.True(second.IsSuccess);
+        Assert.False(second.Value!.Accepted);
+        Assert.Equal(Guid.Empty, second.Value.ClickId);
+        Assert.Equal(1, clickRepository.AddedCount);
     }
 
     private static ITrackingTokenService CreateTokenService()
@@ -179,6 +229,35 @@ public sealed class TrackingInteractionGuardTests
         public Task AddAsync(QPhising.Domain.Tracking.TrackingClick click, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class CountingTrackingClickRepository : ITrackingClickRepository
+    {
+        public int AddedCount { get; private set; }
+
+        public Task AddAsync(QPhising.Domain.Tracking.TrackingClick click, CancellationToken cancellationToken = default)
+        {
+            AddedCount++;
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class InMemoryTrackingClickRealtimeStore : ITrackingClickRealtimeStore
+    {
+        private readonly HashSet<string> _dedupKeys = [];
+
+        public Task<TrackingClickRealtimeResult> RegisterClickAsync(
+            TrackingClickRealtimeRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            string dedupKey = $"{request.CampaignId:D}:{request.RecipientEmail}:{request.TokenNonce}";
+            bool alreadySeen = !_dedupKeys.Add(dedupKey);
+
+            return Task.FromResult(new TrackingClickRealtimeResult(
+                IsDuplicate: alreadySeen,
+                CampaignClickCount: alreadySeen ? 0 : 1,
+                RecipientClickCount: alreadySeen ? 0 : 1));
         }
     }
 
