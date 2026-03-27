@@ -241,7 +241,7 @@
   - **Expected output:** Reusable policy/guard contract and integration points that return explicit domain/application errors for expired campaigns.
   - **Related layer:** Backend (Domain/Application)
 
-- [ ] **Implement infrastructure persistence for campaign module**
+- [x] **Implement infrastructure persistence for campaign module**
   - **Description:** Add Infrastructure implementations (EF Core configuration/repository mappings) for campaign aggregate, including indexes for status/date queries and transactional unit-of-work integration.
   - **Expected output:** Concrete repository implementation + entity configuration compatible with existing DbContext and migration-ready schema mapping.
   - **Related layer:** Backend/Infra
@@ -257,6 +257,15 @@
   - **Related layer:** Backend (Domain/Application/Infra test scope)
 
 ### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Implemented EF Core campaign persistence in Infrastructure with `QPhisingDbContext`, campaign entity configuration, and PostgreSQL provider wiring.
+  - Added `CampaignRepository` implementation for identity lookup, filtered list queries, date-window overlap queries, and write operations using the domain repository contract.
+  - Integrated transactional unit-of-work persistence by binding `UnitOfWork.SaveChangesAsync` to EF Core `DbContext.SaveChangesAsync`.
+  - Added migration-ready schema mapping for campaign aggregate with explicit columns and indexes (`status`, `start_date`, `end_date`, composite `status/start/end`) to optimize lifecycle and reporting queries.
+  - Reproducible command evidence:
+    - `rg -n "QPhisingDbContext|CampaignEntityTypeConfiguration|CampaignRepository|UseNpgsql|MigrationsAssembly" backend/Infrastructure`
+    - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
+
 - Subtask completion update (2026-03-27):
   - Added reusable `ICampaignInteractionGuard` contract and `CampaignInteractionGuard` implementation in Application layer to centralize expired-campaign checks before tracking workflows.
   - Implemented CQRS tracking integration points:
