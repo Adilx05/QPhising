@@ -1,6 +1,8 @@
 using Xunit;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using QPhising.Application.Features.Campaigns.ActivateCampaign;
+using QPhising.Application.Features.Campaigns.ScheduleCampaign;
 using QPhising.Application.Features.Campaigns.UpdateCampaign;
 using QPhising.Application.Features.Health;
 using QPhising.Domain.Campaigns;
@@ -30,9 +32,15 @@ public sealed class AutoMapperConfigurationTests(ApiWebApplicationFactory factor
             DateTimeOffset.UtcNow.AddDays(7));
 
         var updateMapped = mapper.Map<UpdateCampaignResponse>(campaign);
+        var scheduleMapped = mapper.Map<ScheduleCampaignResponse>(campaign);
+        var activateMapped = mapper.Map<ActivateCampaignResponse>(campaign);
 
         Assert.Equal(campaign.Id, updateMapped.Id);
         Assert.Equal(campaign.Name, updateMapped.Name);
         Assert.Equal(campaign.Status, updateMapped.Status);
+        Assert.Equal(campaign.Id, scheduleMapped.Id);
+        Assert.Equal(campaign.Status, scheduleMapped.Status);
+        Assert.Equal(campaign.Id, activateMapped.Id);
+        Assert.Equal(campaign.Status, activateMapped.Status);
     }
 }
