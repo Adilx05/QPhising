@@ -1,6 +1,10 @@
+using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
+using QPhising.API;
 using QPhising.API.Configuration;
 using QPhising.Application.DependencyInjection;
 using QPhising.Infrastructure.DependencyInjection;
@@ -59,7 +63,8 @@ builder.Services
         "BaseUrls:Gateway and BaseUrls:Frontend must be valid absolute URLs.")
     .ValidateOnStart();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.Authority = keycloakOptions.Authority;
@@ -69,11 +74,55 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            RoleClaimType = ClaimTypes.Role,
+            NameClaimType = "preferred_username"
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                if (context.Principal?.Identity is not ClaimsIdentity identity)
+                {
+                    return Task.CompletedTask;
+                }
+
+                var realmAccess = context.Principal.FindFirst("realm_access")?.Value;
+                if (string.IsNullOrWhiteSpace(realmAccess))
+                {
+                    return Task.CompletedTask;
+                }
+
+                using var document = JsonDocument.Parse(realmAccess);
+                if (!document.RootElement.TryGetProperty("roles", out var rolesElement) || rolesElement.ValueKind != JsonValueKind.Array)
+                {
+                    return Task.CompletedTask;
+                }
+
+                foreach (var role in rolesElement.EnumerateArray())
+                {
+                    var roleName = role.GetString();
+                    if (!string.IsNullOrWhiteSpace(roleName) && !identity.HasClaim(ClaimTypes.Role, roleName))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
+                        identity.AddClaim(new Claim("role", roleName));
+                    }
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build())
+    .AddPolicy(AuthorizationPolicies.Admin, policy => policy.RequireRole(AuthorizationPolicies.Admin))
+    .AddPolicy(AuthorizationPolicies.Operator, policy => policy.RequireRole(AuthorizationPolicies.Operator, AuthorizationPolicies.Admin))
+    .AddPolicy(AuthorizationPolicies.Viewer, policy => policy.RequireRole(AuthorizationPolicies.Viewer, AuthorizationPolicies.Operator, AuthorizationPolicies.Admin));
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
@@ -99,3 +148,5 @@ app.MapControllers();
 app.MapHealthChecks("/health", new HealthCheckOptions());
 
 app.Run();
+
+public partial class Program;
