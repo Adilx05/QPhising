@@ -77,7 +77,7 @@
   - **Description:** Create mapping profiles per feature and validate critical mappings used by CQRS handlers.
   - **Expected output:** Registered mapping profiles with compile-safe mappings for command/query DTOs.
   - **Related layer:** Backend
-- [ ] **Harden cross-cutting request pipeline**
+- [x] **Harden cross-cutting request pipeline**
   - **Description:** Ensure FluentValidation and ProblemDetails are consistently applied across all CQRS endpoints.
   - **Expected output:** Uniform validation failures and error contracts without controller business logic.
   - **Related layer:** Backend
@@ -130,6 +130,15 @@
   - Reproducible command evidence:
     - `rg -n "AddAutoMapper|HealthMappingProfile|CreateMap<HealthStatus, HealthStatusDto>" backend/Application`
     - `rg -n "IMapper|mapper.Map<HealthStatusDto>" backend/Application/Features/Health/GetHealthQueryHandler.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj`
+
+- Subtask completion update (2026-03-27):
+  - Added centralized API exception handling with a dedicated `GlobalExceptionHandler` that maps FluentValidation `ValidationException` to RFC7807 `HttpValidationProblemDetails` and returns consistent 400 responses.
+  - Registered exception handling pipeline via `AddExceptionHandler<GlobalExceptionHandler>()` and enriched all ProblemDetails payloads with `traceId` for diagnostics.
+  - Added integration test coverage that injects a failing validator for a CQRS request and asserts deterministic `application/problem+json` validation response contract.
+  - Reproducible command evidence:
+    - `rg -n "GlobalExceptionHandler|AddExceptionHandler|AddProblemDetails\\(" backend/API/Program.cs backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
+    - `rg -n "ValidationPipelineTests|AlwaysFailGetHealthQueryValidator|application/problem\\+json" backend/API.IntegrationTests/ValidationPipelineTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj`
 
 
