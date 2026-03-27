@@ -47,6 +47,18 @@ public sealed class AuthorizationFlowTests : IClassFixture<ApiWebApplicationFact
     }
 
     [Fact]
+    public async Task Admin_Endpoint_Should_Allow_Admin_Role_On_Versioned_Route()
+    {
+        using var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "Test");
+        client.DefaultRequestHeaders.TryAddWithoutValidation(TestAuthHandler.RolesHeader, AuthorizationPolicies.Admin);
+
+        var response = await client.GetAsync("/api/v1/access/admin");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Viewer_Endpoint_Should_Allow_Operator_Role()
     {
         using var client = _factory.CreateClient();
@@ -56,5 +68,16 @@ public sealed class AuthorizationFlowTests : IClassFixture<ApiWebApplicationFact
         var response = await client.GetAsync("/api/access/viewer");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Health_Endpoint_Should_Report_Api_Supported_Versions()
+    {
+        using var client = _factory.CreateClient();
+
+        var response = await client.GetAsync("/api/health");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.Headers.Contains("api-supported-versions"));
     }
 }
