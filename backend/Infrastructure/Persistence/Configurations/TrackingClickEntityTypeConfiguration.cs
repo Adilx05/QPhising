@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using QPhising.Domain.Campaigns;
 using QPhising.Domain.Tracking;
 
 namespace QPhising.Infrastructure.Persistence.Configurations;
@@ -50,5 +51,10 @@ public sealed class TrackingClickEntityTypeConfiguration : IEntityTypeConfigurat
 
         builder.HasIndex(click => new { click.CampaignId, click.ClickedAtUtc })
             .HasDatabaseName("ix_tracking_clicks_campaign_clicked_at");
+
+        builder.HasOne<Campaign>()
+            .WithMany()
+            .HasForeignKey(click => click.CampaignId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
