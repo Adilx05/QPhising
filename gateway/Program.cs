@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Gateway.Configuration;
+using Gateway.Correlation;
 using Gateway.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -136,7 +137,19 @@ builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseSerilogRequestLogging();
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        var correlationId = httpContext.Items.TryGetValue(CorrelationIdMiddleware.CorrelationIdItemKey, out var value)
+            ? value?.ToString()
+            : null;
+
+        diagnosticContext.Set("CorrelationId", correlationId ?? httpContext.TraceIdentifier);
+        diagnosticContext.Set("RequestPath", httpContext.Request.Path.Value ?? "/");
+    };
+});
 app.UseMiddleware<RedisRateLimitingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
