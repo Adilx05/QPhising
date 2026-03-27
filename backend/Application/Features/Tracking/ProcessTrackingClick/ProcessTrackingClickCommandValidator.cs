@@ -11,6 +11,17 @@ public sealed class ProcessTrackingClickCommandValidator : AbstractValidator<Pro
 
         RuleFor(command => command.TrackingToken)
             .NotEmpty()
-            .MaximumLength(128);
+            .MaximumLength(512);
+
+        RuleFor(command => command.IpAddress)
+            .NotEmpty()
+            .MaximumLength(64);
+
+        RuleFor(command => command.UserAgent)
+            .NotEmpty()
+            .MaximumLength(1024);
+
+        RuleFor(command => command.Fingerprint)
+            .MaximumLength(256);
     }
 }

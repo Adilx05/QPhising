@@ -462,7 +462,7 @@
   - **Description:** Add command handler to issue unique tracking links bound to campaign and recipient context.
   - **Expected output:** Unique, signed tracking links generated via application layer.
   - **Related layer:** Backend
-- [ ] **Implement click ingestion and metadata persistence**
+- [x] **Implement click ingestion and metadata persistence**
   - **Description:** Add endpoint/handler to validate tokens and persist click metadata with normalized schema.
   - **Expected output:** Reliable click event records including IP, UserAgent, Timestamp, and Fingerprint.
   - **Related layer:** Backend
@@ -481,6 +481,23 @@
 
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-27):
+  - Implemented click ingestion endpoint and CQRS flow for token-backed tracking clicks:
+    - Added anonymous tracking click endpoint (`GET /api/tracking/click/{campaignId}/{trackingToken}`) in `TrackingController`.
+    - Captured/normalized click metadata (`IpAddress`, `UserAgent`, `Fingerprint`, `ClickedAtUtc`) and delegated to MediatR `ProcessTrackingClickCommand`.
+  - Extended application command/handler/validator and introduced durable click persistence:
+    - Added tracking click persistence contract (`ITrackingClickRepository`) and domain model (`TrackingClick`) with invariant validation.
+    - Updated `ProcessTrackingClickCommandHandler` to validate token, enforce expired-campaign guard, persist click event via repository + unit-of-work, and return typed click response.
+  - Implemented infrastructure persistence schema for click metadata:
+    - Added EF Core entity configuration and repository for `tracking_clicks` with indexes on `campaign_id` and `clicked_at_utc`.
+    - Added migration-ready SQL artifact `20260327203000_add_tracking_clicks_schema.sql`.
+  - Added integration coverage for anonymous click ingestion and metadata persistence assertion.
+  - Reproducible command evidence:
+    - `rg -n "ProcessTrackingClick\\(|AllowAnonymous|click/\\{campaignId:guid\\}/\\{trackingToken\\}" backend/API/Controllers/TrackingController.cs`
+    - `rg -n "class TrackingClick|ITrackingClickRepository|ProcessTrackingClickCommandHandler" backend/Domain backend/Application`
+    - `rg -n "tracking_clicks|TrackingClickEntityTypeConfiguration|TrackingClickRepository" backend/Infrastructure`
+    - `rg -n "ProcessTrackingClick_Should_Accept_Anonymous_Request_And_Persist_Metadata" backend/API.IntegrationTests/TrackingEndpointsTests.cs`
 
 - Subtask completion update (2026-03-27):
   - Added versioned, policy-protected `TrackingController` endpoint for tracking-link issuance (`POST /api/tracking/links` and `/api/v{version}/tracking/links`) with thin MediatR delegation to `GenerateTrackingLinkCommand`.

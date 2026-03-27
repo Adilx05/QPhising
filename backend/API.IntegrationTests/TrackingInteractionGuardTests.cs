@@ -48,10 +48,10 @@ public sealed class TrackingInteractionGuardTests
 
         var repository = new InMemoryCampaignRepository(campaign);
         var guard = new CampaignInteractionGuard(repository);
-        var handler = new ProcessTrackingClickCommandHandler(guard, CreateTokenService());
+        var handler = new ProcessTrackingClickCommandHandler(guard, CreateTokenService(), new InMemoryTrackingClickRepository(), new NoOpUnitOfWork());
 
         var result = await handler.Handle(
-            new ProcessTrackingClickCommand(campaign.Id, "tracking-token"),
+            new ProcessTrackingClickCommand(campaign.Id, "tracking-token", "127.0.0.1", "integration-test-agent"),
             CancellationToken.None);
 
         Assert.False(result.IsSuccess);
@@ -107,10 +107,10 @@ public sealed class TrackingInteractionGuardTests
         var issueResult = tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee@company.test", Guid.NewGuid().ToString("N")));
 
         string tamperedToken = issueResult.Token[..^1] + (issueResult.Token[^1] == 'a' ? 'b' : 'a');
-        var handler = new ProcessTrackingClickCommandHandler(guard, tokenService);
+        var handler = new ProcessTrackingClickCommandHandler(guard, tokenService, new InMemoryTrackingClickRepository(), new NoOpUnitOfWork());
 
         var result = await handler.Handle(
-            new ProcessTrackingClickCommand(campaign.Id, tamperedToken),
+            new ProcessTrackingClickCommand(campaign.Id, tamperedToken, "127.0.0.1", "integration-test-agent"),
             CancellationToken.None);
 
         Assert.False(result.IsSuccess);
@@ -171,6 +171,22 @@ public sealed class TrackingInteractionGuardTests
         public void Update(Campaign campaign)
         {
             _campaigns[campaign.Id] = campaign;
+        }
+    }
+
+    private sealed class InMemoryTrackingClickRepository : ITrackingClickRepository
+    {
+        public Task AddAsync(QPhising.Domain.Tracking.TrackingClick click, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class NoOpUnitOfWork : IUnitOfWork
+    {
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(1);
         }
     }
 }
