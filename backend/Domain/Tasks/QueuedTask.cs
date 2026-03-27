@@ -21,7 +21,7 @@ public sealed class QueuedTask
         {
             [TaskType.TrackingLinkGeneration] = ["campaignId", "recipientEmail"],
             [TaskType.TrackingClickProcessing] = ["campaignId", "trackingCode", "clickedAt"],
-            [TaskType.ExportGeneration] = ["exportType", "requestedByUserId", "requestedAt"],
+            [TaskType.ExportGeneration] = ["exportJobId", "exportType", "format", "requestedByUserId", "requestedAt"],
             [TaskType.CampaignActivation] = ["campaignId", "activateAt"]
         };
 

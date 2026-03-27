@@ -43,6 +43,14 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+
+        services
+            .AddOptions<ExportStorageOptions>()
+            .Bind(configuration.GetSection(ExportStorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => !string.IsNullOrWhiteSpace(options.BasePath), "ExportStorage:BasePath is required.")
+            .ValidateOnStart();
+
         services
             .AddOptions<InfrastructureOptions>()
             .Configure<DatabaseOptions, RedisOptions>((options, database, redis) =>
@@ -68,10 +76,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITrackingClickRepository, TrackingClickRepository>();
         services.AddScoped<IQueuedTaskRepository, QueuedTaskRepository>();
         services.AddScoped<ITaskExecutionLogRepository, TaskExecutionLogRepository>();
+        services.AddScoped<IExportJobRepository, ExportJobRepository>();
         services.AddScoped<IAnalyticsReadRepository, AnalyticsReadRepository>();
         services.AddScoped<IAnalyticsDashboardCache, RedisAnalyticsDashboardCache>();
         services.AddScoped<IExcelExportService, ClosedXmlExcelExportService>();
         services.AddScoped<IPdfExportService, QuestPdfExportService>();
+        services.AddScoped<IExportFileStorage, LocalExportFileStorage>();
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
         services.AddScoped<ITrackingClickRealtimeStore, RedisTrackingClickRealtimeStore>();
         services.AddHostedService<TrackingRetentionBackgroundService>();

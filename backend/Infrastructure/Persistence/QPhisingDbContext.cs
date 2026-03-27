@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QPhising.Domain.Campaigns;
+using QPhising.Domain.Exports;
 using QPhising.Domain.Tasks;
 using QPhising.Domain.Tracking;
 using QPhising.Domain.Templates;
@@ -19,6 +20,8 @@ public sealed class QPhisingDbContext(DbContextOptions<QPhisingDbContext> option
 
     public DbSet<TaskExecutionLog> TaskExecutionLogs => Set<TaskExecutionLog>();
 
+    public DbSet<ExportJob> ExportJobs => Set<ExportJob>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new CampaignEntityTypeConfiguration());
@@ -26,6 +29,7 @@ public sealed class QPhisingDbContext(DbContextOptions<QPhisingDbContext> option
         modelBuilder.ApplyConfiguration(new TrackingClickEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new QueuedTaskEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new TaskExecutionLogEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ExportJobEntityTypeConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }
