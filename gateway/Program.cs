@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Gateway.Configuration;
+using Gateway.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
+using StackExchange.Redis;
 using Ocelot.Middleware;
 using Serilog;
 
@@ -34,6 +36,19 @@ builder.Services
     .ValidateDataAnnotations()
     .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString), "Redis:ConnectionString is required.")
     .ValidateOnStart();
+
+builder.Services
+    .AddOptions<RateLimitingOptions>()
+    .Bind(builder.Configuration.GetSection(RateLimitingOptions.SectionName))
+    .ValidateDataAnnotations()
+    .Validate(options => options.Rules.Count > 0, "RateLimiting:Rules must contain at least one entry.")
+    .ValidateOnStart();
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(serviceProvider =>
+{
+    var redisOptions = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<RedisOptions>>().Value;
+    return ConnectionMultiplexer.Connect(redisOptions.ConnectionString);
+});
 
 var keycloakSection = builder.Configuration.GetSection(KeycloakOptions.SectionName);
 var keycloakOptions = keycloakSection.Get<KeycloakOptions>()
@@ -122,6 +137,7 @@ builder.Services.AddOcelot(builder.Configuration);
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
+app.UseMiddleware<RedisRateLimitingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHealthChecks("/health", new HealthCheckOptions());

@@ -956,7 +956,7 @@
   - **Description:** Enumerate and configure Ocelot routes for all service endpoint families with explicit upstream/downstream mappings.
   - **Expected output:** Comprehensive route coverage with deterministic forwarding rules.
   - **Related layer:** Infra
-- [ ] **Implement distributed Redis rate limiting**
+- [x] **Implement distributed Redis rate limiting**
   - **Description:** Wire Redis-backed rate-limiting strategy for consistent throttling across gateway instances.
   - **Expected output:** Cluster-safe throttling with standardized 429 responses and headers.
   - **Related layer:** Infra
@@ -981,6 +981,14 @@
   - Reproducible command evidence:
     - `jq empty gateway/ocelot.json`
     - `rg -n "UpstreamPathTemplate|DownstreamPathTemplate" gateway/ocelot.json`
+- Subtask completion update (2026-03-27):
+  - Implemented Redis-backed distributed rate limiting middleware in gateway startup pipeline using atomic Redis `INCR` + `EXPIRE` script execution for cluster-safe counters.
+  - Added strongly typed `RateLimiting` configuration with validated rule definitions and standardized limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) plus RFC7807-compatible 429 responses including `Retry-After`.
+  - Registered shared Redis connection (`IConnectionMultiplexer`) from existing `Redis:ConnectionString` configuration and disabled legacy per-route Ocelot in-memory limits to avoid split-brain throttling behavior.
+  - Reproducible command evidence:
+    - `jq empty gateway/ocelot.json`
+    - `jq empty gateway/appsettings.json`
+    - `rg -n "RedisRateLimitingMiddleware|RateLimitingOptions|IConnectionMultiplexer|EnableRateLimiting" gateway`
 - Enforced route-level Ocelot authentication/authorization by requiring Bearer JWTs and role claims (`Admin`, `Operator`, `Viewer`) for access endpoints.
 - Applied route-level rate limits with gateway-wide rate limit headers and 429 handling.
 - Created `gateway/` Ocelot project with:
@@ -991,7 +999,7 @@
   - Startup-time validation (`ValidateOnStart`) with explicit error messages for missing/invalid required keys.
 - Removed hardcoded compose runtime values where applicable by introducing environment-variable expansion defaults in `docker-compose.yml`.
 - Documented configuration keys and production-safe templates in `README.md`.
-- Remaining scope for this task: Redis-backed rate limiting and correlation/access logging enrichment.
+- Remaining scope for this task: correlation propagation, structured access logging hardening, and gateway behavior verification.
 
 ## 13. [ ] Data, migrations, and seed
 - StartedAt:
