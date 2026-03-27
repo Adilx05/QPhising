@@ -93,6 +93,40 @@ public sealed class Campaign
         EndDate = endDate;
     }
 
+    public CampaignStatusChangedDomainEvent Schedule(DateTimeOffset? now = null)
+    {
+        DateTimeOffset current = now ?? DateTimeOffset.UtcNow;
+
+        if (StartDate <= current)
+        {
+            throw new CampaignValidationException("Campaign can only be scheduled before its start date.");
+        }
+
+        if (IsExpired(current))
+        {
+            throw new CampaignValidationException("Expired campaigns cannot be scheduled.");
+        }
+
+        return ChangeStatus(CampaignStatus.Scheduled, current);
+    }
+
+    public CampaignStatusChangedDomainEvent Activate(DateTimeOffset? now = null)
+    {
+        DateTimeOffset current = now ?? DateTimeOffset.UtcNow;
+
+        if (current < StartDate)
+        {
+            throw new CampaignValidationException("Campaign cannot be activated before its start date.");
+        }
+
+        if (current > EndDate)
+        {
+            throw new CampaignValidationException("Campaign cannot be activated after its end date.");
+        }
+
+        return ChangeStatus(CampaignStatus.Active, current);
+    }
+
     public CampaignStatusChangedDomainEvent ChangeStatus(CampaignStatus newStatus, DateTimeOffset? occurredAt = null)
     {
         if (Status == newStatus)

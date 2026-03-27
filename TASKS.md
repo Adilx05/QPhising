@@ -231,7 +231,7 @@
   - **Expected output:** Query handlers + response models optimized for API consumption and consistent with clean read contracts.
   - **Related layer:** Backend (Application)
 
-- [ ] **Add activation and scheduling commands with transition guards**
+- [x] **Add activation and scheduling commands with transition guards**
   - **Description:** Implement commands to schedule and activate campaigns, enforcing valid state transitions and date-window checks at domain boundary.
   - **Expected output:** `ScheduleCampaign` and `ActivateCampaign` handlers that reject invalid transitions and persist legal transitions atomically.
   - **Related layer:** Backend (Application)
@@ -301,6 +301,16 @@
     - `rg -n "GetCampaignByIdQuery|GetCampaignByIdQueryHandler|GetCampaignByIdQueryValidator" backend/Application/Features/Campaigns/GetCampaignById`
     - `rg -n "ListCampaignsQuery|ListCampaignsQueryHandler|ListCampaignsQueryValidator|CampaignReadMappingProfile" backend/Application/Features/Campaigns/ListCampaigns`
     - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Implemented `ScheduleCampaign` and `ActivateCampaign` CQRS command flows with MediatR handlers, FluentValidation validators, and explicit AutoMapper response profiles in Application layer.
+  - Added domain-boundary transition guards through `Campaign.Schedule()` and `Campaign.Activate()` methods enforcing date-window checks before legal status transitions.
+  - Ensured atomic persistence path for legal transitions through `ICampaignRepository.Update(...)` and `IUnitOfWork.SaveChangesAsync(...)`, with deterministic failure responses for domain-rule violations.
+  - Added campaign lifecycle tests covering valid scheduling/activation and invalid date-window transitions.
+  - Reproducible command evidence:
+    - `rg -n "ScheduleCampaign|ActivateCampaign|Schedule\(|Activate\(" backend/Application/Features/Campaigns backend/Domain/Campaigns/Campaign.cs`
+    - `rg -n "CampaignLifecycleTests|Schedule_Should|Activate_Should" backend/API.IntegrationTests/CampaignLifecycleTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 6. [ ] Template module
 - StartedAt:
