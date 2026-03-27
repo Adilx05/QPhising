@@ -1,23 +1,40 @@
-<div class="min-h-screen bg-slate-100 text-slate-900">
+<a
+  class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-sky-600 focus:px-3 focus:py-2 focus:text-white"
+  href="#main-content">
+  Skip to main content
+</a>
+
+<div class="min-h-screen bg-slate-100 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
   <div class="mx-auto flex min-h-screen max-w-7xl">
-    <aside class="w-64 border-r border-slate-200 bg-white p-6">
+    <aside class="w-72 border-r border-slate-200 bg-white p-6 transition-colors dark:border-slate-800 dark:bg-slate-900">
       <h1 class="text-xl font-semibold">QPhising</h1>
-      <p class="mt-2 text-sm text-slate-500">Security simulation console</p>
-      <p class="mt-3 rounded bg-slate-100 px-3 py-2 text-xs text-slate-700">
+      <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Security simulation console</p>
+      <p class="mt-3 rounded bg-slate-100 px-3 py-2 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-200">
         {{ session().displayName }} · {{ session().role }}
       </p>
 
-      <nav class="mt-8 space-y-1">
+      <button
+        type="button"
+        class="mt-4 inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+        (click)="toggleTheme()"
+        [attr.aria-pressed]="themeMode() === 'dark'"
+        aria-label="Toggle dark mode">
+        <span aria-hidden="true">{{ themeMode() === 'dark' ? '🌙' : '☀️' }}</span>
+        <span>{{ themeMode() === 'dark' ? 'Dark mode' : 'Light mode' }}</span>
+      </button>
+
+      <nav class="mt-8 space-y-1" aria-label="Primary navigation">
         <a
           *ngFor="let item of navItems()"
           [routerLink]="item.route"
-          routerLinkActive="bg-sky-50 text-sky-700"
-          class="block rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900">
+          routerLinkActive="bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="block rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">
           {{ item.label }}
         </a>
       </nav>
     </aside>
-    <main class="flex-1 p-6">
+    <main id="main-content" class="flex-1 p-6" tabindex="-1">
       <router-outlet></router-outlet>
     </main>
   </div>

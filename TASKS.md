@@ -884,7 +884,7 @@
   - **Description:** Implement KPI cards, chart panels, filterable data tables, and responsive layout using PrimeNG + Tailwind.
   - **Expected output:** Production-grade SaaS dashboard UI with coherent spacing and component consistency.
   - **Related layer:** Frontend
-- [ ] **Add dark mode and accessibility polish**
+- [x] **Add dark mode and accessibility polish**
   - **Description:** Implement theming, keyboard accessibility, loading/empty/error states, and UX consistency checks.
   - **Expected output:** Accessible, polished UI behavior across desktop/tablet/mobile breakpoints.
   - **Related layer:** Frontend
@@ -932,6 +932,16 @@
     - `npm run build` (from `frontend/`)
     - `rg -n "DashboardTrendChartComponent|DashboardCampaignsTableComponent|applyFilter|filters" frontend/src/app/features/dashboard`
     - `rg -n "dashboardTrendState|dashboardCampaignsState|DashboardCampaignRow|DashboardTrendPoint" frontend/src/app/core/state/app-state.store.ts`
+
+- Subtask completion update (2026-03-27):
+  - Implemented persistent light/dark theme support in the global Signals store with OS-preference fallback and document-level Tailwind `dark` class toggling.
+  - Added accessible theme toggle and keyboard-first navigation enhancements in the layout shell (`Skip to content`, focus-visible styles, ARIA labels/pressed states).
+  - Added consistent loading/error/empty-state UX handling for dashboard views and table/chart components, including screen-reader friendly status/alert semantics.
+  - Applied dark-mode contrast updates across shared presentation components (header/KPI/table) to preserve enterprise visual consistency on desktop/tablet/mobile breakpoints.
+  - Reproducible command evidence:
+    - `npm run build` (from `frontend/`)
+    - `rg -n "ThemeMode|toggleTheme|applyTheme|resolveInitialTheme" frontend/src/app/core/state/app-state.store.ts frontend/src/app/core/layout/layout-shell.component.ts`
+    - `rg -n "Skip to main content|aria-live|emptyDashboardState|aria-pressed" frontend/src/app/core/layout/layout-shell.component.html frontend/src/app/features/dashboard/containers/dashboard-page.component.html`
 
 
 ## 12. [-] Gateway implementation

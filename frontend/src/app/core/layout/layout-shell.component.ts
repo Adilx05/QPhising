@@ -28,7 +28,12 @@ export class LayoutShellComponent {
   ];
 
   protected readonly session = this.appStateStore.session;
+  protected readonly themeMode = this.appStateStore.themeMode;
   protected readonly navItems = computed(() =>
     this.navigationItems.filter((item) => this.appStateStore.canAccessAnyRole(item.allowedRoles))
   );
+
+  protected toggleTheme(): void {
+    this.appStateStore.toggleTheme();
+  }
 }

@@ -13,8 +13,8 @@
     <ng-template pTemplate="caption">
       <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h3 class="text-base font-semibold text-slate-900">Filterable campaign table</h3>
-          <p class="text-sm text-slate-500">Track campaign owner, status, and click rates from one operational view.</p>
+          <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">Filterable campaign table</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Track campaign owner, status, and click rates from one operational view.</p>
         </div>
 
         <div class="flex flex-col gap-2 sm:flex-row">
@@ -24,6 +24,7 @@
               pInputText
               type="text"
               placeholder="Search name/owner/template"
+              aria-label="Search campaigns"
               (input)="applyGlobalFilter($event, dashboardTable)" />
           </span>
 
@@ -31,6 +32,7 @@
             [options]="statuses"
             [showClear]="true"
             placeholder="Filter by status"
+            ariaLabel="Filter campaigns by status"
             (onChange)="applyStatusFilter($event.value, dashboardTable)"></p-dropdown>
         </div>
       </div>
@@ -50,13 +52,21 @@
 
     <ng-template pTemplate="body" let-row>
       <tr>
-        <td class="font-medium text-slate-800">{{ row.name }}</td>
+        <td class="font-medium text-slate-800 dark:text-slate-100">{{ row.name }}</td>
         <td>{{ row.owner }}</td>
         <td><p-tag [value]="row.status" [severity]="statusSeverity(row.status)"></p-tag></td>
         <td>{{ row.templateType }}</td>
         <td>{{ row.startDate }}</td>
         <td>{{ row.endDate }}</td>
         <td>{{ row.clickRate }}%</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+          No campaigns available for this filter.
+        </td>
       </tr>
     </ng-template>
   </p-table>
