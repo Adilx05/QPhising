@@ -73,7 +73,7 @@
   - **Description:** Configure API versioning, default version assumptions, and versioned route conventions.
   - **Expected output:** Versioned endpoints with deterministic routing and discoverable version behavior.
   - **Related layer:** Backend
-- [ ] **Add explicit AutoMapper profile coverage**
+- [x] **Add explicit AutoMapper profile coverage**
   - **Description:** Create mapping profiles per feature and validate critical mappings used by CQRS handlers.
   - **Expected output:** Registered mapping profiles with compile-safe mappings for command/query DTOs.
   - **Related layer:** Backend
@@ -122,6 +122,16 @@
     - `rg -n "AddApiVersioning|DefaultApiVersion|AssumeDefaultVersionWhenUnspecified|ReportApiVersions|ApiVersionReader" backend/API/Program.cs`
     - `rg -n "ApiVersion|v\\{version:apiVersion\\}" backend/API/Controllers/HealthController.cs backend/API/Controllers/AccessController.cs`
     - `rg -n "versioned|api-supported-versions|/api/v1/access/admin" backend/API.IntegrationTests/AuthorizationFlowTests.cs`
+
+- Subtask completion update (2026-03-27):
+  - Added explicit per-feature AutoMapper profile `HealthMappingProfile` for CQRS response mapping (`HealthStatus` -> `HealthStatusDto`).
+  - Updated `GetHealthQueryHandler` to map through `IMapper` instead of inline DTO construction.
+  - Added integration-level mapping validation test to assert global mapping configuration and feature mapping behavior.
+  - Reproducible command evidence:
+    - `rg -n "AddAutoMapper|HealthMappingProfile|CreateMap<HealthStatus, HealthStatusDto>" backend/Application`
+    - `rg -n "IMapper|mapper.Map<HealthStatusDto>" backend/Application/Features/Health/GetHealthQueryHandler.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj`
+
 
 ---
 
