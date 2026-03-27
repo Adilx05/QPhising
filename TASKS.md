@@ -960,7 +960,7 @@
   - **Description:** Wire Redis-backed rate-limiting strategy for consistent throttling across gateway instances.
   - **Expected output:** Cluster-safe throttling with standardized 429 responses and headers.
   - **Related layer:** Infra
-- [ ] **Implement correlation ID propagation**
+- [x] **Implement correlation ID propagation**
   - **Description:** Generate/forward correlation IDs from gateway to downstream APIs and include them in logs.
   - **Expected output:** End-to-end request traceability across gateway and backend logs.
   - **Related layer:** Infra
@@ -989,6 +989,12 @@
     - `jq empty gateway/ocelot.json`
     - `jq empty gateway/appsettings.json`
     - `rg -n "RedisRateLimitingMiddleware|RateLimitingOptions|IConnectionMultiplexer|EnableRateLimiting" gateway`
+- Subtask completion update (2026-03-27):
+  - Added dedicated gateway `CorrelationIdMiddleware` to resolve `X-Correlation-ID` from inbound requests or generate a new identifier when absent.
+  - Propagated correlation IDs through the full gateway request lifecycle by stamping request headers before Ocelot forwarding, returning `X-Correlation-ID` on responses, and aligning `HttpContext.TraceIdentifier`.
+  - Enriched Serilog request diagnostics with `CorrelationId` via `EnrichDiagnosticContext` to improve cross-service traceability in structured logs.
+  - Reproducible command evidence:
+    - `rg -n "CorrelationIdMiddleware|X-Correlation-ID|CorrelationIdItemKey|UseMiddleware<CorrelationIdMiddleware>|EnrichDiagnosticContext" gateway/Program.cs gateway/Correlation/CorrelationIdMiddleware.cs`
 - Enforced route-level Ocelot authentication/authorization by requiring Bearer JWTs and role claims (`Admin`, `Operator`, `Viewer`) for access endpoints.
 - Applied route-level rate limits with gateway-wide rate limit headers and 429 handling.
 - Created `gateway/` Ocelot project with:
@@ -999,7 +1005,7 @@
   - Startup-time validation (`ValidateOnStart`) with explicit error messages for missing/invalid required keys.
 - Removed hardcoded compose runtime values where applicable by introducing environment-variable expansion defaults in `docker-compose.yml`.
 - Documented configuration keys and production-safe templates in `README.md`.
-- Remaining scope for this task: correlation propagation, structured access logging hardening, and gateway behavior verification.
+- Remaining scope for this task: structured access logging hardening and gateway behavior verification.
 
 ## 13. [ ] Data, migrations, and seed
 - StartedAt:
