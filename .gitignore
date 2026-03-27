@@ -1,0 +1,30 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.pdb
+
+# Docker / env
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# Tooling
+*.swp
+*.tmp

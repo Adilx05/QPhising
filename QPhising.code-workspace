@@ -1,0 +1,9 @@
+{
+  "folders": [
+    { "path": "." }
+  ],
+  "settings": {
+    "files.eol": "\n",
+    "editor.formatOnSave": true
+  }
+}

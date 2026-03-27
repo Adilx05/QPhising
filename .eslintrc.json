@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "ignorePatterns": ["**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": ["frontend/tsconfig.json"],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "eslint:recommended"
+      ],
+      "rules": {}
+    }
+  ]
+}
