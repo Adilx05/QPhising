@@ -114,6 +114,7 @@
   - Reproducible command evidence:
     - `rg -n "AddApiVersioning|ApiVersion" backend/API backend/Application`
     - `rg -n "Profile\\b|CreateMap\\(" backend/Application`
+
 - Subtask completion update (2026-03-27):
   - Implemented API versioning with default `1.0`, `AssumeDefaultVersionWhenUnspecified`, combined readers (URL segment + `x-api-version` header + `api-version` query), and API version reporting.
   - Applied versioned route conventions on controllers with explicit `[ApiVersion(\"1.0\")]` and URL-segment routes (`/api/v{version}/...`) while preserving unversioned compatibility routes.
@@ -215,7 +216,7 @@
   - **Expected output:** Clean repository + unit-of-work interfaces and method signatures in Domain abstractions aligned with campaign lifecycle use cases.
   - **Related layer:** Backend (Domain/Application boundary)
 
-- [ ] **Add campaign create command + validation + mapping**
+- [x] **Add campaign create command + validation + mapping**
   - **Description:** Add CQRS command/handler to create campaigns via MediatR, FluentValidation rules, and AutoMapper profile mappings between DTOs and domain models.
   - **Expected output:** `CreateCampaign` command flow that validates inputs, persists through repository/unit-of-work, and returns a typed response contract.
   - **Related layer:** Backend (Application)
@@ -265,6 +266,14 @@
   - Reproducible command evidence:
     - `rg -n "interface ICampaignRepository|CampaignReadCriteria|ListOverlappingWindowAsync|AddAsync\(|void Update\(" backend/Domain/Abstractions`
 
+
+- Subtask completion update (2026-03-27):
+  - Implemented `CreateCampaign` CQRS flow in Application layer with MediatR request/handler returning `Result<CreateCampaignResponse>`.
+  - Added FluentValidation rules for required name/html content, max name length, enum validity, and `StartDate <= EndDate`.
+  - Added AutoMapper profile for domain-to-response projection and persisted writes through `ICampaignRepository` + `IUnitOfWork`.
+  - Reproducible command evidence:
+    - `rg -n "CreateCampaignCommand|CreateCampaignCommandHandler|CreateCampaignCommandValidator|CreateCampaignMappingProfile" backend/Application/Features/Campaigns/CreateCampaign`
+    - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
 
   - Added campaign lifecycle enum and transition guard enforcing allowed flow `Draft -> Scheduled -> Active -> Ended/Archived`.
   - Added domain-specific exceptions and a status-change domain event contract for downstream application handling.
