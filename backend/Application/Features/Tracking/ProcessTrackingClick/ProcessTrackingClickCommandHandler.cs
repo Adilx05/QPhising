@@ -11,7 +11,8 @@ public sealed class ProcessTrackingClickCommandHandler(
     ITrackingTokenService trackingTokenService,
     ITrackingClickRealtimeStore trackingClickRealtimeStore,
     ITrackingClickRepository trackingClickRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<ProcessTrackingClickCommand, Result<ProcessTrackingClickResponse>>
+    IUnitOfWork unitOfWork,
+    IAnalyticsDashboardCache analyticsDashboardCache) : IRequestHandler<ProcessTrackingClickCommand, Result<ProcessTrackingClickResponse>>
 {
     public async Task<Result<ProcessTrackingClickResponse>> Handle(ProcessTrackingClickCommand request, CancellationToken cancellationToken)
     {
@@ -89,6 +90,7 @@ public sealed class ProcessTrackingClickCommandHandler(
 
         await trackingClickRepository.AddAsync(clickEvent, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await analyticsDashboardCache.InvalidateAsync(cancellationToken);
 
         ProcessTrackingClickResponse response = new(
             clickEvent.Id,

@@ -1,6 +1,7 @@
 using AutoMapper;
 using MediatR;
 using QPhising.Application.Common;
+using QPhising.Application.Common.Abstractions;
 using QPhising.Domain.Abstractions;
 
 namespace QPhising.Application.Features.Campaigns.UpdateCampaign;
@@ -8,7 +9,8 @@ namespace QPhising.Application.Features.Campaigns.UpdateCampaign;
 public sealed class UpdateCampaignCommandHandler(
     ICampaignRepository campaignRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper) : IRequestHandler<UpdateCampaignCommand, Result<UpdateCampaignResponse>>
+    IMapper mapper,
+    IAnalyticsDashboardCache analyticsDashboardCache) : IRequestHandler<UpdateCampaignCommand, Result<UpdateCampaignResponse>>
 {
     public async Task<Result<UpdateCampaignResponse>> Handle(UpdateCampaignCommand request, CancellationToken cancellationToken)
     {
@@ -27,6 +29,7 @@ public sealed class UpdateCampaignCommandHandler(
 
         campaignRepository.Update(campaign);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await analyticsDashboardCache.InvalidateAsync(cancellationToken);
 
         UpdateCampaignResponse response = mapper.Map<UpdateCampaignResponse>(campaign);
         return Result<UpdateCampaignResponse>.Success(response);

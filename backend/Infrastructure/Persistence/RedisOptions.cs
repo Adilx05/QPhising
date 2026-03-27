@@ -27,6 +27,9 @@ public sealed class RedisOptions
     [Range(1, 3650)]
     public int TrackingAggregateRetentionDays { get; init; } = 365;
 
+    [Range(30, 86400)]
+    public int AnalyticsDashboardCacheTtlSeconds { get; init; } = 300;
+
     [Required(AllowEmptyStrings = false)]
     public string KeyPrefix { get; init; } = "qphising";
 }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using MediatR;
 using QPhising.Application.Common;
+using QPhising.Application.Common.Abstractions;
 using QPhising.Domain.Abstractions;
 using QPhising.Domain.Campaigns.Exceptions;
 
@@ -9,7 +10,8 @@ namespace QPhising.Application.Features.Campaigns.ScheduleCampaign;
 public sealed class ScheduleCampaignCommandHandler(
     ICampaignRepository campaignRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper) : IRequestHandler<ScheduleCampaignCommand, Result<ScheduleCampaignResponse>>
+    IMapper mapper,
+    IAnalyticsDashboardCache analyticsDashboardCache) : IRequestHandler<ScheduleCampaignCommand, Result<ScheduleCampaignResponse>>
 {
     public async Task<Result<ScheduleCampaignResponse>> Handle(ScheduleCampaignCommand request, CancellationToken cancellationToken)
     {
@@ -30,6 +32,7 @@ public sealed class ScheduleCampaignCommandHandler(
 
         campaignRepository.Update(campaign);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await analyticsDashboardCache.InvalidateAsync(cancellationToken);
 
         return Result<ScheduleCampaignResponse>.Success(mapper.Map<ScheduleCampaignResponse>(campaign));
     }

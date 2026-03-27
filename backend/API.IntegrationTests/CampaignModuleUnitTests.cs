@@ -1,5 +1,7 @@
 using AutoMapper;
 using QPhising.Application.Common;
+using QPhising.Application.Common.Abstractions;
+using QPhising.Application.Features.Analytics.GetDashboardKpis;
 using QPhising.Application.Features.Campaigns.ActivateCampaign;
 using QPhising.Application.Features.Campaigns.CreateCampaign;
 using QPhising.Application.Features.Campaigns.ScheduleCampaign;
@@ -63,7 +65,8 @@ public sealed class CampaignModuleUnitTests
         var now = DateTimeOffset.UtcNow;
         var repository = new InMemoryCampaignRepository();
         var unitOfWork = new RecordingUnitOfWork();
-        var handler = new CreateCampaignCommandHandler(repository, unitOfWork, _mapper);
+        var analyticsCache = new RecordingAnalyticsDashboardCache();
+        var handler = new CreateCampaignCommandHandler(repository, unitOfWork, _mapper, analyticsCache);
 
         var result = await handler.Handle(new CreateCampaignCommand(
             "Campaign A",
@@ -77,6 +80,7 @@ public sealed class CampaignModuleUnitTests
         Assert.Equal(CampaignStatus.Draft, result.Value!.Status);
         Assert.Equal(1, repository.CampaignCount);
         Assert.Equal(1, unitOfWork.SaveChangesCallCount);
+        Assert.Equal(1, analyticsCache.InvalidationCount);
     }
 
     [Fact]
@@ -85,7 +89,7 @@ public sealed class CampaignModuleUnitTests
         var now = DateTimeOffset.UtcNow;
         var repository = new InMemoryCampaignRepository();
         var unitOfWork = new RecordingUnitOfWork();
-        var handler = new UpdateCampaignCommandHandler(repository, unitOfWork, _mapper);
+        var handler = new UpdateCampaignCommandHandler(repository, unitOfWork, _mapper, new RecordingAnalyticsDashboardCache());
 
         var result = await handler.Handle(new UpdateCampaignCommand(
             Guid.NewGuid(),
@@ -113,7 +117,7 @@ public sealed class CampaignModuleUnitTests
 
         var repository = new InMemoryCampaignRepository(campaign);
         var unitOfWork = new RecordingUnitOfWork();
-        var handler = new ScheduleCampaignCommandHandler(repository, unitOfWork, _mapper);
+        var handler = new ScheduleCampaignCommandHandler(repository, unitOfWork, _mapper, new RecordingAnalyticsDashboardCache());
 
         var result = await handler.Handle(new ScheduleCampaignCommand(campaign.Id), CancellationToken.None);
 
@@ -136,13 +140,36 @@ public sealed class CampaignModuleUnitTests
 
         var repository = new InMemoryCampaignRepository(campaign);
         var unitOfWork = new RecordingUnitOfWork();
-        var handler = new ActivateCampaignCommandHandler(repository, unitOfWork, _mapper);
+        var analyticsCache = new RecordingAnalyticsDashboardCache();
+        var handler = new ActivateCampaignCommandHandler(repository, unitOfWork, _mapper, analyticsCache);
 
         var result = await handler.Handle(new ActivateCampaignCommand(campaign.Id), CancellationToken.None);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(CampaignStatus.Active, result.Value!.Status);
         Assert.Equal(1, unitOfWork.SaveChangesCallCount);
+        Assert.Equal(1, analyticsCache.InvalidationCount);
+    }
+
+    private sealed class RecordingAnalyticsDashboardCache : IAnalyticsDashboardCache
+    {
+        public int InvalidationCount { get; private set; }
+
+        public Task<DashboardKpisResponse?> GetAsync(GetDashboardKpisQuery query, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<DashboardKpisResponse?>(null);
+        }
+
+        public Task SetAsync(GetDashboardKpisQuery query, DashboardKpisResponse response, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task InvalidateAsync(CancellationToken cancellationToken = default)
+        {
+            InvalidationCount++;
+            return Task.CompletedTask;
+        }
     }
 
     [Fact]

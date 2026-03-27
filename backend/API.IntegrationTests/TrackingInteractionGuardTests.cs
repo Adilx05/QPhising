@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using QPhising.Application.Common;
 using QPhising.Application.Common.Abstractions;
+using QPhising.Application.Features.Analytics.GetDashboardKpis;
 using QPhising.Application.Features.Tracking.GenerateTrackingLink;
 using QPhising.Application.Features.Tracking.ProcessTrackingClick;
 using QPhising.Domain.Abstractions;
@@ -53,7 +54,8 @@ public sealed class TrackingInteractionGuardTests
             CreateTokenService(),
             new InMemoryTrackingClickRealtimeStore(),
             new InMemoryTrackingClickRepository(),
-            new NoOpUnitOfWork());
+            new NoOpUnitOfWork(),
+            new NoOpAnalyticsDashboardCache());
 
         var result = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, "tracking-token", "127.0.0.1", "integration-test-agent"),
@@ -117,7 +119,8 @@ public sealed class TrackingInteractionGuardTests
             tokenService,
             new InMemoryTrackingClickRealtimeStore(),
             new InMemoryTrackingClickRepository(),
-            new NoOpUnitOfWork());
+            new NoOpUnitOfWork(),
+            new NoOpAnalyticsDashboardCache());
 
         var result = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, tamperedToken, "127.0.0.1", "integration-test-agent"),
@@ -149,7 +152,8 @@ public sealed class TrackingInteractionGuardTests
             tokenService,
             realtimeStore,
             clickRepository,
-            new NoOpUnitOfWork());
+            new NoOpUnitOfWork(),
+            new NoOpAnalyticsDashboardCache());
 
         var first = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, issueResult.Token, "127.0.0.1", "integration-test-agent"),
@@ -188,7 +192,8 @@ public sealed class TrackingInteractionGuardTests
             tokenService,
             new InMemoryTrackingClickRealtimeStore(),
             new InMemoryTrackingClickRepository(),
-            new NoOpUnitOfWork());
+            new NoOpUnitOfWork(),
+            new NoOpAnalyticsDashboardCache());
 
         var clickAttempt = await handler.Handle(
             new ProcessTrackingClickCommand(
@@ -224,7 +229,8 @@ public sealed class TrackingInteractionGuardTests
             tokenService,
             realtimeStore,
             clickRepository,
-            new NoOpUnitOfWork());
+            new NoOpUnitOfWork(),
+            new NoOpAnalyticsDashboardCache());
 
         await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-1@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
@@ -263,7 +269,8 @@ public sealed class TrackingInteractionGuardTests
             tokenService,
             realtimeStore,
             clickRepository,
-            new NoOpUnitOfWork());
+            new NoOpUnitOfWork(),
+            new NoOpAnalyticsDashboardCache());
 
         await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-1@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
@@ -439,6 +446,24 @@ public sealed class TrackingInteractionGuardTests
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return Task.FromResult(1);
+        }
+    }
+
+    private sealed class NoOpAnalyticsDashboardCache : IAnalyticsDashboardCache
+    {
+        public Task<DashboardKpisResponse?> GetAsync(GetDashboardKpisQuery query, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<DashboardKpisResponse?>(null);
+        }
+
+        public Task SetAsync(GetDashboardKpisQuery query, DashboardKpisResponse response, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task InvalidateAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
         }
     }
 }
