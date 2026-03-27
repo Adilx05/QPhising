@@ -379,12 +379,22 @@
   - **Description:** Configure infrastructure persistence, versioning constraints, and migrations for template storage.
   - **Expected output:** Migration-ready schema with efficient query/index strategy.
   - **Related layer:** Infra
-- [ ] **Expose secured template endpoints**
+- [x] **Expose secured template endpoints**
   - **Description:** Add thin API controllers delegating to CQRS with JWT/RBAC enforcement and ProblemDetails responses.
   - **Expected output:** Role-protected template API surface with stable request/response contracts.
   - **Related layer:** Backend
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-27):
+  - Added thin, versioned `TemplatesController` endpoints for list/get/create/update/publish/archive across `/api/templates` and `/api/v{version}/templates`.
+  - Enforced JWT/RBAC policies per endpoint family with `Viewer` policy for read operations and `Operator` policy for write/lifecycle transitions.
+  - Kept API layer free of business logic by delegating all template operations to MediatR CQRS handlers and returning consistent ProblemDetails failures for bad requests/not found outcomes.
+  - Added integration authorization coverage for template endpoints to verify unauthenticated rejection and role-based forbiddance on both unversioned and versioned routes.
+  - Reproducible command evidence:
+    - `rg -n "class TemplatesController|\[Authorize\(Policy = AuthorizationPolicies\.(Viewer|Operator)\)\]|\[Route\("api/v\{version:apiVersion\}/\[controller\]\"\)" backend/API/Controllers/TemplatesController.cs`
+    - `rg -n "TemplateEndpointsAuthorizationTests|/api/templates|/api/v1/templates" backend/API.IntegrationTests/TemplateEndpointsAuthorizationTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 - Subtask completion update (2026-03-27):
   - Implemented template infrastructure persistence in EF Core with dedicated entity configuration for `templates` and owned `template_variables`, including version concurrency token and status/type/name query indexes.
