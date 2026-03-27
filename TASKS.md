@@ -466,7 +466,7 @@
   - **Description:** Add endpoint/handler to validate tokens and persist click metadata with normalized schema.
   - **Expected output:** Reliable click event records including IP, UserAgent, Timestamp, and Fingerprint.
   - **Related layer:** Backend
-- [ ] **Add Redis deduplication and realtime counters**
+- [x] **Add Redis deduplication and realtime counters**
   - **Description:** Use Redis keys for dedup windows and atomic increments for campaign/recipient click counters.
   - **Expected output:** Idempotent click handling and low-latency metrics updates.
   - **Related layer:** Infra
@@ -520,6 +520,18 @@
     - `rg -n "GenerateTrackingLinkCommandHandler|ProcessTrackingClickCommandHandler|tracking token" backend/Application/Features/Tracking`
     - `rg -n "TrackingTokenSpecificationTests|ProcessTrackingClick_Should_Reject_When_TrackingToken_Is_Tampered" backend/API.IntegrationTests`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Added Redis-backed realtime tracking store (`RedisTrackingClickRealtimeStore`) implementing dedup-window registration and atomic counter increments for campaign and recipient click totals.
+  - Added application abstraction `ITrackingClickRealtimeStore` and integrated it into `ProcessTrackingClickCommandHandler` so duplicate clicks return deterministic idempotent acceptance (`Accepted = false`) and skip duplicate persistence.
+  - Registered Redis connection multiplexer and realtime tracking store in Infrastructure DI, and extended Redis options with configurable dedup window + key prefix for environment-driven behavior.
+  - Added integration/unit coverage for deduplication behavior:
+    - repeated clicks using the same token are idempotent,
+    - duplicate submissions persist only once.
+  - Reproducible command evidence:
+    - `rg -n "ITrackingClickRealtimeStore|TrackingClickRealtimeRequest|TrackingClickRealtimeResult" backend/Application`
+    - `rg -n "RedisTrackingClickRealtimeStore|TrackingDeduplicationWindowMinutes|KeyPrefix|IConnectionMultiplexer" backend/Infrastructure`
+    - `rg -n "ProcessTrackingClick_Should_Be_Idempotent_For_Duplicate_Clicks|AlwaysUniqueTrackingClickRealtimeStore" backend/API.IntegrationTests`
 
 ## 8. [-] Task execution engine
 - StartedAt: 2026-03-27T16:52:30Z

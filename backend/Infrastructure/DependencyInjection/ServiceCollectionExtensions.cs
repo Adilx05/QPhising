@@ -6,6 +6,7 @@ using QPhising.Domain.Abstractions;
 using QPhising.Infrastructure.Persistence;
 using QPhising.Infrastructure.Persistence.Repositories;
 using QPhising.Infrastructure.Security;
+using StackExchange.Redis;
 
 namespace QPhising.Infrastructure.DependencyInjection;
 
@@ -47,6 +48,8 @@ public static class ServiceCollectionExtensions
 
         string connectionString = configuration.GetRequiredSection(DatabaseOptions.SectionName)[nameof(DatabaseOptions.ConnectionString)]
             ?? throw new InvalidOperationException("Database:ConnectionString is required.");
+        string redisConnectionString = configuration.GetRequiredSection(RedisOptions.SectionName)[nameof(RedisOptions.ConnectionString)]
+            ?? throw new InvalidOperationException("Redis:ConnectionString is required.");
 
         services.AddDbContext<QPhisingDbContext>(options =>
             options.UseNpgsql(connectionString, npgsqlOptions =>
@@ -55,6 +58,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICampaignRepository, CampaignRepository>();
         services.AddScoped<ITemplateRepository, TemplateRepository>();
         services.AddScoped<ITrackingClickRepository, TrackingClickRepository>();
+        services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
+        services.AddScoped<ITrackingClickRealtimeStore, RedisTrackingClickRealtimeStore>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddSingleton<ITrackingTokenService, HmacTrackingTokenService>();
 

@@ -102,6 +102,7 @@ public sealed class TrackingEndpointsTests : IClassFixture<ApiWebApplicationFact
             {
                 services.AddSingleton<ICampaignRepository>(new InMemoryCampaignRepository(campaign));
                 services.AddSingleton<ITrackingClickRepository>(clickRepository);
+                services.AddSingleton<ITrackingClickRealtimeStore>(new AlwaysUniqueTrackingClickRealtimeStore());
             });
         }).CreateClient();
 
@@ -196,6 +197,19 @@ public sealed class TrackingEndpointsTests : IClassFixture<ApiWebApplicationFact
         {
             _items.Add(click);
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class AlwaysUniqueTrackingClickRealtimeStore : ITrackingClickRealtimeStore
+    {
+        public Task<TrackingClickRealtimeResult> RegisterClickAsync(
+            TrackingClickRealtimeRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new TrackingClickRealtimeResult(
+                IsDuplicate: false,
+                CampaignClickCount: 1,
+                RecipientClickCount: 1));
         }
     }
 }
