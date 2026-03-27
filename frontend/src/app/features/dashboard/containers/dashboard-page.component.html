@@ -1,14 +1,15 @@
 <section class="space-y-6">
   <app-page-header
     title="Dashboard"
-    description="Operational overview of campaign performance.">
+    [description]="'Operational overview of campaign performance · Filter: ' + viewState().activeFilter">
   </app-page-header>
 
   <div class="grid gap-4 md:grid-cols-3">
-    <app-kpi-card title="Campaigns" value="24"></app-kpi-card>
-    <app-kpi-card title="Clicks (24h)" value="696"></app-kpi-card>
-    <app-kpi-card title="Conversion Rate" value="18.3%"></app-kpi-card>
+    <app-kpi-card
+      *ngFor="let kpi of kpis()"
+      [title]="kpi.title"
+      [value]="kpi.value"></app-kpi-card>
   </div>
 
-  <app-entity-table title="Click Trend (Daily)" [rows]="trendRows"></app-entity-table>
+  <app-entity-table title="Click Trend (Daily)" [rows]="trendRows()"></app-entity-table>
 </section>

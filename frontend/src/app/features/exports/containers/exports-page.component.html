@@ -1,7 +1,7 @@
 <section class="space-y-6">
   <app-page-header
     title="Exports"
-    description="Monitor export generation jobs and delivery formats.">
+    [description]="'Generate and track downloadable operational reports · Filter: ' + viewState().activeFilter">
   </app-page-header>
 
   <app-exports-table [rows]="exportJobs"></app-exports-table>
