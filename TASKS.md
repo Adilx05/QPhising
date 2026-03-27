@@ -236,7 +236,7 @@
   - **Expected output:** `ScheduleCampaign` and `ActivateCampaign` handlers that reject invalid transitions and persist legal transitions atomically.
   - **Related layer:** Backend (Application)
 
-- [ ] **Enforce expired-campaign business rule for tracking interactions**
+- [x] **Enforce expired-campaign business rule for tracking interactions**
   - **Description:** Introduce application/domain rule service or guard used by tracking-link generation and click-processing workflows to block operations when campaign `EndDate` is in the past.
   - **Expected output:** Reusable policy/guard contract and integration points that return explicit domain/application errors for expired campaigns.
   - **Related layer:** Backend (Domain/Application)
@@ -258,6 +258,16 @@
 
 ### Execution Notes
 - Subtask completion update (2026-03-27):
+  - Added reusable `ICampaignInteractionGuard` contract and `CampaignInteractionGuard` implementation in Application layer to centralize expired-campaign checks before tracking workflows.
+  - Implemented CQRS tracking integration points:
+    - `GenerateTrackingLinkCommand` flow now blocks link generation when the campaign `EndDate` is in the past.
+    - `ProcessTrackingClickCommand` flow now blocks click processing when the campaign `EndDate` is in the past.
+  - Added automated tests that verify expired campaigns are rejected for both tracking-link generation and click processing, while active-window campaigns still succeed for link generation.
+  - Reproducible command evidence:
+    - `rg -n "ICampaignInteractionGuard|CampaignInteractionGuard|EnsureTrackingInteractionAllowedAsync" backend/Application`
+    - `rg -n "GenerateTrackingLinkCommand|ProcessTrackingClickCommand|Tracking interactions are blocked" backend/Application backend/API.IntegrationTests`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj`
+
   - Added a pure Domain campaign aggregate with explicit invariants for required `Name`, non-empty `HtmlContent`, and `StartDate <= EndDate`.
 - Subtask completion update (2026-03-27):
   - Introduced explicit campaign persistence boundary contracts in Domain abstractions for write-side operations and read-side access by identity/date windows.
