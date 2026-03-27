@@ -4,39 +4,73 @@
     [description]="'Operational overview of campaign performance · Filter: ' + viewState().activeFilter">
   </app-page-header>
 
-  <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <p class="text-sm text-slate-500">Date scope</p>
-      <div class="flex flex-wrap gap-2">
-        <button
-          *ngFor="let filter of filters"
-          type="button"
-          class="rounded-md border px-3 py-1.5 text-sm font-medium transition"
-          [ngClass]="
-            viewState().activeFilter === filter
-              ? 'border-sky-200 bg-sky-50 text-sky-700'
-              : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
-          "
-          (click)="applyFilter(filter)">
-          {{ filter }}
-        </button>
+  <div
+    *ngIf="viewState().error"
+    class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-100"
+    role="alert"
+    aria-live="assertive">
+    <div class="flex items-start justify-between gap-3">
+      <p>{{ viewState().error }}</p>
+      <button
+        type="button"
+        class="rounded px-2 py-1 text-xs font-semibold hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 dark:hover:bg-rose-900"
+        (click)="dismissError()">
+        Dismiss
+      </button>
+    </div>
+  </div>
+
+  <div
+    *ngIf="viewState().loading"
+    class="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+    aria-live="polite">
+    Loading dashboard telemetry…
+  </div>
+
+  <div *ngIf="!viewState().loading" class="space-y-6">
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-slate-500 dark:text-slate-400">Date scope</p>
+        <div class="flex flex-wrap gap-2">
+          <button
+            *ngFor="let filter of filters"
+            type="button"
+            class="rounded-md border px-3 py-1.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+            [ngClass]="
+              viewState().activeFilter === filter
+                ? 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-300'
+                : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+            "
+            [attr.aria-pressed]="viewState().activeFilter === filter"
+            (click)="applyFilter(filter)">
+            {{ filter }}
+          </button>
+        </div>
       </div>
     </div>
+
+    <ng-container *ngIf="hasDashboardData(); else emptyDashboardState">
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <app-kpi-card *ngFor="let kpi of kpis()" [title]="kpi.title" [value]="kpi.value"></app-kpi-card>
+      </div>
+
+      <div class="grid gap-6 xl:grid-cols-5">
+        <div class="xl:col-span-3">
+          <app-dashboard-trend-chart title="Click trend (last 7 days)" [points]="trend()"></app-dashboard-trend-chart>
+        </div>
+
+        <div class="xl:col-span-2">
+          <app-entity-table title="Daily click detail" [rows]="trendRows()"></app-entity-table>
+        </div>
+      </div>
+
+      <app-dashboard-campaigns-table [rows]="campaignRows()"></app-dashboard-campaigns-table>
+    </ng-container>
   </div>
 
-  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    <app-kpi-card *ngFor="let kpi of kpis()" [title]="kpi.title" [value]="kpi.value"></app-kpi-card>
-  </div>
-
-  <div class="grid gap-6 xl:grid-cols-5">
-    <div class="xl:col-span-3">
-      <app-dashboard-trend-chart title="Click trend (last 7 days)" [points]="trend()"></app-dashboard-trend-chart>
+  <ng-template #emptyDashboardState>
+    <div class="rounded-lg border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-600 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300">
+      No dashboard data is available for the selected filter.
     </div>
-
-    <div class="xl:col-span-2">
-      <app-entity-table title="Daily click detail" [rows]="trendRows()"></app-entity-table>
-    </div>
-  </div>
-
-  <app-dashboard-campaigns-table [rows]="campaignRows()"></app-dashboard-campaigns-table>
+  </ng-template>
 </section>

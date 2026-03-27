@@ -1,6 +1,7 @@
 import { Injectable, Signal, computed, signal } from '@angular/core';
 
 export type AppRole = 'Admin' | 'Operator' | 'Viewer';
+export type ThemeMode = 'light' | 'dark';
 export type FeatureKey =
   | 'dashboard'
   | 'campaigns'
@@ -50,6 +51,8 @@ export interface FeatureViewState {
   providedIn: 'root'
 })
 export class AppStateStore {
+  private readonly storageKey = 'qphising-theme-mode';
+
   private readonly sessionState = signal<SessionState>({
     userId: 'session-001',
     displayName: 'SOC Operator',
@@ -57,6 +60,8 @@ export class AppStateStore {
     role: 'Operator',
     authenticated: true
   });
+
+  private readonly themeModeState = signal<ThemeMode>(this.resolveInitialTheme());
 
   private readonly dashboardKpisState = signal<DashboardKpi[]>([
     { title: 'Total Campaigns', value: '24' },
@@ -134,6 +139,7 @@ export class AppStateStore {
   });
 
   readonly session = this.sessionState.asReadonly();
+  readonly themeMode = this.themeModeState.asReadonly();
   readonly dashboardKpis = this.dashboardKpisState.asReadonly();
   readonly dashboardTrend = this.dashboardTrendState.asReadonly();
   readonly dashboardCampaigns = this.dashboardCampaignsState.asReadonly();
@@ -150,12 +156,27 @@ export class AppStateStore {
 
   readonly hasOperatorAccess = computed(() => this.canAccessAnyRole(['Operator', 'Admin']));
 
+  constructor() {
+    this.applyTheme(this.themeModeState());
+  }
+
   canAccessAnyRole(roles: readonly AppRole[]): boolean {
     if (!this.isAuthenticated()) {
       return false;
     }
 
     return roles.includes(this.currentRole());
+  }
+
+  toggleTheme(): void {
+    const nextTheme: ThemeMode = this.themeModeState() === 'dark' ? 'light' : 'dark';
+    this.themeModeState.set(nextTheme);
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(this.storageKey, nextTheme);
+    }
+
+    this.applyTheme(nextTheme);
   }
 
   updateFeatureFilter(feature: FeatureKey, activeFilter: string): void {
@@ -186,5 +207,28 @@ export class AppStateStore {
         error
       }
     }));
+  }
+
+  private resolveInitialTheme(): ThemeMode {
+    if (typeof localStorage !== 'undefined') {
+      const storedTheme = localStorage.getItem(this.storageKey);
+      if (storedTheme === 'light' || storedTheme === 'dark') {
+        return storedTheme;
+      }
+    }
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+
+    return 'light';
+  }
+
+  private applyTheme(theme: ThemeMode): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.classList.toggle('dark', theme === 'dark');
   }
 }
