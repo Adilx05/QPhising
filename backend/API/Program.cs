@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using QPhising.API;
 using QPhising.API.Configuration;
 using QPhising.API.ExceptionHandling;
+using QPhising.API.Realtime;
+using QPhising.Application.Common.Abstractions;
 using QPhising.Application.DependencyInjection;
 using QPhising.Infrastructure.DependencyInjection;
 using Serilog.Context;
@@ -85,6 +87,18 @@ builder.Services
         };
         options.Events = new JwtBearerEvents
         {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/hubs/analytics"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            },
             OnTokenValidated = context =>
             {
                 if (context.Principal?.Identity is not ClaimsIdentity identity)
@@ -129,6 +143,8 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IAnalyticsRealtimeNotifier, SignalRAnalyticsRealtimeNotifier>();
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -198,6 +214,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<AnalyticsHub>("/hubs/analytics").RequireAuthorization(AuthorizationPolicies.Viewer);
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     Predicate = _ => true,

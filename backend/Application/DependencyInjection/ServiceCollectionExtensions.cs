@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICampaignInteractionGuard, CampaignInteractionGuard>();
         services.AddSingleton<ITemplateHtmlSanitizer, TemplateHtmlSanitizer>();
         services.AddSingleton<ITemplateVariableSubstitutionEngine, TemplateVariableSubstitutionEngine>();
+        services.AddSingleton<IAnalyticsRealtimeNotifier, NoOpAnalyticsRealtimeNotifier>();
         return services;
     }
 }

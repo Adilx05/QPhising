@@ -11,7 +11,8 @@ public sealed class ScheduleCampaignCommandHandler(
     ICampaignRepository campaignRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    IAnalyticsDashboardCache analyticsDashboardCache) : IRequestHandler<ScheduleCampaignCommand, Result<ScheduleCampaignResponse>>
+    IAnalyticsDashboardCache analyticsDashboardCache,
+    IAnalyticsRealtimeNotifier analyticsRealtimeNotifier) : IRequestHandler<ScheduleCampaignCommand, Result<ScheduleCampaignResponse>>
 {
     public async Task<Result<ScheduleCampaignResponse>> Handle(ScheduleCampaignCommand request, CancellationToken cancellationToken)
     {
@@ -33,6 +34,9 @@ public sealed class ScheduleCampaignCommandHandler(
         campaignRepository.Update(campaign);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await analyticsDashboardCache.InvalidateAsync(cancellationToken);
+        await analyticsRealtimeNotifier.PublishDashboardUpdatedAsync(
+            new AnalyticsDashboardUpdatedEvent("campaign_scheduled", campaign.Id, DateTimeOffset.UtcNow),
+            cancellationToken);
 
         return Result<ScheduleCampaignResponse>.Success(mapper.Map<ScheduleCampaignResponse>(campaign));
     }

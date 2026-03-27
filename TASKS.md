@@ -680,7 +680,7 @@
   - **Description:** Define cache keys/TTL and invalidate or refresh cached KPI data on relevant write events.
   - **Expected output:** Reduced analytics latency with controlled consistency guarantees.
   - **Related layer:** Infra
-- [ ] **Implement realtime analytics update channel**
+- [x] **Implement realtime analytics update channel**
   - **Description:** Add SignalR (or equivalent) hub and publish KPI update events with authorization checks.
   - **Expected output:** Live dashboard updates for subscribed authenticated clients.
   - **Related layer:** Backend
@@ -721,6 +721,20 @@
     - `rg -n "Handle_Should_Return_Cached_Response_Without_Hitting_Repository|InvalidationCount" backend/API.IntegrationTests/AnalyticsQueryHandlerTests.cs backend/API.IntegrationTests/CampaignModuleUnitTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
+
+- Subtask completion update (2026-03-27):
+  - Implemented authenticated realtime analytics channel using SignalR:
+    - added `AnalyticsHub` at `/hubs/analytics` with `Viewer` policy enforcement and explicit hub endpoint authorization mapping.
+    - enabled JWT bearer token extraction for SignalR negotiate/websocket flow via `access_token` query support scoped to analytics hub path.
+  - Introduced clean Application boundary for realtime publishing (`IAnalyticsRealtimeNotifier`) with a default no-op implementation to preserve layer isolation and worker compatibility.
+  - Added API-layer SignalR notifier (`SignalRAnalyticsRealtimeNotifier`) and wired it to publish `analytics.dashboard.updated` events when KPI-affecting CQRS writes complete.
+  - Integrated realtime publish calls into campaign lifecycle and accepted tracking-click handlers after transactional persistence + analytics cache invalidation.
+  - Added integration coverage for hub authorization behavior (unauthenticated negotiate rejected, viewer-authorized negotiate allowed) and extended module tests to assert notifier invocation on campaign write flows.
+  - Reproducible command evidence:
+    - `rg -n "AddSignalR|MapHub<AnalyticsHub>|access_token|IAnalyticsRealtimeNotifier" backend/API/Program.cs backend/API/Realtime backend/Application`
+    - `rg -n "PublishDashboardUpdatedAsync|campaign_(created|updated|scheduled|activated)|tracking_click_accepted" backend/Application/Features`
+    - `rg -n "AnalyticsRealtimeHubAuthorizationTests|negotiate" backend/API.IntegrationTests/AnalyticsRealtimeHubAuthorizationTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 10. [ ] Export subsystem
 - StartedAt:

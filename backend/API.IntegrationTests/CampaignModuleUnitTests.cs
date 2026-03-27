@@ -66,7 +66,8 @@ public sealed class CampaignModuleUnitTests
         var repository = new InMemoryCampaignRepository();
         var unitOfWork = new RecordingUnitOfWork();
         var analyticsCache = new RecordingAnalyticsDashboardCache();
-        var handler = new CreateCampaignCommandHandler(repository, unitOfWork, _mapper, analyticsCache);
+        var notifier = new RecordingAnalyticsRealtimeNotifier();
+        var handler = new CreateCampaignCommandHandler(repository, unitOfWork, _mapper, analyticsCache, notifier);
 
         var result = await handler.Handle(new CreateCampaignCommand(
             "Campaign A",
@@ -81,6 +82,7 @@ public sealed class CampaignModuleUnitTests
         Assert.Equal(1, repository.CampaignCount);
         Assert.Equal(1, unitOfWork.SaveChangesCallCount);
         Assert.Equal(1, analyticsCache.InvalidationCount);
+        Assert.Equal(1, notifier.PublishCount);
     }
 
     [Fact]
@@ -89,7 +91,7 @@ public sealed class CampaignModuleUnitTests
         var now = DateTimeOffset.UtcNow;
         var repository = new InMemoryCampaignRepository();
         var unitOfWork = new RecordingUnitOfWork();
-        var handler = new UpdateCampaignCommandHandler(repository, unitOfWork, _mapper, new RecordingAnalyticsDashboardCache());
+        var handler = new UpdateCampaignCommandHandler(repository, unitOfWork, _mapper, new RecordingAnalyticsDashboardCache(), new RecordingAnalyticsRealtimeNotifier());
 
         var result = await handler.Handle(new UpdateCampaignCommand(
             Guid.NewGuid(),
@@ -117,7 +119,7 @@ public sealed class CampaignModuleUnitTests
 
         var repository = new InMemoryCampaignRepository(campaign);
         var unitOfWork = new RecordingUnitOfWork();
-        var handler = new ScheduleCampaignCommandHandler(repository, unitOfWork, _mapper, new RecordingAnalyticsDashboardCache());
+        var handler = new ScheduleCampaignCommandHandler(repository, unitOfWork, _mapper, new RecordingAnalyticsDashboardCache(), new RecordingAnalyticsRealtimeNotifier());
 
         var result = await handler.Handle(new ScheduleCampaignCommand(campaign.Id), CancellationToken.None);
 
@@ -141,7 +143,8 @@ public sealed class CampaignModuleUnitTests
         var repository = new InMemoryCampaignRepository(campaign);
         var unitOfWork = new RecordingUnitOfWork();
         var analyticsCache = new RecordingAnalyticsDashboardCache();
-        var handler = new ActivateCampaignCommandHandler(repository, unitOfWork, _mapper, analyticsCache);
+        var notifier = new RecordingAnalyticsRealtimeNotifier();
+        var handler = new ActivateCampaignCommandHandler(repository, unitOfWork, _mapper, analyticsCache, notifier);
 
         var result = await handler.Handle(new ActivateCampaignCommand(campaign.Id), CancellationToken.None);
 
@@ -149,6 +152,18 @@ public sealed class CampaignModuleUnitTests
         Assert.Equal(CampaignStatus.Active, result.Value!.Status);
         Assert.Equal(1, unitOfWork.SaveChangesCallCount);
         Assert.Equal(1, analyticsCache.InvalidationCount);
+        Assert.Equal(1, notifier.PublishCount);
+    }
+
+    private sealed class RecordingAnalyticsRealtimeNotifier : IAnalyticsRealtimeNotifier
+    {
+        public int PublishCount { get; private set; }
+
+        public Task PublishDashboardUpdatedAsync(AnalyticsDashboardUpdatedEvent updateEvent, CancellationToken cancellationToken = default)
+        {
+            PublishCount++;
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class RecordingAnalyticsDashboardCache : IAnalyticsDashboardCache
