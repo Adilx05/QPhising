@@ -745,7 +745,7 @@
 - Add async export task processing and download endpoints.
 
 ### Subtasks (planned)
-- [ ] **Define export job lifecycle model**
+- [x] **Define export job lifecycle model**
   - **Description:** Model export request, format, status progression, ownership, and file metadata.
   - **Expected output:** Consistent domain/application contract for asynchronous exports.
   - **Related layer:** Backend
@@ -769,6 +769,18 @@
   - **Description:** Define storage TTL and cleanup process for generated export files.
   - **Expected output:** Controlled storage growth and compliance-ready retention behavior.
   - **Related layer:** Infra
+
+
+### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Added export lifecycle domain model with explicit status machine and invariants for ownership, request metadata, and file completion metadata (`ExportJob`, `ExportJobStatus`, `ExportType`, `ExportFormat`).
+  - Added export domain exception hierarchy for validation and invalid transition handling to support deterministic failure semantics in CQRS/worker flows.
+  - Added clean repository/read-criteria abstractions and application contract mapping profile for asynchronous export processing boundaries.
+  - Reproducible command evidence:
+    - `rg -n "class ExportJob|enum ExportJobStatus|enum ExportType|enum ExportFormat" backend/Domain/Exports`
+    - `rg -n "interface IExportJobRepository|record ExportJobReadCriteria" backend/Domain/Abstractions`
+    - `rg -n "ExportJobContract|ExportJobMappingProfile" backend/Application`
+    - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
 
 ## 11. [-] Frontend enterprise UI
 - StartedAt: 2026-03-27T16:40:00Z
