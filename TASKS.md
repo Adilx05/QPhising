@@ -363,7 +363,7 @@
   - **Description:** Define template aggregate, supported template types, variable placeholder format, and lifecycle states.
   - **Expected output:** Domain models and invariants for template correctness and reuse.
   - **Related layer:** Backend
-- [ ] **Implement template CQRS workflows**
+- [x] **Implement template CQRS workflows**
   - **Description:** Add create/update/get/list/publish/archive commands and queries through MediatR with FluentValidation.
   - **Expected output:** End-to-end application handlers for template lifecycle operations.
   - **Related layer:** Backend
@@ -393,6 +393,16 @@
     - `rg -n "class Template|enum TemplateStatus|enum TemplateType|ExtractVariables|Publish\\(|Archive\\(" backend/Domain/Templates`
     - `rg -n "interface ITemplateRepository|record TemplateReadCriteria" backend/Domain/Abstractions`
     - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Implemented full Template lifecycle CQRS in Application layer via MediatR for create/update/get/list/publish/archive workflows.
+  - Added FluentValidation validators for all template commands/queries (identity checks, enum constraints, required fields, pagination bounds, and search length limits).
+  - Added explicit AutoMapper profiles for write/read responses including variable projection from domain `TemplateVariable` objects to API-friendly string collections.
+  - Added deterministic module-level tests for template handlers and validators using in-memory repository + unit-of-work doubles, including valid transitions and failure paths.
+  - Reproducible command evidence:
+    - `rg -n "Features/Templates|CreateTemplateCommand|UpdateTemplateCommand|GetTemplateByIdQuery|ListTemplatesQuery|PublishTemplateCommand|ArchiveTemplateCommand" backend/Application`
+    - `rg -n "TemplateModuleUnitTests|InMemoryTemplateRepository|CreateTemplateCommandValidator|ListTemplatesQueryValidator" backend/API.IntegrationTests/TemplateModuleUnitTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 7. [ ] Tracking module
 - StartedAt:
