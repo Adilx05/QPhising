@@ -226,7 +226,7 @@
   - **Expected output:** `UpdateCampaign` command flow with conflict-safe updates and deterministic mapping profile usage.
   - **Related layer:** Backend (Application)
 
-- [ ] **Add campaign query use cases (list/get detail)**
+- [x] **Add campaign query use cases (list/get detail)**
   - **Description:** Implement read-side CQRS queries for paginated list and single-campaign detail retrieval with filter support (status/date range/template type).
   - **Expected output:** Query handlers + response models optimized for API consumption and consistent with clean read contracts.
   - **Related layer:** Backend (Application)
@@ -290,6 +290,17 @@
     - `rg -n "UpdateCampaignCommand|UpdateCampaignCommandHandler|UpdateCampaignCommandValidator|UpdateCampaignMappingProfile" backend/Application/Features/Campaigns/UpdateCampaign`
     - `rg -n "UpdateCampaignResponse|Campaign.Create\(|TemplateType.Email" backend/API.IntegrationTests/AutoMapperConfigurationTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Implemented read-side campaign CQRS queries in Application layer:
+    - `GetCampaignByIdQuery` with `GetCampaignByIdQueryHandler` and validator for single-campaign detail retrieval.
+    - `ListCampaignsQuery` with `ListCampaignsQueryHandler` and validator for paginated list retrieval with status/template/date-range filters.
+  - Added dedicated read response contracts (`CampaignDetailResponse`, `CampaignListItemResponse`, `ListCampaignsResponse`) optimized for API consumption.
+  - Added explicit AutoMapper read mappings (`Campaign` -> detail/list DTOs) and reused `CampaignReadCriteria` for clean repository read contracts without infrastructure leakage.
+  - Reproducible command evidence:
+    - `rg -n "GetCampaignByIdQuery|GetCampaignByIdQueryHandler|GetCampaignByIdQueryValidator" backend/Application/Features/Campaigns/GetCampaignById`
+    - `rg -n "ListCampaignsQuery|ListCampaignsQueryHandler|ListCampaignsQueryValidator|CampaignReadMappingProfile" backend/Application/Features/Campaigns/ListCampaigns`
+    - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
 
 ## 6. [ ] Template module
 - StartedAt:
