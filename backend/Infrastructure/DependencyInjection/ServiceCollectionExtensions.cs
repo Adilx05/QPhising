@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using QPhising.Application.Common.Abstractions;
 using QPhising.Domain.Abstractions;
 using QPhising.Infrastructure.Persistence;
 using QPhising.Infrastructure.Persistence.Repositories;
+using QPhising.Infrastructure.Security;
 
 namespace QPhising.Infrastructure.DependencyInjection;
 
@@ -23,6 +25,13 @@ public static class ServiceCollectionExtensions
             .Bind(configuration.GetSection(RedisOptions.SectionName))
             .ValidateDataAnnotations()
             .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString), "Redis:ConnectionString is required.")
+            .ValidateOnStart();
+
+        services
+            .AddOptions<TrackingTokenOptions>()
+            .Bind(configuration.GetSection(TrackingTokenOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => !string.IsNullOrWhiteSpace(options.SigningKey), "TrackingTokens:SigningKey is required.")
             .ValidateOnStart();
 
         services
@@ -46,6 +55,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICampaignRepository, CampaignRepository>();
         services.AddScoped<ITemplateRepository, TemplateRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddSingleton<ITrackingTokenService, HmacTrackingTokenService>();
 
         services.AddHealthChecks().AddCheck<InfrastructureOptionsHealthCheck>(
             "infrastructure-config",

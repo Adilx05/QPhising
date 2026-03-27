@@ -454,7 +454,7 @@
 - Define replay/abuse protections and retention policy.
 
 ### Subtasks (planned)
-- [ ] **Define signed tracking token specification**
+- [x] **Define signed tracking token specification**
   - **Description:** Specify token payload, signature method, expiration semantics, and validation flow.
   - **Expected output:** Deterministic token contract for tamper-resistant tracking URLs.
   - **Related layer:** Backend
@@ -478,6 +478,22 @@
   - **Description:** Set lifecycle rules for raw click data, aggregates, and cleanup scheduling.
   - **Expected output:** Enforced retention policy with documented operational behavior.
   - **Related layer:** Infra
+
+
+### Execution Notes
+
+- Subtask completion update (2026-03-27):
+  - Defined deterministic signed tracking token contract via `ITrackingTokenService` with explicit payload claims (`CampaignId`, `RecipientEmail`, `iat`, `exp`, `nonce`, `version`) and validation failure taxonomy for predictable error handling.
+  - Implemented HMAC-SHA256 tracking token issuer/validator (`HmacTrackingTokenService`) with base64url token format (`header.payload.signature`), fixed-time signature comparison, version enforcement, campaign binding checks, and expiration semantics.
+  - Wired token configuration through `TrackingTokens` options (`SigningKey`, `ExpirationMinutes`, `Version`) and registered infrastructure service for application consumption.
+  - Integrated token issuance/validation into existing tracking CQRS handlers so generated links now carry signed tokens and click processing rejects malformed/tampered/expired tokens deterministically.
+  - Added automated tests validating token structure, signature behavior, campaign mismatch detection, and tamper rejection in tracking command flow.
+  - Reproducible command evidence:
+    - `rg -n "ITrackingTokenService|TrackingTokenValidationFailure|TrackingTokenClaims" backend/Application/Common/Abstractions/ITrackingTokenService.cs`
+    - `rg -n "class HmacTrackingTokenService|IssueToken\(|ValidateToken\(|HS256|ExpirationMinutes" backend/Infrastructure/Security`
+    - `rg -n "GenerateTrackingLinkCommandHandler|ProcessTrackingClickCommandHandler|tracking token" backend/Application/Features/Tracking`
+    - `rg -n "TrackingTokenSpecificationTests|ProcessTrackingClick_Should_Reject_When_TrackingToken_Is_Tampered" backend/API.IntegrationTests`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 8. [-] Task execution engine
 - StartedAt: 2026-03-27T16:52:30Z

@@ -1,8 +1,11 @@
+using Microsoft.Extensions.Options;
 using QPhising.Application.Common;
+using QPhising.Application.Common.Abstractions;
 using QPhising.Application.Features.Tracking.GenerateTrackingLink;
 using QPhising.Application.Features.Tracking.ProcessTrackingClick;
 using QPhising.Domain.Abstractions;
 using QPhising.Domain.Campaigns;
+using QPhising.Infrastructure.Security;
 using Xunit;
 
 namespace QPhising.API.IntegrationTests;
@@ -22,7 +25,7 @@ public sealed class TrackingInteractionGuardTests
 
         var repository = new InMemoryCampaignRepository(campaign);
         var guard = new CampaignInteractionGuard(repository);
-        var handler = new GenerateTrackingLinkCommandHandler(guard);
+        var handler = new GenerateTrackingLinkCommandHandler(guard, CreateTokenService());
 
         var result = await handler.Handle(
             new GenerateTrackingLinkCommand(campaign.Id, "employee@company.test"),
@@ -45,7 +48,7 @@ public sealed class TrackingInteractionGuardTests
 
         var repository = new InMemoryCampaignRepository(campaign);
         var guard = new CampaignInteractionGuard(repository);
-        var handler = new ProcessTrackingClickCommandHandler(guard);
+        var handler = new ProcessTrackingClickCommandHandler(guard, CreateTokenService());
 
         var result = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, "tracking-token"),
@@ -68,7 +71,8 @@ public sealed class TrackingInteractionGuardTests
 
         var repository = new InMemoryCampaignRepository(campaign);
         var guard = new CampaignInteractionGuard(repository);
-        var handler = new GenerateTrackingLinkCommandHandler(guard);
+        var tokenService = CreateTokenService();
+        var handler = new GenerateTrackingLinkCommandHandler(guard, tokenService);
 
         var result = await handler.Handle(
             new GenerateTrackingLinkCommand(campaign.Id, "employee@company.test"),
@@ -78,6 +82,51 @@ public sealed class TrackingInteractionGuardTests
         Assert.NotNull(result.Value);
         Assert.Equal(campaign.Id, result.Value!.CampaignId);
         Assert.StartsWith("/api/v1/tracking/click/", result.Value.TrackingPath);
+        Assert.Equal("HS256", result.Value.SignatureAlgorithm);
+
+        var validation = tokenService.ValidateToken(result.Value.TrackingToken, campaign.Id);
+        Assert.True(validation.IsValid);
+        Assert.NotNull(validation.Claims);
+        Assert.Equal("employee@company.test", validation.Claims!.RecipientEmail);
+    }
+
+    [Fact]
+    public async Task ProcessTrackingClick_Should_Reject_When_TrackingToken_Is_Tampered()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var campaign = Campaign.Create(
+            "Security Simulation",
+            TemplateType.Email,
+            "<h1>Simulation</h1>",
+            now.AddDays(-1),
+            now.AddDays(2));
+
+        var repository = new InMemoryCampaignRepository(campaign);
+        var guard = new CampaignInteractionGuard(repository);
+        var tokenService = CreateTokenService();
+        var issueResult = tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee@company.test", Guid.NewGuid().ToString("N")));
+
+        string tamperedToken = issueResult.Token[..^1] + (issueResult.Token[^1] == 'a' ? 'b' : 'a');
+        var handler = new ProcessTrackingClickCommandHandler(guard, tokenService);
+
+        var result = await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, tamperedToken),
+            CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains("signature is invalid", result.Errors.Single(), StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static ITrackingTokenService CreateTokenService()
+    {
+        var options = Options.Create(new TrackingTokenOptions
+        {
+            SigningKey = "integration-test-signing-key-minimum-32chars",
+            ExpirationMinutes = 30,
+            Version = 1
+        });
+
+        return new HmacTrackingTokenService(options);
     }
 
     private sealed class InMemoryCampaignRepository : ICampaignRepository

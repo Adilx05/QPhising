@@ -12,4 +12,7 @@ public sealed record GenerateTrackingLinkResponse(
     string RecipientEmail,
     string TrackingToken,
     string TrackingPath,
-    DateTimeOffset GeneratedAtUtc);
+    DateTimeOffset GeneratedAtUtc,
+    DateTimeOffset ExpiresAtUtc,
+    string SignatureAlgorithm,
+    int TokenVersion);

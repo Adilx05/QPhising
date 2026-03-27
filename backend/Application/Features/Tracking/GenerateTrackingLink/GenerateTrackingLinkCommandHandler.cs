@@ -5,7 +5,8 @@ using QPhising.Application.Common.Abstractions;
 namespace QPhising.Application.Features.Tracking.GenerateTrackingLink;
 
 public sealed class GenerateTrackingLinkCommandHandler(
-    ICampaignInteractionGuard campaignInteractionGuard) : IRequestHandler<GenerateTrackingLinkCommand, Result<GenerateTrackingLinkResponse>>
+    ICampaignInteractionGuard campaignInteractionGuard,
+    ITrackingTokenService trackingTokenService) : IRequestHandler<GenerateTrackingLinkCommand, Result<GenerateTrackingLinkResponse>>
 {
     public async Task<Result<GenerateTrackingLinkResponse>> Handle(GenerateTrackingLinkCommand request, CancellationToken cancellationToken)
     {
@@ -15,15 +16,20 @@ public sealed class GenerateTrackingLinkCommandHandler(
             return Result<GenerateTrackingLinkResponse>.Failure(guardResult.Errors.ToArray());
         }
 
-        string token = Guid.NewGuid().ToString("N");
-        DateTimeOffset generatedAt = DateTimeOffset.UtcNow;
+        var issueResult = trackingTokenService.IssueToken(new TrackingTokenIssueRequest(
+            request.CampaignId,
+            request.RecipientEmail,
+            Guid.NewGuid().ToString("N")));
 
         GenerateTrackingLinkResponse response = new(
             request.CampaignId,
             request.RecipientEmail,
-            token,
-            $"/api/v1/tracking/click/{request.CampaignId}/{token}",
-            generatedAt);
+            issueResult.Token,
+            $"/api/v1/tracking/click/{request.CampaignId}/{issueResult.Token}",
+            issueResult.IssuedAtUtc,
+            issueResult.ExpiresAtUtc,
+            issueResult.SignatureAlgorithm,
+            issueResult.Version);
 
         return Result<GenerateTrackingLinkResponse>.Success(response);
     }
