@@ -24,6 +24,9 @@ public sealed class RedisOptions
     [Range(1, 100000)]
     public int TrackingIpRejectionThreshold { get; init; } = 50;
 
+    [Range(1, 3650)]
+    public int TrackingAggregateRetentionDays { get; init; } = 365;
+
     [Required(AllowEmptyStrings = false)]
     public string KeyPrefix { get; init; } = "qphising";
 }

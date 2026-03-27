@@ -474,7 +474,7 @@
   - **Description:** Add nonce/time-window checks, suspicious-rate thresholds, and reject/flag behavior.
   - **Expected output:** Hardened tracking pipeline against replay and abusive click traffic.
   - **Related layer:** Backend
-- [ ] **Define retention and archival policy implementation**
+- [x] **Define retention and archival policy implementation**
   - **Description:** Set lifecycle rules for raw click data, aggregates, and cleanup scheduling.
   - **Expected output:** Enforced retention policy with documented operational behavior.
   - **Related layer:** Infra
@@ -545,6 +545,20 @@
     - `rg -n "outside_valid_window|ip_rate_suspicious|ip_threshold_exceeded|FlaggedForReview" backend/Application/Features/Tracking/ProcessTrackingClick backend/Infrastructure/Persistence/RedisTrackingClickRealtimeStore.cs backend/API/Controllers/TrackingController.cs`
     - `rg -n "ProcessTrackingClick_Should_Reject_When_Click_Is_Outside_Token_Time_Window|ProcessTrackingClick_Should_Flag_When_Ip_Rate_Is_Suspicious|ProcessTrackingClick_Should_Reject_When_Ip_Rate_Exceeds_Hard_Threshold" backend/API.IntegrationTests/TrackingInteractionGuardTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Implemented retention lifecycle enforcement for tracking data with explicit operational policy settings:
+    - added `TrackingRetention` options (`RawClickRetentionDays`, `AggregateRetentionDays`, `CleanupIntervalMinutes`, `CleanupBatchSize`) and startup validation,
+    - introduced Redis aggregate TTL policy (`TrackingAggregateRetentionDays`) for campaign/recipient counters,
+    - documented defaults in API runtime configuration templates.
+  - Added scheduled cleanup execution for raw click records:
+    - extended `ITrackingClickRepository` with batch delete semantics for stale click events,
+    - implemented EF-backed `DeleteOlderThanAsync` and registered a hosted retention scheduler (`TrackingRetentionBackgroundService`) to execute cleanup cycles and emit structured diagnostics.
+  - Updated in-memory tracking repository test doubles to satisfy the expanded repository contract.
+  - Reproducible command evidence:
+    - `rg -n "TrackingRetentionOptions|TrackingRetentionBackgroundService|DeleteOlderThanAsync" backend/Infrastructure backend/Domain`
+    - `rg -n "TrackingAggregateRetentionDays|KeyExpireAsync\\(campaignCounterKey|KeyExpireAsync\\(recipientCounterKey" backend/Infrastructure/Persistence/RedisOptions.cs backend/Infrastructure/Persistence/RedisTrackingClickRealtimeStore.cs`
+    - `rg -n "\"TrackingRetention\"|TrackingAggregateRetentionDays" backend/API/appsettings.json backend/API/appsettings.Production.Template.json`
 
 ## 8. [-] Task execution engine
 - StartedAt: 2026-03-27T16:52:30Z

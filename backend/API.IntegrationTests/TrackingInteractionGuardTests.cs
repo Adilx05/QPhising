@@ -343,6 +343,11 @@ public sealed class TrackingInteractionGuardTests
         {
             return Task.CompletedTask;
         }
+
+        public Task<int> DeleteOlderThanAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(0);
+        }
     }
 
     private sealed class CountingTrackingClickRepository : ITrackingClickRepository
@@ -353,6 +358,11 @@ public sealed class TrackingInteractionGuardTests
         {
             AddedCount++;
             return Task.CompletedTask;
+        }
+
+        public Task<int> DeleteOlderThanAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(0);
         }
     }
 
