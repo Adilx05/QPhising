@@ -6,10 +6,17 @@ using QPhising.Domain.Campaigns;
 namespace QPhising.Application.Features.Analytics.GetDashboardKpis;
 
 public sealed class GetDashboardKpisQueryHandler(
-    IAnalyticsReadRepository analyticsReadRepository) : IRequestHandler<GetDashboardKpisQuery, Result<DashboardKpisResponse>>
+    IAnalyticsReadRepository analyticsReadRepository,
+    IAnalyticsDashboardCache analyticsDashboardCache) : IRequestHandler<GetDashboardKpisQuery, Result<DashboardKpisResponse>>
 {
     public async Task<Result<DashboardKpisResponse>> Handle(GetDashboardKpisQuery request, CancellationToken cancellationToken)
     {
+        DashboardKpisResponse? cachedResponse = await analyticsDashboardCache.GetAsync(request, cancellationToken);
+        if (cachedResponse is not null)
+        {
+            return Result<DashboardKpisResponse>.Success(cachedResponse);
+        }
+
         IReadOnlyCollection<Guid> campaignIds = request.CampaignIds?.Distinct().ToArray() ?? Array.Empty<Guid>();
         IReadOnlyCollection<TemplateType> templateTypes = request.TemplateTypes?.Distinct().ToArray() ?? Array.Empty<TemplateType>();
         IReadOnlyCollection<CampaignStatus> campaignStatuses = request.CampaignStatuses?.Distinct().ToArray() ?? Array.Empty<CampaignStatus>();
@@ -100,6 +107,7 @@ public sealed class GetDashboardKpisQueryHandler(
             CampaignStatusBreakdown: campaignStatusBreakdown,
             TemplateTypeBreakdown: templateTypeBreakdown);
 
+        await analyticsDashboardCache.SetAsync(request, response, cancellationToken);
         return Result<DashboardKpisResponse>.Success(response);
     }
 

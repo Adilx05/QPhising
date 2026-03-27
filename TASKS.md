@@ -676,7 +676,7 @@
   - **Description:** Add efficient aggregation queries for totals, trends, and grouped breakdowns.
   - **Expected output:** Performant analytics read handlers with deterministic pagination/time-window behavior.
   - **Related layer:** Backend
-- [ ] **Integrate Redis caching and invalidation**
+- [x] **Integrate Redis caching and invalidation**
   - **Description:** Define cache keys/TTL and invalidate or refresh cached KPI data on relevant write events.
   - **Expected output:** Reduced analytics latency with controlled consistency guarantees.
   - **Related layer:** Infra
@@ -707,6 +707,19 @@
     - `rg -n "IAnalyticsReadRepository|AnalyticsDashboardReadModel|AnalyticsReadCriteria" backend/Application/Common/Abstractions/IAnalyticsReadRepository.cs`
     - `rg -n "class AnalyticsReadRepository|GetDashboardReadModelAsync|CampaignStatusBreakdownReadModel|TemplateTypeBreakdownReadModel" backend/Infrastructure/Persistence/Repositories/AnalyticsReadRepository.cs`
     - `rg -n "AnalyticsQueryHandlerTests|Handle_Should_Map_Read_Model_To_Kpi_Response_With_Derived_Rates" backend/API.IntegrationTests/AnalyticsQueryHandlerTests.cs`
+
+- Subtask completion update (2026-03-27):
+  - Added analytics dashboard Redis cache contract (`IAnalyticsDashboardCache`) and integrated cache read/write flow into `GetDashboardKpisQueryHandler` with deterministic cache keys derived from canonicalized filter dimensions.
+  - Implemented infrastructure Redis cache service (`RedisAnalyticsDashboardCache`) with TTL control and generation-based invalidation strategy to avoid keyspace scans while ensuring stale KPI snapshots are bypassed after write events.
+  - Added analytics cache TTL configuration (`Redis:AnalyticsDashboardCacheTtlSeconds`) and wired cache service registration in Infrastructure dependency injection.
+  - Connected cache invalidation to relevant KPI-changing write flows: campaign create/update/schedule/activate and accepted tracking click persistence.
+  - Expanded test coverage for cache-hit behavior in analytics handler and write-side invalidation invocation assertions in campaign handler tests.
+  - Reproducible command evidence:
+    - `rg -n "IAnalyticsDashboardCache|GetAsync\\(|SetAsync\\(|InvalidateAsync\\(" backend/Application`
+    - `rg -n "RedisAnalyticsDashboardCache|AnalyticsDashboardCacheTtlSeconds|analytics:dashboard:generation" backend/Infrastructure backend/API`
+    - `rg -n "analyticsDashboardCache\\.InvalidateAsync|ProcessTrackingClickCommandHandler|CreateCampaignCommandHandler|UpdateCampaignCommandHandler|ScheduleCampaignCommandHandler|ActivateCampaignCommandHandler" backend/Application/Features`
+    - `rg -n "Handle_Should_Return_Cached_Response_Without_Hitting_Repository|InvalidationCount" backend/API.IntegrationTests/AnalyticsQueryHandlerTests.cs backend/API.IntegrationTests/CampaignModuleUnitTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 
 ## 10. [ ] Export subsystem
