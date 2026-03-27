@@ -1,5 +1,9 @@
+using System.Security.Claims;
+using System.Text.Json;
 using Gateway.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Serilog;
@@ -31,9 +35,13 @@ builder.Services
     .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString), "Redis:ConnectionString is required.")
     .ValidateOnStart();
 
+var keycloakSection = builder.Configuration.GetSection(KeycloakOptions.SectionName);
+var keycloakOptions = keycloakSection.Get<KeycloakOptions>()
+                      ?? throw new InvalidOperationException("Keycloak configuration is required.");
+
 builder.Services
     .AddOptions<KeycloakOptions>()
-    .Bind(builder.Configuration.GetSection(KeycloakOptions.SectionName))
+    .Bind(keycloakSection)
     .ValidateDataAnnotations()
     .Validate(options => Uri.IsWellFormedUriString(options.Authority, UriKind.Absolute), "Keycloak:Authority must be a valid absolute URL.")
     .ValidateOnStart();
@@ -55,12 +63,67 @@ builder.Services
         "BaseUrls:Gateway, BaseUrls:Api, and BaseUrls:Frontend must be valid absolute URLs.")
     .ValidateOnStart();
 
+builder.Services
+    .AddAuthentication()
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = keycloakOptions.Authority;
+        options.Audience = keycloakOptions.Audience;
+        options.RequireHttpsMetadata = keycloakOptions.RequireHttpsMetadata;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            RoleClaimType = ClaimTypes.Role,
+            NameClaimType = "preferred_username"
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                if (context.Principal?.Identity is not ClaimsIdentity identity)
+                {
+                    return Task.CompletedTask;
+                }
+
+                var realmAccess = context.Principal.FindFirst("realm_access")?.Value;
+                if (string.IsNullOrWhiteSpace(realmAccess))
+                {
+                    return Task.CompletedTask;
+                }
+
+                using var document = JsonDocument.Parse(realmAccess);
+                if (!document.RootElement.TryGetProperty("roles", out var rolesElement) || rolesElement.ValueKind != JsonValueKind.Array)
+                {
+                    return Task.CompletedTask;
+                }
+
+                foreach (var role in rolesElement.EnumerateArray())
+                {
+                    var roleName = role.GetString();
+                    if (!string.IsNullOrWhiteSpace(roleName) && !identity.HasClaim(ClaimTypes.Role, roleName))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
+                        identity.AddClaim(new Claim("role", roleName));
+                    }
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization();
 builder.Services.AddHealthChecks();
 builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapHealthChecks("/health", new HealthCheckOptions());
 
 await app.UseOcelot();

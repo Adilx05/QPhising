@@ -82,13 +82,30 @@
 
 ---
 
-## 4. [ ] Identity and authorization
-- StartedAt:
-- FinishedAt:
-- Owner:
+## 4. [x] Identity and authorization
+- StartedAt: 2026-03-27T17:25:00Z
+- FinishedAt: 2026-03-27T17:45:00Z
+- Owner: Codex
 - Integrate Keycloak JWT validation in API and gateway.
 - Define role policies: `Admin`, `Operator`, `Viewer`.
 - Add authorization matrix per endpoint family in TASKS.md.
+
+### Execution Notes
+- Hardened API JWT authentication against Keycloak with issuer/audience/lifetime/signing-key validation and role claim normalization from Keycloak `realm_access.roles`.
+- Added deny-by-default authorization fallback policy and explicit role policies:
+  - `Admin`: requires `Admin` role.
+  - `Operator`: requires `Operator` or `Admin` role.
+  - `Viewer`: requires `Viewer`, `Operator`, or `Admin` role.
+- Added policy-annotated access endpoints (`/api/access/admin`, `/api/access/operator`, `/api/access/viewer`) and kept health endpoint anonymous.
+- Added integration tests covering unauthenticated (401), unauthorized (403), and authorized (200) flows.
+- Authorization matrix by endpoint family:
+
+| Endpoint family | Method | Policy | Allowed roles |
+|---|---|---|---|
+| `/api/health` | GET | Anonymous | Any |
+| `/api/access/admin` | GET | `Admin` | Admin |
+| `/api/access/operator` | GET | `Operator` | Operator, Admin |
+| `/api/access/viewer` | GET | `Viewer` | Viewer, Operator, Admin |
 
 ## 5. [ ] Campaign management module
 - StartedAt:
@@ -168,6 +185,8 @@
 - Enforce JWT validation, Redis-backed rate limiting, correlation IDs, and access logging.
 
 ### Execution Notes
+- Enforced route-level Ocelot authentication/authorization by requiring Bearer JWTs and role claims (`Admin`, `Operator`, `Viewer`) for access endpoints.
+- Applied route-level rate limits with gateway-wide rate limit headers and 429 handling.
 - Created `gateway/` Ocelot project with:
   - Ocelot configuration routing `/api/{everything}` and `/api-health`.
   - Startup wiring for config loading, Serilog logging, and `/health` endpoint.
@@ -176,7 +195,7 @@
   - Startup-time validation (`ValidateOnStart`) with explicit error messages for missing/invalid required keys.
 - Removed hardcoded compose runtime values where applicable by introducing environment-variable expansion defaults in `docker-compose.yml`.
 - Documented configuration keys and production-safe templates in `README.md`.
-- Remaining scope for this task: JWT enforcement policies, Redis rate limiting, and correlation/access logging enrichment.
+- Remaining scope for this task: Redis-backed rate limiting and correlation/access logging enrichment.
 
 ## 13. [ ] Data, migrations, and seed
 - StartedAt:
