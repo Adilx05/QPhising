@@ -868,7 +868,7 @@
 - Deliver premium SaaS layout: sidebar, KPI cards, charts, filterable tables, dark mode, responsive behavior.
 
 ### Subtasks (planned)
-- [ ] **Establish feature-based frontend module map**
+- [x] **Establish feature-based frontend module map**
   - **Description:** Define modules for dashboard, campaigns, templates, tracking, tasks, analytics, and exports with smart/dumb separation.
   - **Expected output:** Scalable Angular feature structure and reusable shared UI components.
   - **Related layer:** Frontend
@@ -890,6 +890,16 @@
   - **Related layer:** Frontend
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-27):
+  - Established a feature-based Angular module map with dedicated modules for `dashboard`, `campaigns`, `templates`, `tracking`, `tasks`, `analytics`, and `exports`.
+  - Implemented smart/dumb separation in each feature via `containers/*-page.component` (smart orchestration) and `components/*` presentational table/summary components consuming `@Input` models.
+  - Added shared reusable UI building blocks in `SharedModule` (`KpiCardComponent`, `PageHeaderComponent`, `EntityTableComponent`) and wired lazy-loaded route topology for all feature areas in `AppRoutingModule`.
+  - Updated layout navigation shell to expose feature routes through a consistent enterprise sidebar.
+  - Reproducible command evidence:
+    - `npm run build` (from `frontend/`)
+    - `rg -n "loadChildren|dashboard|campaigns|templates|tracking|tasks|analytics|exports" frontend/src/app/app-routing.module.ts`
+    - `rg --files frontend/src/app/features/{campaigns,templates,tracking,tasks,analytics,exports}`
 - Initialized Angular workspace in `frontend/` with:
   - PrimeNG and TailwindCSS configuration.
   - Feature-based structure (`features/dashboard`) and shared dumb component (`shared/components/kpi-card`).

@@ -1,0 +1,15 @@
+<p-card [header]="title">
+  <p-table [value]="rows" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="capitalize" *ngFor="let column of (rows[0] ? (rows[0] | keyvalue) : [])">{{ column.key }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td *ngFor="let column of row | keyvalue">{{ column.value }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

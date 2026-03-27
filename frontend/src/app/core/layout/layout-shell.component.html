@@ -3,6 +3,16 @@
     <aside class="w-64 border-r border-slate-200 bg-white p-6">
       <h1 class="text-xl font-semibold">QPhising</h1>
       <p class="mt-2 text-sm text-slate-500">Security simulation console</p>
+
+      <nav class="mt-8 space-y-1">
+        <a
+          *ngFor="let item of navItems"
+          [routerLink]="item.route"
+          routerLinkActive="bg-sky-50 text-sky-700"
+          class="block rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900">
+          {{ item.label }}
+        </a>
+      </nav>
     </aside>
     <main class="flex-1 p-6">
       <router-outlet></router-outlet>
