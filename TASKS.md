@@ -764,7 +764,7 @@
   - **Description:** Build ClosedXML-based service for campaign and analytics datasets with enterprise-ready formatting.
   - **Expected output:** Reproducible `.xlsx` outputs aligned with report requirements.
   - **Related layer:** Backend
-- [ ] **Implement PDF report generation**
+- [x] **Implement PDF report generation**
   - **Description:** Build PDF rendering service for campaign and analytics report layouts.
   - **Expected output:** Downloadable `.pdf` reports generated from validated export payloads.
   - **Related layer:** Backend
@@ -801,6 +801,17 @@
     - `rg -n "IExcelExportService|ExportBinaryFile" backend/Application/Common/Abstractions/Exports/IExcelExportService.cs`
     - `rg -n "ClosedXmlExcelExportService|BuildCampaignReportAsync|BuildAnalyticsReportAsync" backend/Infrastructure/Exports/ClosedXmlExcelExportService.cs`
     - `rg -n "ExcelExportPipelineTests|BuildCampaignReportAsync_Should_CreateWorkbook|BuildAnalyticsReportAsync_Should_CreateWorkbook" backend/API.IntegrationTests/ExcelExportPipelineTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-27):
+  - Added Application-layer PDF export contract (`IPdfExportService`) aligned with existing export abstractions and reusable `ExportBinaryFile` response model.
+  - Implemented QuestPDF-backed infrastructure service (`QuestPdfExportService`) for campaign and analytics report rendering with deterministic file naming and `application/pdf` MIME type.
+  - Registered PDF export service in infrastructure dependency injection for consumption by CQRS/worker flows without layering violations.
+  - Added automated PDF export tests validating campaign/analytics generation, file naming, MIME type, and binary PDF signature (`%PDF-`).
+  - Reproducible command evidence:
+    - `rg -n "interface IPdfExportService|BuildCampaignReportAsync|BuildAnalyticsReportAsync" backend/Application/Common/Abstractions/Exports/IPdfExportService.cs`
+    - `rg -n "class QuestPdfExportService|GeneratePdf|application/pdf" backend/Infrastructure/Exports/QuestPdfExportService.cs`
+    - `rg -n "AddScoped<IPdfExportService" backend/Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs`
+    - `rg -n "PdfExportPipelineTests|%PDF-|BuildCampaignReportAsync_Should_CreatePdfBinary|BuildAnalyticsReportAsync_Should_CreatePdfBinary" backend/API.IntegrationTests/PdfExportPipelineTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 11. [-] Frontend enterprise UI
