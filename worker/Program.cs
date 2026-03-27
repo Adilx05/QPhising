@@ -1,5 +1,9 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using QPhising.Application.DependencyInjection;
+using QPhising.Infrastructure.DependencyInjection;
+using QPhising.Worker.Configuration;
 using QPhising.Worker.Services;
+using QPhising.Worker.TaskExecution;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +17,15 @@ builder.Host.UseSerilog((context, _, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration).WriteTo.Console();
 });
 
+builder.Services
+    .AddOptions<TaskWorkerOptions>()
+    .Bind(builder.Configuration.GetSection(TaskWorkerOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddTaskExecution();
 builder.Services.AddHostedService<TaskWorkerService>();
 builder.Services.AddHealthChecks();
 

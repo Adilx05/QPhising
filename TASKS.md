@@ -577,7 +577,7 @@
   - **Description:** Persist queued tasks with claim/lease semantics and concurrency-safe status updates.
   - **Expected output:** Restart-safe queue storage with deterministic worker claim behavior.
   - **Related layer:** Infra
-- [ ] **Implement worker dispatcher and handler registry**
+- [x] **Implement worker dispatcher and handler registry**
   - **Description:** Route task types to dedicated handlers and enforce standardized execution contract.
   - **Expected output:** Extensible execution pipeline for background tasks with consistent handler outcomes.
   - **Related layer:** Backend
@@ -617,10 +617,24 @@
     - `rg -n "QueuedTaskEntityTypeConfiguration|queued_tasks|payload_json" backend/Infrastructure`
     - `rg -n "Implement durable queue persistence strategy" TASKS.md`
 
-- Created runnable `worker/` ASP.NET-hosted background service for task execution bootstrap:
-  - `TaskWorkerService` with heartbeat logging loop.
-  - DI registration, configuration loading, Serilog wiring, and `/health` endpoint.
-- Remaining scope for this task: persistent task queue model, retry/dead-letter policy, and execution history persistence.
+- Subtask completion update (2026-03-27):
+  - Implemented worker dispatcher and handler registry with standardized task execution contract:
+    - added `IQueuedTaskHandler` and `QueuedTaskHandlerResult`,
+    - added registry/dispatcher (`IQueuedTaskHandlerRegistry`, `QueuedTaskHandlerRegistry`, `IQueuedTaskDispatcher`, `QueuedTaskDispatcher`) to route `TaskType` to dedicated handlers.
+  - Replaced worker heartbeat loop with queue-processing orchestration:
+    - worker now claims tasks with lease windows from durable queue persistence,
+    - transitions lifecycle (`Claimed` -> `Running` -> `Succeeded`/`Failed`) with persisted state updates,
+    - dispatches execution to per-task handlers for tracking link generation, tracking click processing, campaign activation, and export generation.
+  - Integrated worker host with Application + Infrastructure dependency graph and task execution registration:
+    - wired MediatR-backed handler execution through existing CQRS command handlers,
+    - added strongly-typed `TaskWorker` options for poll interval and lease duration.
+  - Reproducible command evidence:
+    - `rg -n "IQueuedTaskHandler|QueuedTaskHandlerResult|IQueuedTaskHandlerRegistry|IQueuedTaskDispatcher|QueuedTaskDispatcher" worker/TaskExecution`
+    - `rg -n "TrackingLinkGenerationTaskHandler|TrackingClickProcessingTaskHandler|CampaignActivationTaskHandler|ExportGenerationTaskHandler" worker/TaskExecution/Handlers`
+    - `rg -n "ClaimNextAsync|StartExecution|DispatchAsync|Complete\\(|Fail\\(" worker/Services/TaskWorkerService.cs`
+    - `dotnet build worker/Worker.csproj` *(fails in current environment: `dotnet` not installed)*
+
+- Remaining scope for this task: retry/backoff + dead-letter policy and execution history/observability persistence.
 
 ## 9. [ ] Analytics and dashboard APIs
 - StartedAt:
