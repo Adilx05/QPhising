@@ -72,9 +72,20 @@ public sealed class RedisTrackingClickRealtimeStore(
 
         string campaignCounterKey = $"{_options.KeyPrefix}:tracking:counter:campaign:{request.CampaignId:D}";
         string recipientCounterKey = $"{_options.KeyPrefix}:tracking:counter:recipient:{recipientKey}";
+        var counterRetention = TimeSpan.FromDays(Math.Max(1, _options.TrackingAggregateRetentionDays));
 
         long campaignCounter = await _database.StringIncrementAsync(campaignCounterKey).ConfigureAwait(false);
         long recipientCounter = await _database.StringIncrementAsync(recipientCounterKey).ConfigureAwait(false);
+
+        if (campaignCounter == 1)
+        {
+            await _database.KeyExpireAsync(campaignCounterKey, counterRetention).ConfigureAwait(false);
+        }
+
+        if (recipientCounter == 1)
+        {
+            await _database.KeyExpireAsync(recipientCounterKey, counterRetention).ConfigureAwait(false);
+        }
 
         return new TrackingClickRealtimeResult(
             IsDuplicate: false,

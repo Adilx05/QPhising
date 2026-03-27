@@ -199,6 +199,11 @@ public sealed class TrackingEndpointsTests : IClassFixture<ApiWebApplicationFact
             _items.Add(click);
             return Task.CompletedTask;
         }
+
+        public Task<int> DeleteOlderThanAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(0);
+        }
     }
 
     private sealed class AlwaysUniqueTrackingClickRealtimeStore : ITrackingClickRealtimeStore

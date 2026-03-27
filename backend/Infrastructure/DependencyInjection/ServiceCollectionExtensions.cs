@@ -36,6 +36,12 @@ public static class ServiceCollectionExtensions
             .ValidateOnStart();
 
         services
+            .AddOptions<TrackingRetentionOptions>()
+            .Bind(configuration.GetSection(TrackingRetentionOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services
             .AddOptions<InfrastructureOptions>()
             .Configure<DatabaseOptions, RedisOptions>((options, database, redis) =>
             {
@@ -60,6 +66,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITrackingClickRepository, TrackingClickRepository>();
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
         services.AddScoped<ITrackingClickRealtimeStore, RedisTrackingClickRealtimeStore>();
+        services.AddHostedService<TrackingRetentionBackgroundService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddSingleton<ITrackingTokenService, HmacTrackingTokenService>();
 
