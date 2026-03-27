@@ -1,6 +1,7 @@
 using AutoMapper;
 using MediatR;
 using QPhising.Application.Common;
+using QPhising.Application.Common.Abstractions;
 using QPhising.Domain.Abstractions;
 using QPhising.Domain.Templates;
 using QPhising.Domain.Templates.Exceptions;
@@ -10,10 +11,17 @@ namespace QPhising.Application.Features.Templates.CreateTemplate;
 public sealed class CreateTemplateCommandHandler(
     ITemplateRepository templateRepository,
     IUnitOfWork unitOfWork,
+    ITemplateHtmlSanitizer templateHtmlSanitizer,
     IMapper mapper) : IRequestHandler<CreateTemplateCommand, Result<CreateTemplateResponse>>
 {
     public async Task<Result<CreateTemplateResponse>> Handle(CreateTemplateCommand request, CancellationToken cancellationToken)
     {
+        Result<string> sanitizeResult = templateHtmlSanitizer.Sanitize(request.HtmlContent);
+        if (!sanitizeResult.IsSuccess || sanitizeResult.Value is null)
+        {
+            return Result<CreateTemplateResponse>.Failure(sanitizeResult.Errors.ToArray());
+        }
+
         Template template;
 
         try
@@ -21,7 +29,7 @@ public sealed class CreateTemplateCommandHandler(
             template = Template.Create(
                 request.Name,
                 request.Type,
-                request.HtmlContent,
+                sanitizeResult.Value,
                 request.Variables);
         }
         catch (TemplateDomainException exception)

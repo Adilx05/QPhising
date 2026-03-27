@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
         services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped<ICampaignInteractionGuard, CampaignInteractionGuard>();
+        services.AddSingleton<ITemplateHtmlSanitizer, TemplateHtmlSanitizer>();
         return services;
     }
 }
