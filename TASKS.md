@@ -371,7 +371,7 @@
   - **Description:** Apply allowlist-based sanitization before persistence/rendering and reject unsafe markup patterns.
   - **Expected output:** Sanitized template content that prevents unsafe script/style injection vectors.
   - **Related layer:** Backend
-- [ ] **Implement variable substitution engine**
+- [x] **Implement variable substitution engine**
   - **Description:** Resolve template placeholders from approved data sources with deterministic missing-variable behavior.
   - **Expected output:** Renderer service producing final HTML with validated substitutions.
   - **Related layer:** Backend
@@ -408,6 +408,16 @@
   - Implemented allowlist-based template HTML sanitization service (`TemplateHtmlSanitizer`) in Application layer and registered it in DI for reuse by template CQRS handlers before domain persistence.
   - Hardened create/update template command handlers to sanitize incoming HTML and reject unsafe markup patterns (`<script>`, inline event handlers, unsafe protocols) with deterministic failures.
   - Added module tests for sanitization behavior, including unsafe markup rejection and allowed-tag/attribute normalization.
+
+- Subtask completion update (2026-03-27):
+  - Implemented deterministic template variable substitution engine (`TemplateVariableSubstitutionEngine`) in Application layer with explicit contract abstraction for renderer usage.
+  - Enforced approved-variable rendering rules: rejects undeclared placeholders in HTML, rejects unapproved input keys, validates variable naming, and returns deterministic missing-variable errors.
+  - Added HTML-encoded substitution output to prevent value-based markup injection and registered the service in Application DI for cross-feature reuse.
+  - Added module tests for render success (including HTML encoding), missing-variable failure, and undeclared-placeholder rejection.
+  - Reproducible command evidence:
+    - `rg -n "ITemplateVariableSubstitutionEngine|TemplateVariableSubstitutionEngine|PlaceholderPattern|Missing values for placeholders" backend/Application`
+    - `rg -n "TemplateVariableSubstitutionEngine_Should_" backend/API.IntegrationTests/TemplateModuleUnitTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
   - Reproducible command evidence:
     - `rg -n "ITemplateHtmlSanitizer|TemplateHtmlSanitizer|unsafe markup" backend/Application`
     - `rg -n "CreateTemplateCommandHandler_Should_Reject_Unsafe_Html_Markup|TemplateHtmlSanitizer_Should_Remove_Disallowed_Attributes_And_Tags" backend/API.IntegrationTests/TemplateModuleUnitTests.cs`
