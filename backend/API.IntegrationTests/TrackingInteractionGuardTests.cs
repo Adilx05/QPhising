@@ -55,7 +55,8 @@ public sealed class TrackingInteractionGuardTests
             new InMemoryTrackingClickRealtimeStore(),
             new InMemoryTrackingClickRepository(),
             new NoOpUnitOfWork(),
-            new NoOpAnalyticsDashboardCache());
+            new NoOpAnalyticsDashboardCache(),
+            new NoOpAnalyticsRealtimeNotifier());
 
         var result = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, "tracking-token", "127.0.0.1", "integration-test-agent"),
@@ -120,7 +121,8 @@ public sealed class TrackingInteractionGuardTests
             new InMemoryTrackingClickRealtimeStore(),
             new InMemoryTrackingClickRepository(),
             new NoOpUnitOfWork(),
-            new NoOpAnalyticsDashboardCache());
+            new NoOpAnalyticsDashboardCache(),
+            new NoOpAnalyticsRealtimeNotifier());
 
         var result = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, tamperedToken, "127.0.0.1", "integration-test-agent"),
@@ -153,7 +155,8 @@ public sealed class TrackingInteractionGuardTests
             realtimeStore,
             clickRepository,
             new NoOpUnitOfWork(),
-            new NoOpAnalyticsDashboardCache());
+            new NoOpAnalyticsDashboardCache(),
+            new NoOpAnalyticsRealtimeNotifier());
 
         var first = await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, issueResult.Token, "127.0.0.1", "integration-test-agent"),
@@ -193,7 +196,8 @@ public sealed class TrackingInteractionGuardTests
             new InMemoryTrackingClickRealtimeStore(),
             new InMemoryTrackingClickRepository(),
             new NoOpUnitOfWork(),
-            new NoOpAnalyticsDashboardCache());
+            new NoOpAnalyticsDashboardCache(),
+            new NoOpAnalyticsRealtimeNotifier());
 
         var clickAttempt = await handler.Handle(
             new ProcessTrackingClickCommand(
@@ -230,7 +234,8 @@ public sealed class TrackingInteractionGuardTests
             realtimeStore,
             clickRepository,
             new NoOpUnitOfWork(),
-            new NoOpAnalyticsDashboardCache());
+            new NoOpAnalyticsDashboardCache(),
+            new NoOpAnalyticsRealtimeNotifier());
 
         await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-1@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
@@ -270,7 +275,8 @@ public sealed class TrackingInteractionGuardTests
             realtimeStore,
             clickRepository,
             new NoOpUnitOfWork(),
-            new NoOpAnalyticsDashboardCache());
+            new NoOpAnalyticsDashboardCache(),
+            new NoOpAnalyticsRealtimeNotifier());
 
         await handler.Handle(
             new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-1@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
@@ -449,6 +455,15 @@ public sealed class TrackingInteractionGuardTests
         }
     }
 
+
+
+    private sealed class NoOpAnalyticsRealtimeNotifier : IAnalyticsRealtimeNotifier
+    {
+        public Task PublishDashboardUpdatedAsync(AnalyticsDashboardUpdatedEvent updateEvent, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+    }
     private sealed class NoOpAnalyticsDashboardCache : IAnalyticsDashboardCache
     {
         public Task<DashboardKpisResponse?> GetAsync(GetDashboardKpisQuery query, CancellationToken cancellationToken = default)

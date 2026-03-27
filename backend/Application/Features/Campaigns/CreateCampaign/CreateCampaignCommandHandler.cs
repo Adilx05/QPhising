@@ -11,7 +11,8 @@ public sealed class CreateCampaignCommandHandler(
     ICampaignRepository campaignRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    IAnalyticsDashboardCache analyticsDashboardCache) : IRequestHandler<CreateCampaignCommand, Result<CreateCampaignResponse>>
+    IAnalyticsDashboardCache analyticsDashboardCache,
+    IAnalyticsRealtimeNotifier analyticsRealtimeNotifier) : IRequestHandler<CreateCampaignCommand, Result<CreateCampaignResponse>>
 {
     public async Task<Result<CreateCampaignResponse>> Handle(CreateCampaignCommand request, CancellationToken cancellationToken)
     {
@@ -25,6 +26,9 @@ public sealed class CreateCampaignCommandHandler(
         await campaignRepository.AddAsync(campaign, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await analyticsDashboardCache.InvalidateAsync(cancellationToken);
+        await analyticsRealtimeNotifier.PublishDashboardUpdatedAsync(
+            new AnalyticsDashboardUpdatedEvent("campaign_created", campaign.Id, DateTimeOffset.UtcNow),
+            cancellationToken);
 
         CreateCampaignResponse response = mapper.Map<CreateCampaignResponse>(campaign);
         return Result<CreateCampaignResponse>.Success(response);
