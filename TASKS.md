@@ -64,6 +64,28 @@
 - Add CQRS stack (MediatR), FluentValidation pipeline behaviors, AutoMapper profiles, repository + unit-of-work contracts.
 - Add API versioning, problem details, structured logging, health checks.
 
+### Subtasks (planned)
+- [ ] **Enforce strict layer dependency graph**
+  - **Description:** Verify project references satisfy Clean Architecture (`Domain <- Application <- Infrastructure <- API`) and remove any reverse coupling.
+  - **Expected output:** Buildable solution with one-way dependency flow and no cross-layer leakage.
+  - **Related layer:** Backend
+- [ ] **Complete API versioning implementation**
+  - **Description:** Configure API versioning, default version assumptions, and versioned route conventions.
+  - **Expected output:** Versioned endpoints with deterministic routing and discoverable version behavior.
+  - **Related layer:** Backend
+- [ ] **Add explicit AutoMapper profile coverage**
+  - **Description:** Create mapping profiles per feature and validate critical mappings used by CQRS handlers.
+  - **Expected output:** Registered mapping profiles with compile-safe mappings for command/query DTOs.
+  - **Related layer:** Backend
+- [ ] **Harden cross-cutting request pipeline**
+  - **Description:** Ensure FluentValidation and ProblemDetails are consistently applied across all CQRS endpoints.
+  - **Expected output:** Uniform validation failures and error contracts without controller business logic.
+  - **Related layer:** Backend
+- [ ] **Operationalize health and observability baseline**
+  - **Description:** Expand health checks/readiness and structured log enrichment for traceability in distributed runtime.
+  - **Expected output:** Production-ready health endpoints and enriched structured logs for API diagnostics.
+  - **Related layer:** Infra
+
 ### Execution Notes
 - Implemented backend solution and project structure under `backend/`:
   - `QPhising.Backend.sln`
@@ -194,6 +216,32 @@
 - Implement email template builder backend APIs and storage schema.
 - Implement landing page renderer pipeline with safe HTML handling and variable substitution.
 
+### Subtasks (planned)
+- [ ] **Model template domain and variable contracts**
+  - **Description:** Define template aggregate, supported template types, variable placeholder format, and lifecycle states.
+  - **Expected output:** Domain models and invariants for template correctness and reuse.
+  - **Related layer:** Backend
+- [ ] **Implement template CQRS workflows**
+  - **Description:** Add create/update/get/list/publish/archive commands and queries through MediatR with FluentValidation.
+  - **Expected output:** End-to-end application handlers for template lifecycle operations.
+  - **Related layer:** Backend
+- [ ] **Build safe HTML sanitization pipeline**
+  - **Description:** Apply allowlist-based sanitization before persistence/rendering and reject unsafe markup patterns.
+  - **Expected output:** Sanitized template content that prevents unsafe script/style injection vectors.
+  - **Related layer:** Backend
+- [ ] **Implement variable substitution engine**
+  - **Description:** Resolve template placeholders from approved data sources with deterministic missing-variable behavior.
+  - **Expected output:** Renderer service producing final HTML with validated substitutions.
+  - **Related layer:** Backend
+- [ ] **Add template persistence schema and indexes**
+  - **Description:** Configure infrastructure persistence, versioning constraints, and migrations for template storage.
+  - **Expected output:** Migration-ready schema with efficient query/index strategy.
+  - **Related layer:** Infra
+- [ ] **Expose secured template endpoints**
+  - **Description:** Add thin API controllers delegating to CQRS with JWT/RBAC enforcement and ProblemDetails responses.
+  - **Expected output:** Role-protected template API surface with stable request/response contracts.
+  - **Related layer:** Backend
+
 ## 7. [ ] Tracking module
 - StartedAt:
 - FinishedAt:
@@ -203,6 +251,32 @@
 - Use Redis for deduplication and real-time counters.
 - Define replay/abuse protections and retention policy.
 
+### Subtasks (planned)
+- [ ] **Define signed tracking token specification**
+  - **Description:** Specify token payload, signature method, expiration semantics, and validation flow.
+  - **Expected output:** Deterministic token contract for tamper-resistant tracking URLs.
+  - **Related layer:** Backend
+- [ ] **Implement tracking link generation CQRS**
+  - **Description:** Add command handler to issue unique tracking links bound to campaign and recipient context.
+  - **Expected output:** Unique, signed tracking links generated via application layer.
+  - **Related layer:** Backend
+- [ ] **Implement click ingestion and metadata persistence**
+  - **Description:** Add endpoint/handler to validate tokens and persist click metadata with normalized schema.
+  - **Expected output:** Reliable click event records including IP, UserAgent, Timestamp, and Fingerprint.
+  - **Related layer:** Backend
+- [ ] **Add Redis deduplication and realtime counters**
+  - **Description:** Use Redis keys for dedup windows and atomic increments for campaign/recipient click counters.
+  - **Expected output:** Idempotent click handling and low-latency metrics updates.
+  - **Related layer:** Infra
+- [ ] **Implement replay and abuse protections**
+  - **Description:** Add nonce/time-window checks, suspicious-rate thresholds, and reject/flag behavior.
+  - **Expected output:** Hardened tracking pipeline against replay and abusive click traffic.
+  - **Related layer:** Backend
+- [ ] **Define retention and archival policy implementation**
+  - **Description:** Set lifecycle rules for raw click data, aggregates, and cleanup scheduling.
+  - **Expected output:** Enforced retention policy with documented operational behavior.
+  - **Related layer:** Infra
+
 ## 8. [-] Task execution engine
 - StartedAt: 2026-03-27T16:52:30Z
 - FinishedAt:
@@ -210,6 +284,28 @@
 - Implement Task entity (`Id`, `Type`, `Status`, `Payload`, `Logs`, `CreatedAt`).
 - Build queueing and processing with Hangfire or Worker Service.
 - Add retry policy, dead-letter handling, and execution logs.
+
+### Subtasks (planned)
+- [ ] **Formalize task aggregate and transition rules**
+  - **Description:** Define `Task` lifecycle transitions, task-type contracts, payload schema, and execution status semantics.
+  - **Expected output:** Domain-consistent task model and transition guards suitable for queue processing.
+  - **Related layer:** Backend
+- [ ] **Implement durable queue persistence strategy**
+  - **Description:** Persist queued tasks with claim/lease semantics and concurrency-safe status updates.
+  - **Expected output:** Restart-safe queue storage with deterministic worker claim behavior.
+  - **Related layer:** Infra
+- [ ] **Implement worker dispatcher and handler registry**
+  - **Description:** Route task types to dedicated handlers and enforce standardized execution contract.
+  - **Expected output:** Extensible execution pipeline for background tasks with consistent handler outcomes.
+  - **Related layer:** Backend
+- [ ] **Add retry/backoff and dead-letter handling**
+  - **Description:** Introduce retry policy per task type with capped attempts and dead-letter terminal state.
+  - **Expected output:** Predictable failure recovery and dead-lettered task visibility.
+  - **Related layer:** Backend
+- [ ] **Add execution logging and observability**
+  - **Description:** Persist structured execution logs, correlation IDs, and timing metrics for each task run.
+  - **Expected output:** Queryable execution history and diagnostics for operations and troubleshooting.
+  - **Related layer:** Infra
 
 ### Execution Notes
 - Created runnable `worker/` ASP.NET-hosted background service for task execution bootstrap:
@@ -225,6 +321,28 @@
 - Add Redis caching strategy and invalidation rules.
 - Add real-time update channel (SignalR or equivalent).
 
+### Subtasks (planned)
+- [ ] **Define KPI contracts and filter dimensions**
+  - **Description:** Specify response models and filters for campaign, click, conversion, and throughput metrics.
+  - **Expected output:** Stable analytics contracts consumable by dashboard components.
+  - **Related layer:** Backend
+- [ ] **Implement analytics CQRS query handlers**
+  - **Description:** Add efficient aggregation queries for totals, trends, and grouped breakdowns.
+  - **Expected output:** Performant analytics read handlers with deterministic pagination/time-window behavior.
+  - **Related layer:** Backend
+- [ ] **Integrate Redis caching and invalidation**
+  - **Description:** Define cache keys/TTL and invalidate or refresh cached KPI data on relevant write events.
+  - **Expected output:** Reduced analytics latency with controlled consistency guarantees.
+  - **Related layer:** Infra
+- [ ] **Implement realtime analytics update channel**
+  - **Description:** Add SignalR (or equivalent) hub and publish KPI update events with authorization checks.
+  - **Expected output:** Live dashboard updates for subscribed authenticated clients.
+  - **Related layer:** Backend
+- [ ] **Expose secured dashboard endpoints**
+  - **Description:** Add API endpoints for analytics widgets with role-based access enforcement.
+  - **Expected output:** JWT/RBAC-protected analytics API surface ready for frontend integration.
+  - **Related layer:** Backend
+
 ## 10. [ ] Export subsystem
 - StartedAt:
 - FinishedAt:
@@ -232,6 +350,32 @@
 - Implement Excel exports via ClosedXML.
 - Implement PDF exports (campaign and analytics reports).
 - Add async export task processing and download endpoints.
+
+### Subtasks (planned)
+- [ ] **Define export job lifecycle model**
+  - **Description:** Model export request, format, status progression, ownership, and file metadata.
+  - **Expected output:** Consistent domain/application contract for asynchronous exports.
+  - **Related layer:** Backend
+- [ ] **Implement Excel export pipeline**
+  - **Description:** Build ClosedXML-based service for campaign and analytics datasets with enterprise-ready formatting.
+  - **Expected output:** Reproducible `.xlsx` outputs aligned with report requirements.
+  - **Related layer:** Backend
+- [ ] **Implement PDF report generation**
+  - **Description:** Build PDF rendering service for campaign and analytics report layouts.
+  - **Expected output:** Downloadable `.pdf` reports generated from validated export payloads.
+  - **Related layer:** Backend
+- [ ] **Integrate async export processing**
+  - **Description:** Queue export jobs to background worker with retry/dead-letter support and status updates.
+  - **Expected output:** Non-blocking export execution with reliable job tracking.
+  - **Related layer:** Backend
+- [ ] **Provide secured export APIs and file delivery**
+  - **Description:** Add create/status/download endpoints with JWT/RBAC and ownership checks.
+  - **Expected output:** Secure, auditable export workflow from request to file retrieval.
+  - **Related layer:** Backend
+- [ ] **Implement export file retention cleanup**
+  - **Description:** Define storage TTL and cleanup process for generated export files.
+  - **Expected output:** Controlled storage growth and compliance-ready retention behavior.
+  - **Related layer:** Infra
 
 ## 11. [-] Frontend enterprise UI
 - StartedAt: 2026-03-27T16:40:00Z
@@ -241,6 +385,28 @@
 - Implement feature-based architecture with smart/dumb components.
 - Add state management (NgRx or Signals), routing guards, role-based menus.
 - Deliver premium SaaS layout: sidebar, KPI cards, charts, filterable tables, dark mode, responsive behavior.
+
+### Subtasks (planned)
+- [ ] **Establish feature-based frontend module map**
+  - **Description:** Define modules for dashboard, campaigns, templates, tracking, tasks, analytics, and exports with smart/dumb separation.
+  - **Expected output:** Scalable Angular feature structure and reusable shared UI components.
+  - **Related layer:** Frontend
+- [ ] **Implement global state strategy**
+  - **Description:** Introduce NgRx or Signals for auth/session, dashboard data, and feature-level view state.
+  - **Expected output:** Predictable frontend state flows with typed selectors/actions.
+  - **Related layer:** Frontend
+- [ ] **Implement route guards and role-aware navigation**
+  - **Description:** Add authentication guards and role-based menu rendering/route access checks.
+  - **Expected output:** Protected frontend routes and consistent RBAC-driven navigation UX.
+  - **Related layer:** Frontend
+- [ ] **Build enterprise dashboard experience**
+  - **Description:** Implement KPI cards, chart panels, filterable data tables, and responsive layout using PrimeNG + Tailwind.
+  - **Expected output:** Production-grade SaaS dashboard UI with coherent spacing and component consistency.
+  - **Related layer:** Frontend
+- [ ] **Add dark mode and accessibility polish**
+  - **Description:** Implement theming, keyboard accessibility, loading/empty/error states, and UX consistency checks.
+  - **Expected output:** Accessible, polished UI behavior across desktop/tablet/mobile breakpoints.
+  - **Related layer:** Frontend
 
 ### Execution Notes
 - Initialized Angular workspace in `frontend/` with:
@@ -255,6 +421,28 @@
 - Owner: Codex
 - Configure Ocelot routes to API services.
 - Enforce JWT validation, Redis-backed rate limiting, correlation IDs, and access logging.
+
+### Subtasks (planned)
+- [ ] **Complete gateway route matrix**
+  - **Description:** Enumerate and configure Ocelot routes for all service endpoint families with explicit upstream/downstream mappings.
+  - **Expected output:** Comprehensive route coverage with deterministic forwarding rules.
+  - **Related layer:** Infra
+- [ ] **Implement distributed Redis rate limiting**
+  - **Description:** Wire Redis-backed rate-limiting strategy for consistent throttling across gateway instances.
+  - **Expected output:** Cluster-safe throttling with standardized 429 responses and headers.
+  - **Related layer:** Infra
+- [ ] **Implement correlation ID propagation**
+  - **Description:** Generate/forward correlation IDs from gateway to downstream APIs and include them in logs.
+  - **Expected output:** End-to-end request traceability across gateway and backend logs.
+  - **Related layer:** Infra
+- [ ] **Harden structured access logging**
+  - **Description:** Enrich logs with route, principal, status code, latency, and throttling/security outcomes.
+  - **Expected output:** Operationally useful access/audit logs for incident analysis.
+  - **Related layer:** Infra
+- [ ] **Validate gateway auth/rate-limit behavior**
+  - **Description:** Add integration-level checks for JWT policy enforcement and throttling/correlation requirements.
+  - **Expected output:** Reproducible verification evidence for gateway security and resilience behavior.
+  - **Related layer:** Backend
 
 ### Execution Notes
 - Enforced route-level Ocelot authentication/authorization by requiring Bearer JWTs and role claims (`Admin`, `Operator`, `Viewer`) for access endpoints.
@@ -276,6 +464,28 @@
 - Configure PostgreSQL migrations.
 - Add seed data: users/roles mapping assumptions, sample campaigns, templates, task history, analytics bootstrap data.
 
+### Subtasks (planned)
+- [ ] **Finalize relational schema for all active modules**
+  - **Description:** Define entities, relationships, constraints, and indexes across campaign/template/tracking/task/analytics/export domains.
+  - **Expected output:** Coherent normalized schema aligned with application use cases.
+  - **Related layer:** Infra
+- [ ] **Create baseline and incremental migrations**
+  - **Description:** Generate EF migrations for current model and validate upgrade/downgrade behavior.
+  - **Expected output:** Reproducible migration chain for local and containerized deployment.
+  - **Related layer:** Infra
+- [ ] **Implement identity and role seed strategy**
+  - **Description:** Seed role assumptions and default users metadata needed for RBAC-enabled environments.
+  - **Expected output:** Deterministic bootstrap data supporting secure role-based flows.
+  - **Related layer:** Infra
+- [ ] **Seed representative business and analytics data**
+  - **Description:** Seed campaigns, templates, task history, and KPI bootstrap records for realistic UI/API validation.
+  - **Expected output:** Non-placeholder seed dataset suitable for dashboard and export verification.
+  - **Related layer:** Infra
+- [ ] **Ensure idempotent seed execution**
+  - **Description:** Implement re-runnable seed scripts/initializers that avoid duplicate records and preserve integrity.
+  - **Expected output:** Safe repeated seed runs across developer and CI environments.
+  - **Related layer:** Infra
+
 ## 14. [-] Docker and runtime
 - StartedAt: 2026-03-27T16:55:00Z
 - FinishedAt: 2026-03-27T17:20:00Z
@@ -283,6 +493,28 @@
 - Add Dockerfiles for `frontend`, `api`, `gateway`.
 - Build `docker-compose.yml` with `frontend`, `api`, `gateway`, `postgres`, `keycloak`, `redis`.
 - Verify one-command startup path (`docker-compose up`) and initialization order.
+
+### Subtasks (planned)
+- [ ] **Validate deterministic image builds**
+  - **Description:** Confirm Dockerfiles produce reproducible artifacts for frontend, API, gateway, and worker.
+  - **Expected output:** Consistent container images with documented build assumptions.
+  - **Related layer:** Infra
+- [ ] **Finalize compose startup dependencies**
+  - **Description:** Align healthchecks and `depends_on` conditions with true service readiness.
+  - **Expected output:** Reliable startup ordering with minimized race conditions.
+  - **Related layer:** Infra
+- [ ] **Verify full-stack `docker compose up` lifecycle**
+  - **Description:** Execute and document one-command startup, health convergence, and service reachability checks.
+  - **Expected output:** Recorded evidence of healthy end-to-end stack initialization.
+  - **Related layer:** Infra
+- [ ] **Audit environment variable to config mapping**
+  - **Description:** Ensure all runtime settings are environment-driven and mapped to application configuration keys.
+  - **Expected output:** No hidden hardcoded runtime values; portable runtime configuration.
+  - **Related layer:** Infra
+- [ ] **Document compose operational profiles**
+  - **Description:** Define local/deployment compose usage patterns and troubleshooting notes.
+  - **Expected output:** Clear runtime documentation for developers and operators.
+  - **Related layer:** Infra
 
 ### Execution Notes
 - Updated Dockerfiles to align with real app entrypoints and production-style multi-stage outputs:
@@ -313,6 +545,28 @@
 - Add code quality gates and dependency vulnerability checks.
 - Add operational runbooks, backup/restore notes, and incident logging guidance.
 
+### Subtasks (planned)
+- [ ] **Define multi-stage CI workflow**
+  - **Description:** Configure CI stages for restore/build/lint/test/security scan/container build across backend and frontend.
+  - **Expected output:** End-to-end automated pipeline with explicit stage dependencies.
+  - **Related layer:** Infra
+- [ ] **Implement quality thresholds and merge gates**
+  - **Description:** Add lint/test/coverage thresholds and fail conditions to block low-quality merges.
+  - **Expected output:** Enforced quality gates with transparent pass/fail criteria.
+  - **Related layer:** Infra
+- [ ] **Integrate dependency and container vulnerability scanning**
+  - **Description:** Add SCA and image scanning with policy-based severity thresholds.
+  - **Expected output:** Automated vulnerability reporting with actionable blocking rules.
+  - **Related layer:** Infra
+- [ ] **Add secret/config security checks**
+  - **Description:** Integrate secret detection and insecure configuration policy checks into CI.
+  - **Expected output:** Early detection of credential leaks and risky runtime settings.
+  - **Related layer:** Infra
+- [ ] **Produce operational runbooks**
+  - **Description:** Document backup/restore procedures, incident response workflow, and logging/observability guidance.
+  - **Expected output:** Practical operational documentation for support and on-call execution.
+  - **Related layer:** Infra
+
 ## 16. [ ] Definition of Done checklist (must be in TASKS.md)
 - StartedAt:
 - FinishedAt:
@@ -325,6 +579,24 @@
 - [ ] Dashboard populated with seed data.
 - [ ] Full stack runs via compose.
 - [ ] TASKS.md updated after each completed task with evidence links (commit hash, file paths, command outputs).
+
+### Subtasks (planned)
+- [ ] **Translate each DoD line into measurable acceptance criteria**
+  - **Description:** Define exact evidence required for each checklist item (artifact + command + expected result).
+  - **Expected output:** Objective, auditable DoD criteria that can be validated consistently.
+  - **Related layer:** Infra
+- [ ] **Map DoD criteria to owning delivery tasks**
+  - **Description:** Create traceability between DoD checklist items and specific task IDs/modules.
+  - **Expected output:** Clear ownership matrix preventing ambiguous completion claims.
+  - **Related layer:** Infra
+- [ ] **Standardize completion evidence template**
+  - **Description:** Enforce a uniform per-task evidence block format (commit hash, files, reproducible commands).
+  - **Expected output:** Consistent completion documentation across all task entries.
+  - **Related layer:** Infra
+- [ ] **Add release-readiness final verification pass**
+  - **Description:** Define a final pre-release review gate that confirms all DoD criteria are satisfied.
+  - **Expected output:** Single, repeatable release-go/no-go verification checkpoint.
+  - **Related layer:** Infra
 
 ## 17. [x] Task status audit hardening
 - StartedAt: 2026-03-27T17:50:00Z
