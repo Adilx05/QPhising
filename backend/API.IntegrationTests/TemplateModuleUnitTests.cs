@@ -1,4 +1,5 @@
 using AutoMapper;
+using QPhising.Application.Common;
 using QPhising.Application.Features.Templates.ArchiveTemplate;
 using QPhising.Application.Features.Templates.CreateTemplate;
 using QPhising.Application.Features.Templates.GetTemplateById;
@@ -14,6 +15,7 @@ namespace QPhising.API.IntegrationTests;
 public sealed class TemplateModuleUnitTests
 {
     private readonly IMapper _mapper;
+    private readonly TemplateHtmlSanitizer _templateHtmlSanitizer = new();
 
     public TemplateModuleUnitTests()
     {
@@ -34,7 +36,7 @@ public sealed class TemplateModuleUnitTests
     {
         var repository = new InMemoryTemplateRepository();
         var unitOfWork = new RecordingUnitOfWork();
-        var handler = new CreateTemplateCommandHandler(repository, unitOfWork, _mapper);
+        var handler = new CreateTemplateCommandHandler(repository, unitOfWork, _templateHtmlSanitizer, _mapper);
 
         var result = await handler.Handle(new CreateTemplateCommand(
             "Security Awareness",
@@ -48,6 +50,25 @@ public sealed class TemplateModuleUnitTests
         Assert.Contains("first_name", result.Value.Variables);
         Assert.Equal(1, repository.TemplateCount);
         Assert.Equal(1, unitOfWork.SaveChangesCallCount);
+        Assert.Equal("<h1>Hello {{first_name}}</h1>", result.Value.HtmlContent);
+    }
+
+    [Fact]
+    public async Task CreateTemplateCommandHandler_Should_Reject_Unsafe_Html_Markup()
+    {
+        var repository = new InMemoryTemplateRepository();
+        var unitOfWork = new RecordingUnitOfWork();
+        var handler = new CreateTemplateCommandHandler(repository, unitOfWork, _templateHtmlSanitizer, _mapper);
+
+        var result = await handler.Handle(new CreateTemplateCommand(
+            "Unsafe Template",
+            TemplateType.Email,
+            "<div>Welcome</div><script>alert('xss')</script>"), CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.True(result.Errors.Single().Contains("unsafe markup", StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(0, repository.TemplateCount);
+        Assert.Equal(0, unitOfWork.SaveChangesCallCount);
     }
 
     [Fact]
@@ -55,7 +76,7 @@ public sealed class TemplateModuleUnitTests
     {
         var repository = new InMemoryTemplateRepository();
         var unitOfWork = new RecordingUnitOfWork();
-        var handler = new UpdateTemplateCommandHandler(repository, unitOfWork, _mapper);
+        var handler = new UpdateTemplateCommandHandler(repository, unitOfWork, _templateHtmlSanitizer, _mapper);
 
         var result = await handler.Handle(new UpdateTemplateCommand(
             Guid.NewGuid(),
@@ -153,6 +174,18 @@ public sealed class TemplateModuleUnitTests
         Assert.False(validation.IsValid);
         Assert.Contains(validation.Errors, error => error.PropertyName == nameof(ListTemplatesQuery.PageNumber));
         Assert.Contains(validation.Errors, error => error.PropertyName == nameof(ListTemplatesQuery.PageSize));
+    }
+
+    [Fact]
+    public void TemplateHtmlSanitizer_Should_Remove_Disallowed_Attributes_And_Tags()
+    {
+        var sanitizer = new TemplateHtmlSanitizer();
+        var input = "<div onclick=\"hack()\"><a href=\"https://example.com\" style=\"color:red\">link</a><video src=\"/sample.mp4\"></video></div>";
+
+        var result = sanitizer.Sanitize(input);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("<div><a href=\"https://example.com\">link</a></div>", result.Value);
     }
 
     private sealed class RecordingUnitOfWork : IUnitOfWork

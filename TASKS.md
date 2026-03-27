@@ -367,7 +367,7 @@
   - **Description:** Add create/update/get/list/publish/archive commands and queries through MediatR with FluentValidation.
   - **Expected output:** End-to-end application handlers for template lifecycle operations.
   - **Related layer:** Backend
-- [ ] **Build safe HTML sanitization pipeline**
+- [x] **Build safe HTML sanitization pipeline**
   - **Description:** Apply allowlist-based sanitization before persistence/rendering and reject unsafe markup patterns.
   - **Expected output:** Sanitized template content that prevents unsafe script/style injection vectors.
   - **Related layer:** Backend
@@ -402,6 +402,15 @@
   - Reproducible command evidence:
     - `rg -n "Features/Templates|CreateTemplateCommand|UpdateTemplateCommand|GetTemplateByIdQuery|ListTemplatesQuery|PublishTemplateCommand|ArchiveTemplateCommand" backend/Application`
     - `rg -n "TemplateModuleUnitTests|InMemoryTemplateRepository|CreateTemplateCommandValidator|ListTemplatesQueryValidator" backend/API.IntegrationTests/TemplateModuleUnitTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Implemented allowlist-based template HTML sanitization service (`TemplateHtmlSanitizer`) in Application layer and registered it in DI for reuse by template CQRS handlers before domain persistence.
+  - Hardened create/update template command handlers to sanitize incoming HTML and reject unsafe markup patterns (`<script>`, inline event handlers, unsafe protocols) with deterministic failures.
+  - Added module tests for sanitization behavior, including unsafe markup rejection and allowed-tag/attribute normalization.
+  - Reproducible command evidence:
+    - `rg -n "ITemplateHtmlSanitizer|TemplateHtmlSanitizer|unsafe markup" backend/Application`
+    - `rg -n "CreateTemplateCommandHandler_Should_Reject_Unsafe_Html_Markup|TemplateHtmlSanitizer_Should_Remove_Disallowed_Attributes_And_Tags" backend/API.IntegrationTests/TemplateModuleUnitTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 7. [ ] Tracking module
