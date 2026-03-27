@@ -659,7 +659,7 @@
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 
-## 9. [ ] Analytics and dashboard APIs
+## 9. [-] Analytics and dashboard APIs
 - StartedAt:
 - FinishedAt:
 - Owner:
@@ -684,7 +684,7 @@
   - **Description:** Add SignalR (or equivalent) hub and publish KPI update events with authorization checks.
   - **Expected output:** Live dashboard updates for subscribed authenticated clients.
   - **Related layer:** Backend
-- [ ] **Expose secured dashboard endpoints**
+- [x] **Expose secured dashboard endpoints**
   - **Description:** Add API endpoints for analytics widgets with role-based access enforcement.
   - **Expected output:** JWT/RBAC-protected analytics API surface ready for frontend integration.
   - **Related layer:** Backend
@@ -721,6 +721,17 @@
     - `rg -n "Handle_Should_Return_Cached_Response_Without_Hitting_Repository|InvalidationCount" backend/API.IntegrationTests/AnalyticsQueryHandlerTests.cs backend/API.IntegrationTests/CampaignModuleUnitTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
+
+
+- Subtask completion update (2026-03-27):
+  - Exposed secured, versioned analytics dashboard API endpoint via thin `AnalyticsController` (`GET /api/analytics/dashboard-kpis` and `/api/v{version}/analytics/dashboard-kpis`).
+  - Enforced JWT/RBAC at endpoint level using `Viewer` policy to allow dashboard reads for `Viewer`/`Operator`/`Admin` roles per existing authorization policy hierarchy.
+  - Kept API controller business-logic free by delegating filter inputs directly to MediatR `GetDashboardKpisQuery` and returning ProblemDetails-compatible 400 responses for invalid analytics requests.
+  - Added integration authorization coverage for unauthenticated rejection, viewer-role success on unversioned/versioned routes, and invalid date-window validation contract checks.
+  - Reproducible command evidence:
+    - `rg -n "class AnalyticsController|dashboard-kpis|Authorize\(Policy = AuthorizationPolicies.Viewer\)|GetDashboardKpisQuery" backend/API/Controllers/AnalyticsController.cs`
+    - `rg -n "AnalyticsEndpointsAuthorizationTests|dashboard-kpis|v1/analytics|application/problem\+json" backend/API.IntegrationTests/AnalyticsEndpointsAuthorizationTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 - Subtask completion update (2026-03-27):
   - Implemented authenticated realtime analytics channel using SignalR:
