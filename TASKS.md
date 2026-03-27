@@ -375,7 +375,7 @@
   - **Description:** Resolve template placeholders from approved data sources with deterministic missing-variable behavior.
   - **Expected output:** Renderer service producing final HTML with validated substitutions.
   - **Related layer:** Backend
-- [ ] **Add template persistence schema and indexes**
+- [x] **Add template persistence schema and indexes**
   - **Description:** Configure infrastructure persistence, versioning constraints, and migrations for template storage.
   - **Expected output:** Migration-ready schema with efficient query/index strategy.
   - **Related layer:** Infra
@@ -385,6 +385,17 @@
   - **Related layer:** Backend
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-27):
+  - Implemented template infrastructure persistence in EF Core with dedicated entity configuration for `templates` and owned `template_variables`, including version concurrency token and status/type/name query indexes.
+  - Added unique constraints for published-template naming and per-template variable names to enforce storage integrity aligned with lifecycle/versioning rules.
+  - Added concrete `TemplateRepository` implementation for create/update/get/list/published-template read paths and registered it in Infrastructure DI.
+  - Added SQL migration artifact `20260327190000_add_templates_schema.sql` with table/index definitions to provide migration-ready schema bootstrap in environments where EF migration tooling is unavailable.
+  - Reproducible command evidence:
+    - `rg -n "class TemplateEntityTypeConfiguration|ToTable\("templates"\)|IsConcurrencyToken|ux_templates_published_name|ux_template_variables_template_name" backend/Infrastructure/Persistence/Configurations/TemplateEntityTypeConfiguration.cs`
+    - `rg -n "class TemplateRepository|GetPublishedByNameAsync|ILike|Include\(template => template.Variables\)" backend/Infrastructure/Persistence/Repositories/TemplateRepository.cs`
+    - `rg -n "DbSet<Template>|ApplyConfiguration\(new TemplateEntityTypeConfiguration\)|ITemplateRepository" backend/Infrastructure/Persistence/QPhisingDbContext.cs backend/Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs`
+    - `rg -n "CREATE TABLE IF NOT EXISTS templates|CREATE TABLE IF NOT EXISTS template_variables|ux_templates_published_name" backend/Infrastructure/Persistence/Migrations/20260327190000_add_templates_schema.sql`
 - Subtask completion update (2026-03-27):
   - Added Template domain aggregate and lifecycle model in Domain layer with explicit invariants for required name/content, versioning, and legal status transitions (`Draft -> Published -> Archived`, with direct draft archive allowed).
   - Added template variable contract/value object enforcing placeholder variable naming rules and deterministic placeholder format extraction (`{{variable_name}}`).
