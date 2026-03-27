@@ -760,7 +760,7 @@
   - **Description:** Model export request, format, status progression, ownership, and file metadata.
   - **Expected output:** Consistent domain/application contract for asynchronous exports.
   - **Related layer:** Backend
-- [ ] **Implement Excel export pipeline**
+- [x] **Implement Excel export pipeline**
   - **Description:** Build ClosedXML-based service for campaign and analytics datasets with enterprise-ready formatting.
   - **Expected output:** Reproducible `.xlsx` outputs aligned with report requirements.
   - **Related layer:** Backend
@@ -792,6 +792,16 @@
     - `rg -n "interface IExportJobRepository|record ExportJobReadCriteria" backend/Domain/Abstractions`
     - `rg -n "ExportJobContract|ExportJobMappingProfile" backend/Application`
     - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-27):
+  - Implemented ClosedXML-backed excel export service (`IExcelExportService` + `ClosedXmlExcelExportService`) supporting campaign and analytics workbook generation with multi-sheet outputs and styled headers.
+  - Added campaign report workbook structure with summary metrics and detailed campaign rows (status/template/date windows/duration), ordered for deterministic exports.
+  - Added analytics report workbook structure with KPI sheet, trend sheet, campaign status breakdown, and template-type breakdown for operational dashboard parity.
+  - Added automated tests to validate workbook generation, sheet presence, and critical headers/row counts for both campaign and analytics export flows.
+  - Reproducible command evidence:
+    - `rg -n "IExcelExportService|ExportBinaryFile" backend/Application/Common/Abstractions/Exports/IExcelExportService.cs`
+    - `rg -n "ClosedXmlExcelExportService|BuildCampaignReportAsync|BuildAnalyticsReportAsync" backend/Infrastructure/Exports/ClosedXmlExcelExportService.cs`
+    - `rg -n "ExcelExportPipelineTests|BuildCampaignReportAsync_Should_CreateWorkbook|BuildAnalyticsReportAsync_Should_CreateWorkbook" backend/API.IntegrationTests/ExcelExportPipelineTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 11. [-] Frontend enterprise UI
 - StartedAt: 2026-03-27T16:40:00Z
