@@ -2,6 +2,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using QPhising.Application.Behaviors;
+using QPhising.Application.Common;
+using QPhising.Application.Common.Abstractions;
 
 namespace QPhising.Application.DependencyInjection;
 
@@ -13,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
         services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddScoped<ICampaignInteractionGuard, CampaignInteractionGuard>();
         return services;
     }
 }
