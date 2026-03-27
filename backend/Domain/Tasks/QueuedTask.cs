@@ -41,6 +41,7 @@ public sealed class QueuedTask
         CorrelationId = correlationId;
         Status = TaskExecutionStatus.Queued;
         AttemptCount = 0;
+        NextAttemptAt = createdAt;
     }
 
     public Guid Id { get; }
@@ -66,6 +67,8 @@ public sealed class QueuedTask
     public DateTimeOffset? LastFailedAt { get; private set; }
 
     public DateTimeOffset? LeaseExpiresAt { get; private set; }
+
+    public DateTimeOffset? NextAttemptAt { get; private set; }
 
     public string? LastError { get; private set; }
 
@@ -102,14 +105,20 @@ public sealed class QueuedTask
 
     public void Claim(DateTimeOffset leaseExpiresAt, DateTimeOffset? claimedAt = null)
     {
-        if (leaseExpiresAt <= (claimedAt ?? DateTimeOffset.UtcNow))
+        DateTimeOffset claimTimestamp = claimedAt ?? DateTimeOffset.UtcNow;
+        if (leaseExpiresAt <= claimTimestamp)
         {
             throw new TaskValidationException("Task lease expiration must be in the future.");
         }
 
+        if (NextAttemptAt.HasValue && NextAttemptAt.Value > claimTimestamp)
+        {
+            throw new TaskValidationException("Task cannot be claimed before its next retry window.");
+        }
+
         TransitionTo(TaskExecutionStatus.Claimed);
 
-        ClaimedAt = claimedAt ?? DateTimeOffset.UtcNow;
+        ClaimedAt = claimTimestamp;
         LeaseExpiresAt = leaseExpiresAt;
     }
 
@@ -126,6 +135,7 @@ public sealed class QueuedTask
         TransitionTo(TaskExecutionStatus.Succeeded);
         CompletedAt = completedAt ?? DateTimeOffset.UtcNow;
         LeaseExpiresAt = null;
+        NextAttemptAt = null;
         LastError = null;
     }
 
@@ -145,6 +155,11 @@ public sealed class QueuedTask
 
     public void Requeue()
     {
+        RequeueForRetry(DateTimeOffset.UtcNow);
+    }
+
+    public void RequeueForRetry(DateTimeOffset nextAttemptAt, DateTimeOffset? referenceTime = null)
+    {
         if (Status != TaskExecutionStatus.Failed)
         {
             throw new InvalidTaskStatusTransitionException(Status, TaskExecutionStatus.Queued);
@@ -155,9 +170,17 @@ public sealed class QueuedTask
             throw new TaskValidationException("Task cannot be requeued because it has exhausted max attempts.");
         }
 
+        DateTimeOffset now = referenceTime ?? DateTimeOffset.UtcNow;
+        if (nextAttemptAt < now)
+        {
+            throw new TaskValidationException("Task retry window must not be scheduled in the past.");
+        }
+
         TransitionTo(TaskExecutionStatus.Queued);
         ClaimedAt = null;
         StartedAt = null;
+        LeaseExpiresAt = null;
+        NextAttemptAt = nextAttemptAt;
     }
 
     public void MoveToDeadLetter(string reason)
@@ -173,6 +196,8 @@ public sealed class QueuedTask
         }
 
         TransitionTo(TaskExecutionStatus.DeadLettered);
+        LeaseExpiresAt = null;
+        NextAttemptAt = null;
         LastError = reason.Trim();
     }
 
@@ -180,6 +205,7 @@ public sealed class QueuedTask
     {
         TransitionTo(TaskExecutionStatus.Canceled);
         LeaseExpiresAt = null;
+        NextAttemptAt = null;
     }
 
     private void TransitionTo(TaskExecutionStatus nextStatus)

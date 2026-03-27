@@ -581,7 +581,7 @@
   - **Description:** Route task types to dedicated handlers and enforce standardized execution contract.
   - **Expected output:** Extensible execution pipeline for background tasks with consistent handler outcomes.
   - **Related layer:** Backend
-- [ ] **Add retry/backoff and dead-letter handling**
+- [x] **Add retry/backoff and dead-letter handling**
   - **Description:** Introduce retry policy per task type with capped attempts and dead-letter terminal state.
   - **Expected output:** Predictable failure recovery and dead-lettered task visibility.
   - **Related layer:** Backend
@@ -634,7 +634,18 @@
     - `rg -n "ClaimNextAsync|StartExecution|DispatchAsync|Complete\\(|Fail\\(" worker/Services/TaskWorkerService.cs`
     - `dotnet build worker/Worker.csproj` *(fails in current environment: `dotnet` not installed)*
 
-- Remaining scope for this task: retry/backoff + dead-letter policy and execution history/observability persistence.
+- Subtask completion update (2026-03-27):
+  - Implemented worker-level retry/backoff policy with configurable options (`InitialRetryDelaySeconds`, `MaxRetryDelaySeconds`, `RetryBackoffMultiplier`) and exponential delay calculation per failed attempt.
+  - Added deterministic dead-letter handling in worker execution flow: non-retryable failures or exhausted-attempt failures now transition tasks to terminal `DeadLettered` state with persisted reason.
+  - Extended queued-task persistence and claiming semantics with `next_attempt_at` scheduling: retries are delayed until eligible window and claim queries honor backoff windows.
+  - Added migration-ready schema update for retry scheduling (`next_attempt_at`) and indexing for efficient due-task claims.
+  - Expanded domain unit coverage for retry scheduling window behavior (`RequeueForRetry_Should_Set_NextAttemptWindow`).
+  - Reproducible command evidence:
+    - `rg -n "InitialRetryDelaySeconds|MaxRetryDelaySeconds|RetryBackoffMultiplier|HandleTaskFailure|CalculateRetryDelay|MoveToDeadLetter|RequeueForRetry" worker`
+    - `rg -n "next_attempt_at|ix_queued_tasks_status_next_attempt_at_created_at|ClaimNextQueuedTaskIdAsync" backend/Infrastructure/Persistence`
+    - `rg -n "RequeueForRetry_Should_Set_NextAttemptWindow|NextAttemptAt" backend/API.IntegrationTests/TaskAggregateUnitTests.cs backend/Domain/Tasks/QueuedTask.cs`
+
+- Remaining scope for this task: execution history/observability persistence.
 
 ## 9. [ ] Analytics and dashboard APIs
 - StartedAt:

@@ -66,6 +66,10 @@ public sealed class QueuedTaskEntityTypeConfiguration : IEntityTypeConfiguration
         builder.Property(task => task.LeaseExpiresAt)
             .HasColumnName("lease_expires_at");
 
+        builder.Property(task => task.NextAttemptAt)
+            .HasColumnName("next_attempt_at")
+            .IsRequired();
+
         builder.Property(task => task.LastError)
             .HasColumnName("last_error")
             .HasMaxLength(2048);
@@ -79,5 +83,8 @@ public sealed class QueuedTaskEntityTypeConfiguration : IEntityTypeConfiguration
 
         builder.HasIndex(task => task.LeaseExpiresAt)
             .HasDatabaseName("ix_queued_tasks_lease_expires_at");
+
+        builder.HasIndex(task => new { task.Status, task.NextAttemptAt, task.CreatedAt })
+            .HasDatabaseName("ix_queued_tasks_status_next_attempt_at_created_at");
     }
 }
