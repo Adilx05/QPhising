@@ -876,7 +876,7 @@
   - **Description:** Introduce NgRx or Signals for auth/session, dashboard data, and feature-level view state.
   - **Expected output:** Predictable frontend state flows with typed selectors/actions.
   - **Related layer:** Frontend
-- [ ] **Implement route guards and role-aware navigation**
+- [x] **Implement route guards and role-aware navigation**
   - **Description:** Add authentication guards and role-based menu rendering/route access checks.
   - **Expected output:** Protected frontend routes and consistent RBAC-driven navigation UX.
   - **Related layer:** Frontend
@@ -906,6 +906,15 @@
   - Dashboard smart container rendering KPI cards and chart component.
 - Remaining scope for this task: state management, guards, role-based menus, and full enterprise UI feature set.
 
+
+- Subtask completion update (2026-03-27):
+  - Implemented centralized frontend route authorization guards (`routeMatchAccessGuard` + `routeAccessGuard`) that enforce authenticated sessions and role constraints before lazy-feature route activation.
+  - Added route-level RBAC metadata in `AppRoutingModule` for all feature areas, including stricter `Operator/Admin` protection on `tasks` and an explicit `/unauthorized` route for denied navigation outcomes.
+  - Updated layout navigation rendering to use a shared role-access predicate from `AppStateStore`, ensuring sidebar visibility rules match route guard decisions.
+  - Reproducible command evidence:
+    - `rg -n "routeAccessGuard|routeMatchAccessGuard|roles:" frontend/src/app/app-routing.module.ts frontend/src/app/core/auth/route-access.guard.ts`
+    - `rg -n "canAccessAnyRole|navigationItems|allowedRoles" frontend/src/app/core/state/app-state.store.ts frontend/src/app/core/layout/layout-shell.component.ts`
+    - `npm run build` (from `frontend/`)
 - Subtask completion update (2026-03-27):
   - Implemented a Signals-based global frontend state store (`AppStateStore`) to centralize auth/session state, dashboard KPI/trend datasets, and typed feature-level view state for dashboard/campaigns/templates/tracking/tasks/analytics/exports.
   - Wired layout and feature container components to consume global signals/computed selectors instead of embedding dashboard/session state directly in component classes.

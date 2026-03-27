@@ -5,10 +5,11 @@ import { RouterModule } from '@angular/router';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { UnauthorizedPageComponent } from './core/auth/unauthorized-page.component';
 import { LayoutShellComponent } from './core/layout/layout-shell.component';
 
 @NgModule({
-  declarations: [AppComponent, LayoutShellComponent],
+  declarations: [AppComponent, LayoutShellComponent, UnauthorizedPageComponent],
   imports: [BrowserModule, BrowserAnimationsModule, RouterModule, AppRoutingModule],
   providers: [],
   bootstrap: [AppComponent]
