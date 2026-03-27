@@ -573,7 +573,7 @@
   - **Description:** Define `Task` lifecycle transitions, task-type contracts, payload schema, and execution status semantics.
   - **Expected output:** Domain-consistent task model and transition guards suitable for queue processing.
   - **Related layer:** Backend
-- [ ] **Implement durable queue persistence strategy**
+- [x] **Implement durable queue persistence strategy**
   - **Description:** Persist queued tasks with claim/lease semantics and concurrency-safe status updates.
   - **Expected output:** Restart-safe queue storage with deterministic worker claim behavior.
   - **Related layer:** Infra
@@ -599,6 +599,23 @@
     - `rg -n "QueuedTask|TaskExecutionStatus|TaskType|TaskPayload" backend/Domain/Tasks`
     - `rg -n "TaskAggregateUnitTests|Create_Should_Require_Payload_Contract|Lifecycle_Should_Allow" backend/API.IntegrationTests/TaskAggregateUnitTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Implemented durable queue persistence contracts and infrastructure wiring:
+    - added `IQueuedTaskRepository` abstraction in Domain for add/get/update/claim/requeue operations,
+    - registered repository implementation in Infrastructure DI.
+  - Added EF Core persistence model for queued tasks with JSON payload storage and operational indexes:
+    - `queued_tasks` mapping via `QueuedTaskEntityTypeConfiguration`,
+    - `DbSet<QueuedTask>` registration in `QPhisingDbContext`,
+    - migration SQL for durable task table and indexes.
+  - Implemented concurrency-safe queue claim semantics in `QueuedTaskRepository`:
+    - atomically requeues expired leases,
+    - claims the next queued task using PostgreSQL `FOR UPDATE SKIP LOCKED`,
+    - returns deterministically claimed task for worker processing.
+  - Reproducible command evidence:
+    - `rg -n "IQueuedTaskRepository|ClaimNextAsync|RequeueExpiredClaimsAsync" backend/Domain backend/Infrastructure`
+    - `rg -n "QueuedTaskEntityTypeConfiguration|queued_tasks|payload_json" backend/Infrastructure`
+    - `rg -n "Implement durable queue persistence strategy" TASKS.md`
 
 - Created runnable `worker/` ASP.NET-hosted background service for task execution bootstrap:
   - `TaskWorkerService` with heartbeat logging loop.

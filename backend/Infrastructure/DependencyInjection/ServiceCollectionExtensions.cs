@@ -64,6 +64,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICampaignRepository, CampaignRepository>();
         services.AddScoped<ITemplateRepository, TemplateRepository>();
         services.AddScoped<ITrackingClickRepository, TrackingClickRepository>();
+        services.AddScoped<IQueuedTaskRepository, QueuedTaskRepository>();
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
         services.AddScoped<ITrackingClickRealtimeStore, RedisTrackingClickRealtimeStore>();
         services.AddHostedService<TrackingRetentionBackgroundService>();
