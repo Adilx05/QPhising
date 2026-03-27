@@ -65,7 +65,9 @@ public sealed class TaskAggregateUnitTests
     {
         IReadOnlyDictionary<string, string> payload = new Dictionary<string, string>
         {
+            ["exportJobId"] = Guid.NewGuid().ToString(),
             ["exportType"] = "CampaignReport",
+            ["format"] = "Excel",
             ["requestedByUserId"] = Guid.NewGuid().ToString(),
             ["requestedAt"] = DateTimeOffset.UtcNow.ToString("O")
         };
@@ -89,7 +91,9 @@ public sealed class TaskAggregateUnitTests
     {
         IReadOnlyDictionary<string, string> payload = new Dictionary<string, string>
         {
+            ["exportJobId"] = Guid.NewGuid().ToString(),
             ["exportType"] = "CampaignReport",
+            ["format"] = "Excel",
             ["requestedByUserId"] = Guid.NewGuid().ToString(),
             ["requestedAt"] = DateTimeOffset.UtcNow.ToString("O")
         };

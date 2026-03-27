@@ -768,7 +768,7 @@
   - **Description:** Build PDF rendering service for campaign and analytics report layouts.
   - **Expected output:** Downloadable `.pdf` reports generated from validated export payloads.
   - **Related layer:** Backend
-- [ ] **Integrate async export processing**
+- [x] **Integrate async export processing**
   - **Description:** Queue export jobs to background worker with retry/dead-letter support and status updates.
   - **Expected output:** Non-blocking export execution with reliable job tracking.
   - **Related layer:** Backend
@@ -812,6 +812,22 @@
     - `rg -n "class QuestPdfExportService|GeneratePdf|application/pdf" backend/Infrastructure/Exports/QuestPdfExportService.cs`
     - `rg -n "AddScoped<IPdfExportService" backend/Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs`
     - `rg -n "PdfExportPipelineTests|%PDF-|BuildCampaignReportAsync_Should_CreatePdfBinary|BuildAnalyticsReportAsync_Should_CreatePdfBinary" backend/API.IntegrationTests/PdfExportPipelineTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-27):
+  - Added application CQRS entrypoint for asynchronous export requests (`QueueExportJobCommand`) that creates `ExportJob` records and enqueues `TaskType.ExportGeneration` queued tasks with deterministic payload schema (`exportJobId`, export type/format, owner, request time).
+  - Implemented infrastructure persistence for export jobs (`export_jobs` EF configuration/repository + SQL migration) and wired dependency injection for `IExportJobRepository`.
+  - Replaced placeholder worker export handler with end-to-end processing flow:
+    - transitions export job status (`Requested/Queued/Failed -> Processing -> Completed|Failed`),
+    - generates Excel/PDF files using existing export services,
+    - persists files through local storage abstraction,
+    - returns retryable failures so existing worker retry/dead-letter logic applies.
+  - Added export storage configuration/options (`ExportStorage`) with startup validation and worker/API defaults.
+  - Added test coverage for queued export command flow and updated task aggregate payload schema tests for export task contract.
+  - Reproducible command evidence:
+    - `rg -n "QueueExportJobCommand|TaskType.ExportGeneration|exportJobId|format" backend/Application/Features/Exports/QueueExportJob backend/Domain/Tasks/QueuedTask.cs`
+    - `rg -n "ExportJobEntityTypeConfiguration|ExportJobRepository|DbSet<ExportJob>|export_jobs" backend/Infrastructure/Persistence`
+    - `rg -n "class ExportGenerationTaskHandler|TryMoveToProcessing|BuildExportBinaryAsync|IExportFileStorage" worker/TaskExecution/Handlers/ExportGenerationTaskHandler.cs backend/Application/Common/Abstractions/Exports/IExportFileStorage.cs`
+    - `rg -n "QueueExportJobCommandHandlerTests|TaskAggregateUnitTests" backend/API.IntegrationTests`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
 
 ## 11. [-] Frontend enterprise UI
