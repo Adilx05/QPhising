@@ -17,12 +17,15 @@ public sealed class QPhisingDbContext(DbContextOptions<QPhisingDbContext> option
 
     public DbSet<QueuedTask> QueuedTasks => Set<QueuedTask>();
 
+    public DbSet<TaskExecutionLog> TaskExecutionLogs => Set<TaskExecutionLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new CampaignEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new TemplateEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new TrackingClickEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new QueuedTaskEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new TaskExecutionLogEntityTypeConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

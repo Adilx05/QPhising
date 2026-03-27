@@ -585,7 +585,7 @@
   - **Description:** Introduce retry policy per task type with capped attempts and dead-letter terminal state.
   - **Expected output:** Predictable failure recovery and dead-lettered task visibility.
   - **Related layer:** Backend
-- [ ] **Add execution logging and observability**
+- [x] **Add execution logging and observability**
   - **Description:** Persist structured execution logs, correlation IDs, and timing metrics for each task run.
   - **Expected output:** Queryable execution history and diagnostics for operations and troubleshooting.
   - **Related layer:** Infra
@@ -645,7 +645,19 @@
     - `rg -n "next_attempt_at|ix_queued_tasks_status_next_attempt_at_created_at|ClaimNextQueuedTaskIdAsync" backend/Infrastructure/Persistence`
     - `rg -n "RequeueForRetry_Should_Set_NextAttemptWindow|NextAttemptAt" backend/API.IntegrationTests/TaskAggregateUnitTests.cs backend/Domain/Tasks/QueuedTask.cs`
 
-- Remaining scope for this task: execution history/observability persistence.
+
+- Subtask completion update (2026-03-27):
+  - Added durable task execution history model (`TaskExecutionLog`) with structured lifecycle events (`Claimed`, `Started`, `Succeeded`, `Failed`, `Retried`, `DeadLettered`), correlation ID capture, attempt metadata, and per-run duration metrics.
+  - Added clean persistence boundary contract `ITaskExecutionLogRepository` in Domain abstractions and EF Core infrastructure implementation/configuration mapped to `task_execution_logs` with task/time and correlation indexes.
+  - Instrumented worker execution flow to persist structured execution logs at each lifecycle stage with serialized diagnostic payloads (status, retries, error data, `traceId`, retry window), while keeping worker orchestration logic inside the worker layer.
+  - Added migration-ready SQL artifact `20260327235500_add_task_execution_logs_schema.sql` for execution history storage and relational integrity with queued tasks.
+  - Added domain-focused unit coverage for task execution log invariants (normalization and negative-duration rejection).
+  - Reproducible command evidence:
+    - `rg -n "TaskExecutionLog|TaskExecutionLogEventType|ITaskExecutionLogRepository" backend/Domain backend/Infrastructure`
+    - `rg -n "PersistExecutionLogAsync|TaskExecutionLogEventType\.(Claimed|Started|Succeeded|Failed|Retried|DeadLettered)|ExecutionDurationMilliseconds" worker/Services/TaskWorkerService.cs`
+    - `rg -n "task_execution_logs|ix_task_execution_logs_task_id_occurred_at|ix_task_execution_logs_correlation_id" backend/Infrastructure/Persistence/Migrations/20260327235500_add_task_execution_logs_schema.sql backend/Infrastructure/Persistence/Configurations/TaskExecutionLogEntityTypeConfiguration.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
 
 ## 9. [ ] Analytics and dashboard APIs
 - StartedAt:
