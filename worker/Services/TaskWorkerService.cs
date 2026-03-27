@@ -82,17 +82,58 @@ public sealed class TaskWorkerService(
         }
         else
         {
-            queuedTask.Fail(executionResult.ErrorMessage ?? "Task execution failed.");
-            logger.LogWarning(
-                "Task {TaskId} failed. Retryable={IsRetryable}. Error={ErrorMessage}",
-                queuedTask.Id,
-                executionResult.IsRetryable,
-                executionResult.ErrorMessage);
+            HandleTaskFailure(queuedTask, executionResult);
         }
 
         taskRepository.Update(queuedTask);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return true;
+    }
+
+    private void HandleTaskFailure(QueuedTask queuedTask, QueuedTaskHandlerResult executionResult)
+    {
+        string failureMessage = executionResult.ErrorMessage ?? "Task execution failed.";
+        DateTimeOffset failedAt = DateTimeOffset.UtcNow;
+
+        queuedTask.Fail(failureMessage, failedAt);
+
+        bool exhaustedAttempts = queuedTask.AttemptCount >= queuedTask.MaxAttempts;
+        if (!executionResult.IsRetryable || exhaustedAttempts)
+        {
+            queuedTask.MoveToDeadLetter(failureMessage);
+            logger.LogWarning(
+                "Task {TaskId} moved to dead-letter. Retryable={IsRetryable}. Attempt={AttemptCount}/{MaxAttempts}. Error={ErrorMessage}",
+                queuedTask.Id,
+                executionResult.IsRetryable,
+                queuedTask.AttemptCount,
+                queuedTask.MaxAttempts,
+                failureMessage);
+
+            return;
+        }
+
+        TimeSpan retryDelay = CalculateRetryDelay(queuedTask.AttemptCount);
+        DateTimeOffset nextAttemptAt = failedAt.Add(retryDelay);
+        queuedTask.RequeueForRetry(nextAttemptAt, failedAt);
+
+        logger.LogWarning(
+            "Task {TaskId} failed and scheduled for retry at {NextAttemptAt}. Attempt={AttemptCount}/{MaxAttempts} DelaySeconds={DelaySeconds} Error={ErrorMessage}",
+            queuedTask.Id,
+            nextAttemptAt,
+            queuedTask.AttemptCount,
+            queuedTask.MaxAttempts,
+            retryDelay.TotalSeconds,
+            failureMessage);
+    }
+
+    private TimeSpan CalculateRetryDelay(int attemptCount)
+    {
+        int boundedAttempt = Math.Max(attemptCount, 1);
+        double exponentialDelay = _options.InitialRetryDelaySeconds *
+                                  Math.Pow(_options.RetryBackoffMultiplier, boundedAttempt - 1);
+
+        double cappedDelay = Math.Min(exponentialDelay, _options.MaxRetryDelaySeconds);
+        return TimeSpan.FromSeconds(cappedDelay);
     }
 }

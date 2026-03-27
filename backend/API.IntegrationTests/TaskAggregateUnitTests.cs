@@ -61,6 +61,30 @@ public sealed class TaskAggregateUnitTests
     }
 
     [Fact]
+    public void RequeueForRetry_Should_Set_NextAttemptWindow()
+    {
+        IReadOnlyDictionary<string, string> payload = new Dictionary<string, string>
+        {
+            ["exportType"] = "CampaignReport",
+            ["requestedByUserId"] = Guid.NewGuid().ToString(),
+            ["requestedAt"] = DateTimeOffset.UtcNow.ToString("O")
+        };
+
+        QueuedTask task = QueuedTask.Create(TaskType.ExportGeneration, payload, maxAttempts: 3);
+
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        task.Claim(now.AddMinutes(5), now);
+        task.StartExecution(now.AddSeconds(1));
+        task.Fail("temporary dependency outage", now.AddSeconds(2));
+
+        DateTimeOffset nextAttemptAt = now.AddMinutes(2);
+        task.RequeueForRetry(nextAttemptAt, now.AddSeconds(2));
+
+        Assert.Equal(TaskExecutionStatus.Queued, task.Status);
+        Assert.Equal(nextAttemptAt, task.NextAttemptAt);
+    }
+
+    [Fact]
     public void MoveToDeadLetter_Should_Require_Failed_Status()
     {
         IReadOnlyDictionary<string, string> payload = new Dictionary<string, string>

@@ -34,7 +34,8 @@ public sealed class QueuedTaskRepository(QPhisingDbContext dbContext) : IQueuedT
             SET status = {TaskExecutionStatus.Queued.ToString()},
                 claimed_at = NULL,
                 lease_expires_at = NULL,
-                started_at = NULL
+                started_at = NULL,
+                next_attempt_at = {referenceTime}
             WHERE status = {TaskExecutionStatus.Claimed.ToString()}
               AND lease_expires_at IS NOT NULL
               AND lease_expires_at <= {referenceTime};
@@ -92,7 +93,8 @@ public sealed class QueuedTaskRepository(QPhisingDbContext dbContext) : IQueuedT
                 SELECT id
                 FROM queued_tasks
                 WHERE status = @queued_status
-                ORDER BY created_at, id
+                  AND next_attempt_at <= @as_of
+                ORDER BY next_attempt_at, created_at, id
                 FOR UPDATE SKIP LOCKED
                 LIMIT 1
             )
@@ -106,6 +108,7 @@ public sealed class QueuedTaskRepository(QPhisingDbContext dbContext) : IQueuedT
             """;
 
         command.Parameters.Add(CreateParameter(command, "@queued_status", TaskExecutionStatus.Queued.ToString()));
+        command.Parameters.Add(CreateParameter(command, "@as_of", claimedAt));
         command.Parameters.Add(CreateParameter(command, "@claimed_status", TaskExecutionStatus.Claimed.ToString()));
         command.Parameters.Add(CreateParameter(command, "@claimed_at", claimedAt));
         command.Parameters.Add(CreateParameter(command, "@lease_expires_at", leaseExpiresAt));
