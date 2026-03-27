@@ -1,10 +1,13 @@
 FROM node:22-alpine AS build
 WORKDIR /app
-COPY package.json ./
+
+COPY package.json package-lock.json* ./
 RUN npm install
+
 COPY . .
 RUN npm run build
 
-FROM nginx:1.27-alpine
+FROM nginx:1.27-alpine AS runtime
 COPY --from=build /app/dist/qphising-frontend /usr/share/nginx/html
 EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
