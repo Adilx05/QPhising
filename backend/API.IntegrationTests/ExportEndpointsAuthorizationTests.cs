@@ -214,5 +214,11 @@ public sealed class ExportEndpointsAuthorizationTests : IClassFixture<ApiWebAppl
 
             return Task.FromResult<ExportFileContent?>(new ExportFileContent(bytes, bytes.LongLength));
         }
+
+        public Task<bool> DeleteIfExistsAsync(string storagePath, CancellationToken cancellationToken = default)
+        {
+            bool removed = Files.Remove(storagePath);
+            return Task.FromResult(removed);
+        }
     }
 }

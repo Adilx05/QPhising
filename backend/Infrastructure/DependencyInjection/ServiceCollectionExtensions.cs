@@ -52,6 +52,12 @@ public static class ServiceCollectionExtensions
             .ValidateOnStart();
 
         services
+            .AddOptions<ExportRetentionOptions>()
+            .Bind(configuration.GetSection(ExportRetentionOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services
             .AddOptions<InfrastructureOptions>()
             .Configure<DatabaseOptions, RedisOptions>((options, database, redis) =>
             {
@@ -85,6 +91,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
         services.AddScoped<ITrackingClickRealtimeStore, RedisTrackingClickRealtimeStore>();
         services.AddHostedService<TrackingRetentionBackgroundService>();
+        services.AddHostedService<ExportRetentionBackgroundService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddSingleton<ITrackingTokenService, HmacTrackingTokenService>();
 

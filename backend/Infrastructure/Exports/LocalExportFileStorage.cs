@@ -63,6 +63,30 @@ public sealed class LocalExportFileStorage(IOptions<ExportStorageOptions> option
         return new ExportFileContent(content, content.LongLength);
     }
 
+    public Task<bool> DeleteIfExistsAsync(string storagePath, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(storagePath))
+        {
+            return Task.FromResult(false);
+        }
+
+        string normalizedBasePath = Path.GetFullPath(_options.BasePath);
+        string normalizedStoragePath = Path.GetFullPath(storagePath);
+
+        if (!normalizedStoragePath.StartsWith(normalizedBasePath, StringComparison.Ordinal))
+        {
+            return Task.FromResult(false);
+        }
+
+        if (!File.Exists(normalizedStoragePath))
+        {
+            return Task.FromResult(false);
+        }
+
+        File.Delete(normalizedStoragePath);
+        return Task.FromResult(true);
+    }
+
     private static string SanitizeFileName(string fileName)
     {
         string candidate = string.IsNullOrWhiteSpace(fileName) ? "export.bin" : fileName.Trim();

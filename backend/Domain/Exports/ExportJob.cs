@@ -161,6 +161,19 @@ public sealed class ExportJob
         CanceledAt = canceledAt ?? DateTimeOffset.UtcNow;
     }
 
+    public void PurgeFileArtifact()
+    {
+        if (Status != ExportJobStatus.Completed)
+        {
+            throw new ExportValidationException("Only completed export jobs can purge file artifacts.");
+        }
+
+        FileName = null;
+        StoragePath = null;
+        ContentType = null;
+        FileSizeBytes = null;
+    }
+
     private void TransitionTo(ExportJobStatus requestedStatus)
     {
         if (Status == requestedStatus)

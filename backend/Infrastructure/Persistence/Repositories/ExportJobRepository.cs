@@ -72,4 +72,23 @@ public sealed class ExportJobRepository(QPhisingDbContext dbContext) : IExportJo
     {
         dbContext.ExportJobs.Update(exportJob);
     }
+
+    public async Task<IReadOnlyCollection<ExportJob>> ListExpiredWithStoredFileAsync(
+        DateTimeOffset asOfUtc,
+        int take,
+        CancellationToken cancellationToken = default)
+    {
+        int boundedTake = Math.Max(1, take);
+
+        return await dbContext.ExportJobs
+            .Where(job =>
+                job.Status == ExportJobStatus.Completed &&
+                job.ExpiresAt.HasValue &&
+                job.ExpiresAt.Value <= asOfUtc &&
+                job.StoragePath != null)
+            .OrderBy(job => job.ExpiresAt)
+            .ThenBy(job => job.Id)
+            .Take(boundedTake)
+            .ToArrayAsync(cancellationToken);
+    }
 }

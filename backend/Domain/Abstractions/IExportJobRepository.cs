@@ -13,4 +13,9 @@ public interface IExportJobRepository
     Task AddAsync(ExportJob exportJob, CancellationToken cancellationToken = default);
 
     void Update(ExportJob exportJob);
+
+    Task<IReadOnlyCollection<ExportJob>> ListExpiredWithStoredFileAsync(
+        DateTimeOffset asOfUtc,
+        int take,
+        CancellationToken cancellationToken = default);
 }
