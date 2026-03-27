@@ -10,6 +10,10 @@ public interface IExportFileStorage
     Task<ExportFileContent?> TryReadAsync(
         string storagePath,
         CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteIfExistsAsync(
+        string storagePath,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed record StoredExportFile(

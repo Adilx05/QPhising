@@ -776,7 +776,7 @@
   - **Description:** Add create/status/download endpoints with JWT/RBAC and ownership checks.
   - **Expected output:** Secure, auditable export workflow from request to file retrieval.
   - **Related layer:** Backend
-- [ ] **Implement export file retention cleanup**
+- [x] **Implement export file retention cleanup**
   - **Description:** Define storage TTL and cleanup process for generated export files.
   - **Expected output:** Controlled storage growth and compliance-ready retention behavior.
   - **Related layer:** Infra
@@ -847,6 +847,16 @@
     - `rg -n "class ExportGenerationTaskHandler|TryMoveToProcessing|BuildExportBinaryAsync|IExportFileStorage" worker/TaskExecution/Handlers/ExportGenerationTaskHandler.cs backend/Application/Common/Abstractions/Exports/IExportFileStorage.cs`
     - `rg -n "QueueExportJobCommandHandlerTests|TaskAggregateUnitTests" backend/API.IntegrationTests`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
+- Subtask completion update (2026-03-27):
+  - Implemented explicit export-retention cleanup scheduler in Infrastructure (`ExportRetentionBackgroundService`) with configurable cleanup interval and batch-size options (`ExportRetention`).
+  - Extended export storage abstraction with safe deletion (`DeleteIfExistsAsync`) and implemented path-bound physical file deletion in local storage.
+  - Added export repository cleanup query contract to fetch expired completed export jobs that still retain file pointers, then purge file artifacts (`FileName`/`StoragePath`/`ContentType`/`FileSizeBytes`) after deletion to prevent repeated cleanup loops.
+  - Wired startup options validation + hosted service registration and documented runtime defaults in API/worker configuration templates.
+  - Reproducible command evidence:
+    - `rg -n "ExportRetentionOptions|ExportRetentionBackgroundService|DeleteIfExistsAsync" backend/Infrastructure/Exports backend/Application/Common/Abstractions/Exports/IExportFileStorage.cs`
+    - `rg -n "ListExpiredWithStoredFileAsync|PurgeFileArtifact" backend/Domain backend/Infrastructure/Persistence/Repositories/ExportJobRepository.cs`
+    - `rg -n "\"ExportRetention\"|CleanupBatchSize|CleanupIntervalMinutes" backend/API/appsettings.json backend/API/appsettings.Production.Template.json worker/appsettings.json`
 
 ## 11. [-] Frontend enterprise UI
 - StartedAt: 2026-03-27T16:40:00Z
