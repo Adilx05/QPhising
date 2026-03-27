@@ -1035,7 +1035,7 @@
 - Add seed data: users/roles mapping assumptions, sample campaigns, templates, task history, analytics bootstrap data.
 
 ### Subtasks (planned)
-- [ ] **Finalize relational schema for all active modules**
+- [x] **Finalize relational schema for all active modules**
   - **Description:** Define entities, relationships, constraints, and indexes across campaign/template/tracking/task/analytics/export domains.
   - **Expected output:** Coherent normalized schema aligned with application use cases.
   - **Related layer:** Infra
@@ -1055,6 +1055,16 @@
   - **Description:** Implement re-runnable seed scripts/initializers that avoid duplicate records and preserve integrity.
   - **Expected output:** Safe repeated seed runs across developer and CI environments.
   - **Related layer:** Infra
+
+### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Finalized relational schema coverage by adding an idempotent SQL migration artifact for active modules (`20260328013000_finalize_relational_schema.sql`).
+  - Added the missing `campaigns` table baseline with required columns, normalized date-window constraint (`start_date <= end_date`), and lifecycle query indexes.
+  - Added explicit referential integrity between `tracking_clicks.campaign_id` and `campaigns.id` with cascade-delete behavior, and mirrored the relationship in EF Core mapping.
+  - Added non-negative data-integrity constraints for persisted export file sizes and task execution durations.
+  - Reproducible command evidence:
+    - `rg -n "CREATE TABLE IF NOT EXISTS campaigns|fk_tracking_clicks_campaigns_campaign_id|ck_export_jobs_file_size_non_negative|ck_task_execution_logs_duration_non_negative" backend/Infrastructure/Persistence/Migrations/20260328013000_finalize_relational_schema.sql`
+    - `rg -n "HasOne<Campaign>|HasForeignKey\\(click => click.CampaignId\\)" backend/Infrastructure/Persistence/Configurations/TrackingClickEntityTypeConfiguration.cs`
 
 ## 14. [-] Docker and runtime
 - StartedAt: 2026-03-27T16:55:00Z
