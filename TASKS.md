@@ -952,7 +952,7 @@
 - Enforce JWT validation, Redis-backed rate limiting, correlation IDs, and access logging.
 
 ### Subtasks (planned)
-- [ ] **Complete gateway route matrix**
+- [x] **Complete gateway route matrix**
   - **Description:** Enumerate and configure Ocelot routes for all service endpoint families with explicit upstream/downstream mappings.
   - **Expected output:** Comprehensive route coverage with deterministic forwarding rules.
   - **Related layer:** Infra
@@ -974,6 +974,13 @@
   - **Related layer:** Backend
 
 ### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Expanded `gateway/ocelot.json` into an explicit route matrix covering all active API endpoint families exposed by the backend controllers: `access`, `health` (including liveness/readiness aliases), `campaigns`, `templates`, `tracking` (link generation + click), `analytics`, and `exports`.
+  - Added deterministic upstream/downstream mappings for both unversioned and versioned (`/api/v{version}/...`) paths where API versioning is supported.
+  - Preserved route-level JWT enforcement for secured families while keeping anonymous health/click tracking routes aligned with backend authorization intent.
+  - Reproducible command evidence:
+    - `jq empty gateway/ocelot.json`
+    - `rg -n "UpstreamPathTemplate|DownstreamPathTemplate" gateway/ocelot.json`
 - Enforced route-level Ocelot authentication/authorization by requiring Bearer JWTs and role claims (`Admin`, `Operator`, `Viewer`) for access endpoints.
 - Applied route-level rate limits with gateway-wide rate limit headers and 429 handling.
 - Created `gateway/` Ocelot project with:
