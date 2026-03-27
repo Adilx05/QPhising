@@ -1,0 +1,16 @@
+<p-card [header]="title">
+  <div class="space-y-4">
+    <p class="text-sm text-slate-500">Daily click distribution for active dashboard scope.</p>
+
+    <div class="grid h-56 grid-cols-7 items-end gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div *ngFor="let point of points" class="flex h-full flex-col items-center justify-end gap-2">
+        <div
+          class="w-full rounded-t-md bg-sky-500/80 transition-all duration-300"
+          [style.height.%]="(point.clicks / maxClicks()) * 100"
+          [attr.aria-label]="point.day + ' clicks ' + point.clicks"></div>
+        <div class="text-xs font-semibold text-slate-600">{{ point.day }}</div>
+        <div class="text-xs text-slate-500">{{ point.clicks }}</div>
+      </div>
+    </div>
+  </div>
+</p-card>

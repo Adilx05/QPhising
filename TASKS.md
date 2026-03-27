@@ -880,7 +880,7 @@
   - **Description:** Add authentication guards and role-based menu rendering/route access checks.
   - **Expected output:** Protected frontend routes and consistent RBAC-driven navigation UX.
   - **Related layer:** Frontend
-- [ ] **Build enterprise dashboard experience**
+- [x] **Build enterprise dashboard experience**
   - **Description:** Implement KPI cards, chart panels, filterable data tables, and responsive layout using PrimeNG + Tailwind.
   - **Expected output:** Production-grade SaaS dashboard UI with coherent spacing and component consistency.
   - **Related layer:** Frontend
@@ -923,6 +923,16 @@
     - `rg -n "class AppStateStore|sessionState|dashboardKpisState|featureState|computed\(" frontend/src/app/core/state/app-state.store.ts`
     - `rg -n "inject\(AppStateStore\)|viewState|dashboardKpis|dashboardTrendRows" frontend/src/app/core/layout/layout-shell.component.ts frontend/src/app/features/*/containers/*.ts`
     - `npm run build` (from `frontend/`)
+- Subtask completion update (2026-03-27):
+  - Delivered enterprise dashboard composition using PrimeNG + Tailwind with responsive KPI grid, trend chart panel, and operational table layout optimized for desktop/tablet breakpoints.
+  - Added dedicated presentational dashboard components (`DashboardTrendChartComponent`, `DashboardCampaignsTableComponent`) and kept orchestration in the container component to preserve smart/dumb separation.
+  - Extended global Signals state with typed dashboard trend and campaign performance datasets consumed by dashboard widgets.
+  - Implemented filterable/sortable campaign table UX (global search, status filter, pagination, status tags) and date-scope quick filters bound to feature view state.
+  - Reproducible command evidence:
+    - `npm run build` (from `frontend/`)
+    - `rg -n "DashboardTrendChartComponent|DashboardCampaignsTableComponent|applyFilter|filters" frontend/src/app/features/dashboard`
+    - `rg -n "dashboardTrendState|dashboardCampaignsState|DashboardCampaignRow|DashboardTrendPoint" frontend/src/app/core/state/app-state.store.ts`
+
 
 ## 12. [-] Gateway implementation
 - StartedAt: 2026-03-27T16:49:00Z
