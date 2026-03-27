@@ -116,6 +116,7 @@ public sealed class TrackingEndpointsTests : IClassFixture<ApiWebApplicationFact
         Assert.NotNull(payload);
         Assert.Equal(campaign.Id, payload!.CampaignId);
         Assert.True(payload.Accepted);
+        Assert.False(payload.FlaggedForReview);
         Assert.Equal("device-1", payload.Fingerprint);
         Assert.NotEqual(Guid.Empty, payload.ClickId);
         Assert.Single(clickRepository.Items);
@@ -208,6 +209,9 @@ public sealed class TrackingEndpointsTests : IClassFixture<ApiWebApplicationFact
         {
             return Task.FromResult(new TrackingClickRealtimeResult(
                 IsDuplicate: false,
+                IsRejected: false,
+                IsFlagged: false,
+                DecisionReason: null,
                 CampaignClickCount: 1,
                 RecipientClickCount: 1));
         }

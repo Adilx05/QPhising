@@ -163,8 +163,121 @@ public sealed class TrackingInteractionGuardTests
         Assert.True(first.Value!.Accepted);
         Assert.True(second.IsSuccess);
         Assert.False(second.Value!.Accepted);
+        Assert.True(second.Value.FlaggedForReview);
         Assert.Equal(Guid.Empty, second.Value.ClickId);
         Assert.Equal(1, clickRepository.AddedCount);
+    }
+
+    [Fact]
+    public async Task ProcessTrackingClick_Should_Reject_When_Click_Is_Outside_Token_Time_Window()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var campaign = Campaign.Create(
+            "Replay Guard Campaign",
+            TemplateType.Email,
+            "<h1>Simulation</h1>",
+            now.AddDays(-1),
+            now.AddDays(2));
+
+        var repository = new InMemoryCampaignRepository(campaign);
+        var guard = new CampaignInteractionGuard(repository);
+        var tokenService = CreateTokenService();
+        var issueResult = tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee@company.test", Guid.NewGuid().ToString("N")));
+        var handler = new ProcessTrackingClickCommandHandler(
+            guard,
+            tokenService,
+            new InMemoryTrackingClickRealtimeStore(),
+            new InMemoryTrackingClickRepository(),
+            new NoOpUnitOfWork());
+
+        var clickAttempt = await handler.Handle(
+            new ProcessTrackingClickCommand(
+                campaign.Id,
+                issueResult.Token,
+                "127.0.0.1",
+                "integration-test-agent",
+                ClickedAtUtc: issueResult.ExpiresAtUtc.AddMinutes(2)),
+            CancellationToken.None);
+
+        Assert.False(clickAttempt.IsSuccess);
+        Assert.Contains("outside_valid_window", clickAttempt.Errors.Single());
+    }
+
+    [Fact]
+    public async Task ProcessTrackingClick_Should_Flag_When_Ip_Rate_Is_Suspicious()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var campaign = Campaign.Create(
+            "Abuse Guard Campaign",
+            TemplateType.Email,
+            "<h1>Simulation</h1>",
+            now.AddDays(-1),
+            now.AddDays(2));
+
+        var repository = new InMemoryCampaignRepository(campaign);
+        var guard = new CampaignInteractionGuard(repository);
+        var tokenService = CreateTokenService();
+        var realtimeStore = new InMemoryTrackingClickRealtimeStore(suspiciousIpThreshold: 2, rejectionIpThreshold: 10);
+        var clickRepository = new CountingTrackingClickRepository();
+        var handler = new ProcessTrackingClickCommandHandler(
+            guard,
+            tokenService,
+            realtimeStore,
+            clickRepository,
+            new NoOpUnitOfWork());
+
+        await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-1@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
+            CancellationToken.None);
+        await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-2@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
+            CancellationToken.None);
+        var suspiciousAttempt = await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-3@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
+            CancellationToken.None);
+
+        Assert.True(suspiciousAttempt.IsSuccess);
+        Assert.True(suspiciousAttempt.Value!.Accepted);
+        Assert.True(suspiciousAttempt.Value.FlaggedForReview);
+        Assert.Equal(3, clickRepository.AddedCount);
+    }
+
+    [Fact]
+    public async Task ProcessTrackingClick_Should_Reject_When_Ip_Rate_Exceeds_Hard_Threshold()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var campaign = Campaign.Create(
+            "Abuse Reject Campaign",
+            TemplateType.Email,
+            "<h1>Simulation</h1>",
+            now.AddDays(-1),
+            now.AddDays(2));
+
+        var repository = new InMemoryCampaignRepository(campaign);
+        var guard = new CampaignInteractionGuard(repository);
+        var tokenService = CreateTokenService();
+        var realtimeStore = new InMemoryTrackingClickRealtimeStore(suspiciousIpThreshold: 1, rejectionIpThreshold: 2);
+        var clickRepository = new CountingTrackingClickRepository();
+        var handler = new ProcessTrackingClickCommandHandler(
+            guard,
+            tokenService,
+            realtimeStore,
+            clickRepository,
+            new NoOpUnitOfWork());
+
+        await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-1@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
+            CancellationToken.None);
+        await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-2@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
+            CancellationToken.None);
+        var rejectedAttempt = await handler.Handle(
+            new ProcessTrackingClickCommand(campaign.Id, tokenService.IssueToken(new TrackingTokenIssueRequest(campaign.Id, "employee-3@company.test", Guid.NewGuid().ToString("N"))).Token, "127.0.0.1", "integration-test-agent"),
+            CancellationToken.None);
+
+        Assert.False(rejectedAttempt.IsSuccess);
+        Assert.Contains("ip_threshold_exceeded", rejectedAttempt.Errors.Single());
+        Assert.Equal(2, clickRepository.AddedCount);
     }
 
     private static ITrackingTokenService CreateTokenService()
@@ -246,18 +359,68 @@ public sealed class TrackingInteractionGuardTests
     private sealed class InMemoryTrackingClickRealtimeStore : ITrackingClickRealtimeStore
     {
         private readonly HashSet<string> _dedupKeys = [];
+        private readonly Dictionary<string, int> _ipCounters = new(StringComparer.OrdinalIgnoreCase);
+        private readonly int _suspiciousIpThreshold;
+        private readonly int _rejectionIpThreshold;
+
+        public InMemoryTrackingClickRealtimeStore(int suspiciousIpThreshold = 20, int rejectionIpThreshold = 50)
+        {
+            _suspiciousIpThreshold = suspiciousIpThreshold;
+            _rejectionIpThreshold = rejectionIpThreshold;
+        }
 
         public Task<TrackingClickRealtimeResult> RegisterClickAsync(
             TrackingClickRealtimeRequest request,
             CancellationToken cancellationToken = default)
         {
+            if (request.ClickedAtUtc < request.TokenIssuedAtUtc || request.ClickedAtUtc > request.TokenExpiresAtUtc)
+            {
+                return Task.FromResult(new TrackingClickRealtimeResult(
+                    IsDuplicate: false,
+                    IsRejected: true,
+                    IsFlagged: true,
+                    DecisionReason: "outside_valid_window",
+                    CampaignClickCount: 0,
+                    RecipientClickCount: 0));
+            }
+
             string dedupKey = $"{request.CampaignId:D}:{request.RecipientEmail}:{request.TokenNonce}";
             bool alreadySeen = !_dedupKeys.Add(dedupKey);
+            if (alreadySeen)
+            {
+                return Task.FromResult(new TrackingClickRealtimeResult(
+                    IsDuplicate: true,
+                    IsRejected: false,
+                    IsFlagged: true,
+                    DecisionReason: "duplicate_nonce",
+                    CampaignClickCount: 0,
+                    RecipientClickCount: 0));
+            }
+
+            _ipCounters.TryGetValue(request.IpAddress, out int currentIpRate);
+            int nextIpRate = currentIpRate + 1;
+            _ipCounters[request.IpAddress] = nextIpRate;
+
+            if (nextIpRate > _rejectionIpThreshold)
+            {
+                return Task.FromResult(new TrackingClickRealtimeResult(
+                    IsDuplicate: false,
+                    IsRejected: true,
+                    IsFlagged: true,
+                    DecisionReason: "ip_threshold_exceeded",
+                    CampaignClickCount: 0,
+                    RecipientClickCount: 0));
+            }
+
+            bool flagged = nextIpRate > _suspiciousIpThreshold;
 
             return Task.FromResult(new TrackingClickRealtimeResult(
-                IsDuplicate: alreadySeen,
-                CampaignClickCount: alreadySeen ? 0 : 1,
-                RecipientClickCount: alreadySeen ? 0 : 1));
+                IsDuplicate: false,
+                IsRejected: false,
+                IsFlagged: flagged,
+                DecisionReason: flagged ? "ip_rate_suspicious" : null,
+                CampaignClickCount: 1,
+                RecipientClickCount: 1));
         }
     }
 

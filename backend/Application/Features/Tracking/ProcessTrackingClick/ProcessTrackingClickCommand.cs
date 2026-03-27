@@ -19,4 +19,5 @@ public sealed record ProcessTrackingClickResponse(
     string UserAgent,
     string? Fingerprint,
     DateTimeOffset ClickedAtUtc,
-    bool Accepted);
+    bool Accepted,
+    bool FlaggedForReview);
