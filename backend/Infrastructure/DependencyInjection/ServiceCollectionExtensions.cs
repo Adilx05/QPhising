@@ -71,6 +71,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAnalyticsReadRepository, AnalyticsReadRepository>();
         services.AddScoped<IAnalyticsDashboardCache, RedisAnalyticsDashboardCache>();
         services.AddScoped<IExcelExportService, ClosedXmlExcelExportService>();
+        services.AddScoped<IPdfExportService, QuestPdfExportService>();
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
         services.AddScoped<ITrackingClickRealtimeStore, RedisTrackingClickRealtimeStore>();
         services.AddHostedService<TrackingRetentionBackgroundService>();
