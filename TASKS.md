@@ -65,7 +65,7 @@
 - Add API versioning, problem details, structured logging, health checks.
 
 ### Subtasks (planned)
-- [ ] **Enforce strict layer dependency graph**
+- [x] **Enforce strict layer dependency graph**
   - **Description:** Verify project references satisfy Clean Architecture (`Domain <- Application <- Infrastructure <- API`) and remove any reverse coupling.
   - **Expected output:** Buildable solution with one-way dependency flow and no cross-layer leakage.
   - **Related layer:** Backend
@@ -104,6 +104,11 @@
   - Commands:
     - `cat > backend/...`
     - `mkdir -p backend/...`
+- Added architecture dependency graph guard test in `API.IntegrationTests` to enforce strict project references:
+  - `Domain` has no project references.
+  - `Application` references only `Domain`.
+  - `Infrastructure` references only `Domain` and `Application`.
+  - `API` references only `Application` and `Infrastructure`.
 - Audit adjustment:
   - Downgraded to `[-] in progress` because API versioning and explicit AutoMapper profiles are not implemented yet, so completion criteria are not fully met.
   - Reproducible command evidence:
