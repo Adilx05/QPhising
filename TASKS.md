@@ -81,7 +81,7 @@
   - **Description:** Ensure FluentValidation and ProblemDetails are consistently applied across all CQRS endpoints.
   - **Expected output:** Uniform validation failures and error contracts without controller business logic.
   - **Related layer:** Backend
-- [ ] **Operationalize health and observability baseline**
+- [x] **Operationalize health and observability baseline**
   - **Description:** Expand health checks/readiness and structured log enrichment for traceability in distributed runtime.
   - **Expected output:** Production-ready health endpoints and enriched structured logs for API diagnostics.
   - **Related layer:** Infra
@@ -139,6 +139,20 @@
   - Reproducible command evidence:
     - `rg -n "GlobalExceptionHandler|AddExceptionHandler|AddProblemDetails\\(" backend/API/Program.cs backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
     - `rg -n "ValidationPipelineTests|AlwaysFailGetHealthQueryValidator|application/problem\\+json" backend/API.IntegrationTests/ValidationPipelineTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj`
+
+- Subtask completion update (2026-03-27):
+  - Expanded health diagnostics with explicit liveness/readiness endpoints:
+    - `/health` (full),
+    - `/health/live` (process liveness),
+    - `/health/ready` (readiness-tagged dependencies).
+  - Tagged infrastructure configuration health check as readiness-only and kept health endpoints anonymous for orchestrator probes.
+  - Added structured log enrichment for distributed diagnostics (`TraceId`, `CorrelationId`, request/user/network metadata) and propagated `X-Correlation-ID` on responses.
+  - Added integration coverage validating anonymous health endpoints, JSON response contract, and correlation ID propagation.
+  - Reproducible command evidence:
+    - `rg -n "MapHealthChecks\\(\"/health|/health/live|/health/ready|WriteHealthResponseAsync|UseSerilogRequestLogging\\(options|X-Correlation-ID" backend/API/Program.cs`
+    - `rg -n "AddCheck<InfrastructureOptionsHealthCheck>|tags: \\[\"ready\"\\]" backend/Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs`
+    - `rg -n "Health_Endpoints_Should_Be_Anonymous_And_Return_Json|/health/live|/health/ready|X-Correlation-ID" backend/API.IntegrationTests/HealthChecksEndpointsTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj`
 
 

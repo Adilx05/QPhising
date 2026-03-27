@@ -4,12 +4,14 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using QPhising.API;
 using QPhising.API.Configuration;
 using QPhising.API.ExceptionHandling;
 using QPhising.Application.DependencyInjection;
 using QPhising.Infrastructure.DependencyInjection;
+using Serilog.Context;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -153,11 +155,38 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy("API process is alive."), tags: ["live"]);
 
 var app = builder.Build();
 
-app.UseSerilogRequestLogging();
+app.Use(async (context, next) =>
+{
+    var correlationId = context.Request.Headers.TryGetValue("X-Correlation-ID", out var incomingCorrelationId) &&
+                        !string.IsNullOrWhiteSpace(incomingCorrelationId)
+        ? incomingCorrelationId.ToString()
+        : context.TraceIdentifier;
+
+    context.Response.Headers["X-Correlation-ID"] = correlationId;
+
+    using (LogContext.PushProperty("CorrelationId", correlationId))
+    {
+        await next();
+    }
+});
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("TraceId", httpContext.TraceIdentifier);
+        diagnosticContext.Set("CorrelationId", httpContext.Response.Headers["X-Correlation-ID"].ToString());
+        diagnosticContext.Set("RequestPath", httpContext.Request.Path.Value ?? string.Empty);
+        diagnosticContext.Set("RequestMethod", httpContext.Request.Method);
+        diagnosticContext.Set("UserName", httpContext.User.Identity?.Name ?? "anonymous");
+        diagnosticContext.Set("RemoteIp", httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown");
+    };
+});
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
@@ -169,8 +198,42 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHealthChecks("/health", new HealthCheckOptions());
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    Predicate = _ => true,
+    ResponseWriter = WriteHealthResponseAsync
+}).AllowAnonymous();
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live"),
+    ResponseWriter = WriteHealthResponseAsync
+}).AllowAnonymous();
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = WriteHealthResponseAsync
+}).AllowAnonymous();
 
 app.Run();
+
+static async Task WriteHealthResponseAsync(HttpContext context, HealthReport report)
+{
+    context.Response.ContentType = "application/json";
+
+    var payload = new
+    {
+        status = report.Status.ToString(),
+        traceId = context.TraceIdentifier,
+        checks = report.Entries.Select(entry => new
+        {
+            name = entry.Key,
+            status = entry.Value.Status.ToString(),
+            description = entry.Value.Description,
+            durationMs = entry.Value.Duration.TotalMilliseconds
+        })
+    };
+
+    await context.Response.WriteAsJsonAsync(payload);
+}
 
 public partial class Program;
