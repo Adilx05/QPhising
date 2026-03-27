@@ -35,7 +35,9 @@ public static class ServiceCollectionExtensions
             .ValidateOnStart();
 
         services.AddSingleton<IUnitOfWork, UnitOfWork>();
-        services.AddHealthChecks().AddCheck<InfrastructureOptionsHealthCheck>("infrastructure-config");
+        services.AddHealthChecks().AddCheck<InfrastructureOptionsHealthCheck>(
+            "infrastructure-config",
+            tags: ["ready"]);
 
         return services;
     }
