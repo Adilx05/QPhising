@@ -359,7 +359,7 @@
 - Implement landing page renderer pipeline with safe HTML handling and variable substitution.
 
 ### Subtasks (planned)
-- [ ] **Model template domain and variable contracts**
+- [x] **Model template domain and variable contracts**
   - **Description:** Define template aggregate, supported template types, variable placeholder format, and lifecycle states.
   - **Expected output:** Domain models and invariants for template correctness and reuse.
   - **Related layer:** Backend
@@ -383,6 +383,16 @@
   - **Description:** Add thin API controllers delegating to CQRS with JWT/RBAC enforcement and ProblemDetails responses.
   - **Expected output:** Role-protected template API surface with stable request/response contracts.
   - **Related layer:** Backend
+
+### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Added Template domain aggregate and lifecycle model in Domain layer with explicit invariants for required name/content, versioning, and legal status transitions (`Draft -> Published -> Archived`, with direct draft archive allowed).
+  - Added template variable contract/value object enforcing placeholder variable naming rules and deterministic placeholder format extraction (`{{variable_name}}`).
+  - Added Template-specific domain exception hierarchy and write/read repository abstractions for future CQRS workflows without introducing infrastructure coupling.
+  - Reproducible command evidence:
+    - `rg -n "class Template|enum TemplateStatus|enum TemplateType|ExtractVariables|Publish\\(|Archive\\(" backend/Domain/Templates`
+    - `rg -n "interface ITemplateRepository|record TemplateReadCriteria" backend/Domain/Abstractions`
+    - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
 
 ## 7. [ ] Tracking module
 - StartedAt:
