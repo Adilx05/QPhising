@@ -488,7 +488,7 @@
 - Add retry policy, dead-letter handling, and execution logs.
 
 ### Subtasks (planned)
-- [ ] **Formalize task aggregate and transition rules**
+- [x] **Formalize task aggregate and transition rules**
   - **Description:** Define `Task` lifecycle transitions, task-type contracts, payload schema, and execution status semantics.
   - **Expected output:** Domain-consistent task model and transition guards suitable for queue processing.
   - **Related layer:** Backend
@@ -510,6 +510,15 @@
   - **Related layer:** Infra
 
 ### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Added Domain task execution model under `backend/Domain/Tasks` with pure aggregate `QueuedTask`, status enum (`Queued`, `Claimed`, `Running`, `Succeeded`, `Failed`, `DeadLettered`, `Canceled`), and guarded lifecycle transitions for queue processing semantics.
+  - Added explicit task type contracts and payload schema enforcement per task type (`TrackingLinkGeneration`, `TrackingClickProcessing`, `ExportGeneration`, `CampaignActivation`) via required payload-key validation at domain boundary.
+  - Added domain exception set for task invariants and transition failures (`TaskValidationException`, `InvalidTaskStatusTransitionException`) plus unit tests covering payload contract enforcement, legal lifecycle path, retry exhaustion, and dead-letter guard behavior.
+  - Reproducible command evidence:
+    - `rg -n "QueuedTask|TaskExecutionStatus|TaskType|TaskPayload" backend/Domain/Tasks`
+    - `rg -n "TaskAggregateUnitTests|Create_Should_Require_Payload_Contract|Lifecycle_Should_Allow" backend/API.IntegrationTests/TaskAggregateUnitTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj` *(fails in current environment: `dotnet` not installed)*
+
 - Created runnable `worker/` ASP.NET-hosted background service for task execution bootstrap:
   - `TaskWorkerService` with heartbeat logging loop.
   - DI registration, configuration loading, Serilog wiring, and `/health` endpoint.
