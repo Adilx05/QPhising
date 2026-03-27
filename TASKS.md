@@ -205,7 +205,7 @@
 - Enforce rule: expired campaigns reject tracking link generation and click processing.
 
 ### Subtasks (planned)
-- [ ] **Define campaign aggregate and value rules**
+- [x] **Define campaign aggregate and value rules**
   - **Description:** Model `Campaign` as a domain aggregate with explicit invariants (`Name` required, `StartDate <= EndDate`, allowed status transitions Draft -> Scheduled -> Active -> Ended/Archived), plus value objects/enums for `TemplateType` and `CampaignStatus`.
   - **Expected output:** Domain entities, enums, and domain-specific exceptions/events in the Domain layer with no framework dependencies; compile-ready and reusable by Application CQRS handlers.
   - **Related layer:** Backend (Domain)
@@ -254,6 +254,16 @@
   - **Description:** Add unit tests for domain invariants and transition rules plus application tests for handlers/validators, including expired-campaign rejection paths.
   - **Expected output:** Deterministic automated test suite covering happy-path and rule-violation scenarios for campaign lifecycle.
   - **Related layer:** Backend (Domain/Application/Infra test scope)
+
+### Execution Notes
+- Subtask completion update (2026-03-27):
+  - Added a pure Domain campaign aggregate with explicit invariants for required `Name`, non-empty `HtmlContent`, and `StartDate <= EndDate`.
+  - Added campaign lifecycle enum and transition guard enforcing allowed flow `Draft -> Scheduled -> Active -> Ended/Archived`.
+  - Added domain-specific exceptions and a status-change domain event contract for downstream application handling.
+  - Reproducible command evidence:
+    - `rg -n "class Campaign|AllowedStatusTransitions|ValidateDateRange|ChangeStatus" backend/Domain/Campaigns/Campaign.cs`
+    - `rg -n "enum CampaignStatus|enum TemplateType|CampaignValidationException|InvalidCampaignStatusTransitionException|CampaignStatusChangedDomainEvent" backend/Domain/Campaigns`
+    - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
 
 ## 6. [ ] Template module
 - StartedAt:
