@@ -1,10 +1,13 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace QPhising.API.Controllers;
 
 [ApiController]
+[ApiVersion("1.0")]
 [Route("api/access")]
+[Route("api/v{version:apiVersion}/access")]
 public sealed class AccessController : ControllerBase
 {
     [HttpGet("admin")]

@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,9 @@ using QPhising.Application.Features.Health;
 namespace QPhising.API.Controllers;
 
 [ApiController]
+[ApiVersion("1.0")]
 [Route("api/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [AllowAnonymous]
 public sealed class HealthController : ControllerBase
 {

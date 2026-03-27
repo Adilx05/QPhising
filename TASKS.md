@@ -69,7 +69,7 @@
   - **Description:** Verify project references satisfy Clean Architecture (`Domain <- Application <- Infrastructure <- API`) and remove any reverse coupling.
   - **Expected output:** Buildable solution with one-way dependency flow and no cross-layer leakage.
   - **Related layer:** Backend
-- [ ] **Complete API versioning implementation**
+- [x] **Complete API versioning implementation**
   - **Description:** Configure API versioning, default version assumptions, and versioned route conventions.
   - **Expected output:** Versioned endpoints with deterministic routing and discoverable version behavior.
   - **Related layer:** Backend
@@ -114,6 +114,14 @@
   - Reproducible command evidence:
     - `rg -n "AddApiVersioning|ApiVersion" backend/API backend/Application`
     - `rg -n "Profile\\b|CreateMap\\(" backend/Application`
+- Subtask completion update (2026-03-27):
+  - Implemented API versioning with default `1.0`, `AssumeDefaultVersionWhenUnspecified`, combined readers (URL segment + `x-api-version` header + `api-version` query), and API version reporting.
+  - Applied versioned route conventions on controllers with explicit `[ApiVersion(\"1.0\")]` and URL-segment routes (`/api/v{version}/...`) while preserving unversioned compatibility routes.
+  - Added integration coverage for versioned access endpoint and discoverable version behavior via `api-supported-versions` response header.
+  - Reproducible command evidence:
+    - `rg -n "AddApiVersioning|DefaultApiVersion|AssumeDefaultVersionWhenUnspecified|ReportApiVersions|ApiVersionReader" backend/API/Program.cs`
+    - `rg -n "ApiVersion|v\\{version:apiVersion\\}" backend/API/Controllers/HealthController.cs backend/API/Controllers/AccessController.cs`
+    - `rg -n "versioned|api-supported-versions|/api/v1/access/admin" backend/API.IntegrationTests/AuthorizationFlowTests.cs`
 
 ---
 
