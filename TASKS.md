@@ -136,6 +136,57 @@
 - Add commands/queries for CRUD, activation, scheduling.
 - Enforce rule: expired campaigns reject tracking link generation and click processing.
 
+### Subtasks (planned)
+- [ ] **Define campaign aggregate and value rules**
+  - **Description:** Model `Campaign` as a domain aggregate with explicit invariants (`Name` required, `StartDate <= EndDate`, allowed status transitions Draft -> Scheduled -> Active -> Ended/Archived), plus value objects/enums for `TemplateType` and `CampaignStatus`.
+  - **Expected output:** Domain entities, enums, and domain-specific exceptions/events in the Domain layer with no framework dependencies; compile-ready and reusable by Application CQRS handlers.
+  - **Related layer:** Backend (Domain)
+
+- [ ] **Design persistence contract and write-side abstractions**
+  - **Description:** Extend repository and unit-of-work contracts for campaign write operations (create/update/status changes) and read access by identity/date window without leaking infrastructure concerns.
+  - **Expected output:** Clean repository + unit-of-work interfaces and method signatures in Domain abstractions aligned with campaign lifecycle use cases.
+  - **Related layer:** Backend (Domain/Application boundary)
+
+- [ ] **Add campaign create command + validation + mapping**
+  - **Description:** Add CQRS command/handler to create campaigns via MediatR, FluentValidation rules, and AutoMapper profile mappings between DTOs and domain models.
+  - **Expected output:** `CreateCampaign` command flow that validates inputs, persists through repository/unit-of-work, and returns a typed response contract.
+  - **Related layer:** Backend (Application)
+
+- [ ] **Add campaign update command + validation + mapping**
+  - **Description:** Implement CQRS update flow for editable fields (`Name`, `TemplateType`, `HtmlContent`, dates) with immutable/audit-safe constraints and validator coverage for update-specific rules.
+  - **Expected output:** `UpdateCampaign` command flow with conflict-safe updates and deterministic mapping profile usage.
+  - **Related layer:** Backend (Application)
+
+- [ ] **Add campaign query use cases (list/get detail)**
+  - **Description:** Implement read-side CQRS queries for paginated list and single-campaign detail retrieval with filter support (status/date range/template type).
+  - **Expected output:** Query handlers + response models optimized for API consumption and consistent with clean read contracts.
+  - **Related layer:** Backend (Application)
+
+- [ ] **Add activation and scheduling commands with transition guards**
+  - **Description:** Implement commands to schedule and activate campaigns, enforcing valid state transitions and date-window checks at domain boundary.
+  - **Expected output:** `ScheduleCampaign` and `ActivateCampaign` handlers that reject invalid transitions and persist legal transitions atomically.
+  - **Related layer:** Backend (Application)
+
+- [ ] **Enforce expired-campaign business rule for tracking interactions**
+  - **Description:** Introduce application/domain rule service or guard used by tracking-link generation and click-processing workflows to block operations when campaign `EndDate` is in the past.
+  - **Expected output:** Reusable policy/guard contract and integration points that return explicit domain/application errors for expired campaigns.
+  - **Related layer:** Backend (Domain/Application)
+
+- [ ] **Implement infrastructure persistence for campaign module**
+  - **Description:** Add Infrastructure implementations (EF Core configuration/repository mappings) for campaign aggregate, including indexes for status/date queries and transactional unit-of-work integration.
+  - **Expected output:** Concrete repository implementation + entity configuration compatible with existing DbContext and migration-ready schema mapping.
+  - **Related layer:** Backend/Infra
+
+- [ ] **Expose secured campaign API endpoints (controller thin layer)**
+  - **Description:** Add API endpoints for campaign CRUD, activation, and scheduling; controllers delegate only to MediatR and enforce JWT/RBAC policies without business logic.
+  - **Expected output:** Versioned, policy-protected endpoints with request/response contracts and ProblemDetails-compatible error responses.
+  - **Related layer:** Backend (API)
+
+- [ ] **Add module-level tests for domain rules and CQRS flows**
+  - **Description:** Add unit tests for domain invariants and transition rules plus application tests for handlers/validators, including expired-campaign rejection paths.
+  - **Expected output:** Deterministic automated test suite covering happy-path and rule-violation scenarios for campaign lifecycle.
+  - **Related layer:** Backend (Domain/Application/Infra test scope)
+
 ## 6. [ ] Template module
 - StartedAt:
 - FinishedAt:
