@@ -45,6 +45,7 @@ public sealed class ExportEndpointsAuthorizationTests : IClassFixture<ApiWebAppl
             {
                 services.AddSingleton<IExportJobRepository>(exportRepository);
                 services.AddSingleton<IQueuedTaskRepository>(taskRepository);
+                services.AddSingleton<IUnitOfWork, NoOpUnitOfWork>();
             });
         }).CreateClient();
 
@@ -124,8 +125,18 @@ public sealed class ExportEndpointsAuthorizationTests : IClassFixture<ApiWebAppl
             {
                 services.AddSingleton<IExportJobRepository>(new InMemoryExportJobRepository(exportJob));
                 services.AddSingleton<IExportFileStorage>(exportFileStorage);
+                services.AddSingleton<IUnitOfWork, NoOpUnitOfWork>();
             });
         }).CreateClient();
+    }
+
+
+    private sealed class NoOpUnitOfWork : IUnitOfWork
+    {
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(1);
+        }
     }
 
     private sealed record ExportJobResponse(

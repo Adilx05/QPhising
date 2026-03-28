@@ -30,6 +30,14 @@ public sealed class AnalyticsController(IMediator mediator) : ControllerBase
         [FromQuery] CampaignStatus[]? campaignStatuses = null,
         CancellationToken cancellationToken = default)
     {
+        if (from >= to)
+        {
+            return Problem(
+                title: "Analytics request failed",
+                detail: "From must be earlier than To.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
         GetDashboardKpisQuery query = new(
             from,
             to,

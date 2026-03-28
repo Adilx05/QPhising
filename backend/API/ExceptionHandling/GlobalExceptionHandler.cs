@@ -4,16 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace QPhising.API.ExceptionHandling;
 
-public sealed class GlobalExceptionHandler(
-    ILogger<GlobalExceptionHandler> logger,
-    IProblemDetailsService problemDetailsService) : IExceptionHandler
+public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         if (exception is ValidationException validationException)
         {
             var errors = validationException.Errors
-                .GroupBy(error => string.IsNullOrWhiteSpace(error.PropertyName) ? string.Empty : error.PropertyName)
+                .GroupBy(error => string.IsNullOrWhiteSpace(error.PropertyName) ? "request" : error.PropertyName)
                 .ToDictionary(
                     group => group.Key,
                     group => group.Select(error => error.ErrorMessage).Distinct().ToArray());
@@ -30,12 +28,8 @@ public sealed class GlobalExceptionHandler(
                 Title = "One or more validation errors occurred."
             };
 
-            return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
-            {
-                HttpContext = httpContext,
-                ProblemDetails = validationProblem,
-                Exception = exception
-            });
+            await WriteProblemDetailsAsync(httpContext, validationProblem, cancellationToken);
+            return true;
         }
 
         logger.LogError(exception, "Unhandled exception for {Path}", httpContext.Request.Path);
@@ -46,11 +40,17 @@ public sealed class GlobalExceptionHandler(
             Title = "An unexpected error occurred."
         };
 
-        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
-        {
-            HttpContext = httpContext,
-            ProblemDetails = problem,
-            Exception = exception
-        });
+        await WriteProblemDetailsAsync(httpContext, problem, cancellationToken);
+        return true;
+    }
+
+    private static Task WriteProblemDetailsAsync(HttpContext httpContext, ProblemDetails problemDetails, CancellationToken cancellationToken)
+    {
+        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
+        return httpContext.Response.WriteAsJsonAsync(
+            value: problemDetails,
+            options: null,
+            contentType: "application/problem+json",
+            cancellationToken: cancellationToken);
     }
 }

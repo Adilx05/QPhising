@@ -25,11 +25,10 @@ public sealed partial class TemplateHtmlSanitizer : ITemplateHtmlSanitizer
         ["td"] = ["colspan", "rowspan"]
     };
 
-    private static readonly Regex[] ForbiddenPatternChecks =
+    private static readonly Regex[] RejectPatternChecks =
     [
-        UnsafeElementPattern(),
-        UnsafeAttributePattern(),
-        UnsafeProtocolPattern()
+        DangerousElementPattern(),
+        DangerousProtocolPattern()
     ];
 
     public Result<string> Sanitize(string htmlContent)
@@ -41,7 +40,7 @@ public sealed partial class TemplateHtmlSanitizer : ITemplateHtmlSanitizer
 
         string normalized = htmlContent.Trim();
 
-        foreach (Regex pattern in ForbiddenPatternChecks)
+        foreach (Regex pattern in RejectPatternChecks)
         {
             if (pattern.IsMatch(normalized))
             {
@@ -56,8 +55,7 @@ public sealed partial class TemplateHtmlSanitizer : ITemplateHtmlSanitizer
 
     private static string SanitizeTagMatch(Match match)
     {
-        string isClosingTagValue = match.Groups["closing"].Value;
-        bool isClosingTag = string.Equals(isClosingTagValue, "/", StringComparison.Ordinal);
+        bool isClosingTag = string.Equals(match.Groups["closing"].Value, "/", StringComparison.Ordinal);
 
         string tagName = match.Groups["tag"].Value.ToLowerInvariant();
         if (!AllowedTags.Contains(tagName))
@@ -156,11 +154,8 @@ public sealed partial class TemplateHtmlSanitizer : ITemplateHtmlSanitizer
     private static partial Regex AttributePattern();
 
     [GeneratedRegex("<\\s*(script|iframe|object|embed|style|link|meta|base|form|input|button|textarea|svg|math)", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)]
-    private static partial Regex UnsafeElementPattern();
-
-    [GeneratedRegex("\\son[a-z0-9_-]+\\s*=", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)]
-    private static partial Regex UnsafeAttributePattern();
+    private static partial Regex DangerousElementPattern();
 
     [GeneratedRegex("(javascript:|vbscript:|data:text/html)", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)]
-    private static partial Regex UnsafeProtocolPattern();
+    private static partial Regex DangerousProtocolPattern();
 }
