@@ -1689,10 +1689,22 @@
     - `rg -n "AddOpenApi|MapOpenApi|AddApiVersioning" backend/API/Program.cs`
     - `sed -n "1,260p" docs/openapi-generation-strategy-decision.md`
 
-- [ ] **Define OpenAPI source of truth and generation inputs**
+- [x] **Define OpenAPI source of truth and generation inputs**
   - **Description:** Establish authoritative OpenAPI document source (gateway or backend API spec), versioning convention, and command inputs for deterministic client generation.
   - **Expected output:** Documented spec source path/URL and pinned generation inputs with repeatable invocation command.
   - **Related layer:** Backend / Gateway / Infra
+- Subtask completion update (2026-03-28):
+  - Established backend API OpenAPI document as the authoritative generation source (`/openapi/v1.json`) and explicitly documented why gateway specs are non-authoritative for contract generation.
+  - Added deterministic generation inputs and pinned toolchain artifacts:
+    - `frontend/openapi/openapi-generator.config.json`
+    - `frontend/scripts/generate-openapi-client.sh` (pinned `openapitools/openapi-generator-cli:v7.14.0`)
+    - `frontend/package.json` script `generate:api-client`
+  - Added source-of-truth and invocation record at `docs/openapi-source-of-truth-and-generation-inputs.md` including canonical source URL, versioning convention, and repeatability contract.
+  - Reproducible command evidence:
+    - `rg -n "AddOpenApi\(|MapOpenApi\(" backend/API/Program.cs`
+    - `rg -n "openapi/v1.json|openapitools/openapi-generator-cli:v7.14.0|src/app/core/api/generated" docs/openapi-source-of-truth-and-generation-inputs.md frontend/scripts/generate-openapi-client.sh`
+    - `rg -n "generate:api-client" frontend/package.json`
+
 - [ ] **Create typed generated client module structure**
   - **Description:** Plan generated output organization (e.g., `proxies.ts` or per-feature generated clients) so it aligns with Angular feature modules and does not leak transport concerns into presentation components.
   - **Expected output:** File-structure blueprint for generated clients plus ownership boundaries between generated and handwritten code.
