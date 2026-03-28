@@ -1349,3 +1349,9 @@
   - Reproducible command evidence:
     - `rg -n "RejectPatternChecks|DangerousElementPattern|DangerousProtocolPattern|Template HTML contains unsafe markup" backend/Application/Common/TemplateHtmlSanitizer.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~CreateTemplateCommandHandler_Should_Reject_Unsafe_Html_Markup|FullyQualifiedName~TemplateHtmlSanitizer_Should_Remove_Disallowed_Attributes_And_Tags"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Aligned integration-test `TrackingTokenOptions` in `ApiWebApplicationFactory` with test-issued token settings via `PostConfigure<TrackingTokenOptions>`.
+  - This stabilizes anonymous tracking-click endpoint tests by preventing token signature/version mismatches that previously downgraded valid clicks to `400 BadRequest`.
+  - Reproducible command evidence:
+    - `rg -n "PostConfigure<TrackingTokenOptions>|integration-test-signing-key-minimum-32chars" backend/API.IntegrationTests/ApiWebApplicationFactory.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~ProcessTrackingClick_Should_Accept_Anonymous_Request_And_Persist_Metadata"` *(fails in current environment: `dotnet` not installed)*

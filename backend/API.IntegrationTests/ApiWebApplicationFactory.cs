@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using QPhising.Application.Common.Abstractions;
 using QPhising.Application.Features.Analytics.GetDashboardKpis;
+using QPhising.Infrastructure.Security;
 
 namespace QPhising.API.IntegrationTests;
 
@@ -36,6 +37,13 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<IAnalyticsDashboardCache>();
             services.AddSingleton<IAnalyticsReadRepository, TestAnalyticsReadRepository>();
             services.AddSingleton<IAnalyticsDashboardCache, TestAnalyticsDashboardCache>();
+
+            services.PostConfigure<TrackingTokenOptions>(options =>
+            {
+                options.SigningKey = "integration-test-signing-key-minimum-32chars";
+                options.ExpirationMinutes = 30;
+                options.Version = 1;
+            });
         });
     }
 
