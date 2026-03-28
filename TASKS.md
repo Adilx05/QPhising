@@ -1223,6 +1223,15 @@
     - `rg -n "gateway:|healthcheck:|api-health/ready" docker-compose.yml`
     - `rg -n "UpstreamPathTemplate": "/api-health/ready" gateway/ocelot.json`
 
+- Subtask completion update (2026-03-28):
+  - Fixed gateway correlation middleware header propagation to avoid mutating response headers after the response has already started.
+  - Switched `CorrelationIdMiddleware` response header assignment to `HttpResponse.OnStarting` and removed post-pipeline header mutation that could raise `System.InvalidOperationException` under early-written error responses (for example, Ocelot quota responses).
+  - Disabled Ocelot global rate-limiting (`GlobalConfiguration:RateLimitOptions:EnableRateLimiting=false`) to prevent duplicate throttling conflicts with the custom Redis rate-limiting middleware and to stop health-probe failures requiring `X-Client-Id`.
+  - Added gateway integration safeguards to assert global Ocelot rate limiting remains disabled and correlation middleware tolerates already-started responses.
+  - Reproducible command evidence:
+    - `rg -n "OnStarting|Headers.ContainsKey\(CorrelationIdHeader\)|TraceIdentifier" gateway/Correlation/CorrelationIdMiddleware.cs`
+    - `rg -n "EnableRateLimiting" gateway/ocelot.json gateway/Gateway.IntegrationTests/GatewayBehaviorValidationTests.cs`
+
 - Evidence:
   - Files: `docker-compose.yml`, `frontend/Dockerfile`, `backend/Dockerfile`, `gateway/Dockerfile`, `worker/Dockerfile`, `TASKS.md`.
   - Commands:

@@ -382,6 +382,7 @@
   "GlobalConfiguration": {
     "BaseUrl": "http://gateway:8080",
     "RateLimitOptions": {
+      "EnableRateLimiting": false,
       "DisableRateLimitHeaders": false,
       "QuotaExceededMessage": "Gateway rate limit exceeded.",
       "HttpStatusCode": 429,
