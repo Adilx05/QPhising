@@ -15,9 +15,9 @@ public sealed class QueueExportJobCommandHandlerTests
 
     public QueueExportJobCommandHandlerTests()
     {
-        MapperConfiguration mapperConfiguration = new(configuration =>
+        MapperConfiguration mapperConfiguration = new(cfg =>
         {
-            configuration.AddProfile(new ExportJobMappingProfile());
+            cfg.AddProfile<ExportJobMappingProfile>();
         });
 
         _mapper = mapperConfiguration.CreateMapper();
@@ -78,6 +78,19 @@ public sealed class QueueExportJobCommandHandlerTests
 
         public void Update(ExportJob exportJob)
         {
+        }
+
+        public Task<IReadOnlyCollection<ExportJob>> ListExpiredWithStoredFileAsync(
+            DateTimeOffset asOfUtc,
+            int take,
+            CancellationToken cancellationToken = default)
+        {
+            IReadOnlyCollection<ExportJob> expired = Jobs
+                .Where(job => job.ExpiresAt.HasValue && job.ExpiresAt.Value <= asOfUtc && !string.IsNullOrWhiteSpace(job.StoragePath))
+                .Take(take)
+                .ToArray();
+
+            return Task.FromResult(expired);
         }
     }
 
