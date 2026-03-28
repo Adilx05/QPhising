@@ -1196,7 +1196,7 @@
     - `git show --name-only --oneline ad5cc79`
     - `docker compose config`
 
-## 15. [ ] DevSecOps and quality gates
+## 15. [-] DevSecOps and quality gates
 - StartedAt:
 - FinishedAt:
 - Owner:
@@ -1205,10 +1205,22 @@
 - Add operational runbooks, backup/restore notes, and incident logging guidance.
 
 ### Subtasks (planned)
-- [ ] **Define multi-stage CI workflow**
+- [x] **Define multi-stage CI workflow**
   - **Description:** Configure CI stages for restore/build/lint/test/security scan/container build across backend and frontend.
   - **Expected output:** End-to-end automated pipeline with explicit stage dependencies.
   - **Related layer:** Infra
+
+### Execution Notes
+
+- Subtask completion update (2026-03-28):
+  - Added a GitHub Actions multi-stage CI workflow at `.github/workflows/ci.yml` with explicit stage dependencies (`needs`) across `restore`, `build_backend`, `build_frontend`, `lint`, `test`, `security_scan`, and `container_build`.
+  - Implemented backend and frontend restore/build/lint/test checks plus security scanning (`dotnet` vulnerable package scan, `npm audit`, and Trivy filesystem scan) and Docker compose-based container image builds for `frontend`, `api`, `gateway`, and `worker`.
+  - Ensured each stage is isolated and deterministic with explicit toolchain setup (`actions/setup-dotnet`, `actions/setup-node`, Docker Buildx) and lockfile-based frontend restore (`npm ci`).
+  - Reproducible command evidence:
+    - `test -f .github/workflows/ci.yml`
+    - `rg -n "needs:|restore:|build_backend:|build_frontend:|lint:|test:|security_scan:|container_build:" .github/workflows/ci.yml`
+    - `rg -n "dotnet restore|dotnet build|dotnet test|dotnet list .*--vulnerable|npm ci|npm audit|trivy-action|docker compose build" .github/workflows/ci.yml`
+
 - [ ] **Implement quality thresholds and merge gates**
   - **Description:** Add lint/test/coverage thresholds and fail conditions to block low-quality merges.
   - **Expected output:** Enforced quality gates with transparent pass/fail criteria.
