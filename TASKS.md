@@ -1782,10 +1782,19 @@
   - Reproducible command evidence:
     - `sed -n "1,320p" docs/campaigns-modules-list-detail-live-data-integration-plan.md`
     - `rg -n "Plan campaigns/modules/list/detail live data integration|campaigns-modules-list-detail-live-data-integration-plan" TASKS.md docs/campaigns-modules-list-detail-live-data-integration-plan.md`
-- [ ] **Plan form CRUD endpoint wiring**
+- [x] **Plan form CRUD endpoint wiring**
   - **Description:** Map create/update/delete forms to actual command endpoints, including payload shaping, validation error projection, and optimistic/pessimistic update strategy.
   - **Expected output:** Form wiring specification per module with request/response handling contract.
   - **Related layer:** Frontend / Backend
+- Subtask completion update (2026-03-28):
+  - Added `docs/form-crud-endpoint-wiring-plan.md` with a module-by-module form command wiring specification covering campaigns, templates, exports, tracking, and tasks.
+  - Defined generated-client-first command invocation pattern (facade -> generated OpenAPI service -> mapper/error normalization), with explicit prohibition on handwritten duplicate HTTP transport.
+  - Documented payload-shaping contracts, validation error projection (`HttpValidationProblemDetails`), and pessimistic backend-truth refresh strategy after successful commands.
+  - Captured currently missing delete/cancel command endpoints (campaigns/tasks/exports) as explicit contract gaps with interim UI constraints to prevent non-existent action wiring.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/form-crud-endpoint-wiring-plan.md`
+    - `rg -n "\[HttpPost\]|\[HttpPut\]|\[HttpDelete\]|archive|schedule|activate" backend/API/Controllers/CampaignsController.cs backend/API/Controllers/TemplatesController.cs backend/API/Controllers/ExportsController.cs backend/API/Controllers/TrackingController.cs`
+    - `rg -n "Plan form CRUD endpoint wiring|form-crud-endpoint-wiring-plan" TASKS.md docs/form-crud-endpoint-wiring-plan.md`
 - [ ] **Define standard loading/empty/error/retry UX states**
   - **Description:** Introduce a shared state model for async pages/components so all API-driven UIs provide consistent loading skeletons, empty states, recoverable errors, and retry actions.
   - **Expected output:** UI state-handling standard with adoption checklist per screen.
