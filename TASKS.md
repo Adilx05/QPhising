@@ -1216,6 +1216,13 @@
     - `rg -n "Compose operational profiles|Local development profile|CI/verification profile|Deployment-like profile|Compose troubleshooting notes" README.md`
     - `rg -n "Document compose operational profiles" TASKS.md`
 
+- Subtask completion update (2026-03-28):
+  - Fixed gateway container health probe path mismatch in `docker-compose.yml` by switching the gateway healthcheck from `/health` to `/api-health/ready`.
+  - This avoids Ocelot `UnableToFindDownstreamRouteError` for `GET /health` during compose health probing and aligns gateway health detection with existing upstream route mappings in `gateway/ocelot.json`.
+  - Reproducible command evidence:
+    - `rg -n "gateway:|healthcheck:|api-health/ready" docker-compose.yml`
+    - `rg -n "UpstreamPathTemplate": "/api-health/ready" gateway/ocelot.json`
+
 - Evidence:
   - Files: `docker-compose.yml`, `frontend/Dockerfile`, `backend/Dockerfile`, `gateway/Dockerfile`, `worker/Dockerfile`, `TASKS.md`.
   - Commands:
