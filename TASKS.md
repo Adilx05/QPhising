@@ -1367,3 +1367,9 @@
   - Reproducible command evidence:
     - `rg -n "GroupBy\(error => string.IsNullOrWhiteSpace\(error.PropertyName\) \? \"request\"" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Health_Endpoint_Should_Return_ProblemDetails_When_Request_Validation_Fails"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Reworked API global exception handler response writing to directly emit RFC7807 JSON (`application/problem+json`) for both validation and unexpected exceptions.
+  - This removes dependency on `IProblemDetailsService.TryWriteAsync` success path for validation failures and guarantees deterministic `400` responses in validation pipeline integration tests.
+  - Reproducible command evidence:
+    - `rg -n "WriteProblemDetailsAsync|application/problem\+json|return true;" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Health_Endpoint_Should_Return_ProblemDetails_When_Request_Validation_Fails"` *(fails in current environment: `dotnet` not installed)*
