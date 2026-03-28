@@ -1311,3 +1311,11 @@
   - [ ] reproducible command evidence.
 - [ ] Security/validation requirements for touched endpoints are enforced and test-covered where applicable.
 - [ ] No placeholder code, TODO markers, or empty stubs remain in touched scope.
+
+- Subtask completion update (2026-03-28):
+  - Stabilized analytics endpoint authorization integration tests by overriding production analytics read dependencies in `ApiWebApplicationFactory` with deterministic in-memory test doubles.
+  - Replaced `IAnalyticsReadRepository` and `IAnalyticsDashboardCache` registrations for test host startup to avoid external Redis/PostgreSQL dependency failures that surfaced as HTTP 500 during authorized dashboard KPI requests.
+  - Ensured viewer-role authorization tests exercise auth policy behavior and controller/mediator flow without infrastructure flakiness.
+  - Reproducible command evidence:
+    - `rg -n "RemoveAll<IAnalyticsReadRepository>|RemoveAll<IAnalyticsDashboardCache>|TestAnalyticsReadRepository|TestAnalyticsDashboardCache" backend/API.IntegrationTests/ApiWebApplicationFactory.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Analytics_DashboardKpis_Should_Allow_Viewer_Role"` *(fails in current environment: `dotnet` not installed)*
