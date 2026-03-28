@@ -135,6 +135,47 @@ public sealed class GatewayBehaviorValidationTests
     }
 
     [Fact]
+    public async Task RedisRateLimitingMiddleware_Should_Not_Apply_Api_Rule_To_ApiHealth_Path()
+    {
+        var nextCalled = false;
+        var middleware = new RedisRateLimitingMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        var context = new DefaultHttpContext();
+        context.Request.Path = "/api-health/ready";
+        context.Request.Method = HttpMethods.Get;
+
+        var options = Options.Create(new RateLimitingOptions
+        {
+            DefaultWindowSeconds = 60,
+            Rules =
+            [
+                new RateLimitRuleOptions
+                {
+                    PathPrefix = "/api",
+                    Methods = [HttpMethods.Get],
+                    Limit = 1,
+                    WindowSeconds = 60
+                }
+            ]
+        });
+
+        var multiplexerMock = new Mock<IConnectionMultiplexer>(MockBehavior.Strict);
+
+        await middleware.InvokeAsync(
+            context,
+            multiplexerMock.Object,
+            options,
+            NullLogger<RedisRateLimitingMiddleware>.Instance);
+
+        Assert.True(nextCalled);
+        Assert.False(context.Response.Headers.ContainsKey("X-RateLimit-Limit"));
+    }
+
+    [Fact]
     public async Task CorrelationIdMiddleware_Should_Propagate_Inbound_Header_To_Response_And_TraceIdentifier()
     {
         var expectedCorrelationId = "test-correlation-id";

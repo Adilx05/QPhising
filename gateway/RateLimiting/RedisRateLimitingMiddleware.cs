@@ -95,7 +95,7 @@ public sealed class RedisRateLimitingMiddleware(RequestDelegate next)
 
         foreach (var rule in options.Rules)
         {
-            if (!requestPath.StartsWith(rule.PathPrefix, StringComparison.OrdinalIgnoreCase))
+            if (!PathMatchesPrefix(requestPath, rule.PathPrefix))
             {
                 continue;
             }
@@ -107,6 +107,32 @@ public sealed class RedisRateLimitingMiddleware(RequestDelegate next)
         }
 
         return null;
+    }
+
+    private static bool PathMatchesPrefix(string requestPath, string pathPrefix)
+    {
+        if (string.IsNullOrWhiteSpace(pathPrefix))
+        {
+            return false;
+        }
+
+        var normalizedPrefix = pathPrefix.Trim();
+        if (!normalizedPrefix.StartsWith('/'))
+        {
+            normalizedPrefix = $"/{normalizedPrefix}";
+        }
+
+        if (!requestPath.StartsWith(normalizedPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (requestPath.Length == normalizedPrefix.Length)
+        {
+            return true;
+        }
+
+        return requestPath[normalizedPrefix.Length] == '/';
     }
 
     private static string ResolveClientId(HttpContext context)

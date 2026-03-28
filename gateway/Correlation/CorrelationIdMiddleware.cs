@@ -14,7 +14,12 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
         context.Items[CorrelationIdItemKey] = correlationId;
         context.TraceIdentifier = correlationId;
         context.Request.Headers[CorrelationIdHeader] = correlationId;
-        TrySetResponseCorrelationHeader(context, correlationId);
+        context.Response.OnStarting(state =>
+        {
+            var httpContext = (HttpContext)state;
+            TrySetResponseCorrelationHeader(httpContext, correlationId);
+            return Task.CompletedTask;
+        }, context);
 
         using (LogContext.PushProperty("CorrelationId", correlationId))
         {
@@ -26,7 +31,6 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
 
             await next(context);
         }
-
     }
 
     private void TrySetResponseCorrelationHeader(HttpContext context, string correlationId)
