@@ -1730,10 +1730,21 @@
     - `rg -n "check:api-client-freshness|generate:api-client" frontend/package.json`
     - `sed -n "1,260p" docs/openapi-regeneration-and-drift-control-workflow.md`
 
-- [ ] **Plan removal of handwritten duplicate API logic**
+- [x] **Plan removal of handwritten duplicate API logic**
   - **Description:** Identify all manual HTTP services duplicated by generated clients and define staged deprecation/removal sequence to avoid breaking active modules.
   - **Expected output:** Migration list of duplicate services with replacement mapping and safe removal order.
   - **Related layer:** Frontend
+- Subtask completion update (2026-03-28):
+  - Audited frontend source for handwritten transport duplication (`HttpClient`, `fetch`, direct `/api/*` calls, transport services) and confirmed no existing manual HTTP transport layer is present yet.
+  - Added migration/deprecation plan at `docs/openapi-handwritten-api-logic-removal-plan.md` with:
+    - duplicate/manual logic register,
+    - replacement mapping to generated-client facades/mappers,
+    - staged safe removal order (available-contract flows first, blocked flows after backend contract availability),
+    - anti-regression rules preventing reintroduction of handwritten duplicate transport code.
+  - Reproducible command evidence:
+    - `rg -n "HttpClient|http\\.(get|post|put|delete|patch)|fetch\\(|/api/" frontend/src/app -g '*.ts'`
+    - `sed -n "1,320p" docs/openapi-handwritten-api-logic-removal-plan.md`
+    - `rg -n "Plan removal of handwritten duplicate API logic|openapi-handwritten-api-logic-removal-plan" TASKS.md docs/openapi-handwritten-api-logic-removal-plan.md`
 - [ ] **Validate architecture compatibility of generated clients**
   - **Description:** Ensure generated clients support auth interceptors, typed error handling, and centralized API consumption patterns required by current frontend architecture.
   - **Expected output:** Compatibility checklist with approved extension points and required wrapper/facade strategy.
