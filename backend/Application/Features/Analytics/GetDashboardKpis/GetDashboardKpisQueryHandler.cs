@@ -118,7 +118,7 @@ public sealed class GetDashboardKpisQueryHandler(
             return 0m;
         }
 
-        return decimal.Round((decimal)numerator / denominator * 100m, 2, MidpointRounding.AwayFromZero);
+        return decimal.Min(100m, decimal.Round((decimal)numerator / denominator * 100m, 2, MidpointRounding.AwayFromZero));
     }
 
     private static decimal CalculateRate(int numerator, int denominator)
@@ -128,7 +128,7 @@ public sealed class GetDashboardKpisQueryHandler(
             return 0m;
         }
 
-        return decimal.Round((decimal)numerator / denominator * 100m, 2, MidpointRounding.AwayFromZero);
+        return decimal.Min(100m, decimal.Round((decimal)numerator / denominator * 100m, 2, MidpointRounding.AwayFromZero));
     }
 
     private static TimeZoneInfo ResolveTimeZone(string requestedTimeZone)

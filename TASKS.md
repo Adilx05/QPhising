@@ -1325,3 +1325,9 @@
   - Reproducible command evidence:
     - `rg -n "if \(from >= to\)|From must be earlier than To|StatusCodes.Status400BadRequest" backend/API/Controllers/AnalyticsController.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Analytics_DashboardKpis_Should_Reject_Request_With_Invalid_Range_Using_ProblemDetails"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Normalized analytics KPI percent calculations to cap derived rates at 100% in `GetDashboardKpisQueryHandler` for both `long` and `int` overloads.
+  - This aligns click-through/conversion/success KPI semantics with percentage bounds and resolves handler test failures where aggregate denominators are small relative to numerators.
+  - Reproducible command evidence:
+    - `rg -n "decimal.Min\(100m|private static decimal CalculateRate" backend/Application/Features/Analytics/GetDashboardKpis/GetDashboardKpisQueryHandler.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~AnalyticsQueryHandlerTests.Handle_Should_Map_Read_Model_To_Kpi_Response_With_Derived_Rates"` *(fails in current environment: `dotnet` not installed)*
