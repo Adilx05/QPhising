@@ -1819,10 +1819,18 @@
     - `sed -n "1,320p" docs/server-side-pagination-filter-sort-integration-plan.md`
     - `rg -n "\[HttpGet|FromQuery|skip|take|pageNumber|pageSize|searchTerm|statuses|templateTypes" backend/API/Controllers/CampaignsController.cs backend/API/Controllers/TemplatesController.cs backend/API/Controllers/ExportsController.cs backend/API/Controllers/TrackingController.cs`
     - `rg -n "Plan server-side pagination/filter/sort integration|server-side-pagination-filter-sort-integration-plan" TASKS.md docs/server-side-pagination-filter-sort-integration-plan.md`
-- [ ] **Define DTO-to-UI mapping strategy**
+- [x] **Define DTO-to-UI mapping strategy**
   - **Description:** Establish mapper layer/facade conventions separating generated DTOs from presentational models, including date/enum formatting and null-safe defaults.
   - **Expected output:** Mapping strategy document with per-feature mapper ownership and naming conventions.
   - **Related layer:** Frontend
+- Subtask completion update (2026-03-28):
+  - Added `docs/dto-to-ui-mapping-strategy.md` defining strict generated-DTO to UI-model separation, mapper placement, naming conventions, and mandatory feature/facade mapper flow.
+  - Standardized date and enum normalization rules with null-safe defaults to keep transport concerns out of containers/components and ensure deterministic UI rendering behavior.
+  - Documented per-feature mapper ownership matrix and implementation definition-of-done checklist for dashboard, campaigns, templates, tracking, tasks, analytics, exports, and auth/core.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/dto-to-ui-mapping-strategy.md`
+    - `rg -n "Define DTO-to-UI mapping strategy|dto-to-ui-mapping-strategy" TASKS.md docs/dto-to-ui-mapping-strategy.md`
+    - `rg -n "data-access/mappers|models/" frontend/src/app/features frontend/src/app/core -g '*.ts'`
 - [ ] **Define centralized API consumption pattern**
   - **Description:** Standardize how features consume generated clients (facades/data-access services), including shared error translation, cancellation, and retry/backoff policy.
   - **Expected output:** API consumption architecture guideline with reusable integration pattern per feature module.
