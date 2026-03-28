@@ -1043,7 +1043,7 @@
   - **Description:** Generate EF migrations for current model and validate upgrade/downgrade behavior.
   - **Expected output:** Reproducible migration chain for local and containerized deployment.
   - **Related layer:** Infra
-- [ ] **Implement identity and role seed strategy**
+- [x] **Implement identity and role seed strategy**
   - **Description:** Seed role assumptions and default users metadata needed for RBAC-enabled environments.
   - **Expected output:** Deterministic bootstrap data supporting secure role-based flows.
   - **Related layer:** Infra
@@ -1057,6 +1057,15 @@
   - **Related layer:** Infra
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-28):
+  - Implemented deterministic identity/RBAC seed strategy with a dedicated SQL migration (`20260328103000_add_identity_role_seed_strategy.sql`).
+  - Added role seed metadata for `Admin`, `Operator`, and `Viewer` plus default Keycloak user-role assumption records (`seed-admin`, `seed-operator`, `seed-viewer`) to bootstrap role-based environments consistently.
+  - Added normalized assignment bridge and supporting indexes to keep role assumptions queryable and integrity-safe through FK constraints.
+  - Added rollback support (`rollback/20260328103000_add_identity_role_seed_strategy.down.sql`) to preserve migration downgrade parity.
+  - Reproducible command evidence:
+    - `rg -n "identity_roles|identity_user_role_assumptions|identity_user_role_assignments|seed-admin|seed-operator|seed-viewer" backend/Infrastructure/Persistence/Migrations/20260328103000_add_identity_role_seed_strategy.sql`
+    - `rg -n "20260328103000_add_identity_role_seed_strategy" backend/Infrastructure/Persistence/Migrations/README.md backend/Infrastructure/Persistence/Migrations/rollback/20260328103000_add_identity_role_seed_strategy.down.sql`
 
 - Subtask completion update (2026-03-28):
   - Added a full baseline PostgreSQL schema snapshot migration (`00000000000000_baseline_full_schema.sql`) that bootstraps all active module tables, indexes, and integrity constraints in one idempotent pass.
