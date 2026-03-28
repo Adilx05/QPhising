@@ -1051,12 +1051,21 @@
   - **Description:** Seed campaigns, templates, task history, and KPI bootstrap records for realistic UI/API validation.
   - **Expected output:** Non-placeholder seed dataset suitable for dashboard and export verification.
   - **Related layer:** Infra
-- [ ] **Ensure idempotent seed execution**
+- [x] **Ensure idempotent seed execution**
   - **Description:** Implement re-runnable seed scripts/initializers that avoid duplicate records and preserve integrity.
   - **Expected output:** Safe repeated seed runs across developer and CI environments.
   - **Related layer:** Infra
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-28):
+  - Implemented a dedicated re-runnable seed bootstrap script (`backend/Infrastructure/Persistence/Scripts/seed.sh`) that applies representative seed data independently from migration history.
+  - Added deterministic idempotent seed SQL (`backend/Infrastructure/Persistence/Seeds/idempotent_seed.sql`) with transaction scope, advisory locking, schema preflight checks, and `ON CONFLICT` upserts to prevent duplicates while preserving integrity across repeated runs.
+  - Documented repeatable seed usage and guarantees in the persistence migration README for local/CI workflows.
+  - Reproducible command evidence:
+    - `bash -n backend/Infrastructure/Persistence/Scripts/seed.sh`
+    - `rg -n "pg_advisory_xact_lock|to_regclass|required.table_name|ON CONFLICT" backend/Infrastructure/Persistence/Seeds/idempotent_seed.sql`
+    - `rg -n "Re-runnable seed bootstrap|Scripts/seed.sh" backend/Infrastructure/Persistence/Migrations/README.md`
 
 - Subtask completion update (2026-03-28):
   - Added representative seed migration `20260328113000_seed_representative_business_analytics_data.sql` covering non-placeholder business data across templates/template variables, campaigns (all lifecycle states), tracking clicks, queued tasks, task execution logs, and export jobs.
