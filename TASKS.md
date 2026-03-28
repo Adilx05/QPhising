@@ -1613,18 +1613,36 @@
   - **Description:** Perform a page-by-page/component-by-component audit (dashboard, campaigns, templates, analytics, exports, auth/administration views) to identify hardcoded metrics, local arrays, in-component stubs, and mock services.
   - **Expected output:** Audited inventory table with file path, component/service name, mocked data source type, and replacement priority.
   - **Related layer:** Frontend
-- [ ] **Map missing frontend-to-backend integrations**
+- [x] **Map missing frontend-to-backend integrations**
   - **Description:** For each audited UI flow, verify whether a real API call exists and is wired; explicitly flag flows still using local mock logic.
   - **Expected output:** Gap matrix mapping UI flow -> expected endpoint -> current status (`connected` / `missing` / `partially connected`).
   - **Related layer:** Frontend
-- [ ] **Identify unused backend endpoints relevant to implemented UI features**
+- [x] **Identify unused backend endpoints relevant to implemented UI features**
   - **Description:** Cross-reference existing API surface (controllers/OpenAPI) against current frontend usage to detect endpoints that exist but are never consumed.
   - **Expected output:** Endpoint utilization report listing available-but-unused endpoints with candidate frontend integration targets.
   - **Related layer:** Frontend / Backend
-- [ ] **Audit DTO and client model mismatches**
+- Subtask completion update (2026-03-28):
+  - Completed backend endpoint utilization analysis against currently implemented frontend feature pages.
+  - Added `docs/backend-endpoint-utilization-report.md` with endpoint-level utilization status and candidate frontend integration targets.
+  - Confirmed current frontend consumes none of the UI-relevant backend endpoints and identified two UI/backend contract gaps (`Tracking` events read API, `Tasks` API surface).
+  - Reproducible command evidence:
+    - `rg -n "HttpClient|http\.get|http\.post|fetch\(|/api/" frontend/src/app || true`
+    - `rg -n "class .*Controller|\[Http(Get|Post|Put|Delete|Patch)|\[Route\(" backend/API/Controllers -g '*.cs'`
+    - `sed -n '1,260p' docs/backend-endpoint-utilization-report.md`
+
+- [x] **Audit DTO and client model mismatches**
   - **Description:** Compare backend response/request contracts with frontend interfaces/view models to identify missing mappings, field name/type mismatches, nullable handling gaps, and date/time serialization assumptions.
   - **Expected output:** DTO alignment checklist with required model additions/changes and mapping ownership per feature.
   - **Related layer:** Frontend / Backend
+- Subtask completion update (2026-03-28):
+  - Completed DTO/client-model mismatch audit by cross-referencing UI-relevant backend contracts and existing frontend models.
+  - Added `docs/dto-client-model-alignment-checklist.md` with field/type/enum/nullability/date mismatches plus mapping ownership per feature.
+  - Identified critical enum divergence (`TemplateType` and campaign/template status semantics) and missing DTO coverage for current Tasks/Tracking read-table pages.
+  - Reproducible command evidence:
+    - `rg -n "record .*Response|record .*Request|record .*Contract|enum" backend/Application backend/API/Controllers backend/Application/Common/Contracts -g '*.cs'`
+    - `rg -n "interface SessionState|interface DashboardKpi|DashboardCampaignRow|protected readonly (campaigns|templates|kpis|trendRows|events|tasks|exportJobs) = \[" frontend/src/app`
+    - `sed -n '1,260p' docs/dto-client-model-alignment-checklist.md`
+
 - [ ] **Audit environment and base URL configuration gaps**
   - **Description:** Review all frontend environments/runtime config to ensure API base URL/gateway URL values are centrally configured and not hardcoded in services/components.
   - **Expected output:** Configuration gap report with exact missing keys and target configuration source per environment.
@@ -1638,6 +1656,15 @@
     - `rg -n "sessionState|dashboardKpisState|dashboardTrendState|dashboardCampaignsState|featureState" frontend/src/app/core/state/app-state.store.ts`
     - `rg -n "protected readonly (kpis|trendRows|campaigns|templates|events|tasks|exportJobs) = \[" frontend/src/app/features`
     - `sed -n '1,220p' docs/frontend-mock-data-inventory.md`
+
+- Subtask completion update (2026-03-28):
+  - Completed UI-flow-to-endpoint gap mapping across the previously audited frontend mock-data inventory.
+  - Produced explicit integration status matrix (`connected` / `missing` / `partially connected`) with endpoint expectations per flow in `docs/frontend-backend-integration-gap-matrix.md`.
+  - Confirmed no current frontend transport wiring (`HttpClient`/`fetch`) and identified backend coverage gaps for Tracking list and Tasks queue views.
+  - Reproducible command evidence:
+    - `rg -n "HttpClient|http\.get|http\.post|fetch\(|/api/" frontend/src/app`
+    - `rg -n "class .*Controller|\[Http(Get|Post|Put|Delete|Patch)|\[Route\(" backend/API/Controllers -g '*.cs'`
+    - `sed -n '1,240p' docs/frontend-backend-integration-gap-matrix.md`
 
 ### 18.2 Swagger/OpenAPI client generation
 - [ ] **Evaluate and select OpenAPI generation strategy**
