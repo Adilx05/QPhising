@@ -133,11 +133,11 @@ public sealed class ExportGenerationTaskHandler(
         DateTimeOffset fromUtc = toUtc.AddDays(-30);
 
         return new AnalyticsReadCriteria(
-            FromUtc: fromUtc,
-            ToUtc: toUtc,
-            CampaignStatuses: null,
-            TemplateTypes: null,
-            AggregateByDay: true);
+            From: fromUtc,
+            To: toUtc,
+            CampaignIds: [],
+            TemplateTypes: [],
+            CampaignStatuses: []);
     }
 
     private static bool TryMoveToProcessing(ExportJob exportJob, out string? error)
