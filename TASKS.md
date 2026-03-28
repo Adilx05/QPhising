@@ -1795,10 +1795,18 @@
     - `sed -n "1,320p" docs/form-crud-endpoint-wiring-plan.md`
     - `rg -n "\[HttpPost\]|\[HttpPut\]|\[HttpDelete\]|archive|schedule|activate" backend/API/Controllers/CampaignsController.cs backend/API/Controllers/TemplatesController.cs backend/API/Controllers/ExportsController.cs backend/API/Controllers/TrackingController.cs`
     - `rg -n "Plan form CRUD endpoint wiring|form-crud-endpoint-wiring-plan" TASKS.md docs/form-crud-endpoint-wiring-plan.md`
-- [ ] **Define standard loading/empty/error/retry UX states**
+- [x] **Define standard loading/empty/error/retry UX states**
   - **Description:** Introduce a shared state model for async pages/components so all API-driven UIs provide consistent loading skeletons, empty states, recoverable errors, and retry actions.
   - **Expected output:** UI state-handling standard with adoption checklist per screen.
   - **Related layer:** Frontend
+- Subtask completion update (2026-03-28):
+  - Added shared async UX state standard at `docs/frontend-async-ux-state-standard.md` covering deterministic `loading/success/empty/error-recoverable/error-fatal` state model, transition matrix, and retry/error classification rules.
+  - Defined concrete rendering/accessibility rules for skeletons, empty states, and error banners plus manual-retry policy requirements for API-driven screens.
+  - Added adoption checklist per implemented screen family (dashboard, campaigns, templates, tracking, tasks, analytics, exports) with compliance definition-of-done criteria.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/frontend-async-ux-state-standard.md`
+    - `rg -n "Define standard loading/empty/error/retry UX states|frontend-async-ux-state-standard" TASKS.md docs/frontend-async-ux-state-standard.md`
+    - `rg -n "viewState\(\)\.loading|viewState\(\)\.error|emptyDashboardState" frontend/src/app/features/dashboard/containers/dashboard-page.component.html`
 - [ ] **Plan server-side pagination/filter/sort integration**
   - **Description:** For all data tables/lists, map UI controls to backend query params (page, size, sort, filters), including total count handling and query-state persistence.
   - **Expected output:** Contract table per list page defining exact query param mapping and response expectations.
