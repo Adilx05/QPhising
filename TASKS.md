@@ -1361,3 +1361,9 @@
   - Reproducible command evidence:
     - `rg -n "NoOpUnitOfWork|NoOpAnalyticsDashboardCache|NoOpAnalyticsRealtimeNotifier|AddSingleton<IUnitOfWork" backend/API.IntegrationTests/TrackingEndpointsTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~ProcessTrackingClick_Should_Accept_Anonymous_Request_And_Persist_Metadata"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Hardened global validation exception mapping by normalizing model-level FluentValidation errors to the `request` key instead of an empty property key.
+  - This restores deterministic `400 application/problem+json` responses for pipeline validation failures (e.g., synthetic `GetHealthQuery` validator test) and avoids 500s caused by invalid/ambiguous validation dictionary keys.
+  - Reproducible command evidence:
+    - `rg -n "GroupBy\(error => string.IsNullOrWhiteSpace\(error.PropertyName\) \? \"request\"" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Health_Endpoint_Should_Return_ProblemDetails_When_Request_Validation_Fails"` *(fails in current environment: `dotnet` not installed)*

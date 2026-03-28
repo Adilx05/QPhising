@@ -13,7 +13,7 @@ public sealed class GlobalExceptionHandler(
         if (exception is ValidationException validationException)
         {
             var errors = validationException.Errors
-                .GroupBy(error => string.IsNullOrWhiteSpace(error.PropertyName) ? string.Empty : error.PropertyName)
+                .GroupBy(error => string.IsNullOrWhiteSpace(error.PropertyName) ? "request" : error.PropertyName)
                 .ToDictionary(
                     group => group.Key,
                     group => group.Select(error => error.ErrorMessage).Distinct().ToArray());
