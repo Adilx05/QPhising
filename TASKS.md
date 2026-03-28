@@ -1221,7 +1221,15 @@
     - `rg -n "needs:|restore:|build_backend:|build_frontend:|lint:|test:|security_scan:|container_build:" .github/workflows/ci.yml`
     - `rg -n "dotnet restore|dotnet build|dotnet test|dotnet list .*--vulnerable|npm ci|npm audit|trivy-action|docker compose build" .github/workflows/ci.yml`
 
-- [ ] **Implement quality thresholds and merge gates**
+- Subtask completion update (2026-03-28):
+  - Added explicit merge quality gate variables in CI with configurable backend line-coverage minimum (`QUALITY_MIN_BACKEND_LINE_COVERAGE`) to make threshold policy transparent and reviewable.
+  - Hardened `test` stage to collect backend coverage via Coverlet (`XPlat Code Coverage`), generate deterministic summary artifacts via `reportgenerator`, and fail the pipeline when line coverage is below threshold.
+  - Preserved deterministic frontend quality checks while keeping merge blocking behavior centralized in CI job failure semantics.
+  - Reproducible command evidence:
+    - `rg -n "QUALITY_MIN_BACKEND_LINE_COVERAGE|XPlat Code Coverage|reportgenerator|Summary.json|Coverage gate failed" .github/workflows/ci.yml`
+    - `sed -n '1,240p' .github/workflows/ci.yml`
+
+- [x] **Implement quality thresholds and merge gates**
   - **Description:** Add lint/test/coverage thresholds and fail conditions to block low-quality merges.
   - **Expected output:** Enforced quality gates with transparent pass/fail criteria.
   - **Related layer:** Infra
