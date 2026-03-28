@@ -10,6 +10,9 @@ on:
 permissions:
   contents: read
 
+env:
+  QUALITY_MIN_BACKEND_LINE_COVERAGE: "70"
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -135,8 +138,45 @@ jobs:
         run: npm ci
         working-directory: frontend
 
-      - name: Execute backend tests
-        run: dotnet test backend/QPhising.Backend.sln --configuration Release --no-build
+      - name: Execute backend tests with coverage collection
+        run: >-
+          dotnet test backend/QPhising.Backend.sln
+          --configuration Release
+          --no-build
+          --collect:"XPlat Code Coverage"
+          --results-directory ./.artifacts/test-results
+
+      - name: Generate backend coverage summary
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.*
+          reportgenerator \
+            "-reports:.artifacts/test-results/**/coverage.cobertura.xml" \
+            "-targetdir:.artifacts/coverage-report" \
+            "-reporttypes:TextSummary;JsonSummary"
+
+      - name: Enforce backend line coverage threshold
+        run: |
+          python - <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+
+          summary_path = Path('.artifacts/coverage-report/Summary.json')
+          if not summary_path.exists():
+              raise SystemExit('Coverage summary not found at .artifacts/coverage-report/Summary.json')
+
+          summary = json.loads(summary_path.read_text())
+          line_coverage = float(summary['summary']['linecoverage'])
+          threshold = float(os.environ.get('QUALITY_MIN_BACKEND_LINE_COVERAGE', '70'))
+
+          print(f'Backend line coverage: {line_coverage:.2f}%')
+          print(f'Required minimum: {threshold:.2f}%')
+
+          if line_coverage < threshold:
+              raise SystemExit(
+                  f'Coverage gate failed: backend line coverage {line_coverage:.2f}% is below {threshold:.2f}%'
+              )
+          PYTHON
 
       - name: Execute frontend test smoke build
         run: npm run build -- --configuration production
