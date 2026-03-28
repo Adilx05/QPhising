@@ -1123,7 +1123,7 @@
   - **Description:** Execute and document one-command startup, health convergence, and service reachability checks.
   - **Expected output:** Recorded evidence of healthy end-to-end stack initialization.
   - **Related layer:** Infra
-- [ ] **Audit environment variable to config mapping**
+- [x] **Audit environment variable to config mapping**
   - **Description:** Ensure all runtime settings are environment-driven and mapped to application configuration keys.
   - **Expected output:** No hidden hardcoded runtime values; portable runtime configuration.
   - **Related layer:** Infra
@@ -1161,6 +1161,16 @@
     - `bash -n scripts/compose/verify-full-stack-lifecycle.sh`
     - `./scripts/compose/verify-full-stack-lifecycle.sh` *(fails in current environment: `docker` not installed)*
     - `rg -n "verify-full-stack-lifecycle|health convergence|docker compose up --build" README.md scripts/compose/verify-full-stack-lifecycle.sh`
+
+- Subtask completion update (2026-03-28):
+  - Audited compose/runtime configuration mapping across API, gateway, and worker against strongly typed options bound at startup (`Database`, `Redis`, `TrackingTokens`, `TrackingRetention`, `ExportStorage`, `ExportRetention`, `TaskWorker`, `Keycloak`, `Smtp`, `BaseUrls`).
+  - Removed worker hidden runtime defaults by mapping required infrastructure and worker execution keys via environment variables in `docker-compose.yml` (database/redis, tracking, export, worker polling/retry controls).
+  - Expanded API runtime environment mappings to include tracking/retention/export sections so container runtime behavior is fully overrideable without image rebuilds.
+  - Updated README configuration matrix to document API/Gateway/Worker environment-variable mappings for portable local/deployment runtime configuration.
+  - Reproducible command evidence:
+    - `rg -n "TrackingTokens__|TrackingRetention__|ExportStorage__|ExportRetention__|TaskWorker__|Redis__Tracking|Database__ConnectionString" docker-compose.yml`
+    - `rg -n "Backend configuration keys|Gateway configuration keys|Worker configuration keys|TrackingTokens|TaskWorker" README.md`
+    - `docker compose config` *(fails in current environment: `docker` not installed)*
 
 - Subtask completion update (2026-03-28):
   - Finalized compose startup dependency ordering by gating `gateway` startup on healthy `api`, `redis`, and `keycloak` services via `depends_on.condition: service_healthy`.

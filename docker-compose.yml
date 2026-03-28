@@ -62,6 +62,24 @@ services:
       ASPNETCORE_URLS: http://+:8080
       Database__ConnectionString: Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
       Redis__ConnectionString: ${REDIS_HOST:-redis}:6379
+      Redis__TrackingDeduplicationWindowMinutes: ${REDIS_TRACKING_DEDUPLICATION_WINDOW_MINUTES:-15}
+      Redis__TrackingTokenClockSkewSeconds: ${REDIS_TRACKING_TOKEN_CLOCK_SKEW_SECONDS:-30}
+      Redis__TrackingAbuseWindowMinutes: ${REDIS_TRACKING_ABUSE_WINDOW_MINUTES:-1}
+      Redis__TrackingSuspiciousIpThreshold: ${REDIS_TRACKING_SUSPICIOUS_IP_THRESHOLD:-20}
+      Redis__TrackingIpRejectionThreshold: ${REDIS_TRACKING_IP_REJECTION_THRESHOLD:-50}
+      Redis__TrackingAggregateRetentionDays: ${REDIS_TRACKING_AGGREGATE_RETENTION_DAYS:-365}
+      Redis__AnalyticsDashboardCacheTtlSeconds: ${REDIS_ANALYTICS_DASHBOARD_CACHE_TTL_SECONDS:-300}
+      TrackingRetention__RawClickRetentionDays: ${TRACKING_RETENTION_RAW_CLICK_DAYS:-90}
+      TrackingRetention__AggregateRetentionDays: ${TRACKING_RETENTION_AGGREGATE_DAYS:-365}
+      TrackingRetention__CleanupIntervalMinutes: ${TRACKING_RETENTION_CLEANUP_INTERVAL_MINUTES:-60}
+      TrackingRetention__CleanupBatchSize: ${TRACKING_RETENTION_CLEANUP_BATCH_SIZE:-1000}
+      TrackingTokens__SigningKey: ${TRACKING_TOKENS_SIGNING_KEY:-qphising-local-dev-signing-key-please-change-2026}
+      TrackingTokens__ExpirationMinutes: ${TRACKING_TOKENS_EXPIRATION_MINUTES:-30}
+      TrackingTokens__Version: ${TRACKING_TOKENS_VERSION:-1}
+      ExportStorage__BasePath: ${EXPORT_STORAGE_BASE_PATH:-/tmp/qphising-exports}
+      ExportStorage__FileTtlDays: ${EXPORT_STORAGE_FILE_TTL_DAYS:-7}
+      ExportRetention__CleanupIntervalMinutes: ${EXPORT_RETENTION_CLEANUP_INTERVAL_MINUTES:-60}
+      ExportRetention__CleanupBatchSize: ${EXPORT_RETENTION_CLEANUP_BATCH_SIZE:-250}
       Keycloak__Authority: ${KEYCLOAK_AUTHORITY:-http://keycloak:8080/realms/qphising}
       Keycloak__Audience: ${KEYCLOAK_AUDIENCE:-qphising-api}
       Keycloak__RequireHttpsMetadata: ${KEYCLOAK_REQUIRE_HTTPS_METADATA:-false}
@@ -98,6 +116,30 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: ${WORKER_ASPNETCORE_ENVIRONMENT:-Development}
       ASPNETCORE_URLS: http://+:8080
+      Database__ConnectionString: Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      Redis__ConnectionString: ${REDIS_HOST:-redis}:6379
+      Redis__TrackingDeduplicationWindowMinutes: ${REDIS_TRACKING_DEDUPLICATION_WINDOW_MINUTES:-15}
+      Redis__TrackingTokenClockSkewSeconds: ${REDIS_TRACKING_TOKEN_CLOCK_SKEW_SECONDS:-30}
+      Redis__TrackingAbuseWindowMinutes: ${REDIS_TRACKING_ABUSE_WINDOW_MINUTES:-1}
+      Redis__TrackingSuspiciousIpThreshold: ${REDIS_TRACKING_SUSPICIOUS_IP_THRESHOLD:-20}
+      Redis__TrackingIpRejectionThreshold: ${REDIS_TRACKING_IP_REJECTION_THRESHOLD:-50}
+      Redis__TrackingAggregateRetentionDays: ${REDIS_TRACKING_AGGREGATE_RETENTION_DAYS:-365}
+      TrackingRetention__RawClickRetentionDays: ${TRACKING_RETENTION_RAW_CLICK_DAYS:-90}
+      TrackingRetention__AggregateRetentionDays: ${TRACKING_RETENTION_AGGREGATE_DAYS:-365}
+      TrackingRetention__CleanupIntervalMinutes: ${TRACKING_RETENTION_CLEANUP_INTERVAL_MINUTES:-60}
+      TrackingRetention__CleanupBatchSize: ${TRACKING_RETENTION_CLEANUP_BATCH_SIZE:-1000}
+      TrackingTokens__SigningKey: ${TRACKING_TOKENS_SIGNING_KEY:-qphising-local-dev-signing-key-please-change-2026}
+      TrackingTokens__ExpirationMinutes: ${TRACKING_TOKENS_EXPIRATION_MINUTES:-30}
+      TrackingTokens__Version: ${TRACKING_TOKENS_VERSION:-1}
+      ExportStorage__BasePath: ${EXPORT_STORAGE_BASE_PATH:-/tmp/qphising-exports}
+      ExportStorage__FileTtlDays: ${EXPORT_STORAGE_FILE_TTL_DAYS:-7}
+      ExportRetention__CleanupIntervalMinutes: ${EXPORT_RETENTION_CLEANUP_INTERVAL_MINUTES:-60}
+      ExportRetention__CleanupBatchSize: ${EXPORT_RETENTION_CLEANUP_BATCH_SIZE:-250}
+      TaskWorker__PollIntervalSeconds: ${TASK_WORKER_POLL_INTERVAL_SECONDS:-5}
+      TaskWorker__ClaimLeaseDurationSeconds: ${TASK_WORKER_CLAIM_LEASE_DURATION_SECONDS:-60}
+      TaskWorker__InitialRetryDelaySeconds: ${TASK_WORKER_INITIAL_RETRY_DELAY_SECONDS:-5}
+      TaskWorker__MaxRetryDelaySeconds: ${TASK_WORKER_MAX_RETRY_DELAY_SECONDS:-300}
+      TaskWorker__RetryBackoffMultiplier: ${TASK_WORKER_RETRY_BACKOFF_MULTIPLIER:-2}
     depends_on:
       postgres:
         condition: service_healthy
