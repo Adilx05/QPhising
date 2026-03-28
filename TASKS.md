@@ -1705,10 +1705,18 @@
     - `rg -n "openapi/v1.json|openapitools/openapi-generator-cli:v7.14.0|src/app/core/api/generated" docs/openapi-source-of-truth-and-generation-inputs.md frontend/scripts/generate-openapi-client.sh`
     - `rg -n "generate:api-client" frontend/package.json`
 
-- [ ] **Create typed generated client module structure**
+- [x] **Create typed generated client module structure**
   - **Description:** Plan generated output organization (e.g., `proxies.ts` or per-feature generated clients) so it aligns with Angular feature modules and does not leak transport concerns into presentation components.
   - **Expected output:** File-structure blueprint for generated clients plus ownership boundaries between generated and handwritten code.
   - **Related layer:** Frontend
+- Subtask completion update (2026-03-28):
+  - Defined the generated-client module blueprint and ownership boundaries in `docs/openapi-generated-client-module-structure.md`.
+  - Standardized the canonical Angular API layer structure under `core/api` with explicit separation for generated artifacts, runtime client providers, facades, mappers, and error normalization.
+  - Documented allowed/forbidden dependency flow to prevent transport leakage into feature/presentation layers while preserving typed generated-client usage.
+  - Reproducible command evidence:
+    - `sed -n "1,260p" docs/openapi-generated-client-module-structure.md`
+    - `rg -n "Create typed generated client module structure|openapi-generated-client-module-structure" TASKS.md docs/openapi-generated-client-module-structure.md`
+
 - [ ] **Define regeneration and drift-control workflow**
   - **Description:** Specify when regeneration is required (contract changes, release milestones), and include automated checks to detect stale generated client artifacts.
   - **Expected output:** Regeneration SOP (local + CI) with freshness validation rule and failure criteria.
