@@ -1433,10 +1433,38 @@
           - `<command 1>` (expected: `<brief expected result>`)
           - `<command 2>` (expected: `<brief expected result>`)
     ```
-- [ ] **Add release-readiness final verification pass**
+- [x] **Add release-readiness final verification pass**
   - **Description:** Define a final pre-release review gate that confirms all DoD criteria are satisfied.
   - **Expected output:** Single, repeatable release-go/no-go verification checkpoint.
   - **Related layer:** Infra
+  - **Release go/no-go verification gate (run in order):**
+    1. **Placeholder scan (Go if clean)**
+       - Command: `rg -n "TODO|TBD|placeholder|stub" backend frontend gateway worker docker docs`
+       - Pass criteria: no unresolved placeholder markers in implementation scope.
+    2. **Required module presence (Go if all present)**
+       - Command: `test -d backend && test -d frontend && test -d gateway && test -d worker && test -f docker-compose.yml`
+       - Pass criteria: command exits `0`.
+    3. **Security policy wiring check (Go if explicit JWT + RBAC exists)**
+       - Command: `rg -n "AddAuthentication|AddAuthorization|RequireAuthorization|Policy|Admin|Operator|Viewer" backend/API gateway`
+       - Pass criteria: explicit authn/authz policy configuration is discoverable.
+    4. **Expired campaign enforcement check (Go if guard logic exists)**
+       - Command: `rg -n "expired|EndDate|reject.*tracking|tracking.*reject|CampaignStatus" backend/Domain backend/Application backend/API`
+       - Pass criteria: deterministic guard coverage for expired campaign tracking flows.
+    5. **Exports flow check (Go if queue/status/download paths exist)**
+       - Command: `rg -n "Export|QueueExport|DownloadExport|GetExportStatus" backend/Application backend/API backend/API.IntegrationTests`
+       - Pass criteria: export CQRS/API/test flow is present.
+    6. **Dashboard seed readiness check (Go if seed path is present)**
+       - Command: `rg -n "seed|Seed|Dashboard|Analytics" backend/Infrastructure backend/API docker`
+       - Pass criteria: seed initialization path for analytics dashboard is discoverable.
+    7. **Compose specification validation (Go if config resolves)**
+       - Command: `docker compose config`
+       - Pass criteria: compose file resolves without schema/config errors.
+    8. **TASKS evidence hygiene check (Go if evidence metadata is present)**
+       - Command: `rg -n "Commit:|Concrete files:|Reproducible command evidence:|Reproducible commands:" TASKS.md`
+       - Pass criteria: completed work entries include auditable evidence metadata.
+  - **Release decision rule:**
+    - **GO** only when all eight checks pass.
+    - **NO-GO** when any check fails; log failing command output in task execution notes and remediate before re-running the gate.
 
 ### Execution Notes
 
@@ -1464,6 +1492,13 @@
   - Reproducible command evidence:
     - `rg -n "Standard evidence template|Commit:|Concrete files:|Reproducible command evidence:|expected:" TASKS.md`
     - `rg -n "\[x\] \*\*Standardize completion evidence template\*\*" TASKS.md`
+
+- Subtask completion update (2026-03-28):
+  - Defined a single, ordered release-readiness verification gate for go/no-go decisions with explicit commands and pass criteria mapped to Definition of Done controls.
+  - Added a strict release decision rule requiring all gate checks to pass before release and enforcing remediation + re-run on any failure.
+  - Reproducible command evidence:
+    - `rg -n "Add release-readiness final verification pass|Release go/no-go verification gate|Release decision rule" TASKS.md`
+    - `rg -n "\[x\] \*\*Add release-readiness final verification pass\*\*" TASKS.md`
 
 ## 17. [x] Task status audit hardening
 - StartedAt: 2026-03-27T17:50:00Z
