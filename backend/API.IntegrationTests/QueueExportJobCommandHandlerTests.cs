@@ -44,8 +44,8 @@ public sealed class QueueExportJobCommandHandlerTests
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
         Assert.Equal(ExportJobStatus.Queued, result.Value!.Status);
-        Assert.Equal(1, exportJobRepository.Jobs.Count);
-        Assert.Equal(1, queuedTaskRepository.Tasks.Count);
+        Assert.Single(exportJobRepository.Jobs);
+        Assert.Single(queuedTaskRepository.Tasks);
 
         QueuedTask queuedTask = queuedTaskRepository.Tasks.Single();
         Assert.Equal(TaskType.ExportGeneration, queuedTask.Type);
