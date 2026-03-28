@@ -1047,7 +1047,7 @@
   - **Description:** Seed role assumptions and default users metadata needed for RBAC-enabled environments.
   - **Expected output:** Deterministic bootstrap data supporting secure role-based flows.
   - **Related layer:** Infra
-- [ ] **Seed representative business and analytics data**
+- [x] **Seed representative business and analytics data**
   - **Description:** Seed campaigns, templates, task history, and KPI bootstrap records for realistic UI/API validation.
   - **Expected output:** Non-placeholder seed dataset suitable for dashboard and export verification.
   - **Related layer:** Infra
@@ -1057,6 +1057,14 @@
   - **Related layer:** Infra
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-28):
+  - Added representative seed migration `20260328113000_seed_representative_business_analytics_data.sql` covering non-placeholder business data across templates/template variables, campaigns (all lifecycle states), tracking clicks, queued tasks, task execution logs, and export jobs.
+  - Seed dataset was designed for realistic dashboard/KPI validation by combining active/scheduled/ended/archived campaign states with recent click activity and mixed task/export outcomes (`Succeeded`, `Failed`, `Queued`, `Completed`).
+  - Added rollback parity script (`rollback/20260328113000_seed_representative_business_analytics_data.down.sql`) and documented the migration in the persistence migration README.
+  - Reproducible command evidence:
+    - `rg -n "seed_representative_business_analytics_data|INSERT INTO (templates|campaigns|tracking_clicks|queued_tasks|task_execution_logs|export_jobs)" backend/Infrastructure/Persistence/Migrations/20260328113000_seed_representative_business_analytics_data.sql backend/Infrastructure/Persistence/Migrations/README.md`
+    - `test -f backend/Infrastructure/Persistence/Migrations/rollback/20260328113000_seed_representative_business_analytics_data.down.sql`
 
 - Subtask completion update (2026-03-28):
   - Implemented deterministic identity/RBAC seed strategy with a dedicated SQL migration (`20260328103000_add_identity_role_seed_strategy.sql`).
