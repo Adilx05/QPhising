@@ -1229,11 +1229,21 @@
     - `rg -n "QUALITY_MIN_BACKEND_LINE_COVERAGE|XPlat Code Coverage|reportgenerator|Summary.json|Coverage gate failed" .github/workflows/ci.yml`
     - `sed -n '1,240p' .github/workflows/ci.yml`
 
+
+- Subtask completion update (2026-03-28):
+  - Strengthened CI `security_scan` stage with policy-driven security gates for both dependency and container image risk.
+  - Added configurable security threshold variables (`SECURITY_FAIL_ON_DOTNET_SEVERITY`, `SECURITY_FAIL_ON_NPM_SEVERITY`, `SECURITY_FAIL_ON_TRIVY_SEVERITY`) so blocking criteria are explicit and reviewable.
+  - Replaced passive .NET vulnerability listing with a JSON report + policy enforcement script that fails the pipeline when vulnerabilities meet/exceed the configured severity.
+  - Added container image vulnerability scanning for `frontend`, `api`, `gateway`, and `worker` after compose builds, using Trivy with blocking `exit-code` behavior on configured severities.
+  - Reproducible command evidence:
+    - `rg -n "SECURITY_FAIL_ON_DOTNET_SEVERITY|SECURITY_FAIL_ON_NPM_SEVERITY|SECURITY_FAIL_ON_TRIVY_SEVERITY" .github/workflows/ci.yml`
+    - `rg -n "dotnet list .*--format json|Blocking \.NET vulnerabilities detected|npm audit --audit-level|docker compose build frontend api gateway worker|aquasec/trivy:0.57.1" .github/workflows/ci.yml`
+    - `sed -n '180,320p' .github/workflows/ci.yml`
 - [x] **Implement quality thresholds and merge gates**
   - **Description:** Add lint/test/coverage thresholds and fail conditions to block low-quality merges.
   - **Expected output:** Enforced quality gates with transparent pass/fail criteria.
   - **Related layer:** Infra
-- [ ] **Integrate dependency and container vulnerability scanning**
+- [x] **Integrate dependency and container vulnerability scanning**
   - **Description:** Add SCA and image scanning with policy-based severity thresholds.
   - **Expected output:** Automated vulnerability reporting with actionable blocking rules.
   - **Related layer:** Infra
