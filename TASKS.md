@@ -1609,7 +1609,7 @@
 - Scope: Frontend + Backend + Gateway + Infra + Auth alignment required for end-to-end production data flow.
 
 ### 18.1 Current state analysis
-- [ ] **Inventory hardcoded/mock data usage across all UI modules**
+- [x] **Inventory hardcoded/mock data usage across all UI modules**
   - **Description:** Perform a page-by-page/component-by-component audit (dashboard, campaigns, templates, analytics, exports, auth/administration views) to identify hardcoded metrics, local arrays, in-component stubs, and mock services.
   - **Expected output:** Audited inventory table with file path, component/service name, mocked data source type, and replacement priority.
   - **Related layer:** Frontend
@@ -1629,6 +1629,15 @@
   - **Description:** Review all frontend environments/runtime config to ensure API base URL/gateway URL values are centrally configured and not hardcoded in services/components.
   - **Expected output:** Configuration gap report with exact missing keys and target configuration source per environment.
   - **Related layer:** Frontend / Gateway / Infra
+
+- Subtask completion update (2026-03-28):
+  - Completed a frontend-wide hardcoded/mock data audit for dashboard, campaigns, templates, analytics, tracking, tasks, exports, and core session state.
+  - Added an audited inventory table capturing file path, component/store owner, mock source type, evidence summary, and replacement priority (P0/P1).
+  - Recorded audit artifact at `docs/frontend-mock-data-inventory.md` to serve as source input for subsequent frontend-backend integration subtasks.
+  - Reproducible command evidence:
+    - `rg -n "sessionState|dashboardKpisState|dashboardTrendState|dashboardCampaignsState|featureState" frontend/src/app/core/state/app-state.store.ts`
+    - `rg -n "protected readonly (kpis|trendRows|campaigns|templates|events|tasks|exportJobs) = \[" frontend/src/app/features`
+    - `sed -n '1,220p' docs/frontend-mock-data-inventory.md`
 
 ### 18.2 Swagger/OpenAPI client generation
 - [ ] **Evaluate and select OpenAPI generation strategy**
