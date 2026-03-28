@@ -1759,10 +1759,18 @@
     - `rg -n "HttpClient|http\.(get|post|put|delete|patch)|fetch\(|/api/" frontend/src/app -g '*.ts'`
 
 ### 18.3 Frontend integration execution planning
-- [ ] **Plan dashboard live data integration**
+- [x] **Plan dashboard live data integration**
   - **Description:** Replace all hardcoded KPI/chart/dashboard values with real endpoint consumption and explicit transformation rules for chart/card view models.
   - **Expected output:** Dashboard integration plan mapping each widget -> endpoint -> mapper -> UI state contract.
   - **Related layer:** Frontend / Backend
+- Subtask completion update (2026-03-28):
+  - Added `docs/dashboard-live-data-integration-plan.md` with a full widget integration matrix mapping dashboard KPI cards, trend chart/table, and campaigns table to authoritative backend endpoints, generated-client facades, mapper outputs, and UI state bindings.
+  - Defined deterministic dashboard filter-to-query translation rules (`Last 24 hours`, `Last 7 days`, `Last 30 days`) and explicit DTO-to-UI transformation/null-safety conventions.
+  - Captured generated-client-first execution path (`core/api/facades` + `core/api/mappers`) and documented current backend contract parity gap for campaigns table fields (`owner`, `clickRate`) with mitigation.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/dashboard-live-data-integration-plan.md`
+    - `rg -n "dashboardKpisState|dashboardTrendState|dashboardCampaignsState" frontend/src/app/core/state/app-state.store.ts`
+    - `rg -n "dashboard-kpis|\\[HttpGet\\(\" backend/API/Controllers/AnalyticsController.cs backend/API/Controllers/CampaignsController.cs`
 - [ ] **Plan campaigns/modules/list/detail live data integration**
   - **Description:** Define API-backed data flow for each list/detail page currently using static sources, including route-param based detail retrieval.
   - **Expected output:** Feature-by-feature integration matrix for list/detail pages with endpoint and model binding definitions.
