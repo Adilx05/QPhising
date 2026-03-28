@@ -1317,6 +1317,14 @@
     - `rg -n "SECURITY_FAIL_ON_CONFIG_SEVERITY|Detect committed secrets with Gitleaks|Enforce infrastructure configuration security policy" .github/workflows/ci.yml`
     - `rg -n "ghcr.io/gitleaks/gitleaks:v8.24.2|gitleaks.*detect|aquasec/trivy:0.57.1 config" .github/workflows/ci.yml`
     - `sed -n '1,260p' .github/workflows/ci.yml`
+
+- Subtask completion update (2026-03-28):
+  - Added operations runbook at `docs/operations/operational-runbook.md` covering on-call ownership/severity levels, PostgreSQL and Redis backup routines, restore procedures, incident response workflow, and logging/observability operations guidance.
+  - Included concrete command playbooks for backup integrity verification, disaster-recovery restore sequencing, readiness validation, correlation-ID log tracing, and alerting thresholds.
+  - Reproducible command evidence:
+    - `test -f docs/operations/operational-runbook.md`
+    - `rg -n "PostgreSQL logical backup|PostgreSQL restore|Incident response workflow|Logging and observability guidance|X-Correlation-ID" docs/operations/operational-runbook.md`
+
 - [x] **Implement quality thresholds and merge gates**
   - **Description:** Add lint/test/coverage thresholds and fail conditions to block low-quality merges.
   - **Expected output:** Enforced quality gates with transparent pass/fail criteria.
@@ -1329,7 +1337,7 @@
   - **Description:** Integrate secret detection and insecure configuration policy checks into CI.
   - **Expected output:** Early detection of credential leaks and risky runtime settings.
   - **Related layer:** Infra
-- [ ] **Produce operational runbooks**
+- [x] **Produce operational runbooks**
   - **Description:** Document backup/restore procedures, incident response workflow, and logging/observability guidance.
   - **Expected output:** Practical operational documentation for support and on-call execution.
   - **Related layer:** Infra
