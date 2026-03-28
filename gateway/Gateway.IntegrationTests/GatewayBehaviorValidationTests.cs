@@ -58,6 +58,21 @@ public sealed class GatewayBehaviorValidationTests
         }
     }
 
+
+    [Fact]
+    public void Ocelot_Global_RateLimiting_Should_Be_Disabled_To_Avoid_Duplicate_Throttling_With_Custom_Middleware()
+    {
+        var ocelotPath = ResolveGatewayFilePath("ocelot.json");
+        using var document = JsonDocument.Parse(File.ReadAllText(ocelotPath));
+
+        var globalRateLimitOptions = document.RootElement
+            .GetProperty("GlobalConfiguration")
+            .GetProperty("RateLimitOptions");
+
+        Assert.True(globalRateLimitOptions.TryGetProperty("EnableRateLimiting", out var enableRateLimiting));
+        Assert.False(enableRateLimiting.GetBoolean());
+    }
+
     [Fact]
     public async Task RedisRateLimitingMiddleware_Should_Return_429_With_Standard_Headers_When_Limit_Is_Exceeded()
     {
@@ -141,4 +156,23 @@ public sealed class GatewayBehaviorValidationTests
         Assert.Equal(expectedCorrelationId, context.Response.Headers[CorrelationIdMiddleware.CorrelationIdHeader].ToString());
         Assert.Equal(expectedCorrelationId, context.Items[CorrelationIdMiddleware.CorrelationIdItemKey]);
     }
+
+    [Fact]
+    public async Task CorrelationIdMiddleware_Should_Not_Throw_When_Response_Has_Already_Started()
+    {
+        var middleware = new CorrelationIdMiddleware(
+            async context =>
+            {
+                await context.Response.WriteAsync("started");
+            },
+            NullLogger<CorrelationIdMiddleware>.Instance);
+
+        var context = new DefaultHttpContext();
+
+        var exception = await Record.ExceptionAsync(() => middleware.InvokeAsync(context));
+
+        Assert.Null(exception);
+        Assert.True(context.Response.Headers.ContainsKey(CorrelationIdMiddleware.CorrelationIdHeader));
+    }
+
 }
