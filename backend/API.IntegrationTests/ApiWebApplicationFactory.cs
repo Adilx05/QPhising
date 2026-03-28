@@ -15,14 +15,14 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>
         {
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = TestAuthHandler.Scheme;
-                options.DefaultChallengeScheme = TestAuthHandler.Scheme;
-            }).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.Scheme, _ =>
+                options.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
+                options.DefaultChallengeScheme = TestAuthHandler.SchemeName;
+            }).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ =>
             {
             });
 
             services.AddAuthorizationBuilder()
-                .SetFallbackPolicy(new AuthorizationPolicyBuilder(TestAuthHandler.Scheme)
+                .SetFallbackPolicy(new AuthorizationPolicyBuilder(TestAuthHandler.SchemeName)
                     .RequireAuthenticatedUser()
                     .Build())
                 .AddPolicy(AuthorizationPolicies.Admin, policy => policy.RequireRole(AuthorizationPolicies.Admin))

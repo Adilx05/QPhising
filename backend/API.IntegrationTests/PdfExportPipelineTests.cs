@@ -14,14 +14,14 @@ public sealed class PdfExportPipelineTests
 
         Campaign draftCampaign = Campaign.Create(
             "Quarterly Simulation",
-            TemplateType.Invoice,
+            TemplateType.Email,
             "<html>simulation</html>",
             DateTimeOffset.UtcNow.AddDays(1),
             DateTimeOffset.UtcNow.AddDays(8));
 
         Campaign scheduledCampaign = Campaign.Create(
             "HR Credential Drill",
-            TemplateType.HRNotice,
+            TemplateType.LandingPage,
             "<html>hr</html>",
             DateTimeOffset.UtcNow.AddDays(4),
             DateTimeOffset.UtcNow.AddDays(12));
@@ -76,8 +76,8 @@ public sealed class PdfExportPipelineTests
             ],
             TemplateTypeBreakdown:
             [
-                new TemplateTypeBreakdownReadModel(TemplateType.Invoice, 2, 90, 10),
-                new TemplateTypeBreakdownReadModel(TemplateType.HRNotice, 1, 50, 6)
+                new TemplateTypeBreakdownReadModel(TemplateType.Email, 2, 90, 10),
+                new TemplateTypeBreakdownReadModel(TemplateType.LandingPage, 1, 50, 6)
             ]);
 
         AnalyticsReadCriteria criteria = new(

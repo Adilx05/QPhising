@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Logging.Abstractions;
 using QPhising.Application.Common.Contracts.Exports;
 using QPhising.Application.Features.Exports.Common;
 using QPhising.Application.Features.Exports.QueueExportJob;
@@ -15,10 +16,10 @@ public sealed class QueueExportJobCommandHandlerTests
 
     public QueueExportJobCommandHandlerTests()
     {
-        MapperConfiguration mapperConfiguration = new(configuration =>
+        MapperConfiguration mapperConfiguration = new(cfg =>
         {
-            configuration.AddProfile(new ExportJobMappingProfile());
-        });
+            cfg.AddProfile<ExportJobMappingProfile>();
+        }, NullLoggerFactory.Instance);
 
         _mapper = mapperConfiguration.CreateMapper();
     }
@@ -43,8 +44,8 @@ public sealed class QueueExportJobCommandHandlerTests
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
         Assert.Equal(ExportJobStatus.Queued, result.Value!.Status);
-        Assert.Equal(1, exportJobRepository.Jobs.Count);
-        Assert.Equal(1, queuedTaskRepository.Tasks.Count);
+        Assert.Single(exportJobRepository.Jobs);
+        Assert.Single(queuedTaskRepository.Tasks);
 
         QueuedTask queuedTask = queuedTaskRepository.Tasks.Single();
         Assert.Equal(TaskType.ExportGeneration, queuedTask.Type);
@@ -78,6 +79,19 @@ public sealed class QueueExportJobCommandHandlerTests
 
         public void Update(ExportJob exportJob)
         {
+        }
+
+        public Task<IReadOnlyCollection<ExportJob>> ListExpiredWithStoredFileAsync(
+            DateTimeOffset asOfUtc,
+            int take,
+            CancellationToken cancellationToken = default)
+        {
+            IReadOnlyCollection<ExportJob> expired = Jobs
+                .Where(job => job.ExpiresAt.HasValue && job.ExpiresAt.Value <= asOfUtc && !string.IsNullOrWhiteSpace(job.StoragePath))
+                .Take(take)
+                .ToArray();
+
+            return Task.FromResult(expired);
         }
     }
 

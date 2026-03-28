@@ -8,7 +8,7 @@ namespace QPhising.API.IntegrationTests;
 
 public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    public const string Scheme = "Test";
+    public const string SchemeName = "Test";
     public const string RolesHeader = "X-Test-Roles";
     public const string UserIdHeader = "X-Test-UserId";
 
@@ -48,9 +48,9 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
             }
         }
 
-        var identity = new ClaimsIdentity(claims, Scheme);
+        var identity = new ClaimsIdentity(claims, SchemeName);
         var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, Scheme);
+        var ticket = new AuthenticationTicket(principal, SchemeName);
 
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }

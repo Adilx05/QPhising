@@ -165,6 +165,19 @@ public sealed class ExportEndpointsAuthorizationTests : IClassFixture<ApiWebAppl
         {
             _items[exportJob.Id] = exportJob;
         }
+
+        public Task<IReadOnlyCollection<ExportJob>> ListExpiredWithStoredFileAsync(
+            DateTimeOffset asOfUtc,
+            int take,
+            CancellationToken cancellationToken = default)
+        {
+            IReadOnlyCollection<ExportJob> expired = _items.Values
+                .Where(job => job.ExpiresAt.HasValue && job.ExpiresAt.Value <= asOfUtc && !string.IsNullOrWhiteSpace(job.StoragePath))
+                .Take(take)
+                .ToArray();
+
+            return Task.FromResult(expired);
+        }
     }
 
     private sealed class InMemoryQueuedTaskRepository : IQueuedTaskRepository
