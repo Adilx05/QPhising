@@ -14,16 +14,7 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
         context.Items[CorrelationIdItemKey] = correlationId;
         context.TraceIdentifier = correlationId;
         context.Request.Headers[CorrelationIdHeader] = correlationId;
-        context.Response.OnStarting(static state =>
-        {
-            var httpContext = (HttpContext)state;
-            if (!httpContext.Response.Headers.ContainsKey(CorrelationIdHeader))
-            {
-                httpContext.Response.Headers[CorrelationIdHeader] = httpContext.TraceIdentifier;
-            }
-
-            return Task.CompletedTask;
-        }, context);
+        TrySetResponseCorrelationHeader(context, correlationId);
 
         using (LogContext.PushProperty("CorrelationId", correlationId))
         {
@@ -36,6 +27,23 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
             await next(context);
         }
 
+    }
+
+    private void TrySetResponseCorrelationHeader(HttpContext context, string correlationId)
+    {
+        if (context.Response.HasStarted)
+        {
+            logger.LogWarning(
+                "Skipping correlation response header for {Method} {Path} because the response has already started.",
+                context.Request.Method,
+                context.Request.Path);
+            return;
+        }
+
+        if (!context.Response.Headers.ContainsKey(CorrelationIdHeader))
+        {
+            context.Response.Headers[CorrelationIdHeader] = correlationId;
+        }
     }
 
     private static string ResolveCorrelationId(HttpContext context)
