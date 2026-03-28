@@ -60,6 +60,27 @@ docker compose up --build
 
 `docker-compose.yml` now uses `${VAR:-default}` expansion for runtime values (DB, Redis, Keycloak, SMTP, base URLs, exposed ports).
 
+### Full-stack lifecycle verification
+
+Use the verification script to run one-command startup, wait for health convergence, and validate endpoint reachability:
+
+```bash
+./scripts/compose/verify-full-stack-lifecycle.sh
+```
+
+The script performs:
+
+* `docker compose up --build -d --remove-orphans`
+* health convergence checks using `docker compose ps --format json`
+* reachability probes for Keycloak, API, Gateway, and Frontend
+* automatic cleanup via `docker compose down -v --remove-orphans`
+
+Optional overrides:
+
+* `STARTUP_TIMEOUT_SECONDS` (default `600`)
+* `POLL_INTERVAL_SECONDS` (default `5`)
+* `*_HEALTH_URL` variables for custom endpoint probes
+
 ### Deterministic image build assumptions
 
 To keep image outputs reproducible across environments:
