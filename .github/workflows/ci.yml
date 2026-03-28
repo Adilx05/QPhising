@@ -15,6 +15,7 @@ env:
   SECURITY_FAIL_ON_DOTNET_SEVERITY: "high"
   SECURITY_FAIL_ON_NPM_SEVERITY: "high"
   SECURITY_FAIL_ON_TRIVY_SEVERITY: "HIGH,CRITICAL"
+  SECURITY_FAIL_ON_CONFIG_SEVERITY: "HIGH,CRITICAL"
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -264,6 +265,27 @@ jobs:
       - name: Check frontend dependency vulnerabilities
         run: npm audit --audit-level=${SECURITY_FAIL_ON_NPM_SEVERITY}
         working-directory: frontend
+
+      - name: Detect committed secrets with Gitleaks
+        run: |
+          docker run --rm \
+            -v "${PWD}:/repo" \
+            -w /repo \
+            ghcr.io/gitleaks/gitleaks:v8.24.2 \
+            detect \
+            --source . \
+            --no-git \
+            --redact \
+            --exit-code 1
+
+      - name: Enforce infrastructure configuration security policy
+        run: |
+          docker run --rm \
+            -v "${PWD}:/workspace" \
+            aquasec/trivy:0.57.1 config \
+            --severity "${SECURITY_FAIL_ON_CONFIG_SEVERITY}" \
+            --exit-code 1 \
+            /workspace
 
       - name: Build service images for vulnerability scanning
         run: docker compose build frontend api gateway worker
