@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Logging.Abstractions;
 using QPhising.Application.Common;
 using QPhising.Application.Common.Abstractions;
 using QPhising.Application.Features.Templates.ArchiveTemplate;
@@ -28,7 +29,7 @@ public sealed class TemplateModuleUnitTests
             cfg.AddProfile<TemplateReadMappingProfile>();
             cfg.AddProfile<PublishTemplateMappingProfile>();
             cfg.AddProfile<ArchiveTemplateMappingProfile>();
-        });
+        }, NullLoggerFactory.Instance);
 
         _mapper = configuration.CreateMapper();
     }

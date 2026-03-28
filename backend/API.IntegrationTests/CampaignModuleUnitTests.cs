@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Logging.Abstractions;
 using QPhising.Application.Common;
 using QPhising.Application.Common.Abstractions;
 using QPhising.Application.Features.Analytics.GetDashboardKpis;
@@ -25,7 +26,7 @@ public sealed class CampaignModuleUnitTests
             cfg.AddProfile<UpdateCampaignMappingProfile>();
             cfg.AddProfile<ScheduleCampaignMappingProfile>();
             cfg.AddProfile<ActivateCampaignMappingProfile>();
-        });
+        }, NullLoggerFactory.Instance);
 
         _mapper = configuration.CreateMapper();
     }

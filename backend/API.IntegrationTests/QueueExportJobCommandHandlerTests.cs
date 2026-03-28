@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Logging.Abstractions;
 using QPhising.Application.Common.Contracts.Exports;
 using QPhising.Application.Features.Exports.Common;
 using QPhising.Application.Features.Exports.QueueExportJob;
@@ -18,7 +19,7 @@ public sealed class QueueExportJobCommandHandlerTests
         MapperConfiguration mapperConfiguration = new(cfg =>
         {
             cfg.AddProfile<ExportJobMappingProfile>();
-        });
+        }, NullLoggerFactory.Instance);
 
         _mapper = mapperConfiguration.CreateMapper();
     }
