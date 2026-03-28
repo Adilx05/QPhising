@@ -1677,10 +1677,18 @@
     - `sed -n '1,240p' docs/frontend-backend-integration-gap-matrix.md`
 
 ### 18.2 Swagger/OpenAPI client generation
-- [ ] **Evaluate and select OpenAPI generation strategy**
+- [x] **Evaluate and select OpenAPI generation strategy**
   - **Description:** Compare viable Angular-compatible generators (e.g., NSwag/OpenAPI Generator) using criteria: type safety, interceptors compatibility, CI reproducibility, and maintainability with feature-based architecture.
   - **Expected output:** Decision record documenting chosen generator, rationale, version pinning, and integration constraints.
   - **Related layer:** Frontend / Backend / Infra
+- Subtask completion update (2026-03-28):
+  - Evaluated Angular-compatible OpenAPI generation strategies against required criteria (type safety, interceptor compatibility, CI reproducibility, and feature-architecture maintainability).
+  - Selected **OpenAPI Generator** (`typescript-angular`) as the project standard and pinned target tooling version (`7.14.0`) for deterministic workflow design.
+  - Added decision record at `docs/openapi-generation-strategy-decision.md` including alternatives, rationale, version pinning, and integration constraints.
+  - Reproducible command evidence:
+    - `rg -n "AddOpenApi|MapOpenApi|AddApiVersioning" backend/API/Program.cs`
+    - `sed -n "1,260p" docs/openapi-generation-strategy-decision.md`
+
 - [ ] **Define OpenAPI source of truth and generation inputs**
   - **Description:** Establish authoritative OpenAPI document source (gateway or backend API spec), versioning convention, and command inputs for deterministic client generation.
   - **Expected output:** Documented spec source path/URL and pinned generation inputs with repeatable invocation command.
