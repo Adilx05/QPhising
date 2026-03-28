@@ -5,6 +5,7 @@ using QPhising.Application.Features.Exports.QueueExportJob;
 using QPhising.Domain.Abstractions;
 using QPhising.Domain.Exports;
 using QPhising.Domain.Tasks;
+using Xunit;
 
 namespace QPhising.API.IntegrationTests;
 

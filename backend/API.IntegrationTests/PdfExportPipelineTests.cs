@@ -1,6 +1,7 @@
 using QPhising.Application.Common.Abstractions;
 using QPhising.Domain.Campaigns;
 using QPhising.Infrastructure.Exports;
+using Xunit;
 
 namespace QPhising.API.IntegrationTests;
 

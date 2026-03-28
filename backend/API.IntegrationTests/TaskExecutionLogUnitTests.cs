@@ -1,5 +1,6 @@
 using QPhising.Domain.Tasks;
 using QPhising.Domain.Tasks.Exceptions;
+using Xunit;
 
 namespace QPhising.API.IntegrationTests;
 
