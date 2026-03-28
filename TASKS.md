@@ -1843,10 +1843,18 @@
   - Reproducible command evidence:
     - `sed -n "1,320p" docs/frontend-centralized-api-consumption-pattern.md`
     - `rg -n "Define centralized API consumption pattern|frontend-centralized-api-consumption-pattern" TASKS.md docs/frontend-centralized-api-consumption-pattern.md`
-- [ ] **Plan auth-aware request flow for all API calls**
+- [x] **Plan auth-aware request flow for all API calls**
   - **Description:** Ensure all generated/manual client calls route through auth-aware interceptors for token attach/refresh/logout handling, including unauthenticated fallback UX.
   - **Expected output:** Auth-aware request-flow diagram and endpoint coverage checklist.
   - **Related layer:** Frontend / Auth
+- Subtask completion update (2026-03-28):
+  - Added `docs/frontend-auth-aware-request-flow-plan.md` with a canonical auth-aware API flow covering interceptor ordering, token attachment rules, single-flight refresh/replay behavior, logout semantics, and unauthenticated fallback UX.
+  - Included request/response flow diagrams plus a concrete public-vs-protected endpoint coverage checklist aligned to gateway-routed frontend API usage.
+  - Documented execution-ready implementation work packages and definition-of-done criteria to enforce generated-client-first auth handling without feature-level token logic duplication.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/frontend-auth-aware-request-flow-plan.md`
+    - `rg -n "Plan auth-aware request flow for all API calls|frontend-auth-aware-request-flow-plan" TASKS.md docs/frontend-auth-aware-request-flow-plan.md`
+    - `rg -n "routeAccessGuard|unauthorized\\?reason=auth|unauthorized\\?reason=role" frontend/src/app/core/auth/route-access.guard.ts`
 
 ### 18.4 Production configuration and runtime connectivity
 - [ ] **Define environment-based API base URL strategy**
