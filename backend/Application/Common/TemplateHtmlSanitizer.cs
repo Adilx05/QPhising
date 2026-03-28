@@ -143,7 +143,7 @@ public sealed partial class TemplateHtmlSanitizer : ITemplateHtmlSanitizer
                (uri.Scheme == Uri.UriSchemeHttp ||
                 uri.Scheme == Uri.UriSchemeHttps ||
                 uri.Scheme == Uri.UriSchemeMailto ||
-                uri.Scheme == Uri.UriSchemeTel);
+                uri.Scheme == "tel");
     }
 
     [GeneratedRegex("<!--.*?-->", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant)]

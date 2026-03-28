@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddMediatR(typeof(ServiceCollectionExtensions).Assembly);
         services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
-        services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
+        services.AddAutoMapper(_ => { }, typeof(ServiceCollectionExtensions).Assembly);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped<ICampaignInteractionGuard, CampaignInteractionGuard>();
         services.AddSingleton<ITemplateHtmlSanitizer, TemplateHtmlSanitizer>();
