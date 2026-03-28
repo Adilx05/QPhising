@@ -213,6 +213,14 @@
   - `rg -n "AddAuthentication|AddAuthorization|RequireAuthorization|RealmAccessRoles" backend/API/Program.cs backend/API/AuthorizationPolicies.cs`
   - `rg -n "Admin|Operator|Viewer" backend/API/Controllers/AccessController.cs gateway/ocelot.json backend/API.IntegrationTests/AuthorizationFlowTests.cs`
 
+- Maintenance update (2026-03-28):
+  - Resolved gateway restore package downgrade failure (`NU1605`) by aligning Ocelot packages to `24.1.0` (`Ocelot` and `Ocelot.Provider.Polly`) so transitive constraints are satisfied consistently.
+  - Updated `Microsoft.AspNetCore.Authentication.JwtBearer` to `10.0.0-preview.3.25172.1` to match available feed resolution and remove `NU1603` drift from `25171.5`.
+  - Removed redundant direct reference to `Microsoft.Extensions.Options.DataAnnotations` from gateway because it is not required and generated `NU1510` prune warning.
+  - Reproducible command evidence:
+    - `rg -n "PackageReference Include=\"(Microsoft.AspNetCore.Authentication.JwtBearer|Ocelot|Ocelot.Provider.Polly)\"" gateway/Gateway.csproj`
+    - `git diff -- gateway/Gateway.csproj TASKS.md`
+
 ## 5. [ ] Campaign management module
 - StartedAt:
 - FinishedAt:
