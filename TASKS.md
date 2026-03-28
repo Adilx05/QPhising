@@ -1027,7 +1027,7 @@
 - Documented configuration keys and production-safe templates in `README.md`.
 - Remaining scope for this task: gateway behavior verification.
 
-## 13. [ ] Data, migrations, and seed
+## 13. [-] Data, migrations, and seed
 - StartedAt:
 - FinishedAt:
 - Owner:
@@ -1039,7 +1039,7 @@
   - **Description:** Define entities, relationships, constraints, and indexes across campaign/template/tracking/task/analytics/export domains.
   - **Expected output:** Coherent normalized schema aligned with application use cases.
   - **Related layer:** Infra
-- [ ] **Create baseline and incremental migrations**
+- [x] **Create baseline and incremental migrations**
   - **Description:** Generate EF migrations for current model and validate upgrade/downgrade behavior.
   - **Expected output:** Reproducible migration chain for local and containerized deployment.
   - **Related layer:** Infra
@@ -1057,6 +1057,16 @@
   - **Related layer:** Infra
 
 ### Execution Notes
+
+- Subtask completion update (2026-03-28):
+  - Added a full baseline PostgreSQL schema snapshot migration (`00000000000000_baseline_full_schema.sql`) that bootstraps all active module tables, indexes, and integrity constraints in one idempotent pass.
+  - Added a new incremental migration (`20260328031500_add_queued_tasks_attempt_constraints.sql`) to enforce queue retry data-integrity invariants (`attempt_count >= 0`, `max_attempts > 0`, and `attempt_count <= max_attempts`).
+  - Added explicit rollback script support for downgrade validation (`rollback/20260328031500_add_queued_tasks_attempt_constraints.down.sql`) and introduced a deterministic migration runner (`migrate.sh`) that tracks applied versions in `schema_migrations`.
+  - Added migration usage documentation for reproducible local/container upgrade and single-step downgrade execution.
+  - Reproducible command evidence:
+    - `bash -n backend/Infrastructure/Persistence/Scripts/migrate.sh`
+    - `rg -n "baseline_full_schema|ck_queued_tasks_attempt_count_non_negative|schema_migrations|rollback" backend/Infrastructure/Persistence`
+
 - Subtask completion update (2026-03-27):
   - Finalized relational schema coverage by adding an idempotent SQL migration artifact for active modules (`20260328013000_finalize_relational_schema.sql`).
   - Added the missing `campaigns` table baseline with required columns, normalized date-window constraint (`start_date <= end_date`), and lifecycle query indexes.
