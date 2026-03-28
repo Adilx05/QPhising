@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace QPhising.API.ExceptionHandling;
 
@@ -47,10 +48,12 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
     private static Task WriteProblemDetailsAsync(HttpContext httpContext, ProblemDetails problemDetails, CancellationToken cancellationToken)
     {
         httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
-        return httpContext.Response.WriteAsJsonAsync(
+        httpContext.Response.ContentType = "application/problem+json";
+        return JsonSerializer.SerializeAsync(
+            utf8Json: httpContext.Response.Body,
             value: problemDetails,
+            inputType: problemDetails.GetType(),
             options: null,
-            contentType: "application/problem+json",
             cancellationToken: cancellationToken);
     }
 }

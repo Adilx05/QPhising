@@ -134,6 +134,12 @@
     - `rg -n "IMapper|mapper.Map<HealthStatusDto>" backend/Application/Features/Health/GetHealthQueryHandler.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj`
 
+- Maintenance update (2026-03-28):
+  - Fixed validation ProblemDetails serialization to preserve runtime type members (`HttpValidationProblemDetails.Errors`) instead of serializing as base `ProblemDetails` only.
+  - This keeps the validation pipeline error contract stable for integration tests expecting an `errors` object.
+  - Reproducible command evidence:
+    - `rg -n "WriteProblemDetailsAsync|JsonSerializer.SerializeAsync|problemDetails.GetType" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
+
 - Subtask completion update (2026-03-27):
   - Added centralized API exception handling with a dedicated `GlobalExceptionHandler` that maps FluentValidation `ValidationException` to RFC7807 `HttpValidationProblemDetails` and returns consistent 400 responses.
   - Registered exception handling pipeline via `AddExceptionHandler<GlobalExceptionHandler>()` and enriched all ProblemDetails payloads with `traceId` for diagnostics.
