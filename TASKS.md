@@ -1343,3 +1343,9 @@
   - Reproducible command evidence:
     - `rg -n "string withoutComments|HtmlTagPattern\(\)\.Replace|Template HTML content is required" backend/Application/Common/TemplateHtmlSanitizer.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~TemplateHtmlSanitizer_Should_Remove_Disallowed_Attributes_And_Tags"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Refined template sanitization policy to **reject dangerous markup** (e.g., `<script>` and dangerous URI protocols) while still stripping non-dangerous disallowed tags/attributes.
+  - This satisfies both safety constraints and expected sanitization behavior in template module tests.
+  - Reproducible command evidence:
+    - `rg -n "RejectPatternChecks|DangerousElementPattern|DangerousProtocolPattern|Template HTML contains unsafe markup" backend/Application/Common/TemplateHtmlSanitizer.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~CreateTemplateCommandHandler_Should_Reject_Unsafe_Html_Markup|FullyQualifiedName~TemplateHtmlSanitizer_Should_Remove_Disallowed_Attributes_And_Tags"` *(fails in current environment: `dotnet` not installed)*
