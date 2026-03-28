@@ -109,8 +109,8 @@ services:
 
   worker:
     build:
-      context: ./worker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: worker/Dockerfile
     container_name: qphising-worker
     restart: unless-stopped
     environment:

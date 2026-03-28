@@ -55,6 +55,15 @@
     - `git show --name-only --oneline 525e6ff`
     - `test -d frontend && test -d backend && test -d gateway && test -d worker`
 
+- Maintenance update (2026-03-28):
+  - Fixed worker container build context/path resolution so `Worker.csproj` can resolve referenced backend projects (`../backend/Application`, `../backend/Infrastructure`) during Docker restore/publish.
+  - Updated `docker-compose.yml` worker build to use repository-root context with `worker/Dockerfile`.
+  - Updated `worker/Dockerfile` restore/publish commands to target `worker/Worker.csproj` from root build context.
+  - Reproducible command evidence:
+    - `docker compose build worker`
+    - `rg -n "worker:\n    build:|context: \.|dockerfile: worker/Dockerfile" docker-compose.yml`
+    - `rg -n "dotnet restore worker/Worker.csproj|dotnet publish worker/Worker.csproj" worker/Dockerfile`
+
 ---
 
 ## 3. [-] Backend Clean Architecture foundation
