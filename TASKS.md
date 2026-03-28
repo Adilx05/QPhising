@@ -1414,10 +1414,25 @@
       - Owning tasks/modules: Task **14** (Dockerfiles + docker-compose runtime validation), with service readiness dependencies from Tasks **3**, **4**, **10**, and **12**.
     - **TASKS.md updated after each completed task with evidence links (commit hash, file paths, command outputs).**
       - Owning tasks/modules: Task **17** (audit hardening) and Task **16** (DoD governance/process).
-- [ ] **Standardize completion evidence template**
+- [x] **Standardize completion evidence template**
   - **Description:** Enforce a uniform per-task evidence block format (commit hash, files, reproducible commands).
   - **Expected output:** Consistent completion documentation across all task entries.
   - **Related layer:** Infra
+  - **Standard evidence template (copy/paste for each completed task or subtask):**
+    ```markdown
+    - Subtask completion update (YYYY-MM-DD):
+      - Summary:
+        - <what was implemented>
+        - <key behavior/contract now enforced>
+      - Evidence:
+        - Commit: `<short-or-full-commit-hash>`
+        - Concrete files:
+          - `<path/to/file1>`
+          - `<path/to/file2>`
+        - Reproducible command evidence:
+          - `<command 1>` (expected: `<brief expected result>`)
+          - `<command 2>` (expected: `<brief expected result>`)
+    ```
 - [ ] **Add release-readiness final verification pass**
   - **Description:** Define a final pre-release review gate that confirms all DoD criteria are satisfied.
   - **Expected output:** Single, repeatable release-go/no-go verification checkpoint.
@@ -1438,6 +1453,17 @@
   - Reproducible command evidence:
     - `rg -n "Map DoD criteria to owning delivery tasks|DoD ownership traceability matrix" TASKS.md`
     - `rg -n "Owning tasks/modules: Task \*\*2\*\*|Owning tasks/modules: Task \*\*4\*\*|Owning tasks/modules: Task \*\*14\*\*" TASKS.md`
+
+- Subtask completion update (2026-03-28):
+  - Standardized a uniform completion evidence template for task/subtask updates with required sections:
+    - summary of implementation,
+    - exact commit hash,
+    - concrete file path list,
+    - reproducible commands with expected results.
+  - Embedded the template directly under Task 16 so future updates can use one consistent, auditable format.
+  - Reproducible command evidence:
+    - `rg -n "Standard evidence template|Commit:|Concrete files:|Reproducible command evidence:|expected:" TASKS.md`
+    - `rg -n "\[x\] \*\*Standardize completion evidence template\*\*" TASKS.md`
 
 ## 17. [x] Task status audit hardening
 - StartedAt: 2026-03-27T17:50:00Z
