@@ -244,6 +244,13 @@
     - `rg -n "PathMatchesPrefix|OnStarting|CorrelationIdMiddleware" gateway/RateLimiting/RedisRateLimitingMiddleware.cs gateway/Correlation/CorrelationIdMiddleware.cs`
     - `dotnet test gateway/Gateway.IntegrationTests/Gateway.IntegrationTests.csproj`
 
+- Maintenance update (2026-03-28):
+  - Fixed a remaining gateway crash path in `CorrelationIdMiddleware` where header mutation could still throw `System.InvalidOperationException` when request/response headers became read-only under early rate-limit/error short-circuit flows.
+  - Added guarded header-write helpers that safely skip request/response `X-Correlation-ID` mutation when Kestrel marks headers read-only, with warning logs for diagnostics instead of unhandled exceptions.
+  - Reproducible command evidence:
+    - `rg -n "TrySetRequestCorrelationHeader|TrySetResponseCorrelationHeader|headers are read-only" gateway/Correlation/CorrelationIdMiddleware.cs`
+    - `dotnet test gateway/Gateway.IntegrationTests/Gateway.IntegrationTests.csproj`
+
 ## 5. [ ] Campaign management module
 - StartedAt:
 - FinishedAt:

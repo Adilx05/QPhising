@@ -13,7 +13,7 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
 
         context.Items[CorrelationIdItemKey] = correlationId;
         context.TraceIdentifier = correlationId;
-        context.Request.Headers[CorrelationIdHeader] = correlationId;
+        TrySetRequestCorrelationHeader(context, correlationId);
         context.Response.OnStarting(state =>
         {
             var httpContext = (HttpContext)state;
@@ -33,6 +33,22 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
         }
     }
 
+    private void TrySetRequestCorrelationHeader(HttpContext context, string correlationId)
+    {
+        try
+        {
+            context.Request.Headers[CorrelationIdHeader] = correlationId;
+        }
+        catch (InvalidOperationException exception)
+        {
+            logger.LogWarning(
+                exception,
+                "Skipping correlation request header for {Method} {Path} because request headers are read-only.",
+                context.Request.Method,
+                context.Request.Path);
+        }
+    }
+
     private void TrySetResponseCorrelationHeader(HttpContext context, string correlationId)
     {
         if (context.Response.HasStarted)
@@ -46,7 +62,18 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next, ILogger<Correl
 
         if (!context.Response.Headers.ContainsKey(CorrelationIdHeader))
         {
-            context.Response.Headers[CorrelationIdHeader] = correlationId;
+            try
+            {
+                context.Response.Headers[CorrelationIdHeader] = correlationId;
+            }
+            catch (InvalidOperationException exception)
+            {
+                logger.LogWarning(
+                    exception,
+                    "Skipping correlation response header for {Method} {Path} because headers are read-only.",
+                    context.Request.Method,
+                    context.Request.Path);
+            }
         }
     }
 
