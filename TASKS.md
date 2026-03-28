@@ -1356,10 +1356,43 @@
 - [ ] TASKS.md updated after each completed task with evidence links (commit hash, file paths, command outputs).
 
 ### Subtasks (planned)
-- [ ] **Translate each DoD line into measurable acceptance criteria**
+- [x] **Translate each DoD line into measurable acceptance criteria**
   - **Description:** Define exact evidence required for each checklist item (artifact + command + expected result).
   - **Expected output:** Objective, auditable DoD criteria that can be validated consistently.
   - **Related layer:** Infra
+  - **Acceptance criteria matrix (artifact + command + expected result):**
+    - **No placeholder code.**
+      - Artifact: repository source tree (`backend/`, `frontend/`, `gateway/`, `worker/`, `docker/`, `docs/`).
+      - Command: `rg -n "TODO|TBD|placeholder|stub" backend frontend gateway worker docker docs`
+      - Expected result: no matches for unresolved placeholder markers in production code/docs scope.
+    - **All required modules implemented.**
+      - Artifact: module roots and critical composition files.
+      - Command: `test -d backend && test -d frontend && test -d gateway && test -d worker && test -f docker-compose.yml`
+      - Expected result: command exits `0`, confirming required modules and orchestration entrypoint exist.
+    - **Role-based security enforced.**
+      - Artifact: API/gateway auth policy wiring and protected endpoints.
+      - Command: `rg -n "AddAuthentication|AddAuthorization|RequireAuthorization|Policy|Admin|Operator|Viewer" backend/API gateway`
+      - Expected result: explicit JWT + RBAC policy definitions and secured route configuration are present.
+    - **Expired campaign rule enforced.**
+      - Artifact: campaign domain/application logic and tracking guard paths.
+      - Command: `rg -n "expired|EndDate|reject.*tracking|tracking.*reject|CampaignStatus" backend/Domain backend/Application backend/API`
+      - Expected result: deterministic guard logic exists that blocks link generation/click processing for expired campaigns.
+    - **Exports functional.**
+      - Artifact: export CQRS handlers, API endpoints, and integration tests.
+      - Command: `rg -n "Export|QueueExport|DownloadExport|GetExportStatus" backend/Application backend/API backend/API.IntegrationTests`
+      - Expected result: queue/status/download export flow is implemented and test-covered.
+    - **Dashboard populated with seed data.**
+      - Artifact: analytics/dashboard seed source and initialization path.
+      - Command: `rg -n "seed|Seed|Dashboard|Analytics" backend/Infrastructure backend/API docker`
+      - Expected result: seed configuration/process for dashboard analytics data is committed and discoverable.
+    - **Full stack runs via compose.**
+      - Artifact: compose specification and service health wiring.
+      - Command: `docker compose config`
+      - Expected result: compose file resolves successfully with all required services and no schema errors.
+    - **TASKS.md updated after each completed task with evidence links (commit hash, file paths, command outputs).**
+      - Artifact: task execution-note entries in `TASKS.md`.
+      - Command: `rg -n "Commit:|Concrete files:|Reproducible command evidence:|Reproducible commands:" TASKS.md`
+      - Expected result: each completed task/subtask includes auditable evidence metadata.
 - [ ] **Map DoD criteria to owning delivery tasks**
   - **Description:** Create traceability between DoD checklist items and specific task IDs/modules.
   - **Expected output:** Clear ownership matrix preventing ambiguous completion claims.
@@ -1372,6 +1405,15 @@
   - **Description:** Define a final pre-release review gate that confirms all DoD criteria are satisfied.
   - **Expected output:** Single, repeatable release-go/no-go verification checkpoint.
   - **Related layer:** Infra
+
+### Execution Notes
+
+- Subtask completion update (2026-03-28):
+  - Translated each Definition of Done checklist line into measurable, auditable acceptance criteria with explicit artifacts, reproducible commands, and expected pass conditions.
+  - Added a DoD acceptance criteria matrix directly under Task 16 so verification can be executed consistently during release-readiness checks.
+  - Reproducible command evidence:
+    - `rg -n "Translate each DoD line into measurable acceptance criteria|Acceptance criteria matrix" TASKS.md`
+    - `rg -n "No placeholder code|All required modules implemented|Role-based security enforced|Expired campaign rule enforced|Exports functional|Dashboard populated with seed data|Full stack runs via compose" TASKS.md`
 
 ## 17. [x] Task status audit hardening
 - StartedAt: 2026-03-27T17:50:00Z
