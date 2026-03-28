@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-preview-alpine AS build
 WORKDIR /src
 
 COPY Directory.Build.props ./
@@ -9,14 +9,17 @@ COPY Infrastructure/Infrastructure.csproj Infrastructure/
 RUN dotnet restore API/API.csproj
 
 COPY . .
-RUN dotnet publish API/API.csproj -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish API/API.csproj \
+    -c Release \
+    -o /app/publish \
+    /p:UseAppHost=false \
+    /p:ContinuousIntegrationBuild=true \
+    /p:Deterministic=true
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview-alpine AS runtime
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl
 
 COPY --from=build /app/publish .
 
