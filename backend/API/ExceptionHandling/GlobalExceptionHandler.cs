@@ -49,6 +49,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
         return httpContext.Response.WriteAsJsonAsync(
             value: problemDetails,
+            options: null,
             contentType: "application/problem+json",
             cancellationToken: cancellationToken);
     }

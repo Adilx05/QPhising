@@ -1379,3 +1379,9 @@
   - Reproducible command evidence:
     - `rg -n "contentType: \"application/problem\+json\"|WriteAsJsonAsync\(" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Health_Endpoint_Should_Return_ProblemDetails_When_Request_Validation_Fails"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Fixed `HttpResponse.WriteAsJsonAsync` compatibility in `GlobalExceptionHandler` by using the overload with explicit `options: null` plus `contentType` and `cancellationToken`.
+  - This resolves compile-time CS1501 on environments/SDKs where the 3-argument overload is unavailable.
+  - Reproducible command evidence:
+    - `rg -n "WriteAsJsonAsync\(|options: null|contentType: \"application/problem\+json\"" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
+    - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
