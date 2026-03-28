@@ -1393,10 +1393,27 @@
       - Artifact: task execution-note entries in `TASKS.md`.
       - Command: `rg -n "Commit:|Concrete files:|Reproducible command evidence:|Reproducible commands:" TASKS.md`
       - Expected result: each completed task/subtask includes auditable evidence metadata.
-- [ ] **Map DoD criteria to owning delivery tasks**
+- [x] **Map DoD criteria to owning delivery tasks**
   - **Description:** Create traceability between DoD checklist items and specific task IDs/modules.
   - **Expected output:** Clear ownership matrix preventing ambiguous completion claims.
   - **Related layer:** Infra
+  - **DoD ownership traceability matrix:**
+    - **No placeholder code.**
+      - Owning tasks/modules: Task **17** (strict completion checklist), cross-cutting across `backend/`, `frontend/`, `gateway/`, `worker/`, `docker/`, `docs/`.
+    - **All required modules implemented.**
+      - Owning tasks/modules: Task **2** (repository layout bootstrap), Task **3** (backend foundation), Task **12** (frontend dashboard), Task **14** (compose orchestration), Task **15** (CI/CD).
+    - **Role-based security enforced.**
+      - Owning tasks/modules: Task **4** (Identity and authorization), plus endpoint-specific coverage in Task **3** and Task **11** APIs.
+    - **Expired campaign rule enforced.**
+      - Owning tasks/modules: Task **5** (Campaign management module) and Task **8** (Tracking & events pipeline guardrails).
+    - **Exports functional.**
+      - Owning tasks/modules: Task **11** (Export/reporting pipeline) with API + CQRS + persistence + authorization coverage.
+    - **Dashboard populated with seed data.**
+      - Owning tasks/modules: Task **9** (Analytics + KPI computation/read model), Task **10** (background jobs/data movement), Task **13** (seed and demo data readiness).
+    - **Full stack runs via compose.**
+      - Owning tasks/modules: Task **14** (Dockerfiles + docker-compose runtime validation), with service readiness dependencies from Tasks **3**, **4**, **10**, and **12**.
+    - **TASKS.md updated after each completed task with evidence links (commit hash, file paths, command outputs).**
+      - Owning tasks/modules: Task **17** (audit hardening) and Task **16** (DoD governance/process).
 - [ ] **Standardize completion evidence template**
   - **Description:** Enforce a uniform per-task evidence block format (commit hash, files, reproducible commands).
   - **Expected output:** Consistent completion documentation across all task entries.
@@ -1414,6 +1431,13 @@
   - Reproducible command evidence:
     - `rg -n "Translate each DoD line into measurable acceptance criteria|Acceptance criteria matrix" TASKS.md`
     - `rg -n "No placeholder code|All required modules implemented|Role-based security enforced|Expired campaign rule enforced|Exports functional|Dashboard populated with seed data|Full stack runs via compose" TASKS.md`
+
+- Subtask completion update (2026-03-28):
+  - Mapped every Definition of Done checklist line to explicit owning delivery task IDs/modules to remove ambiguity in release ownership.
+  - Added a DoD ownership traceability matrix under Task 16 connecting each checklist criterion to implementation/responsibility tasks.
+  - Reproducible command evidence:
+    - `rg -n "Map DoD criteria to owning delivery tasks|DoD ownership traceability matrix" TASKS.md`
+    - `rg -n "Owning tasks/modules: Task \*\*2\*\*|Owning tasks/modules: Task \*\*4\*\*|Owning tasks/modules: Task \*\*14\*\*" TASKS.md`
 
 ## 17. [x] Task status audit hardening
 - StartedAt: 2026-03-27T17:50:00Z
