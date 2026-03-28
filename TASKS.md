@@ -1115,7 +1115,7 @@
   - **Description:** Confirm Dockerfiles produce reproducible artifacts for frontend, API, gateway, and worker.
   - **Expected output:** Consistent container images with documented build assumptions.
   - **Related layer:** Infra
-- [ ] **Finalize compose startup dependencies**
+- [x] **Finalize compose startup dependencies**
   - **Description:** Align healthchecks and `depends_on` conditions with true service readiness.
   - **Expected output:** Reliable startup ordering with minimized race conditions.
   - **Related layer:** Infra
@@ -1153,6 +1153,13 @@
     - `rg -n "npm ci|ContinuousIntegrationBuild|Deterministic|FROM " frontend/Dockerfile backend/Dockerfile gateway/Dockerfile worker/Dockerfile`
     - `rg -n "Deterministic image build assumptions|npm ci|dockerignore" README.md`
     - `test -f frontend/.dockerignore && test -f backend/.dockerignore && test -f gateway/.dockerignore && test -f worker/.dockerignore`
+
+- Subtask completion update (2026-03-28):
+  - Finalized compose startup dependency ordering by gating `gateway` startup on healthy `api`, `redis`, and `keycloak` services via `depends_on.condition: service_healthy`.
+  - This removes a startup race where gateway middleware could begin handling traffic before authentication metadata and rate-limit backing services were healthy.
+  - Reproducible command evidence:
+    - `rg -n "gateway:|depends_on:|condition: service_healthy|keycloak|redis|api:" docker-compose.yml`
+    - `docker compose config` *(fails in current environment: `docker` not installed)*
 
 - Evidence:
   - Files: `docker-compose.yml`, `frontend/Dockerfile`, `backend/Dockerfile`, `gateway/Dockerfile`, `worker/Dockerfile`, `TASKS.md`.
