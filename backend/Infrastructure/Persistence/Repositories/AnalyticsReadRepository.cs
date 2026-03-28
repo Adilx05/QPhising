@@ -104,7 +104,7 @@ public sealed class AnalyticsReadRepository(QPhisingDbContext dbContext) : IAnal
         long tasksRetried = taskLogRows.LongCount(log => log.EventType == TaskExecutionLogEventType.Retried);
         long tasksDeadLettered = taskLogRows.LongCount(log => log.EventType == TaskExecutionLogEventType.DeadLettered);
 
-        decimal averageDuration = taskLogRows
+        decimal averageDuration = (decimal)taskLogRows
             .Where(log => log.ExecutionDurationMilliseconds.HasValue)
             .Select(log => log.ExecutionDurationMilliseconds!.Value)
             .DefaultIfEmpty(0)
