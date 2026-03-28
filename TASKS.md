@@ -1807,10 +1807,18 @@
     - `sed -n "1,320p" docs/frontend-async-ux-state-standard.md`
     - `rg -n "Define standard loading/empty/error/retry UX states|frontend-async-ux-state-standard" TASKS.md docs/frontend-async-ux-state-standard.md`
     - `rg -n "viewState\(\)\.loading|viewState\(\)\.error|emptyDashboardState" frontend/src/app/features/dashboard/containers/dashboard-page.component.html`
-- [ ] **Plan server-side pagination/filter/sort integration**
+- [x] **Plan server-side pagination/filter/sort integration**
   - **Description:** For all data tables/lists, map UI controls to backend query params (page, size, sort, filters), including total count handling and query-state persistence.
   - **Expected output:** Contract table per list page defining exact query param mapping and response expectations.
   - **Related layer:** Frontend / Backend
+- Subtask completion update (2026-03-28):
+  - Added `docs/server-side-pagination-filter-sort-integration-plan.md` with a canonical query-state contract (`page/size/sort/filters`), URL query persistence rules, and backend response metadata requirements (`items` + `totalCount`) for server-driven tables.
+  - Defined per-screen mapping matrix for campaigns/templates/exports/tracking/tasks/dashboard tables, including exact UI-control to query-param translations and identified backend parity gaps where list/sort contracts are missing.
+  - Documented normalization rules (PrimeNG sort-order mapping, filter omission, ISO-8601 date serialization) and phased delivery sequence prioritizing existing contracts first, then missing endpoint enablement.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/server-side-pagination-filter-sort-integration-plan.md`
+    - `rg -n "\[HttpGet|FromQuery|skip|take|pageNumber|pageSize|searchTerm|statuses|templateTypes" backend/API/Controllers/CampaignsController.cs backend/API/Controllers/TemplatesController.cs backend/API/Controllers/ExportsController.cs backend/API/Controllers/TrackingController.cs`
+    - `rg -n "Plan server-side pagination/filter/sort integration|server-side-pagination-filter-sort-integration-plan" TASKS.md docs/server-side-pagination-filter-sort-integration-plan.md`
 - [ ] **Define DTO-to-UI mapping strategy**
   - **Description:** Establish mapper layer/facade conventions separating generated DTOs from presentational models, including date/enum formatting and null-safe defaults.
   - **Expected output:** Mapping strategy document with per-feature mapper ownership and naming conventions.
