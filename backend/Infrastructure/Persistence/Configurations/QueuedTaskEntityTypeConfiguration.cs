@@ -33,10 +33,7 @@ public sealed class QueuedTaskEntityTypeConfiguration : IEntityTypeConfiguration
             .HasColumnType("jsonb")
             .HasConversion(
                 payload => JsonSerializer.Serialize(payload.Values, (JsonSerializerOptions?)null),
-                serializedPayload =>
-                    TaskPayload.Create(
-                        JsonSerializer.Deserialize<Dictionary<string, string>>(serializedPayload, (JsonSerializerOptions?)null)
-                        ?? throw new InvalidOperationException("Queued task payload cannot be null.")))
+                serializedPayload => DeserializePayload(serializedPayload))
             .IsRequired();
 
         builder.Property(task => task.AttemptCount)
@@ -86,5 +83,18 @@ public sealed class QueuedTaskEntityTypeConfiguration : IEntityTypeConfiguration
 
         builder.HasIndex(task => new { task.Status, task.NextAttemptAt, task.CreatedAt })
             .HasDatabaseName("ix_queued_tasks_status_next_attempt_at_created_at");
+    }
+
+    private static TaskPayload DeserializePayload(string serializedPayload)
+    {
+        Dictionary<string, string>? payloadValues =
+            JsonSerializer.Deserialize<Dictionary<string, string>>(serializedPayload, (JsonSerializerOptions?)null);
+
+        if (payloadValues is null)
+        {
+            throw new InvalidOperationException("Queued task payload cannot be null.");
+        }
+
+        return TaskPayload.Create(payloadValues);
     }
 }
