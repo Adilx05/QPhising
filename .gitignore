@@ -16,6 +16,7 @@ obj/
 *.user
 *.suo
 *.pdb
+.vs/
 
 # Docker / env
 .env
