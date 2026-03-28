@@ -1373,3 +1373,9 @@
   - Reproducible command evidence:
     - `rg -n "WriteProblemDetailsAsync|application/problem\+json|return true;" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Health_Endpoint_Should_Return_ProblemDetails_When_Request_Validation_Fails"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Corrected global exception response serialization to explicitly emit `contentType: "application/problem+json"` via `WriteAsJsonAsync`.
+  - This fixes validation pipeline content-type contract regressions where responses were serialized as `application/json`.
+  - Reproducible command evidence:
+    - `rg -n "contentType: \"application/problem\+json\"|WriteAsJsonAsync\(" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Health_Endpoint_Should_Return_ProblemDetails_When_Request_Validation_Fails"` *(fails in current environment: `dotnet` not installed)*
