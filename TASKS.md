@@ -1127,7 +1127,7 @@
   - **Description:** Ensure all runtime settings are environment-driven and mapped to application configuration keys.
   - **Expected output:** No hidden hardcoded runtime values; portable runtime configuration.
   - **Related layer:** Infra
-- [ ] **Document compose operational profiles**
+- [x] **Document compose operational profiles**
   - **Description:** Define local/deployment compose usage patterns and troubleshooting notes.
   - **Expected output:** Clear runtime documentation for developers and operators.
   - **Related layer:** Infra
@@ -1178,6 +1178,13 @@
   - Reproducible command evidence:
     - `rg -n "gateway:|depends_on:|condition: service_healthy|keycloak|redis|api:" docker-compose.yml`
     - `docker compose config` *(fails in current environment: `docker` not installed)*
+
+- Subtask completion update (2026-03-28):
+  - Documented explicit compose operational profiles in `README.md` for local interactive usage, detached local runtime, CI lifecycle verification, and deployment-like override-driven startup.
+  - Added compose troubleshooting guidance for common operator failure modes (port collisions, Keycloak/auth boot order issues, unhealthy services, stale volumes, and slow cold starts).
+  - Reproducible command evidence:
+    - `rg -n "Compose operational profiles|Local development profile|CI/verification profile|Deployment-like profile|Compose troubleshooting notes" README.md`
+    - `rg -n "Document compose operational profiles" TASKS.md`
 
 - Evidence:
   - Files: `docker-compose.yml`, `frontend/Dockerfile`, `backend/Dockerfile`, `gateway/Dockerfile`, `worker/Dockerfile`, `TASKS.md`.
