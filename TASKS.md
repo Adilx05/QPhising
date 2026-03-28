@@ -1745,10 +1745,18 @@
     - `rg -n "HttpClient|http\\.(get|post|put|delete|patch)|fetch\\(|/api/" frontend/src/app -g '*.ts'`
     - `sed -n "1,320p" docs/openapi-handwritten-api-logic-removal-plan.md`
     - `rg -n "Plan removal of handwritten duplicate API logic|openapi-handwritten-api-logic-removal-plan" TASKS.md docs/openapi-handwritten-api-logic-removal-plan.md`
-- [ ] **Validate architecture compatibility of generated clients**
+- [x] **Validate architecture compatibility of generated clients**
   - **Description:** Ensure generated clients support auth interceptors, typed error handling, and centralized API consumption patterns required by current frontend architecture.
   - **Expected output:** Compatibility checklist with approved extension points and required wrapper/facade strategy.
   - **Related layer:** Frontend / Auth
+- Subtask completion update (2026-03-28):
+  - Added architecture compatibility checklist at `docs/openapi-generated-client-architecture-compatibility-checklist.md` validating generated-client alignment with auth interceptors, typed error normalization, and centralized facade consumption patterns.
+  - Documented approved extension points (`core/api/client`, interceptors, facade/mapper/error layers) and explicit disallowed practices to preserve clean architecture boundaries.
+  - Defined mandatory wrapper/facade strategy (feature -> facade -> generated service -> mapper/error mapper) and compliance rules to prevent transport leakage into presentation/state layers.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/openapi-generated-client-architecture-compatibility-checklist.md`
+    - `rg -n "Validate architecture compatibility of generated clients|openapi-generated-client-architecture-compatibility-checklist" TASKS.md docs/openapi-generated-client-architecture-compatibility-checklist.md`
+    - `rg -n "HttpClient|http\.(get|post|put|delete|patch)|fetch\(|/api/" frontend/src/app -g '*.ts'`
 
 ### 18.3 Frontend integration execution planning
 - [ ] **Plan dashboard live data integration**
