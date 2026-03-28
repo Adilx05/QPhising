@@ -1630,10 +1630,19 @@
     - `rg -n "class .*Controller|\[Http(Get|Post|Put|Delete|Patch)|\[Route\(" backend/API/Controllers -g '*.cs'`
     - `sed -n '1,260p' docs/backend-endpoint-utilization-report.md`
 
-- [ ] **Audit DTO and client model mismatches**
+- [x] **Audit DTO and client model mismatches**
   - **Description:** Compare backend response/request contracts with frontend interfaces/view models to identify missing mappings, field name/type mismatches, nullable handling gaps, and date/time serialization assumptions.
   - **Expected output:** DTO alignment checklist with required model additions/changes and mapping ownership per feature.
   - **Related layer:** Frontend / Backend
+- Subtask completion update (2026-03-28):
+  - Completed DTO/client-model mismatch audit by cross-referencing UI-relevant backend contracts and existing frontend models.
+  - Added `docs/dto-client-model-alignment-checklist.md` with field/type/enum/nullability/date mismatches plus mapping ownership per feature.
+  - Identified critical enum divergence (`TemplateType` and campaign/template status semantics) and missing DTO coverage for current Tasks/Tracking read-table pages.
+  - Reproducible command evidence:
+    - `rg -n "record .*Response|record .*Request|record .*Contract|enum" backend/Application backend/API/Controllers backend/Application/Common/Contracts -g '*.cs'`
+    - `rg -n "interface SessionState|interface DashboardKpi|DashboardCampaignRow|protected readonly (campaigns|templates|kpis|trendRows|events|tasks|exportJobs) = \[" frontend/src/app`
+    - `sed -n '1,260p' docs/dto-client-model-alignment-checklist.md`
+
 - [ ] **Audit environment and base URL configuration gaps**
   - **Description:** Review all frontend environments/runtime config to ensure API base URL/gateway URL values are centrally configured and not hardcoded in services/components.
   - **Expected output:** Configuration gap report with exact missing keys and target configuration source per environment.
