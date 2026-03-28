@@ -221,6 +221,13 @@
     - `rg -n "PackageReference Include=\"(Microsoft.AspNetCore.Authentication.JwtBearer|Ocelot|Ocelot.Provider.Polly)\"" gateway/Gateway.csproj`
     - `git diff -- gateway/Gateway.csproj TASKS.md`
 
+- Maintenance update (2026-03-28):
+  - Fixed gateway publish failure caused by SDK default file globs compiling nested integration-test sources from `Gateway.IntegrationTests/` into the runtime project.
+  - Excluded `Gateway.IntegrationTests/**` from `Compile`, `EmbeddedResource`, and `None` item groups in `gateway/Gateway.csproj` so `dotnet publish Gateway.csproj` only builds gateway runtime code.
+  - Reproducible command evidence:
+    - `rg -n "Compile Remove=|EmbeddedResource Remove=|None Remove=" gateway/Gateway.csproj`
+    - `dotnet publish gateway/Gateway.csproj -c Release -o /tmp/gateway-publish /p:UseAppHost=false`
+
 ## 5. [ ] Campaign management module
 - StartedAt:
 - FinishedAt:
