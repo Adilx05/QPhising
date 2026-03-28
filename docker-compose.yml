@@ -198,7 +198,7 @@ services:
     ports:
       - "${GATEWAY_PORT:-5001}:8080"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api-health/ready"]
       interval: 10s
       timeout: 5s
       retries: 12
