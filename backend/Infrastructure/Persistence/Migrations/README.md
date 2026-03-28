@@ -25,3 +25,15 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/qphising" \
 ```
 
 The script persists migration state in `schema_migrations` and executes migrations in lexical order.
+
+
+## Re-runnable seed bootstrap
+
+Use the idempotent seed script to re-apply representative RBAC/business data safely in developer and CI databases:
+
+```bash
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/qphising" \
+  ./backend/Infrastructure/Persistence/Scripts/seed.sh
+```
+
+The seed script executes in a transaction, acquires a Postgres advisory lock to prevent concurrent collisions, validates required schema tables, and uses UPSERT semantics to avoid duplicates.
