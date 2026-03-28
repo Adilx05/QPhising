@@ -228,6 +228,14 @@
     - `rg -n "Compile Remove=|EmbeddedResource Remove=|None Remove=" gateway/Gateway.csproj`
     - `dotnet publish gateway/Gateway.csproj -c Release -o /tmp/gateway-publish /p:UseAppHost=false`
 
+- Maintenance update (2026-03-28):
+  - Fixed a gateway correlation-header crash path where writing `X-Correlation-ID` during late response stages could throw `System.InvalidOperationException: Headers are read-only, response has already started`.
+  - Updated `CorrelationIdMiddleware` to set `X-Correlation-ID` eagerly before downstream execution and guard late writes by checking `HttpResponse.HasStarted`.
+  - Added defensive warning logging when header write is skipped because the response has already started.
+  - Reproducible command evidence:
+    - `rg -n "TrySetResponseCorrelationHeader|Response.HasStarted|Skipping correlation response header" gateway/Correlation/CorrelationIdMiddleware.cs`
+    - `dotnet test gateway/Gateway.IntegrationTests/Gateway.IntegrationTests.csproj`
+
 ## 5. [ ] Campaign management module
 - StartedAt:
 - FinishedAt:
