@@ -15,6 +15,7 @@ using QPhising.Application.DependencyInjection;
 using QPhising.Infrastructure.DependencyInjection;
 using Serilog.Context;
 using Serilog;
+using QPhising.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

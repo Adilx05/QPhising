@@ -12,6 +12,9 @@ permissions:
 
 env:
   QUALITY_MIN_BACKEND_LINE_COVERAGE: "70"
+  SECURITY_FAIL_ON_DOTNET_SEVERITY: "high"
+  SECURITY_FAIL_ON_NPM_SEVERITY: "high"
+  SECURITY_FAIL_ON_TRIVY_SEVERITY: "HIGH,CRITICAL"
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -202,26 +205,89 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Install frontend dependencies
         run: npm ci
         working-directory: frontend
 
-      - name: Check backend dependency vulnerabilities
-        run: dotnet list backend/QPhising.Backend.sln package --vulnerable --include-transitive
+      - name: Check backend dependency vulnerabilities (JSON report)
+        run: >-
+          dotnet list backend/QPhising.Backend.sln package
+          --vulnerable
+          --include-transitive
+          --format json > ./.artifacts-dotnet-vuln-report.json
+
+      - name: Enforce backend dependency vulnerability policy
+        run: |
+          python - <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+
+          report_path = Path('.artifacts-dotnet-vuln-report.json')
+          if not report_path.exists():
+              raise SystemExit('Missing .NET vulnerability report (.artifacts-dotnet-vuln-report.json)')
+
+          minimum_severity = os.environ.get('SECURITY_FAIL_ON_DOTNET_SEVERITY', 'high').strip().lower()
+          severity_rank = {'low': 1, 'moderate': 2, 'medium': 2, 'high': 3, 'critical': 4}
+
+          if minimum_severity not in severity_rank:
+              raise SystemExit(f'Unsupported SECURITY_FAIL_ON_DOTNET_SEVERITY: {minimum_severity}')
+
+          payload = json.loads(report_path.read_text())
+          threshold = severity_rank[minimum_severity]
+          blocking = []
+
+          for project in payload.get('projects', []):
+              project_name = project.get('path') or project.get('name') or 'unknown-project'
+              for framework in project.get('frameworks', []):
+                  framework_name = framework.get('framework') or 'unknown-framework'
+                  for package in framework.get('topLevelPackages', []) + framework.get('transitivePackages', []):
+                      for vulnerability in package.get('vulnerabilities', []):
+                          raw_severity = str(vulnerability.get('severity', 'unknown')).strip().lower()
+                          if severity_rank.get(raw_severity, 0) >= threshold:
+                              blocking.append(
+                                  f"{project_name} [{framework_name}] {package.get('id')} {package.get('resolvedVersion')} => {raw_severity}"
+                              )
+
+          print(f'.NET blocking threshold: {minimum_severity}')
+          print(f'.NET vulnerabilities meeting threshold: {len(blocking)}')
+
+          if blocking:
+              for issue in blocking:
+                  print(f' - {issue}')
+              raise SystemExit('Blocking .NET vulnerabilities detected')
+          PYTHON
 
       - name: Check frontend dependency vulnerabilities
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=${SECURITY_FAIL_ON_NPM_SEVERITY}
         working-directory: frontend
 
-      - name: Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.24.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          format: table
-          ignore-unfixed: true
-          severity: HIGH,CRITICAL
-          exit-code: '1'
+      - name: Build service images for vulnerability scanning
+        run: docker compose build frontend api gateway worker
+
+      - name: Scan service images with Trivy (policy-enforced)
+        run: |
+          set -euo pipefail
+          for service in frontend api gateway worker; do
+            image_id="$(docker compose images -q "${service}")"
+            if [ -z "${image_id}" ]; then
+              echo "No image id found for service ${service}"
+              exit 1
+            fi
+
+            echo "Scanning service ${service} image ${image_id}"
+            docker run --rm \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              aquasec/trivy:0.57.1 image \
+              --scanners vuln \
+              --severity "${SECURITY_FAIL_ON_TRIVY_SEVERITY}" \
+              --ignore-unfixed \
+              --exit-code 1 \
+              "${image_id}"
+          done
 
   container_build:
     name: Container build
