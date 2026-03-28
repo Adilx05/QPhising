@@ -1337,3 +1337,9 @@
   - Reproducible command evidence:
     - `rg -n "NoOpUnitOfWork|AddSingleton<IUnitOfWork, NoOpUnitOfWork>" backend/API.IntegrationTests/ExportEndpointsAuthorizationTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Exports_Queue_Should_Return_Created_For_Viewer_With_Owner_From_Claims"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Adjusted `TemplateHtmlSanitizer` behavior to sanitize by stripping disallowed tags/attributes instead of hard-failing when unsafe patterns are present.
+  - This restores expected module behavior where unsafe attributes (e.g., `onclick`, inline `style`) and unsupported tags (e.g., `video`) are removed while preserving allowed HTML content.
+  - Reproducible command evidence:
+    - `rg -n "string withoutComments|HtmlTagPattern\(\)\.Replace|Template HTML content is required" backend/Application/Common/TemplateHtmlSanitizer.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~TemplateHtmlSanitizer_Should_Remove_Disallowed_Attributes_And_Tags"` *(fails in current environment: `dotnet` not installed)*
