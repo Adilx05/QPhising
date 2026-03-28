@@ -1598,3 +1598,204 @@
   - Reproducible command evidence:
     - `rg -n "WriteAsJsonAsync\(|options: null|contentType: \"application/problem\+json\"" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
     - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
+
+---
+
+## 18. [ ] Frontend–Backend Integration and Production Data Flow
+- StartedAt:
+- FinishedAt:
+- Owner:
+- Objective: Replace all mock/hardcoded frontend behavior with production-grade backend integration via gateway-driven, auth-aware, typed API consumption.
+- Scope: Frontend + Backend + Gateway + Infra + Auth alignment required for end-to-end production data flow.
+
+### 18.1 Current state analysis
+- [ ] **Inventory hardcoded/mock data usage across all UI modules**
+  - **Description:** Perform a page-by-page/component-by-component audit (dashboard, campaigns, templates, analytics, exports, auth/administration views) to identify hardcoded metrics, local arrays, in-component stubs, and mock services.
+  - **Expected output:** Audited inventory table with file path, component/service name, mocked data source type, and replacement priority.
+  - **Related layer:** Frontend
+- [ ] **Map missing frontend-to-backend integrations**
+  - **Description:** For each audited UI flow, verify whether a real API call exists and is wired; explicitly flag flows still using local mock logic.
+  - **Expected output:** Gap matrix mapping UI flow -> expected endpoint -> current status (`connected` / `missing` / `partially connected`).
+  - **Related layer:** Frontend
+- [ ] **Identify unused backend endpoints relevant to implemented UI features**
+  - **Description:** Cross-reference existing API surface (controllers/OpenAPI) against current frontend usage to detect endpoints that exist but are never consumed.
+  - **Expected output:** Endpoint utilization report listing available-but-unused endpoints with candidate frontend integration targets.
+  - **Related layer:** Frontend / Backend
+- [ ] **Audit DTO and client model mismatches**
+  - **Description:** Compare backend response/request contracts with frontend interfaces/view models to identify missing mappings, field name/type mismatches, nullable handling gaps, and date/time serialization assumptions.
+  - **Expected output:** DTO alignment checklist with required model additions/changes and mapping ownership per feature.
+  - **Related layer:** Frontend / Backend
+- [ ] **Audit environment and base URL configuration gaps**
+  - **Description:** Review all frontend environments/runtime config to ensure API base URL/gateway URL values are centrally configured and not hardcoded in services/components.
+  - **Expected output:** Configuration gap report with exact missing keys and target configuration source per environment.
+  - **Related layer:** Frontend / Gateway / Infra
+
+### 18.2 Swagger/OpenAPI client generation
+- [ ] **Evaluate and select OpenAPI generation strategy**
+  - **Description:** Compare viable Angular-compatible generators (e.g., NSwag/OpenAPI Generator) using criteria: type safety, interceptors compatibility, CI reproducibility, and maintainability with feature-based architecture.
+  - **Expected output:** Decision record documenting chosen generator, rationale, version pinning, and integration constraints.
+  - **Related layer:** Frontend / Backend / Infra
+- [ ] **Define OpenAPI source of truth and generation inputs**
+  - **Description:** Establish authoritative OpenAPI document source (gateway or backend API spec), versioning convention, and command inputs for deterministic client generation.
+  - **Expected output:** Documented spec source path/URL and pinned generation inputs with repeatable invocation command.
+  - **Related layer:** Backend / Gateway / Infra
+- [ ] **Create typed generated client module structure**
+  - **Description:** Plan generated output organization (e.g., `proxies.ts` or per-feature generated clients) so it aligns with Angular feature modules and does not leak transport concerns into presentation components.
+  - **Expected output:** File-structure blueprint for generated clients plus ownership boundaries between generated and handwritten code.
+  - **Related layer:** Frontend
+- [ ] **Define regeneration and drift-control workflow**
+  - **Description:** Specify when regeneration is required (contract changes, release milestones), and include automated checks to detect stale generated client artifacts.
+  - **Expected output:** Regeneration SOP (local + CI) with freshness validation rule and failure criteria.
+  - **Related layer:** Frontend / Backend / Infra
+- [ ] **Plan removal of handwritten duplicate API logic**
+  - **Description:** Identify all manual HTTP services duplicated by generated clients and define staged deprecation/removal sequence to avoid breaking active modules.
+  - **Expected output:** Migration list of duplicate services with replacement mapping and safe removal order.
+  - **Related layer:** Frontend
+- [ ] **Validate architecture compatibility of generated clients**
+  - **Description:** Ensure generated clients support auth interceptors, typed error handling, and centralized API consumption patterns required by current frontend architecture.
+  - **Expected output:** Compatibility checklist with approved extension points and required wrapper/facade strategy.
+  - **Related layer:** Frontend / Auth
+
+### 18.3 Frontend integration execution planning
+- [ ] **Plan dashboard live data integration**
+  - **Description:** Replace all hardcoded KPI/chart/dashboard values with real endpoint consumption and explicit transformation rules for chart/card view models.
+  - **Expected output:** Dashboard integration plan mapping each widget -> endpoint -> mapper -> UI state contract.
+  - **Related layer:** Frontend / Backend
+- [ ] **Plan campaigns/modules/list/detail live data integration**
+  - **Description:** Define API-backed data flow for each list/detail page currently using static sources, including route-param based detail retrieval.
+  - **Expected output:** Feature-by-feature integration matrix for list/detail pages with endpoint and model binding definitions.
+  - **Related layer:** Frontend / Backend
+- [ ] **Plan form CRUD endpoint wiring**
+  - **Description:** Map create/update/delete forms to actual command endpoints, including payload shaping, validation error projection, and optimistic/pessimistic update strategy.
+  - **Expected output:** Form wiring specification per module with request/response handling contract.
+  - **Related layer:** Frontend / Backend
+- [ ] **Define standard loading/empty/error/retry UX states**
+  - **Description:** Introduce a shared state model for async pages/components so all API-driven UIs provide consistent loading skeletons, empty states, recoverable errors, and retry actions.
+  - **Expected output:** UI state-handling standard with adoption checklist per screen.
+  - **Related layer:** Frontend
+- [ ] **Plan server-side pagination/filter/sort integration**
+  - **Description:** For all data tables/lists, map UI controls to backend query params (page, size, sort, filters), including total count handling and query-state persistence.
+  - **Expected output:** Contract table per list page defining exact query param mapping and response expectations.
+  - **Related layer:** Frontend / Backend
+- [ ] **Define DTO-to-UI mapping strategy**
+  - **Description:** Establish mapper layer/facade conventions separating generated DTOs from presentational models, including date/enum formatting and null-safe defaults.
+  - **Expected output:** Mapping strategy document with per-feature mapper ownership and naming conventions.
+  - **Related layer:** Frontend
+- [ ] **Define centralized API consumption pattern**
+  - **Description:** Standardize how features consume generated clients (facades/data-access services), including shared error translation, cancellation, and retry/backoff policy.
+  - **Expected output:** API consumption architecture guideline with reusable integration pattern per feature module.
+  - **Related layer:** Frontend
+- [ ] **Plan auth-aware request flow for all API calls**
+  - **Description:** Ensure all generated/manual client calls route through auth-aware interceptors for token attach/refresh/logout handling, including unauthenticated fallback UX.
+  - **Expected output:** Auth-aware request-flow diagram and endpoint coverage checklist.
+  - **Related layer:** Frontend / Auth
+
+### 18.4 Production configuration and runtime connectivity
+- [ ] **Define environment-based API base URL strategy**
+  - **Description:** Specify dev/staging/prod runtime config keys for API base URLs without hardcoding, including fallback behavior and startup validation.
+  - **Expected output:** Environment configuration matrix with required keys and expected values per environment.
+  - **Related layer:** Frontend / Infra
+- [ ] **Verify gateway as mandatory frontend API entrypoint**
+  - **Description:** Ensure all frontend API routes target gateway endpoints only, preventing direct calls to internal backend services.
+  - **Expected output:** Endpoint routing policy with validated frontend base URL and path prefix rules.
+  - **Related layer:** Frontend / Gateway
+- [ ] **Plan production-safe frontend configuration loading**
+  - **Description:** Define runtime-safe configuration delivery (build-time env files and/or runtime injected config) to support immutable images and environment overrides.
+  - **Expected output:** Approved configuration loading design with deployment-time override procedure.
+  - **Related layer:** Frontend / Infra
+- [ ] **Plan Docker/runtime communication validation tasks**
+  - **Description:** Define compose-level verification steps ensuring frontend resolves and reaches gateway in containerized environments with correct network aliases/ports.
+  - **Expected output:** Runtime connectivity checklist for local and production-like compose profiles.
+  - **Related layer:** Frontend / Gateway / Infra
+- [ ] **Plan CORS/reverse-proxy alignment verification**
+  - **Description:** Verify reverse proxy and CORS settings support browser-based gateway access for all required methods/headers, including auth headers.
+  - **Expected output:** CORS/proxy verification matrix with required origins, headers, methods, and pass criteria.
+  - **Related layer:** Gateway / Backend / Infra
+
+### 18.5 Authentication and authorization integration
+- [ ] **Plan end-to-end Keycloak authentication in frontend**
+  - **Description:** Validate login/logout/session bootstrap behavior and token lifecycle handling in SPA runtime against Keycloak realm/client settings.
+  - **Expected output:** Auth flow specification including initialization order, failure handling, and session timeout behavior.
+  - **Related layer:** Frontend / Auth
+- [ ] **Plan token attachment correctness for all API requests**
+  - **Description:** Define verification tasks to ensure every protected request carries correct bearer token and excludes token for public endpoints where required.
+  - **Expected output:** Protected/public endpoint token propagation checklist.
+  - **Related layer:** Frontend / Gateway / Backend / Auth
+- [ ] **Plan role-based UI enforcement using real auth claims**
+  - **Description:** Replace static role flags with claim-driven role resolution and bind menu/actions/feature visibility to authoritative auth state.
+  - **Expected output:** Role-visibility matrix mapping claim -> visible routes/components/actions.
+  - **Related layer:** Frontend / Auth
+- [ ] **Align route protection with API authorization policies**
+  - **Description:** Ensure frontend guards and backend policy expectations are consistent so inaccessible routes/actions fail fast in UI and are enforced server-side.
+  - **Expected output:** Route-to-policy alignment matrix with mismatch remediation list.
+  - **Related layer:** Frontend / Backend / Gateway / Auth
+
+### 18.6 Backend contract alignment for frontend needs
+- [ ] **Identify missing endpoints required by implemented frontend features**
+  - **Description:** From frontend feature inventory, list API capabilities still absent (queries/commands) that block real data integration.
+  - **Expected output:** Missing-endpoint backlog prioritized by frontend dependency criticality.
+  - **Related layer:** Backend / Frontend
+- [ ] **Identify response-shape mismatches vs frontend expectations**
+  - **Description:** Compare existing endpoint responses to UI data needs (field names, nested shapes, paging metadata, enum/string formats).
+  - **Expected output:** Contract mismatch register with proposed authoritative contract direction.
+  - **Related layer:** Backend / Frontend
+- [ ] **Identify missing query/command coverage for UI workflows**
+  - **Description:** Map each UI action to required CQRS command/query and identify absent handlers/endpoints.
+  - **Expected output:** CQRS coverage map (UI action -> command/query -> API route -> status).
+  - **Related layer:** Backend
+- [ ] **Plan Swagger cleanliness and OpenAPI completeness hardening**
+  - **Description:** Define tasks to ensure tags, operation IDs, request/response schemas, auth metadata, and error contracts are clean and generation-ready.
+  - **Expected output:** OpenAPI quality checklist with measurable pass criteria for client generation.
+  - **Related layer:** Backend / Gateway
+- [ ] **Ensure all integration-critical endpoints are documented and client-generatable**
+  - **Description:** Validate that every endpoint needed by frontend integration is represented in OpenAPI without ambiguous schemas or undocumented variants.
+  - **Expected output:** Final integration endpoint catalog with OpenAPI coverage status and blockers.
+  - **Related layer:** Backend / Frontend
+
+### 18.7 Cleanup and refactor sequencing
+- [ ] **Plan removal of mock/fake data providers**
+  - **Description:** Identify and schedule removal of mock services, fake repositories, temporary arrays, and hardcoded metric providers after real API wiring per feature.
+  - **Expected output:** Cleanup execution order that prevents regressions during phased integration.
+  - **Related layer:** Frontend
+- [ ] **Plan dead-code removal post integration**
+  - **Description:** Define criteria and verification steps for deleting obsolete adapters, unused models, and legacy API shims no longer referenced.
+  - **Expected output:** Dead-code removal checklist with safety validation commands.
+  - **Related layer:** Frontend / Backend
+- [ ] **Plan model consolidation and normalization**
+  - **Description:** Consolidate duplicate interfaces/types created during mock phase into canonical generated DTO + UI model mapping structure.
+  - **Expected output:** Model normalization map with target canonical model per domain concept.
+  - **Related layer:** Frontend
+- [ ] **Standardize API service/facade structure for maintainability**
+  - **Description:** Define foldering and naming conventions for data-access services/facades wrapping generated clients to keep future module integrations consistent.
+  - **Expected output:** Maintainable API layer structure standard and migration checklist for existing modules.
+  - **Related layer:** Frontend
+- [ ] **Define forward-compatible integration governance**
+  - **Description:** Add maintenance tasks ensuring all future frontend modules must integrate through generated clients, mapping layer, and auth-aware API patterns.
+  - **Expected output:** Governance checklist embedded into delivery workflow for new modules.
+  - **Related layer:** Frontend / Infra
+
+### 18.8 Validation and QA readiness
+- [ ] **Define page-by-page live data verification plan**
+  - **Description:** Create deterministic QA checks confirming each page renders backend-originated data (not static/mocked data), including traceable API call assertions.
+  - **Expected output:** Page verification checklist with endpoint references and expected payload indicators.
+  - **Related layer:** Frontend / Backend
+- [ ] **Define CRUD backend-hit verification plan**
+  - **Description:** For create/update/delete flows, verify UI actions trigger correct API commands, receive expected statuses, and refresh view state from backend truth.
+  - **Expected output:** CRUD verification matrix per module with request/response and post-action refresh expectations.
+  - **Related layer:** Frontend / Backend
+- [ ] **Define dashboard live-metrics verification plan**
+  - **Description:** Verify KPI cards/charts consume live analytics endpoints and match backend calculations under controlled sample datasets.
+  - **Expected output:** Dashboard metrics validation checklist with metric source mapping and comparison rules.
+  - **Related layer:** Frontend / Backend
+- [ ] **Define generated-client build/regeneration verification plan**
+  - **Description:** Ensure generated client artifacts build successfully and regeneration produces deterministic output without manual fixes.
+  - **Expected output:** Client-generation validation procedure with expected diff/no-diff behavior.
+  - **Related layer:** Frontend / Backend / Infra
+- [ ] **Define dockerized end-to-end integration validation plan**
+  - **Description:** Validate frontend -> gateway -> backend communication in dockerized environment, including auth and protected endpoints.
+  - **Expected output:** End-to-end compose validation checklist with health and functional probes.
+  - **Related layer:** Frontend / Gateway / Backend / Infra / Auth
+- [ ] **Define production behavior verification through gateway**
+  - **Description:** Verify production-like routing, headers, auth propagation, error handling, and fallback behavior exclusively through gateway entrypoint.
+  - **Expected output:** Production gateway verification checklist with pass/fail criteria for release readiness.
+  - **Related layer:** Gateway / Frontend / Backend / Auth
