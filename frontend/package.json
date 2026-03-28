@@ -7,7 +7,8 @@
     "build": "ng build",
     "test": "ng test --watch=false",
     "lint": "ng lint",
-    "generate:api-client": "./scripts/generate-openapi-client.sh"
+    "generate:api-client": "./scripts/generate-openapi-client.sh",
+    "check:api-client-freshness": "./scripts/check-openapi-client-freshness.sh"
   },
   "dependencies": {
     "@angular/animations": "^19.2.0",
