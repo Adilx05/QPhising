@@ -18,7 +18,7 @@ QPhising is a full-stack SaaS application designed for internal security awarene
 
 ## ⚙️ Configuration
 
-Backend (`backend/API`) and Gateway (`gateway`) now use strongly typed options with startup validation.  
+Backend (`backend/API`), Gateway (`gateway`), and Worker (`worker`) use strongly typed options with startup validation.  
 Required keys are loaded from `appsettings.json` and can be overridden by environment variables.
 
 ### Backend configuration keys
@@ -30,6 +30,11 @@ Required keys are loaded from `appsettings.json` and can be overridden by enviro
 | `Keycloak` | `Authority`, `Audience`, `RequireHttpsMetadata` | `Keycloak__Authority` |
 | `Smtp` | `Host`, `Port`, `Username`, `Password`, `FromAddress`, `UseSsl` | `Smtp__Host` |
 | `BaseUrls` | `Gateway`, `Frontend` | `BaseUrls__Gateway` |
+| `TrackingTokens` | `SigningKey`, `ExpirationMinutes`, `Version` | `TrackingTokens__SigningKey` |
+| `TrackingRetention` | `RawClickRetentionDays`, `AggregateRetentionDays`, `CleanupIntervalMinutes`, `CleanupBatchSize` | `TrackingRetention__RawClickRetentionDays` |
+| `ExportStorage` | `BasePath`, `FileTtlDays` | `ExportStorage__BasePath` |
+| `ExportRetention` | `CleanupIntervalMinutes`, `CleanupBatchSize` | `ExportRetention__CleanupIntervalMinutes` |
+| `Redis` | `TrackingDeduplicationWindowMinutes`, `TrackingTokenClockSkewSeconds`, `TrackingAbuseWindowMinutes`, `TrackingSuspiciousIpThreshold`, `TrackingIpRejectionThreshold`, `TrackingAggregateRetentionDays`, `AnalyticsDashboardCacheTtlSeconds` | `Redis__TrackingDeduplicationWindowMinutes` |
 
 ### Gateway configuration keys
 
@@ -40,6 +45,18 @@ Required keys are loaded from `appsettings.json` and can be overridden by enviro
 | `Keycloak` | `Authority`, `Audience`, `RequireHttpsMetadata` | `Keycloak__Authority` |
 | `Smtp` | `Host`, `Port`, `Username`, `Password`, `FromAddress`, `UseSsl` | `Smtp__Host` |
 | `BaseUrls` | `Gateway`, `Api`, `Frontend` | `BaseUrls__Api` |
+
+### Worker configuration keys
+
+| Section | Key | Env override example |
+|---|---|---|
+| `Database` | `ConnectionString` | `Database__ConnectionString` |
+| `Redis` | `ConnectionString`, `TrackingDeduplicationWindowMinutes`, `TrackingTokenClockSkewSeconds`, `TrackingAbuseWindowMinutes`, `TrackingSuspiciousIpThreshold`, `TrackingIpRejectionThreshold`, `TrackingAggregateRetentionDays` | `Redis__ConnectionString` |
+| `TrackingTokens` | `SigningKey`, `ExpirationMinutes`, `Version` | `TrackingTokens__SigningKey` |
+| `TrackingRetention` | `RawClickRetentionDays`, `AggregateRetentionDays`, `CleanupIntervalMinutes`, `CleanupBatchSize` | `TrackingRetention__CleanupBatchSize` |
+| `ExportStorage` | `BasePath`, `FileTtlDays` | `ExportStorage__BasePath` |
+| `ExportRetention` | `CleanupIntervalMinutes`, `CleanupBatchSize` | `ExportRetention__CleanupBatchSize` |
+| `TaskWorker` | `PollIntervalSeconds`, `ClaimLeaseDurationSeconds`, `InitialRetryDelaySeconds`, `MaxRetryDelaySeconds`, `RetryBackoffMultiplier` | `TaskWorker__PollIntervalSeconds` |
 
 > The applications fail fast at startup if required keys are missing or invalid.
 
@@ -58,7 +75,7 @@ Use environment overrides (optional) and start the stack:
 docker compose up --build
 ```
 
-`docker-compose.yml` now uses `${VAR:-default}` expansion for runtime values (DB, Redis, Keycloak, SMTP, base URLs, exposed ports).
+`docker-compose.yml` now uses `${VAR:-default}` expansion for runtime values (DB, Redis, Keycloak, SMTP, base URLs, tracking, export, and worker execution tuning).
 
 ### Full-stack lifecycle verification
 
