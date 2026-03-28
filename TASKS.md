@@ -1717,10 +1717,19 @@
     - `sed -n "1,260p" docs/openapi-generated-client-module-structure.md`
     - `rg -n "Create typed generated client module structure|openapi-generated-client-module-structure" TASKS.md docs/openapi-generated-client-module-structure.md`
 
-- [ ] **Define regeneration and drift-control workflow**
+- [x] **Define regeneration and drift-control workflow**
   - **Description:** Specify when regeneration is required (contract changes, release milestones), and include automated checks to detect stale generated client artifacts.
   - **Expected output:** Regeneration SOP (local + CI) with freshness validation rule and failure criteria.
   - **Related layer:** Frontend / Backend / Infra
+- Subtask completion update (2026-03-28):
+  - Added regeneration/drift-control SOP document at `docs/openapi-regeneration-and-drift-control-workflow.md` defining mandatory regeneration triggers, local/CI workflows, and explicit stale-artifact failure criteria.
+  - Added deterministic freshness-check automation script `frontend/scripts/check-openapi-client-freshness.sh` that regenerates client artifacts and fails when `src/app/core/api/generated/` has post-generation diffs.
+  - Wired frontend package script `check:api-client-freshness` to standardize local and CI drift gate execution.
+  - Reproducible command evidence:
+    - `bash -n frontend/scripts/check-openapi-client-freshness.sh`
+    - `rg -n "check:api-client-freshness|generate:api-client" frontend/package.json`
+    - `sed -n "1,260p" docs/openapi-regeneration-and-drift-control-workflow.md`
+
 - [ ] **Plan removal of handwritten duplicate API logic**
   - **Description:** Identify all manual HTTP services duplicated by generated clients and define staged deprecation/removal sequence to avoid breaking active modules.
   - **Expected output:** Migration list of duplicate services with replacement mapping and safe removal order.
