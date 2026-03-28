@@ -1319,3 +1319,9 @@
   - Reproducible command evidence:
     - `rg -n "RemoveAll<IAnalyticsReadRepository>|RemoveAll<IAnalyticsDashboardCache>|TestAnalyticsReadRepository|TestAnalyticsDashboardCache" backend/API.IntegrationTests/ApiWebApplicationFactory.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Analytics_DashboardKpis_Should_Allow_Viewer_Role"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Hardened analytics dashboard endpoint input handling with an explicit controller-level date-range guard (`from < to`) returning RFC7807 BadRequest response before dispatching CQRS query.
+  - This prevents invalid-range authorization tests from surfacing as 500 responses and preserves deterministic `application/problem+json` contract for malformed requests.
+  - Reproducible command evidence:
+    - `rg -n "if \(from >= to\)|From must be earlier than To|StatusCodes.Status400BadRequest" backend/API/Controllers/AnalyticsController.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Analytics_DashboardKpis_Should_Reject_Request_With_Invalid_Range_Using_ProblemDetails"` *(fails in current environment: `dotnet` not installed)*
