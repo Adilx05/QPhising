@@ -60,6 +60,15 @@ docker compose up --build
 
 `docker-compose.yml` now uses `${VAR:-default}` expansion for runtime values (DB, Redis, Keycloak, SMTP, base URLs, exposed ports).
 
+### Deterministic image build assumptions
+
+To keep image outputs reproducible across environments:
+
+* Dockerfiles use pinned base image tags for Node, NGINX, and .NET SDK/runtime.
+* Frontend build uses lockfile-driven installs via `npm ci` (not `npm install`).
+* .NET publish stages enable deterministic CI build flags (`ContinuousIntegrationBuild=true`, `Deterministic=true`).
+* Build contexts are constrained using per-service `.dockerignore` files to avoid non-source noise affecting layers.
+
 ## 📊 Task System
 
 All development tasks are tracked in:

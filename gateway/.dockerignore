@@ -1,0 +1,11 @@
+bin
+obj
+.git
+.gitignore
+Dockerfile
+README.md
+**/TestResults
+**/*.user
+**/*.suo
+.vscode
+.idea

@@ -1111,7 +1111,7 @@
 - Verify one-command startup path (`docker-compose up`) and initialization order.
 
 ### Subtasks (planned)
-- [ ] **Validate deterministic image builds**
+- [x] **Validate deterministic image builds**
   - **Description:** Confirm Dockerfiles produce reproducible artifacts for frontend, API, gateway, and worker.
   - **Expected output:** Consistent container images with documented build assumptions.
   - **Related layer:** Infra
@@ -1143,6 +1143,17 @@
   - robust `depends_on` wiring using `condition: service_healthy` for startup ordering.
   - explicit environment-variable mappings for ASP.NET Core configuration (`Authentication__*`, `Infrastructure__*`, `ASPNETCORE_*`).
 - Verified compose structure and dependency graph via `docker compose config`.
+- Subtask completion update (2026-03-28):
+  - Hardened deterministic build behavior across all service Dockerfiles (`frontend`, `backend`, `gateway`, `worker`).
+  - Replaced non-deterministic frontend dependency restore (`npm install`) with lockfile-enforced `npm ci`.
+  - Added explicit deterministic .NET publish flags (`/p:ContinuousIntegrationBuild=true` and `/p:Deterministic=true`) for API, gateway, and worker artifacts.
+  - Added per-service `.dockerignore` files to reduce context drift and improve reproducible layer inputs.
+  - Documented deterministic image-build assumptions and constraints in `README.md` for operator visibility.
+  - Reproducible command evidence:
+    - `rg -n "npm ci|ContinuousIntegrationBuild|Deterministic|FROM " frontend/Dockerfile backend/Dockerfile gateway/Dockerfile worker/Dockerfile`
+    - `rg -n "Deterministic image build assumptions|npm ci|dockerignore" README.md`
+    - `test -f frontend/.dockerignore && test -f backend/.dockerignore && test -f gateway/.dockerignore && test -f worker/.dockerignore`
+
 - Evidence:
   - Files: `docker-compose.yml`, `frontend/Dockerfile`, `backend/Dockerfile`, `gateway/Dockerfile`, `worker/Dockerfile`, `TASKS.md`.
   - Commands:
