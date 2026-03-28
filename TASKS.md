@@ -236,6 +236,14 @@
     - `rg -n "TrySetResponseCorrelationHeader|Response.HasStarted|Skipping correlation response header" gateway/Correlation/CorrelationIdMiddleware.cs`
     - `dotnet test gateway/Gateway.IntegrationTests/Gateway.IntegrationTests.csproj`
 
+- Maintenance update (2026-03-28):
+  - Fixed gateway health-probe throttling caused by prefix matching that treated `/api-health/*` as `/api*`, which incorrectly applied API route limits to orchestrator probes.
+  - Hardened `CorrelationIdMiddleware` header injection with `HttpResponse.OnStarting(...)` to avoid read-only header writes after response start in error paths.
+  - Added integration coverage proving `/api-health/ready` does not trigger `/api` rate-limit rules.
+  - Reproducible command evidence:
+    - `rg -n "PathMatchesPrefix|OnStarting|CorrelationIdMiddleware" gateway/RateLimiting/RedisRateLimitingMiddleware.cs gateway/Correlation/CorrelationIdMiddleware.cs`
+    - `dotnet test gateway/Gateway.IntegrationTests/Gateway.IntegrationTests.csproj`
+
 ## 5. [ ] Campaign management module
 - StartedAt:
 - FinishedAt:
