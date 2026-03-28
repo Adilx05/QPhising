@@ -15,11 +15,11 @@ public sealed class RedisRateLimitingMiddleware(RequestDelegate next)
     private const string ResetHeader = "X-RateLimit-Reset";
     private const string RetryAfterHeader = "Retry-After";
 
-    private static readonly LuaScript IncrementRateLimitScript = LuaScript.Prepare(
+    private const string IncrementRateLimitScript =
         "local current = redis.call('INCR', KEYS[1]) " +
         "if current == 1 then redis.call('EXPIRE', KEYS[1], ARGV[1]) end " +
         "local ttl = redis.call('TTL', KEYS[1]) " +
-        "return {current, ttl}");
+        "return {current, ttl}";
 
     public async Task InvokeAsync(
         HttpContext context,
