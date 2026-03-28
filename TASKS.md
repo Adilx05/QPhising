@@ -1643,10 +1643,20 @@
     - `rg -n "interface SessionState|interface DashboardKpi|DashboardCampaignRow|protected readonly (campaigns|templates|kpis|trendRows|events|tasks|exportJobs) = \[" frontend/src/app`
     - `sed -n '1,260p' docs/dto-client-model-alignment-checklist.md`
 
-- [ ] **Audit environment and base URL configuration gaps**
+- [x] **Audit environment and base URL configuration gaps**
   - **Description:** Review all frontend environments/runtime config to ensure API base URL/gateway URL values are centrally configured and not hardcoded in services/components.
   - **Expected output:** Configuration gap report with exact missing keys and target configuration source per environment.
   - **Related layer:** Frontend / Gateway / Infra
+
+- Subtask completion update (2026-03-28):
+  - Completed frontend environment/base URL configuration audit covering Angular workspace config, frontend runtime bootstrap, and compose runtime wiring.
+  - Added `docs/frontend-environment-baseurl-gap-report.md` with exact missing configuration keys, centralized target sources, and per-environment mapping guidance (development/staging/production).
+  - Confirmed frontend currently has no API URL hardcoding because transport wiring is not yet implemented, but also lacks required centralized runtime/build-time base URL configuration contract.
+  - Reproducible command evidence:
+    - `sed -n '1,260p' frontend/angular.json`
+    - `rg -n "https?://|/api|gateway|BASE_URL|baseUrl|API_URL|environment\.|HttpClient|fetch\(" frontend/src frontend/angular.json frontend/Dockerfile`
+    - `sed -n '1,260p' docker-compose.yml`
+    - `sed -n '1,260p' docs/frontend-environment-baseurl-gap-report.md`
 
 - Subtask completion update (2026-03-28):
   - Completed a frontend-wide hardcoded/mock data audit for dashboard, campaigns, templates, analytics, tracking, tasks, exports, and core session state.
