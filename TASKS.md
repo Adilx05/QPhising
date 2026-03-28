@@ -1831,10 +1831,18 @@
     - `sed -n "1,320p" docs/dto-to-ui-mapping-strategy.md`
     - `rg -n "Define DTO-to-UI mapping strategy|dto-to-ui-mapping-strategy" TASKS.md docs/dto-to-ui-mapping-strategy.md`
     - `rg -n "data-access/mappers|models/" frontend/src/app/features frontend/src/app/core -g '*.ts'`
-- [ ] **Define centralized API consumption pattern**
+- [x] **Define centralized API consumption pattern**
   - **Description:** Standardize how features consume generated clients (facades/data-access services), including shared error translation, cancellation, and retry/backoff policy.
   - **Expected output:** API consumption architecture guideline with reusable integration pattern per feature module.
   - **Related layer:** Frontend
+- Subtask completion update (2026-03-28):
+  - Added `docs/frontend-centralized-api-consumption-pattern.md` defining the mandatory generated-client-first API consumption architecture (`Container/Store -> Facade -> Core API Wrapper -> Generated Service`) with strict layering and anti-pattern prohibitions.
+  - Standardized shared cross-feature error translation contract (`validation/unauthorized/forbidden/notFound/conflict/rateLimited/transient/fatal`) plus field-error and trace-id propagation requirements.
+  - Defined deterministic cancellation defaults and centralized retry/backoff matrix (idempotent reads retry with jitter, non-idempotent creates manual retry only, 429 honoring `Retry-After`).
+  - Added feature adoption matrix and governance quality gates to enforce reusable facade patterns and prevent handwritten duplicate transport logic.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/frontend-centralized-api-consumption-pattern.md`
+    - `rg -n "Define centralized API consumption pattern|frontend-centralized-api-consumption-pattern" TASKS.md docs/frontend-centralized-api-consumption-pattern.md`
 - [ ] **Plan auth-aware request flow for all API calls**
   - **Description:** Ensure all generated/manual client calls route through auth-aware interceptors for token attach/refresh/logout handling, including unauthenticated fallback UX.
   - **Expected output:** Auth-aware request-flow diagram and endpoint coverage checklist.
