@@ -1613,7 +1613,7 @@
   - **Description:** Perform a page-by-page/component-by-component audit (dashboard, campaigns, templates, analytics, exports, auth/administration views) to identify hardcoded metrics, local arrays, in-component stubs, and mock services.
   - **Expected output:** Audited inventory table with file path, component/service name, mocked data source type, and replacement priority.
   - **Related layer:** Frontend
-- [ ] **Map missing frontend-to-backend integrations**
+- [x] **Map missing frontend-to-backend integrations**
   - **Description:** For each audited UI flow, verify whether a real API call exists and is wired; explicitly flag flows still using local mock logic.
   - **Expected output:** Gap matrix mapping UI flow -> expected endpoint -> current status (`connected` / `missing` / `partially connected`).
   - **Related layer:** Frontend
@@ -1638,6 +1638,15 @@
     - `rg -n "sessionState|dashboardKpisState|dashboardTrendState|dashboardCampaignsState|featureState" frontend/src/app/core/state/app-state.store.ts`
     - `rg -n "protected readonly (kpis|trendRows|campaigns|templates|events|tasks|exportJobs) = \[" frontend/src/app/features`
     - `sed -n '1,220p' docs/frontend-mock-data-inventory.md`
+
+- Subtask completion update (2026-03-28):
+  - Completed UI-flow-to-endpoint gap mapping across the previously audited frontend mock-data inventory.
+  - Produced explicit integration status matrix (`connected` / `missing` / `partially connected`) with endpoint expectations per flow in `docs/frontend-backend-integration-gap-matrix.md`.
+  - Confirmed no current frontend transport wiring (`HttpClient`/`fetch`) and identified backend coverage gaps for Tracking list and Tasks queue views.
+  - Reproducible command evidence:
+    - `rg -n "HttpClient|http\.get|http\.post|fetch\(|/api/" frontend/src/app`
+    - `rg -n "class .*Controller|\[Http(Get|Post|Put|Delete|Patch)|\[Route\(" backend/API/Controllers -g '*.cs'`
+    - `sed -n '1,240p' docs/frontend-backend-integration-gap-matrix.md`
 
 ### 18.2 Swagger/OpenAPI client generation
 - [ ] **Evaluate and select OpenAPI generation strategy**
