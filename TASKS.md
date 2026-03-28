@@ -1617,10 +1617,19 @@
   - **Description:** For each audited UI flow, verify whether a real API call exists and is wired; explicitly flag flows still using local mock logic.
   - **Expected output:** Gap matrix mapping UI flow -> expected endpoint -> current status (`connected` / `missing` / `partially connected`).
   - **Related layer:** Frontend
-- [ ] **Identify unused backend endpoints relevant to implemented UI features**
+- [x] **Identify unused backend endpoints relevant to implemented UI features**
   - **Description:** Cross-reference existing API surface (controllers/OpenAPI) against current frontend usage to detect endpoints that exist but are never consumed.
   - **Expected output:** Endpoint utilization report listing available-but-unused endpoints with candidate frontend integration targets.
   - **Related layer:** Frontend / Backend
+- Subtask completion update (2026-03-28):
+  - Completed backend endpoint utilization analysis against currently implemented frontend feature pages.
+  - Added `docs/backend-endpoint-utilization-report.md` with endpoint-level utilization status and candidate frontend integration targets.
+  - Confirmed current frontend consumes none of the UI-relevant backend endpoints and identified two UI/backend contract gaps (`Tracking` events read API, `Tasks` API surface).
+  - Reproducible command evidence:
+    - `rg -n "HttpClient|http\.get|http\.post|fetch\(|/api/" frontend/src/app || true`
+    - `rg -n "class .*Controller|\[Http(Get|Post|Put|Delete|Patch)|\[Route\(" backend/API/Controllers -g '*.cs'`
+    - `sed -n '1,260p' docs/backend-endpoint-utilization-report.md`
+
 - [ ] **Audit DTO and client model mismatches**
   - **Description:** Compare backend response/request contracts with frontend interfaces/view models to identify missing mappings, field name/type mismatches, nullable handling gaps, and date/time serialization assumptions.
   - **Expected output:** DTO alignment checklist with required model additions/changes and mapping ownership per feature.
