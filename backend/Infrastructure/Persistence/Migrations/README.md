@@ -6,6 +6,7 @@ This folder stores ordered SQL migrations for PostgreSQL.
 
 - `00000000000000_baseline_full_schema.sql`: baseline snapshot for greenfield bootstrap.
 - `YYYYMMDDHHMMSS_<name>.sql`: incremental forward migrations.
+- `20260328103000_add_identity_role_seed_strategy.sql`: identity role assumptions and deterministic RBAC seed metadata.
 - `rollback/YYYYMMDDHHMMSS_<name>.down.sql`: optional rollback scripts for downgrade validation.
 
 ## Apply / Rollback
