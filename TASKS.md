@@ -1857,10 +1857,17 @@
     - `rg -n "routeAccessGuard|unauthorized\\?reason=auth|unauthorized\\?reason=role" frontend/src/app/core/auth/route-access.guard.ts`
 
 ### 18.4 Production configuration and runtime connectivity
-- [ ] **Define environment-based API base URL strategy**
+- [x] **Define environment-based API base URL strategy**
   - **Description:** Specify dev/staging/prod runtime config keys for API base URLs without hardcoding, including fallback behavior and startup validation.
   - **Expected output:** Environment configuration matrix with required keys and expected values per environment.
   - **Related layer:** Frontend / Infra
+- Subtask completion update (2026-03-28):
+  - Added `docs/environment-based-api-base-url-strategy.md` defining the authoritative frontend runtime config contract for API routing (`gatewayBaseUrl`, `apiPathPrefix`, derived/validated `apiBaseUrl`, optional `requestTimeoutMs`).
+  - Documented explicit dev/staging/prod environment matrix for configuration sources and expected gateway URL patterns, with immutable-image-safe runtime injection guidance for staging/production.
+  - Defined deterministic startup validation/fail-fast behavior for missing or malformed URL config, including derived-vs-explicit base URL mismatch handling and hardcoding prohibition rules.
+  - Reproducible command evidence:
+    - `sed -n "1,260p" docs/environment-based-api-base-url-strategy.md`
+    - `rg -n "Define environment-based API base URL strategy|environment-based-api-base-url-strategy" TASKS.md docs/environment-based-api-base-url-strategy.md`
 - [ ] **Verify gateway as mandatory frontend API entrypoint**
   - **Description:** Ensure all frontend API routes target gateway endpoints only, preventing direct calls to internal backend services.
   - **Expected output:** Endpoint routing policy with validated frontend base URL and path prefix rules.
