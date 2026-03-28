@@ -1771,10 +1771,17 @@
     - `sed -n "1,320p" docs/dashboard-live-data-integration-plan.md`
     - `rg -n "dashboardKpisState|dashboardTrendState|dashboardCampaignsState" frontend/src/app/core/state/app-state.store.ts`
     - `rg -n "dashboard-kpis|\\[HttpGet\\(\" backend/API/Controllers/AnalyticsController.cs backend/API/Controllers/CampaignsController.cs`
-- [ ] **Plan campaigns/modules/list/detail live data integration**
+- [x] **Plan campaigns/modules/list/detail live data integration**
   - **Description:** Define API-backed data flow for each list/detail page currently using static sources, including route-param based detail retrieval.
   - **Expected output:** Feature-by-feature integration matrix for list/detail pages with endpoint and model binding definitions.
   - **Related layer:** Frontend / Backend
+- Subtask completion update (2026-03-28):
+  - Added feature-level list/detail live-data plan at `docs/campaigns-modules-list-detail-live-data-integration-plan.md` with explicit integration matrix per module (campaigns, templates, tracking, tasks, analytics, exports).
+  - Defined route-param detail retrieval contracts (`:campaignId`, `:templateId`, `:taskId`, `:exportJobId`) and endpoint/model-binding rules for generated-client facade consumption.
+  - Documented backend contract blockers and proposed read endpoints for currently unserved tracking/tasks list-detail flows, plus sequencing for safe execution.
+  - Reproducible command evidence:
+    - `sed -n "1,320p" docs/campaigns-modules-list-detail-live-data-integration-plan.md`
+    - `rg -n "Plan campaigns/modules/list/detail live data integration|campaigns-modules-list-detail-live-data-integration-plan" TASKS.md docs/campaigns-modules-list-detail-live-data-integration-plan.md`
 - [ ] **Plan form CRUD endpoint wiring**
   - **Description:** Map create/update/delete forms to actual command endpoints, including payload shaping, validation error projection, and optimistic/pessimistic update strategy.
   - **Expected output:** Form wiring specification per module with request/response handling contract.
