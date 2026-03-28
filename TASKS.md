@@ -1331,3 +1331,9 @@
   - Reproducible command evidence:
     - `rg -n "decimal.Min\(100m|private static decimal CalculateRate" backend/Application/Features/Analytics/GetDashboardKpis/GetDashboardKpisQueryHandler.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~AnalyticsQueryHandlerTests.Handle_Should_Map_Read_Model_To_Kpi_Response_With_Derived_Rates"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Hardened export endpoint authorization integration test wiring by injecting a deterministic `NoOpUnitOfWork` in test-host service overrides used by export queue/status/download flows.
+  - This avoids unintended persistence-layer dependencies during auth-focused endpoint tests and prevents `500` responses when queueing exports with in-memory repositories.
+  - Reproducible command evidence:
+    - `rg -n "NoOpUnitOfWork|AddSingleton<IUnitOfWork, NoOpUnitOfWork>" backend/API.IntegrationTests/ExportEndpointsAuthorizationTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~Exports_Queue_Should_Return_Created_For_Viewer_With_Owner_From_Claims"` *(fails in current environment: `dotnet` not installed)*
