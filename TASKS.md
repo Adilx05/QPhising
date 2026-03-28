@@ -1308,6 +1308,15 @@
     - `rg -n "SECURITY_FAIL_ON_DOTNET_SEVERITY|SECURITY_FAIL_ON_NPM_SEVERITY|SECURITY_FAIL_ON_TRIVY_SEVERITY" .github/workflows/ci.yml`
     - `rg -n "dotnet list .*--format json|Blocking \.NET vulnerabilities detected|npm audit --audit-level|docker compose build frontend api gateway worker|aquasec/trivy:0.57.1" .github/workflows/ci.yml`
     - `sed -n '180,320p' .github/workflows/ci.yml`
+
+- Subtask completion update (2026-03-28):
+  - Added explicit CI secret-leak detection in `security_scan` using Gitleaks (`ghcr.io/gitleaks/gitleaks:v8.24.2`) with fail-fast `--exit-code 1`.
+  - Added policy-enforced configuration security scanning using Trivy `config` mode across repository IaC/runtime config files.
+  - Added configurable config-risk threshold variable (`SECURITY_FAIL_ON_CONFIG_SEVERITY`) to keep secret/config gate behavior transparent and reviewable.
+  - Reproducible command evidence:
+    - `rg -n "SECURITY_FAIL_ON_CONFIG_SEVERITY|Detect committed secrets with Gitleaks|Enforce infrastructure configuration security policy" .github/workflows/ci.yml`
+    - `rg -n "ghcr.io/gitleaks/gitleaks:v8.24.2|gitleaks.*detect|aquasec/trivy:0.57.1 config" .github/workflows/ci.yml`
+    - `sed -n '1,260p' .github/workflows/ci.yml`
 - [x] **Implement quality thresholds and merge gates**
   - **Description:** Add lint/test/coverage thresholds and fail conditions to block low-quality merges.
   - **Expected output:** Enforced quality gates with transparent pass/fail criteria.
@@ -1316,7 +1325,7 @@
   - **Description:** Add SCA and image scanning with policy-based severity thresholds.
   - **Expected output:** Automated vulnerability reporting with actionable blocking rules.
   - **Related layer:** Infra
-- [ ] **Add secret/config security checks**
+- [x] **Add secret/config security checks**
   - **Description:** Integrate secret detection and insecure configuration policy checks into CI.
   - **Expected output:** Early detection of credential leaks and risky runtime settings.
   - **Related layer:** Infra
