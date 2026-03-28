@@ -30,7 +30,7 @@ public sealed class RedisAnalyticsDashboardCache(
             return null;
         }
 
-        return JsonSerializer.Deserialize<DashboardKpisResponse>(payload!, SerializerOptions);
+        return JsonSerializer.Deserialize<DashboardKpisResponse>(payload.ToString(), SerializerOptions);
     }
 
     public async Task SetAsync(

@@ -98,7 +98,7 @@ public sealed class ClosedXmlExcelExportService : IExcelExportService
         foreach ((string label, object value) in kpiRows)
         {
             kpiSheet.Cell(kpiRow, 1).Value = label;
-            kpiSheet.Cell(kpiRow, 2).Value = value;
+            SetCellValue(kpiSheet.Cell(kpiRow, 2), value);
             kpiRow++;
         }
 
@@ -200,6 +200,43 @@ public sealed class ClosedXmlExcelExportService : IExcelExportService
         range.Style.Font.Bold = true;
         range.Style.Fill.BackgroundColor = XLColor.FromHtml("#1D4ED8");
         range.Style.Font.FontColor = XLColor.White;
+    }
+
+    private static void SetCellValue(IXLCell cell, object value)
+    {
+        switch (value)
+        {
+            case int intValue:
+                cell.Value = intValue;
+                break;
+            case long longValue:
+                cell.Value = longValue;
+                break;
+            case decimal decimalValue:
+                cell.Value = decimalValue;
+                break;
+            case double doubleValue:
+                cell.Value = doubleValue;
+                break;
+            case float floatValue:
+                cell.Value = floatValue;
+                break;
+            case bool boolValue:
+                cell.Value = boolValue;
+                break;
+            case DateTime dateTimeValue:
+                cell.Value = dateTimeValue;
+                break;
+            case DateTimeOffset dateTimeOffsetValue:
+                cell.Value = dateTimeOffsetValue.UtcDateTime;
+                break;
+            case string stringValue:
+                cell.Value = stringValue;
+                break;
+            default:
+                cell.Value = value.ToString();
+                break;
+        }
     }
 
     private static ExportBinaryFile ToExportFile(XLWorkbook workbook, string fileName)

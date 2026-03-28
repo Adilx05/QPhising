@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using QPhising.Application.Common.Abstractions;
 using QPhising.Application.Common.Abstractions.Exports;
 using QPhising.Domain.Abstractions;
@@ -59,10 +60,10 @@ public static class ServiceCollectionExtensions
 
         services
             .AddOptions<InfrastructureOptions>()
-            .Configure<DatabaseOptions, RedisOptions>((options, database, redis) =>
+            .Configure<IOptions<DatabaseOptions>, IOptions<RedisOptions>>((options, database, redis) =>
             {
-                options.DatabaseConnectionString = database.ConnectionString;
-                options.RedisConnectionString = redis.ConnectionString;
+                options.DatabaseConnectionString = database.Value.ConnectionString;
+                options.RedisConnectionString = redis.Value.ConnectionString;
             })
             .Validate(options => !string.IsNullOrWhiteSpace(options.DatabaseConnectionString), "Infrastructure database configuration is missing.")
             .Validate(options => !string.IsNullOrWhiteSpace(options.RedisConnectionString), "Infrastructure Redis configuration is missing.")
