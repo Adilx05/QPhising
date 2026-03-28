@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using QPhising.Application.Common.Abstractions;
+using QPhising.Application.Features.Analytics.GetDashboardKpis;
 using QPhising.API.Controllers;
 using QPhising.Domain.Abstractions;
 using QPhising.Domain.Campaigns;
@@ -103,6 +104,9 @@ public sealed class TrackingEndpointsTests : IClassFixture<ApiWebApplicationFact
                 services.AddSingleton<ICampaignRepository>(new InMemoryCampaignRepository(campaign));
                 services.AddSingleton<ITrackingClickRepository>(clickRepository);
                 services.AddSingleton<ITrackingClickRealtimeStore>(new AlwaysUniqueTrackingClickRealtimeStore());
+                services.AddSingleton<IUnitOfWork, NoOpUnitOfWork>();
+                services.AddSingleton<IAnalyticsDashboardCache, NoOpAnalyticsDashboardCache>();
+                services.AddSingleton<IAnalyticsRealtimeNotifier, NoOpAnalyticsRealtimeNotifier>();
             });
         }).CreateClient();
 
@@ -142,6 +146,41 @@ public sealed class TrackingEndpointsTests : IClassFixture<ApiWebApplicationFact
                 services.AddSingleton<ICampaignRepository>(new InMemoryCampaignRepository(campaign));
             });
         }).CreateClient();
+    }
+
+
+    private sealed class NoOpUnitOfWork : IUnitOfWork
+    {
+        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(1);
+        }
+    }
+
+    private sealed class NoOpAnalyticsDashboardCache : IAnalyticsDashboardCache
+    {
+        public Task<DashboardKpisResponse?> GetAsync(GetDashboardKpisQuery query, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<DashboardKpisResponse?>(null);
+        }
+
+        public Task SetAsync(GetDashboardKpisQuery query, DashboardKpisResponse response, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task InvalidateAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class NoOpAnalyticsRealtimeNotifier : IAnalyticsRealtimeNotifier
+    {
+        public Task PublishDashboardUpdatedAsync(AnalyticsDashboardUpdatedEvent updateEvent, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class InMemoryCampaignRepository : ICampaignRepository

@@ -1355,3 +1355,9 @@
   - Reproducible command evidence:
     - `rg -n "PostConfigure<TrackingTokenOptions>|integration-test-signing-key-minimum-32chars" backend/API.IntegrationTests/ApiWebApplicationFactory.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~ProcessTrackingClick_Should_Accept_Anonymous_Request_And_Persist_Metadata"` *(fails in current environment: `dotnet` not installed)*
+- Subtask completion update (2026-03-28):
+  - Stabilized tracking click integration endpoint tests by overriding `IUnitOfWork`, `IAnalyticsDashboardCache`, and `IAnalyticsRealtimeNotifier` with no-op test doubles in the anonymous click scenario host.
+  - This isolates tracking endpoint behavior from infrastructure side effects (DB save, Redis cache invalidation, realtime publish) and prevents infrastructure-driven `500` responses.
+  - Reproducible command evidence:
+    - `rg -n "NoOpUnitOfWork|NoOpAnalyticsDashboardCache|NoOpAnalyticsRealtimeNotifier|AddSingleton<IUnitOfWork" backend/API.IntegrationTests/TrackingEndpointsTests.cs`
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "FullyQualifiedName~ProcessTrackingClick_Should_Accept_Anonymous_Request_And_Persist_Metadata"` *(fails in current environment: `dotnet` not installed)*
