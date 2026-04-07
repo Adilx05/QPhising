@@ -1601,10 +1601,10 @@
 
 ---
 
-## 18. [ ] Frontend–Backend Integration and Production Data Flow
-- StartedAt:
+## 18. [-] Frontend–Backend Integration and Production Data Flow
+- StartedAt: 2026-04-07T00:00:00Z
 - FinishedAt:
-- Owner:
+- Owner: Codex
 - Objective: Replace all mock/hardcoded frontend behavior with production-grade backend integration via gateway-driven, auth-aware, typed API consumption.
 - Scope: Frontend + Backend + Gateway + Infra + Auth alignment required for end-to-end production data flow.
 
@@ -1675,6 +1675,17 @@
     - `rg -n "HttpClient|http\.get|http\.post|fetch\(|/api/" frontend/src/app`
     - `rg -n "class .*Controller|\[Http(Get|Post|Put|Delete|Patch)|\[Route\(" backend/API/Controllers -g '*.cs'`
     - `sed -n '1,240p' docs/frontend-backend-integration-gap-matrix.md`
+
+- Execution update (2026-04-07):
+  - Wired Angular runtime to generated OpenAPI client configuration via `ApiRuntimeService` and `APP_INITIALIZER`, with gateway base URL and bearer token resolution from browser storage.
+  - Replaced hardcoded in-component data on Dashboard, Campaigns, Templates, Analytics, and Exports screens with live generated-client calls through `AppApiFacade`.
+  - Removed seeded dashboard mock arrays from `AppStateStore`; dashboard state is now populated by backend responses at runtime.
+  - Marked Tracking and Tasks screens as backend-contract-blocked in UI state (no hardcoded fake rows), aligned with existing missing-endpoint audit.
+  - Reproducible command evidence:
+    - `npm run build`
+    - `rg -n "AppApiFacade|ApiRuntimeService|APP_INITIALIZER|setDashboardData" frontend/src/app`
+    - `rg -n "Frontend–Backend Integration and Production Data Flow|Execution update \(2026-04-07\)" TASKS.md`
+
 
 ### 18.2 Swagger/OpenAPI client generation
 - [x] **Evaluate and select OpenAPI generation strategy**

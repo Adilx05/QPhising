@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
 import { AppStateStore } from '../../../core/state/app-state.store';
 
@@ -7,13 +7,16 @@ import { AppStateStore } from '../../../core/state/app-state.store';
   selector: 'app-tasks-page',
   templateUrl: './tasks-page.component.html'
 })
-export class TasksPageComponent {
+export class TasksPageComponent implements OnInit {
   private readonly appStateStore = inject(AppStateStore);
 
   protected readonly viewState = computed(() => this.appStateStore.featureViewState().tasks);
-  protected readonly tasks = [
-    { type: 'EmailDispatch', status: 'Processing', attempts: '1', queuedAt: '2026-03-27 09:50' },
-    { type: 'ClickEventProcessing', status: 'Queued', attempts: '0', queuedAt: '2026-03-27 09:53' },
-    { type: 'ExportGeneration', status: 'Completed', attempts: '1', queuedAt: '2026-03-27 09:01' }
-  ];
+  protected readonly tasks = signal<Array<Record<string, string>>>([]);
+
+  ngOnInit(): void {
+    this.appStateStore.setFeatureError(
+      'tasks',
+      'Tasks list endpoint backendde henüz yok. Endpoint açılınca bu ekran doğrudan backendden beslenecek.'
+    );
+  }
 }
