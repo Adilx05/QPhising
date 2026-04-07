@@ -4,6 +4,7 @@ using QPhising.Domain.Exports;
 using QPhising.Domain.Tasks;
 using QPhising.Domain.Tracking;
 using QPhising.Domain.Templates;
+using QPhising.Domain.Setup;
 using QPhising.Infrastructure.Persistence.Configurations;
 
 namespace QPhising.Infrastructure.Persistence;
@@ -22,6 +23,8 @@ public sealed class QPhisingDbContext(DbContextOptions<QPhisingDbContext> option
 
     public DbSet<ExportJob> ExportJobs => Set<ExportJob>();
 
+    public DbSet<SetupState> SetupStates => Set<SetupState>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new CampaignEntityTypeConfiguration());
@@ -30,6 +33,7 @@ public sealed class QPhisingDbContext(DbContextOptions<QPhisingDbContext> option
         modelBuilder.ApplyConfiguration(new QueuedTaskEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new TaskExecutionLogEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ExportJobEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new SetupStateEntityTypeConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

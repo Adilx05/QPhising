@@ -4,11 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using QPhising.Application.Common.Abstractions;
 using QPhising.Application.Common.Abstractions.Exports;
+using QPhising.Application.Common.Abstractions.Setup;
 using QPhising.Domain.Abstractions;
 using QPhising.Infrastructure.Exports;
 using QPhising.Infrastructure.Persistence;
 using QPhising.Infrastructure.Persistence.Repositories;
 using QPhising.Infrastructure.Security;
+using System.Net.Http.Headers;
 using StackExchange.Redis;
 
 namespace QPhising.Infrastructure.DependencyInjection;
@@ -29,6 +31,14 @@ public static class ServiceCollectionExtensions
             .Bind(configuration.GetSection(RedisOptions.SectionName))
             .ValidateDataAnnotations()
             .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString), "Redis:ConnectionString is required.")
+            .ValidateOnStart();
+
+
+        services
+            .AddOptions<KeycloakValidationOptions>()
+            .Bind(configuration.GetSection(KeycloakValidationOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => Uri.IsWellFormedUriString(options.Authority, UriKind.Absolute), "Keycloak:Authority must be a valid absolute URL.")
             .ValidateOnStart();
 
         services
@@ -85,6 +95,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITaskExecutionLogRepository, TaskExecutionLogRepository>();
         services.AddScoped<IExportJobRepository, ExportJobRepository>();
         services.AddScoped<IAnalyticsReadRepository, AnalyticsReadRepository>();
+        services.AddScoped<ISetupStateRepository, SetupStateRepository>();
+        services.AddScoped<IDatabaseSetupValidator, DatabaseSetupValidator>();
+        services.AddHttpClient<ISsoSetupValidator, SsoSetupValidator>(client =>
+        {
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
         services.AddScoped<IAnalyticsDashboardCache, RedisAnalyticsDashboardCache>();
         services.AddScoped<IExcelExportService, ClosedXmlExcelExportService>();
         services.AddScoped<IPdfExportService, QuestPdfExportService>();
