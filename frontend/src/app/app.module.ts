@@ -6,11 +6,15 @@ import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ApiRuntimeService } from './core/api/api-runtime.service';
+import { AuthSessionService } from './core/auth/auth-session.service';
 import { UnauthorizedPageComponent } from './core/auth/unauthorized-page.component';
 import { LayoutShellComponent } from './core/layout/layout-shell.component';
 
-function initializeApiRuntime(apiRuntimeService: ApiRuntimeService): () => void {
-  return () => apiRuntimeService.configure();
+function initializeApplication(apiRuntimeService: ApiRuntimeService, authSessionService: AuthSessionService): () => void {
+  return () => {
+    apiRuntimeService.configure();
+    authSessionService.bootstrapSessionFromTokenClaims();
+  };
 }
 
 @NgModule({
@@ -19,8 +23,8 @@ function initializeApiRuntime(apiRuntimeService: ApiRuntimeService): () => void 
   providers: [
     {
       provide: APP_INITIALIZER,
-      useFactory: initializeApiRuntime,
-      deps: [ApiRuntimeService],
+      useFactory: initializeApplication,
+      deps: [ApiRuntimeService, AuthSessionService],
       multi: true
     }
   ],

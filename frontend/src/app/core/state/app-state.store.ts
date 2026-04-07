@@ -2,6 +2,8 @@ import { Injectable, Signal, computed, signal } from '@angular/core';
 
 export type AppRole = 'Admin' | 'Operator' | 'Viewer';
 export type ThemeMode = 'light' | 'dark';
+export const APP_ROLES: readonly AppRole[] = ['Admin', 'Operator', 'Viewer'];
+
 export type FeatureKey =
   | 'dashboard'
   | 'campaigns'
@@ -15,9 +17,36 @@ export interface SessionState {
   userId: string;
   displayName: string;
   email: string;
-  role: AppRole;
+  role: AppRole | null;
   authenticated: boolean;
 }
+
+export interface TokenClaims {
+  sub?: string;
+  preferred_username?: string;
+  name?: string;
+  email?: string;
+  realm_access?: {
+    roles?: string[];
+  };
+}
+
+const APP_ROLE_CLAIM_MAP: Readonly<Record<string, AppRole>> = {
+  admin: 'Admin',
+  operator: 'Operator',
+  viewer: 'Viewer',
+  qphising_admin: 'Admin',
+  qphising_operator: 'Operator',
+  qphising_viewer: 'Viewer'
+};
+
+const ANONYMOUS_SESSION: SessionState = {
+  userId: '',
+  displayName: 'Anonymous',
+  email: '',
+  role: null,
+  authenticated: false
+};
 
 export interface DashboardKpi {
   title: string;
@@ -53,13 +82,7 @@ export interface FeatureViewState {
 export class AppStateStore {
   private readonly storageKey = 'qphising-theme-mode';
 
-  private readonly sessionState = signal<SessionState>({
-    userId: 'session-001',
-    displayName: 'SOC Operator',
-    email: 'operator@corp.local',
-    role: 'Operator',
-    authenticated: true
-  });
+  private readonly sessionState = signal<SessionState>(ANONYMOUS_SESSION);
 
   private readonly themeModeState = signal<ThemeMode>(this.resolveInitialTheme());
 
@@ -101,12 +124,35 @@ export class AppStateStore {
     this.applyTheme(this.themeModeState());
   }
 
+  hydrateSessionFromTokenClaims(claims: TokenClaims | null | undefined): void {
+    if (!claims) {
+      this.resetSession();
+      return;
+    }
+
+    const resolvedRole = this.resolveRoleFromClaims(claims.realm_access?.roles);
+
+    this.sessionState.set({
+      userId: claims.sub?.trim() ?? '',
+      displayName: this.resolveDisplayName(claims),
+      email: claims.email?.trim() ?? '',
+      role: resolvedRole,
+      authenticated: true
+    });
+  }
+
+  resetSession(): void {
+    this.sessionState.set(ANONYMOUS_SESSION);
+  }
+
   canAccessAnyRole(roles: readonly AppRole[]): boolean {
-    if (!this.isAuthenticated()) {
+    const currentRole = this.currentRole();
+
+    if (!this.isAuthenticated() || !currentRole) {
       return false;
     }
 
-    return roles.includes(this.currentRole());
+    return roles.includes(currentRole);
   }
 
   toggleTheme(): void {
@@ -159,6 +205,25 @@ export class AppStateStore {
         error
       }
     }));
+  }
+
+  private resolveRoleFromClaims(realmRoles: string[] | undefined): AppRole | null {
+    if (!Array.isArray(realmRoles)) {
+      return null;
+    }
+
+    for (const role of realmRoles) {
+      const normalizedRole = APP_ROLE_CLAIM_MAP[role.trim().toLowerCase()];
+      if (normalizedRole) {
+        return normalizedRole;
+      }
+    }
+
+    return null;
+  }
+
+  private resolveDisplayName(claims: TokenClaims): string {
+    return claims.name?.trim() || claims.preferred_username?.trim() || claims.email?.trim() || 'Authenticated User';
   }
 
   private resolveInitialTheme(): ThemeMode {

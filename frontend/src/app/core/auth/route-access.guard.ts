@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, CanMatchFn, Route, Router, UrlSegment, UrlTree } from '@angular/router';
 
-import { AppRole, AppStateStore } from '../state/app-state.store';
+import { APP_ROLES, AppRole, AppStateStore } from '../state/app-state.store';
 
 function resolveRoleRequirements(route: Pick<Route, 'data'>): AppRole[] {
   const configuredRoles = route.data?.['roles'];
@@ -10,7 +10,7 @@ function resolveRoleRequirements(route: Pick<Route, 'data'>): AppRole[] {
     return [];
   }
 
-  return configuredRoles.filter((role): role is AppRole => role === 'Admin' || role === 'Operator' || role === 'Viewer');
+  return configuredRoles.filter((role): role is AppRole => APP_ROLES.includes(role as AppRole));
 }
 
 function evaluateRouteAccess(route: Pick<Route, 'data'>): true | UrlTree {
