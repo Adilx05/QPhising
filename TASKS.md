@@ -2014,3 +2014,16 @@
   - **Description:** Verify production-like routing, headers, auth propagation, error handling, and fallback behavior exclusively through gateway entrypoint.
   - **Expected output:** Production gateway verification checklist with pass/fail criteria for release readiness.
   - **Related layer:** Gateway / Frontend / Backend / Auth
+
+- Backend setup flow update (2026-04-07):
+  - Added CQRS setup feature handlers under `Application/Features/Setup` for status query, DB validation command, SSO validation command, and finalize command.
+  - Added versioned setup API endpoints:
+    - `GET /api/v1/setup/status`
+    - `POST /api/v1/setup/validate-db`
+    - `POST /api/v1/setup/validate-sso`
+    - `POST /api/v1/setup/finalize`
+  - Kept API controller thin by delegating all operational logic to MediatR handlers.
+  - Added persistent setup state entity/repository and SQL migration script for durable setup completion tracking.
+  - Reproducible command evidence:
+    - `rg -n "Features/Setup|SetupController|validate-db|validate-sso|finalize|status" backend/Application backend/API`
+    - `rg -n "SetupState|ISetupStateRepository|setup_state" backend/Domain backend/Infrastructure`
