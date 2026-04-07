@@ -1,31 +1,37 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, CanMatchFn, Route, Router, UrlSegment, UrlTree } from '@angular/router';
+import { CanActivateFn, CanMatchFn, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
 
-import { APP_ROLES, AppRole, AppStateStore } from '../state/app-state.store';
+import { APP_ROLES, AppRole } from '../state/app-state.store';
+import { AuthService } from './auth.service';
 
 function resolveRoleRequirements(route: Pick<Route, 'data'>): AppRole[] {
   const configuredRoles = route.data?.['roles'];
-
-  if (!Array.isArray(configuredRoles)) {
-    return [];
-  }
-
-  return configuredRoles.filter((role): role is AppRole => APP_ROLES.includes(role as AppRole));
+  return Array.isArray(configuredRoles) ? configuredRoles.filter((role): role is AppRole => APP_ROLES.includes(role as AppRole)) : [];
 }
 
-function evaluateRouteAccess(route: Pick<Route, 'data'>): true | UrlTree {
-  const appStateStore = inject(AppStateStore);
+function resolveCurrentPathFromSegments(segments: UrlSegment[]): string {
+  const path = segments.map((segment) => segment.path).filter((segment) => segment.length > 0).join('/');
+  return path.length > 0 ? `/${path}` : '/';
+}
+
+function evaluateRouteAccess(route: Pick<Route, 'data'>, returnUrl: string): true | false | UrlTree {
+  const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (!appStateStore.isAuthenticated()) {
-    return router.createUrlTree(['/unauthorized'], {
-      queryParams: { reason: 'auth' }
-    });
+  if (!authService.isAuthenticated()) {
+    authService.login(returnUrl);
+    return false;
   }
 
   const requiredRoles = resolveRoleRequirements(route);
+  if (requiredRoles.length === 0) {
+    return true;
+  }
 
-  if (requiredRoles.length === 0 || appStateStore.canAccessAnyRole(requiredRoles)) {
+  const userRoles = authService.getUserRoles();
+  const hasRequiredRole = requiredRoles.some((requiredRole) => userRoles.includes(requiredRole));
+
+  if (hasRequiredRole) {
     return true;
   }
 
@@ -34,6 +40,8 @@ function evaluateRouteAccess(route: Pick<Route, 'data'>): true | UrlTree {
   });
 }
 
-export const routeAccessGuard: CanActivateFn = (route) => evaluateRouteAccess(route);
+export const routeAccessGuard: CanActivateFn = (route, state: RouterStateSnapshot) =>
+  evaluateRouteAccess(route, state.url);
 
-export const routeMatchAccessGuard: CanMatchFn = (route: Route, _segments: UrlSegment[]) => evaluateRouteAccess(route);
+export const routeMatchAccessGuard: CanMatchFn = (route: Route, segments: UrlSegment[]) =>
+  evaluateRouteAccess(route, resolveCurrentPathFromSegments(segments));

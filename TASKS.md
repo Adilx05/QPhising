@@ -251,6 +251,17 @@
     - `rg -n "TrySetRequestCorrelationHeader|TrySetResponseCorrelationHeader|headers are read-only" gateway/Correlation/CorrelationIdMiddleware.cs`
     - `dotnet test gateway/Gateway.IntegrationTests/Gateway.IntegrationTests.csproj`
 
+
+- Frontend auth flow maintenance update (2026-04-07):
+  - Added centralized `AuthService` for auth lifecycle operations (`initialize`, `login`, `logout`, `isAuthenticated`, `getUserRoles`) under `frontend/src/app/core/auth`.
+  - Updated route guards to trigger Keycloak authorize redirect on unauthenticated access (`401` flow) and preserve requested return URL for post-login navigation.
+  - Kept `/unauthorized` page for role-based denial (`403`) only; unauthenticated traffic no longer routes there.
+  - Extended `APP_INITIALIZER` bootstrap to perform auth initialization before route rendering.
+  - Reproducible command evidence:
+    - `rg -n "class AuthService|initialize\(|login\(|logout\(|isAuthenticated\(|getUserRoles\(" frontend/src/app/core/auth/auth.service.ts`
+    - `rg -n "authService\.login|reason: 'role'|routeAccessGuard|routeMatchAccessGuard" frontend/src/app/core/auth/route-access.guard.ts`
+    - `rg -n "APP_INITIALIZER|initializeApplication|authService\.initialize" frontend/src/app/app.module.ts`
+
 ## 5. [ ] Campaign management module
 - StartedAt:
 - FinishedAt:
