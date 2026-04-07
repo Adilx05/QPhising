@@ -60,7 +60,7 @@ public sealed class TemplateEntityTypeConfiguration : IEntityTypeConfiguration<T
                 .HasMaxLength(64)
                 .IsRequired();
 
-            variablesBuilder.HasIndex("template_id", "name")
+            variablesBuilder.HasIndex("template_id", nameof(TemplateVariable.Name))
                 .IsUnique()
                 .HasDatabaseName("ux_template_variables_template_name");
         });
