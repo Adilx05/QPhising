@@ -9,5 +9,6 @@ RUN npm run build
 
 FROM nginx:1.27.5-alpine3.21 AS runtime
 COPY --from=build /app/dist/qphising-frontend /usr/share/nginx/html
+COPY default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

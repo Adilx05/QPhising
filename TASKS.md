@@ -2014,3 +2014,12 @@
   - **Description:** Verify production-like routing, headers, auth propagation, error handling, and fallback behavior exclusively through gateway entrypoint.
   - **Expected output:** Production gateway verification checklist with pass/fail criteria for release readiness.
   - **Related layer:** Gateway / Frontend / Backend / Auth
+
+- Frontend container routing maintenance update (2026-04-07):
+  - Added custom Nginx vhost config at `frontend/default.conf` with SPA fallback routing (`try_files $uri $uri/ /index.html;`) to support deep-link refreshes.
+  - Added `/api` reverse proxy route in frontend Nginx to forward API traffic to `http://gateway:8080` within Docker network.
+  - Updated `frontend/Dockerfile` to ship custom Nginx config to `/etc/nginx/conf.d/default.conf` in runtime image.
+  - Reproducible command evidence:
+    - `docker compose up -d --build frontend`
+    - `curl -I http://localhost:4200/dashboard`
+    - `curl -I http://localhost:4200/analytics/detail`
