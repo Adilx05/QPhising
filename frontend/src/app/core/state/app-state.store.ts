@@ -63,70 +63,11 @@ export class AppStateStore {
 
   private readonly themeModeState = signal<ThemeMode>(this.resolveInitialTheme());
 
-  private readonly dashboardKpisState = signal<DashboardKpi[]>([
-    { title: 'Total Campaigns', value: '24' },
-    { title: 'Clicks (24h)', value: '696' },
-    { title: 'Conversion Rate', value: '18.3%' },
-    { title: 'Tasks Queued', value: '11' }
-  ]);
+  private readonly dashboardKpisState = signal<DashboardKpi[]>([]);
 
-  private readonly dashboardTrendState = signal<DashboardTrendPoint[]>([
-    { day: 'Mon', clicks: 120 },
-    { day: 'Tue', clicks: 145 },
-    { day: 'Wed', clicks: 98 },
-    { day: 'Thu', clicks: 173 },
-    { day: 'Fri', clicks: 160 },
-    { day: 'Sat', clicks: 134 },
-    { day: 'Sun', clicks: 155 }
-  ]);
+  private readonly dashboardTrendState = signal<DashboardTrendPoint[]>([]);
 
-  private readonly dashboardCampaignsState = signal<DashboardCampaignRow[]>([
-    {
-      name: 'Q2 Finance Wire Transfer',
-      owner: 'Alice Warren',
-      status: 'Active',
-      templateType: 'CredentialHarvest',
-      startDate: '2026-03-18',
-      endDate: '2026-04-02',
-      clickRate: 22.4
-    },
-    {
-      name: 'Vendor Invoice Follow-up',
-      owner: 'Omar Delgado',
-      status: 'Scheduled',
-      templateType: 'Attachment',
-      startDate: '2026-03-29',
-      endDate: '2026-04-07',
-      clickRate: 0
-    },
-    {
-      name: 'Benefits Enrollment Alert',
-      owner: 'Rina Cho',
-      status: 'Draft',
-      templateType: 'LandingPage',
-      startDate: '2026-04-04',
-      endDate: '2026-04-18',
-      clickRate: 0
-    },
-    {
-      name: 'SSO Password Rotation',
-      owner: 'Mason Reid',
-      status: 'Ended',
-      templateType: 'CredentialHarvest',
-      startDate: '2026-02-10',
-      endDate: '2026-02-25',
-      clickRate: 15.1
-    },
-    {
-      name: 'Executive Travel Security',
-      owner: 'Nia Patel',
-      status: 'Active',
-      templateType: 'LandingPage',
-      startDate: '2026-03-20',
-      endDate: '2026-04-05',
-      clickRate: 19.8
-    }
-  ]);
+  private readonly dashboardCampaignsState = signal<DashboardCampaignRow[]>([]);
 
   private readonly featureState = signal<Record<FeatureKey, FeatureViewState>>({
     dashboard: { loading: false, error: null, activeFilter: 'Last 7 days' },
@@ -177,6 +118,17 @@ export class AppStateStore {
     }
 
     this.applyTheme(nextTheme);
+  }
+
+
+  setDashboardData(payload: {
+    kpis: DashboardKpi[];
+    trend: DashboardTrendPoint[];
+    campaigns: DashboardCampaignRow[];
+  }): void {
+    this.dashboardKpisState.set(payload.kpis);
+    this.dashboardTrendState.set(payload.trend);
+    this.dashboardCampaignsState.set(payload.campaigns);
   }
 
   updateFeatureFilter(feature: FeatureKey, activeFilter: string): void {

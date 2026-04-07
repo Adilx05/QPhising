@@ -1,5 +1,6 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
+import { AppApiFacade } from '../../../core/api/app-api.facade';
 import { AppStateStore } from '../../../core/state/app-state.store';
 
 @Component({
@@ -7,20 +8,33 @@ import { AppStateStore } from '../../../core/state/app-state.store';
   selector: 'app-analytics-page',
   templateUrl: './analytics-page.component.html'
 })
-export class AnalyticsPageComponent {
+export class AnalyticsPageComponent implements OnInit {
   private readonly appStateStore = inject(AppStateStore);
+  private readonly appApiFacade = inject(AppApiFacade);
 
   protected readonly viewState = computed(() => this.appStateStore.featureViewState().analytics);
-  protected readonly kpis = [
-    { title: 'Open Rate', value: '72.6%' },
-    { title: 'Click Rate', value: '18.3%' },
-    { title: 'Credential Submit', value: '6.1%' }
-  ];
+  protected readonly kpis = signal<Array<{ title: string; value: string }>>([]);
+  protected readonly trendRows = signal<Array<Record<string, string>>>([]);
 
-  protected readonly trendRows = [
-    { period: 'Week 1', clickRate: '14%' },
-    { period: 'Week 2', clickRate: '16%' },
-    { period: 'Week 3', clickRate: '19%' },
-    { period: 'Week 4', clickRate: '18%' }
-  ];
+  ngOnInit(): void {
+    void this.loadAnalytics();
+  }
+
+  private async loadAnalytics(): Promise<void> {
+    this.appStateStore.setFeatureLoading('analytics', true);
+    this.appStateStore.setFeatureError('analytics', null);
+
+    try {
+      const data = await this.appApiFacade.getAnalyticsSummary(30);
+      this.kpis.set(data.kpis);
+      this.trendRows.set(data.trendRows);
+    } catch (error) {
+      console.error('Failed to load analytics summary', error);
+      this.appStateStore.setFeatureError('analytics', 'Analytics verisi backendden alınamadı.');
+      this.kpis.set([]);
+      this.trendRows.set([]);
+    } finally {
+      this.appStateStore.setFeatureLoading('analytics', false);
+    }
+  }
 }

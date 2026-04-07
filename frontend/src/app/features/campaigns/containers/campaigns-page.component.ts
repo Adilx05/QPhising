@@ -1,5 +1,6 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
+import { AppApiFacade } from '../../../core/api/app-api.facade';
 import { AppStateStore } from '../../../core/state/app-state.store';
 
 @Component({
@@ -7,13 +8,29 @@ import { AppStateStore } from '../../../core/state/app-state.store';
   selector: 'app-campaigns-page',
   templateUrl: './campaigns-page.component.html'
 })
-export class CampaignsPageComponent {
+export class CampaignsPageComponent implements OnInit {
   private readonly appStateStore = inject(AppStateStore);
+  private readonly appApiFacade = inject(AppApiFacade);
 
   protected readonly viewState = computed(() => this.appStateStore.featureViewState().campaigns);
-  protected readonly campaigns = [
-    { name: 'Q1 Awareness', template: 'CredentialHarvest', status: 'Active', owner: 'Ops Team' },
-    { name: 'Finance Drill', template: 'InvoiceFraud', status: 'Scheduled', owner: 'Risk Team' },
-    { name: 'HR Notice', template: 'PasswordReset', status: 'Draft', owner: 'People Ops' }
-  ];
+  protected readonly campaigns = signal<Array<Record<string, string>>>([]);
+
+  ngOnInit(): void {
+    void this.loadCampaigns();
+  }
+
+  private async loadCampaigns(): Promise<void> {
+    this.appStateStore.setFeatureLoading('campaigns', true);
+    this.appStateStore.setFeatureError('campaigns', null);
+
+    try {
+      this.campaigns.set(await this.appApiFacade.listCampaignRows());
+    } catch (error) {
+      console.error('Failed to load campaigns', error);
+      this.appStateStore.setFeatureError('campaigns', 'Campaign listesi backendden alınamadı.');
+      this.campaigns.set([]);
+    } finally {
+      this.appStateStore.setFeatureLoading('campaigns', false);
+    }
+  }
 }
