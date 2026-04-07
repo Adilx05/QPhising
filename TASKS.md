@@ -1686,6 +1686,16 @@
     - `rg -n "AppApiFacade|ApiRuntimeService|APP_INITIALIZER|setDashboardData" frontend/src/app`
     - `rg -n "Frontend–Backend Integration and Production Data Flow|Execution update \(2026-04-07\)" TASKS.md`
 
+- Execution update (2026-04-07):
+  - Removed hardcoded authenticated session seed (`SOC Operator`) from frontend app state and introduced anonymous-by-default session initialization (`authenticated: false`, `role: null`).
+  - Added token-claims-driven session hydration path (`hydrateSessionFromTokenClaims`) and app bootstrap wiring (`AuthSessionService` via `APP_INITIALIZER`) to initialize state from Keycloak-style JWT payloads.
+  - Implemented role normalization from `realm_access.roles` into app roles (`Admin`, `Operator`, `Viewer`) and aligned route guard role filtering to the shared role set.
+  - Reproducible command evidence:
+    - `rg -n "ANONYMOUS_SESSION|hydrateSessionFromTokenClaims|APP_ROLE_CLAIM_MAP" frontend/src/app/core/state/app-state.store.ts`
+    - `rg -n "bootstrapSessionFromTokenClaims|decodeBase64Url" frontend/src/app/core/auth/auth-session.service.ts`
+    - `rg -n "initializeApplication|AuthSessionService" frontend/src/app/app.module.ts`
+    - `rg -n "APP_ROLES|isAuthenticated" frontend/src/app/core/auth/route-access.guard.ts`
+
 
 ### 18.2 Swagger/OpenAPI client generation
 - [x] **Evaluate and select OpenAPI generation strategy**
