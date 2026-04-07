@@ -1729,6 +1729,16 @@
     - `bash -n frontend/scripts/check-openapi-client-freshness.sh`
     - `rg -n "check:api-client-freshness|generate:api-client" frontend/package.json`
     - `sed -n "1,260p" docs/openapi-regeneration-and-drift-control-workflow.md`
+- Maintenance update (2026-04-07):
+  - Added cross-platform Node.js orchestration scripts for OpenAPI generation and freshness checks:
+    - `frontend/scripts/generate-openapi-client.mjs`
+    - `frontend/scripts/check-openapi-client-freshness.mjs`
+  - Updated shell wrappers (`.sh`) and npm scripts to invoke Node entrypoints, removing the Bash-only execution dependency for Windows users while keeping existing Linux/macOS workflows intact.
+  - Added PowerShell helper `frontend/scripts/generate-openapi-client.ps1` for direct Windows execution scenarios.
+  - Reproducible command evidence:
+    - `node --check frontend/scripts/generate-openapi-client.mjs`
+    - `node --check frontend/scripts/check-openapi-client-freshness.mjs`
+    - `rg -n "generate:api-client|check:api-client-freshness" frontend/package.json`
 
 - [x] **Plan removal of handwritten duplicate API logic**
   - **Description:** Identify all manual HTTP services duplicated by generated clients and define staged deprecation/removal sequence to avoid breaking active modules.
