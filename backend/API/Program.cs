@@ -208,12 +208,11 @@ app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 }
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 app.MapHub<AnalyticsHub>("/hubs/analytics").RequireAuthorization(AuthorizationPolicies.Viewer);
 app.MapHealthChecks("/health", new HealthCheckOptions
