@@ -985,6 +985,23 @@
     - `npm run build` (from `frontend/`)
     - `rg -n "SetupWizardPageComponent|SetupWizardShellComponent|setup/wizard|SetupStateService" frontend/src/app`
 
+- Setup hardening update (2026-04-12):
+  - Locked setup mutation endpoints (`validate-db`, `apply-migrations`, `validate-sso`, `finalize`) after setup completion; `status` remains readable for diagnostics.
+  - Added structured setup audit logs on setup-state mutations including actor identity, change timestamp, and changed setting key.
+  - Extended API health contract to include setup lifecycle state (`pending` / `complete`) for orchestration and operational visibility.
+  - Added integration coverage for setup-endpoint locking and health setup-state projection.
+  - E2E kontrol listesi:
+    1. fresh install
+    2. DB validate
+    3. migrate
+    4. SSO validate
+    5. finalize
+    6. login
+    7. dashboard
+  - Reproducible command evidence:
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter "SetupCompletionPreconditionTests|AuthorizationFlowTests"`
+    - `rg -n "Setup audit|Setup Already Completed|setupStatus|ISetupAuditContext" backend/API backend/Application backend/API.IntegrationTests`
+
 - Subtask completion update (2026-03-27):
   - Established a feature-based Angular module map with dedicated modules for `dashboard`, `campaigns`, `templates`, `tracking`, `tasks`, `analytics`, and `exports`.
   - Implemented smart/dumb separation in each feature via `containers/*-page.component` (smart orchestration) and `components/*` presentational table/summary components consuming `@Input` models.

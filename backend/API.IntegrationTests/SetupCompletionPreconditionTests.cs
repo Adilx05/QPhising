@@ -1,7 +1,9 @@
 using System.Net;
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using QPhising.Application.Common;
 using QPhising.Application.Features.Setup;
 using QPhising.Domain.Abstractions;
 using QPhising.Domain.Configuration;
@@ -37,6 +39,30 @@ public sealed class SetupCompletionPreconditionTests
         HttpResponseMessage response = await client.GetAsync("/api/setup/status");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Setup_Mutation_Endpoint_Should_Be_Locked_When_Setup_Completed()
+    {
+        await using var factory = new CompletedSetupApiWebApplicationFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "Test");
+        client.DefaultRequestHeaders.TryAddWithoutValidation(TestAuthHandler.RolesHeader, AuthorizationPolicies.Admin);
+        client.DefaultRequestHeaders.TryAddWithoutValidation(TestAuthHandler.UserIdHeader, "admin-user");
+
+        HttpResponseMessage response = await client.PostAsJsonAsync("/api/setup/validate-sso", new
+        {
+            authority = "https://id.example.com",
+            realm = "qphising",
+            clientId = "api",
+            clientSecret = "secret",
+            audience = "api"
+        });
+
+        Assert.Equal(HttpStatusCode.Locked, response.StatusCode);
     }
 
     private sealed class IncompleteSetupApiWebApplicationFactory : ApiWebApplicationFactory
@@ -83,6 +109,26 @@ public sealed class SetupCompletionPreconditionTests
         public void Seed(SystemSetting systemSetting)
         {
             _settings[systemSetting.Key] = systemSetting;
+        }
+    }
+
+    private sealed class CompletedSetupApiWebApplicationFactory : ApiWebApplicationFactory
+    {
+        protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
+        {
+            base.ConfigureWebHost(builder);
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<ISystemSettingRepository>();
+                services.AddSingleton<ISystemSettingRepository>(_ =>
+                {
+                    var repository = new InMemorySystemSettingRepository();
+                    var now = DateTimeOffset.UtcNow;
+                    repository.Seed(SystemSetting.Create(SetupSettingKeys.IsCompleted, bool.TrueString, now));
+                    repository.Seed(SystemSetting.Create(SetupSettingKeys.CompletedAtUtc, now.ToString("O"), now));
+                    return repository;
+                });
+            });
         }
     }
 }

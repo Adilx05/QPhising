@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Xunit;
 
 namespace QPhising.API.IntegrationTests;
@@ -79,5 +80,17 @@ public sealed class AuthorizationFlowTests : IClassFixture<ApiWebApplicationFact
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.True(response.Headers.Contains("api-supported-versions"));
+    }
+
+    [Fact]
+    public async Task Health_Endpoint_Should_Include_Setup_Status()
+    {
+        using var client = _factory.CreateClient();
+
+        var response = await client.GetAsync("/api/health");
+        response.EnsureSuccessStatusCode();
+
+        using JsonDocument payload = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        Assert.Equal("complete", payload.RootElement.GetProperty("setupStatus").GetString());
     }
 }
