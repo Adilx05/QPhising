@@ -22,7 +22,7 @@ public sealed class DatabaseMigrationSetupService : IDatabaseMigrationSetupServi
 
             IReadOnlyList<string> pendingAfter = (await dbContext.Database.GetPendingMigrationsAsync(cancellationToken)).ToList();
             IReadOnlyList<string> appliedMigrations = (await dbContext.Database.GetAppliedMigrationsAsync(cancellationToken)).ToList();
-            IReadOnlyList<string> allMigrations = (await dbContext.Database.GetMigrationsAsync(cancellationToken)).ToList();
+            IReadOnlyList<string> allMigrations = dbContext.Database.GetMigrations().ToList();
 
             int appliedCount = Math.Max(0, pendingBefore.Count - pendingAfter.Count);
             string message = appliedCount == 0

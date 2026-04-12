@@ -22,7 +22,7 @@ public sealed class DatabaseSetupValidator : IDatabaseSetupValidator
             await using QPhisingDbContext dbContext = new(dbContextOptions);
             IReadOnlyList<string> appliedMigrations = (await dbContext.Database.GetAppliedMigrationsAsync(cancellationToken)).ToList();
             IReadOnlyList<string> pendingMigrations = (await dbContext.Database.GetPendingMigrationsAsync(cancellationToken)).ToList();
-            IReadOnlyList<string> allMigrations = (await dbContext.Database.GetMigrationsAsync(cancellationToken)).ToList();
+            IReadOnlyList<string> allMigrations = dbContext.Database.GetMigrations().ToList();
 
             string? lastAppliedMigration = appliedMigrations.LastOrDefault();
             string? latestKnownMigration = allMigrations.LastOrDefault();
