@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
+import { OpenAPI } from '../../../core/api/generated';
 import { SetupStateService } from '../../../core/setup/setup-state.service';
 
 interface SetupWizardStep {
@@ -17,6 +19,7 @@ interface SetupWizardStep {
 export class SetupWizardPageComponent implements OnInit, OnDestroy {
   private readonly setupStateService = inject(SetupStateService);
   private readonly router = inject(Router);
+  private readonly formBuilder = inject(FormBuilder);
   private pollHandle: ReturnType<typeof setInterval> | null = null;
 
   protected readonly activeStepIndex = signal(0);
@@ -41,6 +44,36 @@ export class SetupWizardPageComponent implements OnInit, OnDestroy {
 
   protected readonly canGoBack = computed(() => this.activeStepIndex() > 0);
   protected readonly canGoNext = computed(() => this.activeStepIndex() < this.steps.length - 1);
+  protected readonly dbForm = this.formBuilder.group({
+    useConnectionString: [false],
+    host: [''],
+    port: [5432, [Validators.min(1), Validators.max(65535)]],
+    database: [''],
+    username: [''],
+    password: [''],
+    connectionString: ['']
+  });
+  protected readonly dbOperation = signal<{
+    kind: 'validate' | 'migrate' | null;
+    success: boolean;
+    message: string;
+    category: string | null;
+    pendingMigrationCount: number;
+    lastAppliedMigration: string | null;
+    latestKnownMigration: string | null;
+    appliedMigrationCount: number;
+  }>({
+    kind: null,
+    success: false,
+    message: '',
+    category: null,
+    pendingMigrationCount: 0,
+    lastAppliedMigration: null,
+    latestKnownMigration: null,
+    appliedMigrationCount: 0
+  });
+  protected readonly isValidatingDb = signal(false);
+  protected readonly isApplyingMigrations = signal(false);
 
   async ngOnInit(): Promise<void> {
     await this.refreshStatus();
@@ -78,9 +111,84 @@ export class SetupWizardPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  protected async validateDatabaseConnection(): Promise<void> {
+    this.isValidatingDb.set(true);
+    await this.executeDbAction('/api/setup/validate-db', 'validate');
+    this.isValidatingDb.set(false);
+  }
+
+  protected async applyMigrations(): Promise<void> {
+    this.isApplyingMigrations.set(true);
+    await this.executeDbAction('/api/setup/apply-migrations', 'migrate');
+    this.isApplyingMigrations.set(false);
+  }
+
   private startStatusPolling(): void {
     this.pollHandle = setInterval(() => {
       void this.refreshStatus();
     }, 10000);
+  }
+
+  private async executeDbAction(path: string, kind: 'validate' | 'migrate'): Promise<void> {
+    try {
+      const response = await fetch(`${OpenAPI.BASE}${path}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.setupStateService.resolveAccessToken()}`
+        },
+        body: JSON.stringify(this.toDbPayload())
+      });
+
+      const payload = (await response.json()) as {
+        isValid?: boolean;
+        isSuccess?: boolean;
+        message: string;
+        errorCategory?: string | null;
+        pendingMigrationCount?: number;
+        lastAppliedMigration?: string | null;
+        latestKnownMigration?: string | null;
+        appliedMigrationCount?: number;
+      };
+
+      this.dbOperation.set({
+        kind,
+        success: payload.isValid ?? payload.isSuccess ?? false,
+        message: payload.message,
+        category: payload.errorCategory ?? null,
+        pendingMigrationCount: payload.pendingMigrationCount ?? 0,
+        lastAppliedMigration: payload.lastAppliedMigration ?? null,
+        latestKnownMigration: payload.latestKnownMigration ?? null,
+        appliedMigrationCount: payload.appliedMigrationCount ?? 0
+      });
+    } catch (error) {
+      this.dbOperation.set({
+        kind,
+        success: false,
+        message: error instanceof Error ? error.message : 'Database operation failed.',
+        category: 'network',
+        pendingMigrationCount: 0,
+        lastAppliedMigration: null,
+        latestKnownMigration: null,
+        appliedMigrationCount: 0
+      });
+    }
+  }
+
+  private toDbPayload(): Record<string, unknown> {
+    const formValue = this.dbForm.getRawValue();
+    if (formValue.useConnectionString) {
+      return {
+        connectionString: formValue.connectionString
+      };
+    }
+
+    return {
+      host: formValue.host,
+      port: formValue.port,
+      database: formValue.database,
+      username: formValue.username,
+      password: formValue.password
+    };
   }
 }

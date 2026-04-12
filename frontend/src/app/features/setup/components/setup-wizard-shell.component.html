@@ -22,6 +22,44 @@
         </p>
       </div>
 
+      <form [formGroup]="dbForm" class="space-y-4 rounded-lg border border-slate-200 p-4 dark:border-slate-700">
+        <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+          <input type="checkbox" formControlName="useConnectionString" />
+          Use full connection string
+        </label>
+
+        <div *ngIf="!dbForm.get('useConnectionString')?.value" class="grid gap-3 md:grid-cols-2">
+          <input pInputText type="text" placeholder="Host" formControlName="host" />
+          <input pInputText type="number" placeholder="Port" formControlName="port" />
+          <input pInputText type="text" placeholder="Database" formControlName="database" />
+          <input pInputText type="text" placeholder="Username" formControlName="username" />
+          <p-password formControlName="password" [feedback]="false" placeholder="Password" inputStyleClass="w-full"></p-password>
+        </div>
+
+        <textarea
+          *ngIf="dbForm.get('useConnectionString')?.value"
+          rows="3"
+          class="w-full rounded-md border border-slate-300 p-3 text-sm dark:border-slate-600 dark:bg-slate-900"
+          formControlName="connectionString"
+          placeholder="Host=localhost;Port=5432;Database=qphising;Username=postgres;Password=..."></textarea>
+
+        <div class="flex flex-wrap gap-2">
+          <button pButton type="button" label="Bağlantıyı Test Et" [loading]="isValidatingDb" (click)="testDbConnection.emit()"></button>
+          <button pButton type="button" severity="contrast" label="Migration Uygula" [loading]="isApplyingMigrations" (click)="applyMigrations.emit()"></button>
+        </div>
+      </form>
+
+      <div *ngIf="dbOperation.kind" class="rounded-lg border p-4 text-sm" [ngClass]="dbOperation.success ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30' : 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30'">
+        <p class="font-semibold">{{ dbOperation.message }}</p>
+        <p class="mt-2"><strong>Migration Durumu:</strong> {{ dbOperation.pendingMigrationCount === 0 ? 'Up to date' : (dbOperation.pendingMigrationCount + ' pending') }}</p>
+        <p><strong>Son Migration:</strong> {{ dbOperation.lastAppliedMigration ?? 'N/A' }}</p>
+        <p><strong>Latest Known Migration:</strong> {{ dbOperation.latestKnownMigration ?? 'N/A' }}</p>
+        <p *ngIf="dbOperation.kind === 'migrate'"><strong>Applied Migration Count:</strong> {{ dbOperation.appliedMigrationCount }}</p>
+        <div *ngIf="dbOperation.category" class="mt-3 rounded-md border border-amber-300 bg-white/80 p-3 text-xs dark:border-amber-700 dark:bg-slate-900/50">
+          <strong>Hata Sınıfı:</strong> {{ dbOperation.category }} · {{ getActionableErrorMessage(dbOperation.category) }}
+        </div>
+      </div>
+
       <div class="flex flex-wrap items-center justify-between gap-3">
         <button pButton type="button" label="Back" severity="secondary" [disabled]="!canGoBack" (click)="back.emit()"></button>
         <div class="flex items-center gap-2">

@@ -2,8 +2,14 @@
   [steps]="steps"
   [activeStepIndex]="activeStepIndex()"
   [state]="setupState()"
+  [dbForm]="dbForm"
+  [dbOperation]="dbOperation()"
+  [isValidatingDb]="isValidatingDb()"
+  [isApplyingMigrations]="isApplyingMigrations()"
   [canGoBack]="canGoBack()"
   [canGoNext]="canGoNext()"
   (back)="goBack()"
   (next)="goNext()"
-  (refresh)="refreshStatus()"></app-setup-wizard-shell>
+  (refresh)="refreshStatus()"
+  (testDbConnection)="validateDatabaseConnection()"
+  (applyMigrations)="applyMigrations()"></app-setup-wizard-shell>

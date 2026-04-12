@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 import { SetupStateSnapshot } from '../../../core/setup/setup-state.service';
 
@@ -19,10 +20,25 @@ export class SetupWizardShellComponent {
   @Input({ required: true }) canGoBack = false;
   @Input({ required: true }) canGoNext = false;
   @Input({ required: true }) state!: SetupStateSnapshot;
+  @Input({ required: true }) dbForm!: FormGroup;
+  @Input({ required: true }) dbOperation!: {
+    kind: 'validate' | 'migrate' | null;
+    success: boolean;
+    message: string;
+    category: string | null;
+    pendingMigrationCount: number;
+    lastAppliedMigration: string | null;
+    latestKnownMigration: string | null;
+    appliedMigrationCount: number;
+  };
+  @Input({ required: true }) isValidatingDb = false;
+  @Input({ required: true }) isApplyingMigrations = false;
 
   @Output() readonly back = new EventEmitter<void>();
   @Output() readonly next = new EventEmitter<void>();
   @Output() readonly refresh = new EventEmitter<void>();
+  @Output() readonly testDbConnection = new EventEmitter<void>();
+  @Output() readonly applyMigrations = new EventEmitter<void>();
 
 
   protected get currentStep(): SetupWizardStep {
@@ -38,5 +54,18 @@ export class SetupWizardShellComponent {
 
   protected toPrimeStepModel(): Array<{ label: string }> {
     return this.steps.map((step) => ({ label: step.title }));
+  }
+
+  protected getActionableErrorMessage(category: string | null): string {
+    switch (category) {
+      case 'auth':
+        return 'Authentication failed. Check DB username/password and credential permissions.';
+      case 'network':
+        return 'Network issue detected. Verify host/port, firewall rules, and DB service availability.';
+      case 'db_not_found':
+        return 'Database was not found. Create the database or fix the database name in the form.';
+      default:
+        return 'Review details and adjust configuration before retrying.';
+    }
   }
 }
