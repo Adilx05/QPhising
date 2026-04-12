@@ -9,12 +9,14 @@ internal static class DatabaseSetupErrorClassifier
     {
         if (TryFindPostgresException(exception, out PostgresException? postgresException))
         {
-            if (postgresException.SqlState is "28P01" or "28000")
+            string? sqlState = postgresException?.SqlState;
+
+            if (sqlState is "28P01" or "28000")
             {
                 return "auth";
             }
 
-            if (postgresException.SqlState == "3D000")
+            if (sqlState == "3D000")
             {
                 return "db_not_found";
             }

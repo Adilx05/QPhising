@@ -184,6 +184,16 @@
     - `rg -n "ValidatedDatabaseConfiguration|PersistedDatabaseConfiguration|PersistedDatabaseConfigurationSavedAtUtc" backend/Application/Features/Setup`
     - `rg -n "SetupSecretsMasker|MaskSecrets" backend/Infrastructure/Persistence`
 
+- Maintenance update (2026-04-12):
+  - Fixed Infrastructure compile blockers in setup/migration services and DI registration:
+    - Replaced `GetMigrationsAsync` usage with `GetMigrations` to match available EF Core relational API surface in this project.
+    - Hardened null-safety in `DatabaseSetupErrorClassifier` by dereferencing `SqlState` through a nullable local variable.
+    - Added explicit `Microsoft.Extensions.Http` package reference so `IServiceCollection.AddHttpClient(...)` resolves in the Infrastructure project.
+  - Reproducible command evidence:
+    - `rg -n "GetMigrations\\(" backend/Infrastructure/Persistence/DatabaseSetupValidator.cs backend/Infrastructure/Persistence/DatabaseMigrationSetupService.cs`
+    - `rg -n "sqlState" backend/Infrastructure/Persistence/DatabaseSetupErrorClassifier.cs`
+    - `rg -n "Microsoft.Extensions.Http" backend/Infrastructure/Infrastructure.csproj`
+
 
 ---
 
