@@ -8,7 +8,7 @@ fi
 
 DIRECTION="$1"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MIGRATIONS_DIR="$(cd "$SCRIPT_DIR/../Migrations" && pwd)"
+MIGRATIONS_DIR="$(cd "$SCRIPT_DIR/../../LegacyMigrations" && pwd)"
 ROLLBACK_DIR="$MIGRATIONS_DIR/rollback"
 
 : "${DATABASE_URL:?DATABASE_URL environment variable must be set}"

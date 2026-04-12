@@ -1,6 +1,8 @@
-# SQL Migrations
+# SQL Migrations (Legacy)
 
-This folder stores ordered SQL migrations for PostgreSQL.
+This folder stores legacy ordered SQL migrations for PostgreSQL.
+
+> ⚠️ Yeni kurulumlar için resmi yol EF Core migration zinciridir (`../EFMigrations`).
 
 ## Structure
 
@@ -16,12 +18,12 @@ Use the migration runner script:
 
 ```bash
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/qphising" \
-  ./backend/Infrastructure/Persistence/Scripts/migrate.sh up
+  ./backend/Infrastructure/Persistence/Scripts/legacy/migrate.sh up
 ```
 
 ```bash
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/qphising" \
-  ./backend/Infrastructure/Persistence/Scripts/migrate.sh down
+  ./backend/Infrastructure/Persistence/Scripts/legacy/migrate.sh down
 ```
 
 The script persists migration state in `schema_migrations` and executes migrations in lexical order.

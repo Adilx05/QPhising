@@ -194,3 +194,26 @@ AGENTS.md
 ## 🚀 Status
 
 Active development (AI-driven)
+
+
+## 🗄️ Database migration workflow
+
+### Official path (EF Core)
+
+Use EF Core migrations as the default installation/update flow:
+
+```bash
+export Database__ConnectionString="Host=localhost;Port=5432;Database=qphising;Username=postgres;Password=postgres"
+dotnet ef database update \
+  --project backend/Infrastructure/Infrastructure.csproj \
+  --startup-project backend/API/API.csproj
+```
+
+### Legacy path (SQL scripts)
+
+Legacy SQL migrations and runner are kept only for backward compatibility:
+
+- `backend/Infrastructure/Persistence/LegacyMigrations`
+- `backend/Infrastructure/Persistence/Scripts/legacy/migrate.sh`
+
+New schema changes should be added with EF Core migrations under `backend/Infrastructure/Persistence/EFMigrations`.

@@ -1175,6 +1175,17 @@
     - `rg -n "CREATE TABLE IF NOT EXISTS campaigns|fk_tracking_clicks_campaigns_campaign_id|ck_export_jobs_file_size_non_negative|ck_task_execution_logs_duration_non_negative" backend/Infrastructure/Persistence/Migrations/20260328013000_finalize_relational_schema.sql`
     - `rg -n "HasOne<Campaign>|HasForeignKey\\(click => click.CampaignId\\)" backend/Infrastructure/Persistence/Configurations/TrackingClickEntityTypeConfiguration.cs`
 
+- Maintenance update (2026-04-12):
+  - Standardized official database migration workflow on EF Core tooling by adding `Microsoft.EntityFrameworkCore.Design` to Infrastructure and introducing a design-time factory (`IDesignTimeDbContextFactory<QPhisingDbContext>`).
+  - Added EF baseline migration chain under `backend/Infrastructure/Persistence/EFMigrations` and wired baseline execution from embedded legacy baseline SQL snapshot.
+  - Moved previous SQL migration chain to `backend/Infrastructure/Persistence/LegacyMigrations` and moved script runner to `backend/Infrastructure/Persistence/Scripts/legacy/migrate.sh` as backward-compatible legacy path.
+  - Updated migration documentation to make `dotnet ef database update --project backend/Infrastructure/Infrastructure.csproj --startup-project backend/API/API.csproj` the official setup command.
+  - Reproducible command evidence:
+    - `rg -n "Microsoft.EntityFrameworkCore.Design|EmbeddedResource Include="Persistence/LegacyMigrations/00000000000000_baseline_full_schema.sql"" backend/Infrastructure/Infrastructure.csproj`
+    - `rg -n "IDesignTimeDbContextFactory|CreateDbContext|Database__ConnectionString" backend/Infrastructure/Persistence/QPhisingDesignTimeDbContextFactory.cs`
+    - `rg -n "dotnet ef database update|Legacy" README.md backend/Infrastructure/Persistence/EFMigrations/README.md backend/Infrastructure/Persistence/LegacyMigrations/README.md`
+    - `bash -n backend/Infrastructure/Persistence/Scripts/legacy/migrate.sh`
+
 ## 14. [-] Docker and runtime
 - StartedAt: 2026-03-27T16:55:00Z
 - FinishedAt: 2026-03-27T17:20:00Z
