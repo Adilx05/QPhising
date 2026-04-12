@@ -26,9 +26,17 @@ export interface TokenClaims {
   preferred_username?: string;
   name?: string;
   email?: string;
+  exp?: number;
+  nbf?: number;
   realm_access?: {
     roles?: string[];
   };
+  resource_access?: Record<
+    string,
+    {
+      roles?: string[];
+    }
+  >;
 }
 
 const APP_ROLE_CLAIM_MAP: Readonly<Record<string, AppRole>> = {
@@ -130,14 +138,15 @@ export class AppStateStore {
       return;
     }
 
-    const resolvedRole = this.resolveRoleFromClaims(claims.realm_access?.roles);
+    const userId = claims.sub?.trim() ?? '';
+    const resolvedRole = this.resolveRoleFromClaims(claims);
 
     this.sessionState.set({
-      userId: claims.sub?.trim() ?? '',
+      userId,
       displayName: this.resolveDisplayName(claims),
       email: claims.email?.trim() ?? '',
       role: resolvedRole,
-      authenticated: true
+      authenticated: userId.length > 0
     });
   }
 
@@ -207,12 +216,13 @@ export class AppStateStore {
     }));
   }
 
-  private resolveRoleFromClaims(realmRoles: string[] | undefined): AppRole | null {
-    if (!Array.isArray(realmRoles)) {
+  private resolveRoleFromClaims(claims: TokenClaims): AppRole | null {
+    const claimRoles = this.resolveClaimRoles(claims);
+    if (claimRoles.length === 0) {
       return null;
     }
 
-    for (const role of realmRoles) {
+    for (const role of claimRoles) {
       const normalizedRole = APP_ROLE_CLAIM_MAP[role.trim().toLowerCase()];
       if (normalizedRole) {
         return normalizedRole;
@@ -224,6 +234,32 @@ export class AppStateStore {
 
   private resolveDisplayName(claims: TokenClaims): string {
     return claims.name?.trim() || claims.preferred_username?.trim() || claims.email?.trim() || 'Authenticated User';
+  }
+
+  private resolveClaimRoles(claims: TokenClaims): string[] {
+    const aggregatedRoles = new Set<string>();
+    const appendRoles = (roles: string[] | undefined): void => {
+      if (!Array.isArray(roles)) {
+        return;
+      }
+
+      for (const role of roles) {
+        const normalized = role.trim();
+        if (normalized.length > 0) {
+          aggregatedRoles.add(normalized);
+        }
+      }
+    };
+
+    appendRoles(claims.realm_access?.roles);
+
+    if (claims.resource_access) {
+      for (const resource of Object.values(claims.resource_access)) {
+        appendRoles(resource?.roles);
+      }
+    }
+
+    return [...aggregatedRoles];
   }
 
   private resolveInitialTheme(): ThemeMode {

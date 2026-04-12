@@ -274,6 +274,15 @@
     - `rg -n "authService\.login|reason: 'role'|routeAccessGuard|routeMatchAccessGuard" frontend/src/app/core/auth/route-access.guard.ts`
     - `rg -n "APP_INITIALIZER|initializeApplication|authService\.initialize" frontend/src/app/app.module.ts`
 
+- Frontend auth/session hardening update (2026-04-12):
+  - Hardened SPA session bootstrap to hydrate only from valid JWT claims and clear stale/expired tokens before app state initialization.
+  - Extended token-claim model to include temporal claims (`exp`, `nbf`) and resource role claims (`resource_access[*].roles`) to support claim-driven session and RBAC hydration.
+  - Updated session hydration to derive authentication from claim identity (`sub`) instead of static session defaults, while preserving unauthorized route handling for role-based denials only.
+  - Reproducible command evidence:
+    - `rg -n "isTokenTemporallyValid|clearAccessToken\\(\\)|resolveTokenClaims" frontend/src/app/core/auth/auth.service.ts`
+    - `rg -n "exp\\?: number|nbf\\?: number|resource_access\\?:|resolveClaimRoles|authenticated: userId.length > 0" frontend/src/app/core/state/app-state.store.ts`
+    - `npm run build --prefix frontend`
+
 ## 5. [ ] Campaign management module
 - StartedAt:
 - FinishedAt:
