@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using QPhising.Application.Common.Abstractions;
 using QPhising.Application.Features.Analytics.GetDashboardKpis;
+using QPhising.Application.Features.Setup;
+using QPhising.Domain.Abstractions;
+using QPhising.Domain.Configuration;
 using QPhising.Infrastructure.Security;
 
 namespace QPhising.API.IntegrationTests;
@@ -35,8 +38,17 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<IAnalyticsReadRepository>();
             services.RemoveAll<IAnalyticsDashboardCache>();
+            services.RemoveAll<ISystemSettingRepository>();
             services.AddSingleton<IAnalyticsReadRepository, TestAnalyticsReadRepository>();
             services.AddSingleton<IAnalyticsDashboardCache, TestAnalyticsDashboardCache>();
+            services.AddSingleton<ISystemSettingRepository>(_ =>
+            {
+                var now = DateTimeOffset.UtcNow;
+                var repository = new InMemorySystemSettingRepository();
+                repository.Seed(SystemSetting.Create(SetupSettingKeys.IsCompleted, bool.TrueString, now));
+                repository.Seed(SystemSetting.Create(SetupSettingKeys.CompletedAtUtc, now.ToString("O"), now));
+                return repository;
+            });
 
             services.PostConfigure<TrackingTokenOptions>(options =>
             {
@@ -45,6 +57,33 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>
                 options.Version = 1;
             });
         });
+    }
+
+    private sealed class InMemorySystemSettingRepository : ISystemSettingRepository
+    {
+        private readonly Dictionary<string, SystemSetting> _settings = new(StringComparer.Ordinal);
+
+        public Task<SystemSetting?> GetByKeyAsync(string key, CancellationToken cancellationToken = default)
+        {
+            _settings.TryGetValue(key, out var setting);
+            return Task.FromResult(setting);
+        }
+
+        public Task AddAsync(SystemSetting systemSetting, CancellationToken cancellationToken = default)
+        {
+            _settings[systemSetting.Key] = systemSetting;
+            return Task.CompletedTask;
+        }
+
+        public void Update(SystemSetting systemSetting)
+        {
+            _settings[systemSetting.Key] = systemSetting;
+        }
+
+        public void Seed(SystemSetting systemSetting)
+        {
+            _settings[systemSetting.Key] = systemSetting;
+        }
     }
 
     private sealed class TestAnalyticsReadRepository : IAnalyticsReadRepository

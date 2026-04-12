@@ -1,20 +1,28 @@
 using MediatR;
 using QPhising.Application.Common;
 using QPhising.Domain.Abstractions;
-using QPhising.Domain.Setup;
+using System.Globalization;
 
 namespace QPhising.Application.Features.Setup.GetSetupStatus;
 
-public sealed class GetSetupStatusQueryHandler(ISetupStateRepository setupStateRepository)
+public sealed class GetSetupStatusQueryHandler(ISystemSettingRepository systemSettingRepository)
     : IRequestHandler<GetSetupStatusQuery, Result<SetupStatusResponse>>
 {
     public async Task<Result<SetupStatusResponse>> Handle(GetSetupStatusQuery request, CancellationToken cancellationToken)
     {
-        SetupState? setupState = await setupStateRepository.GetAsync(cancellationToken);
+        var completedSetting = await systemSettingRepository.GetByKeyAsync(SetupSettingKeys.IsCompleted, cancellationToken);
+        bool isCompleted = bool.TryParse(completedSetting?.Value, out bool completedValue) && completedValue;
 
-        SetupStatusResponse response = setupState is null
-            ? new SetupStatusResponse(false, null)
-            : new SetupStatusResponse(setupState.IsCompleted, setupState.CompletedAtUtc);
+        var completedAtSetting = await systemSettingRepository.GetByKeyAsync(SetupSettingKeys.CompletedAtUtc, cancellationToken);
+        DateTimeOffset? completedAtUtc = DateTimeOffset.TryParse(
+            completedAtSetting?.Value,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.RoundtripKind,
+            out DateTimeOffset parsedCompletedAtUtc)
+            ? parsedCompletedAtUtc
+            : null;
+
+        SetupStatusResponse response = new(isCompleted, completedAtUtc);
 
         return Result<SetupStatusResponse>.Success(response);
     }

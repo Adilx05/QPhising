@@ -5,6 +5,7 @@ using QPhising.Domain.Tasks;
 using QPhising.Domain.Tracking;
 using QPhising.Domain.Templates;
 using QPhising.Domain.Setup;
+using QPhising.Domain.Configuration;
 using QPhising.Infrastructure.Persistence.Configurations;
 
 namespace QPhising.Infrastructure.Persistence;
@@ -25,6 +26,8 @@ public sealed class QPhisingDbContext(DbContextOptions<QPhisingDbContext> option
 
     public DbSet<SetupState> SetupStates => Set<SetupState>();
 
+    public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new CampaignEntityTypeConfiguration());
@@ -34,6 +37,7 @@ public sealed class QPhisingDbContext(DbContextOptions<QPhisingDbContext> option
         modelBuilder.ApplyConfiguration(new TaskExecutionLogEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ExportJobEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new SetupStateEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new SystemSettingEntityTypeConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

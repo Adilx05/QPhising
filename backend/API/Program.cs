@@ -10,6 +10,7 @@ using QPhising.API;
 using QPhising.API.Configuration;
 using QPhising.API.ExceptionHandling;
 using QPhising.API.Realtime;
+using QPhising.API.Setup;
 using QPhising.Application.Common.Abstractions;
 using QPhising.Application.DependencyInjection;
 using QPhising.Infrastructure.DependencyInjection;
@@ -205,6 +206,7 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 app.UseExceptionHandler();
+app.UseMiddleware<SetupCompletionPreconditionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

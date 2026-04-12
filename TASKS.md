@@ -2027,3 +2027,13 @@
   - Reproducible command evidence:
     - `rg -n "Features/Setup|SetupController|validate-db|validate-sso|finalize|status" backend/Application backend/API`
     - `rg -n "SetupState|ISetupStateRepository|setup_state" backend/Domain backend/Infrastructure`
+
+- Setup completion enforcement update (2026-04-12):
+  - Added durable `system_settings` persistence model for setup completion state (`setup.is_completed`, `setup.completed_at_utc`) and migration scripts.
+  - Updated setup CQRS handlers to read/write setup completion through `ISystemSettingRepository` for key-based extensibility.
+  - Added API precondition middleware to block non-setup API endpoints with `423 Locked` when setup is not finalized.
+  - Added frontend global setup guard and setup route flow so non-setup pages redirect to `/setup` until completion state is true.
+  - Reproducible command evidence:
+    - `rg -n "system_settings|ISystemSettingRepository|SetupSettingKeys" backend/Domain backend/Application backend/Infrastructure`
+    - `rg -n "SetupCompletionPreconditionMiddleware|UseMiddleware<SetupCompletionPreconditionMiddleware>" backend/API`
+    - `rg -n "setupCompletionGuard|setupPageGuard|path: 'setup'" frontend/src/app`
