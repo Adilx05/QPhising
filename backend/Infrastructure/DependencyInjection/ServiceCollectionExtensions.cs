@@ -96,6 +96,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IExportJobRepository, ExportJobRepository>();
         services.AddScoped<IAnalyticsReadRepository, AnalyticsReadRepository>();
         services.AddScoped<ISetupStateRepository, SetupStateRepository>();
+        services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
         services.AddScoped<IDatabaseSetupValidator, DatabaseSetupValidator>();
         services.AddHttpClient<ISsoSetupValidator, SsoSetupValidator>(client =>
         {
