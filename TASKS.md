@@ -273,6 +273,16 @@
     - `rg -n "TrySetRequestCorrelationHeader|TrySetResponseCorrelationHeader|headers are read-only" gateway/Correlation/CorrelationIdMiddleware.cs`
     - `dotnet test gateway/Gateway.IntegrationTests/Gateway.IntegrationTests.csproj`
 
+- Maintenance update (2026-04-12):
+  - Fixed missing gateway setup route mappings that caused `OPTIONS /api/setup/*` preflight requests to return `404 UnableToFindDownstreamRouteError`.
+  - Added setup route forwarding for both unversioned and versioned upstream paths:
+    - `/api/setup{everything}` -> `/api/setup{everything}`
+    - `/api/v{version}/setup{everything}` -> `/api/v{version}/setup{everything}`
+  - Expanded allowed setup upstream methods to include `Options` so browser preflight requests are routed instead of dropped at gateway route matching.
+  - Reproducible command evidence:
+    - `rg -n "\"UpstreamPathTemplate\": \"/api/(v\\{version\\}/)?setup\\{everything\\}\"|UpstreamHttpMethod" gateway/ocelot.json`
+    - `jq empty gateway/ocelot.json`
+
 
 - Frontend auth flow maintenance update (2026-04-07):
   - Added centralized `AuthService` for auth lifecycle operations (`initialize`, `login`, `logout`, `isAuthenticated`, `getUserRoles`) under `frontend/src/app/core/auth`.
