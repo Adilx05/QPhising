@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QPhising.Application.Common;
+using QPhising.Application.Features.Setup.ApplyMigrations;
 using QPhising.Application.Features.Setup.FinalizeSetup;
 using QPhising.Application.Features.Setup.GetSetupStatus;
 using QPhising.Application.Features.Setup.ValidateDatabase;
@@ -27,10 +28,18 @@ public sealed class SetupController(IMediator mediator) : ControllerBase
 
     [HttpPost("validate-db")]
     [ProducesResponseType(typeof(ValidateDatabaseResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ValidateDatabase(CancellationToken cancellationToken)
+    public async Task<IActionResult> ValidateDatabase([FromBody] ValidateDatabaseCommand command, CancellationToken cancellationToken)
     {
-        Result<ValidateDatabaseResponse> result = await mediator.Send(new ValidateDatabaseCommand(), cancellationToken);
+        Result<ValidateDatabaseResponse> result = await mediator.Send(command, cancellationToken);
         return ToActionResult(result, "Unable to validate database configuration");
+    }
+
+    [HttpPost("apply-migrations")]
+    [ProducesResponseType(typeof(ApplyMigrationsResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ApplyMigrations([FromBody] ApplyMigrationsCommand command, CancellationToken cancellationToken)
+    {
+        Result<ApplyMigrationsResponse> result = await mediator.Send(command, cancellationToken);
+        return ToActionResult(result, "Unable to apply database migrations");
     }
 
     [HttpPost("validate-sso")]

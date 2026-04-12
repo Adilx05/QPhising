@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace QPhising.Application.Features.Setup.ValidateDatabase;
+namespace QPhising.Application.Features.Setup.ApplyMigrations;
 
-public sealed class ValidateDatabaseCommandValidator : AbstractValidator<ValidateDatabaseCommand>
+public sealed class ApplyMigrationsCommandValidator : AbstractValidator<ApplyMigrationsCommand>
 {
-    public ValidateDatabaseCommandValidator()
+    public ApplyMigrationsCommandValidator()
     {
         RuleFor(command => command)
             .Must(HaveConnectionInformation)
@@ -20,7 +20,7 @@ public sealed class ValidateDatabaseCommandValidator : AbstractValidator<Validat
         });
     }
 
-    private static bool HaveConnectionInformation(ValidateDatabaseCommand command)
+    private static bool HaveConnectionInformation(ApplyMigrationsCommand command)
     {
         if (!string.IsNullOrWhiteSpace(command.ConnectionString))
         {

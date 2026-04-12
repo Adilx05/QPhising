@@ -98,6 +98,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISetupStateRepository, SetupStateRepository>();
         services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
         services.AddScoped<IDatabaseSetupValidator, DatabaseSetupValidator>();
+        services.AddScoped<IDatabaseMigrationSetupService, DatabaseMigrationSetupService>();
         services.AddHttpClient<ISsoSetupValidator, SsoSetupValidator>(client =>
         {
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

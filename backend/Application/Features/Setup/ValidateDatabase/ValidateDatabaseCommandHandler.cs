@@ -9,7 +9,22 @@ public sealed class ValidateDatabaseCommandHandler(IDatabaseSetupValidator datab
 {
     public async Task<Result<ValidateDatabaseResponse>> Handle(ValidateDatabaseCommand request, CancellationToken cancellationToken)
     {
-        (bool isValid, string message) = await databaseSetupValidator.ValidateAsync(cancellationToken);
-        return Result<ValidateDatabaseResponse>.Success(new ValidateDatabaseResponse(isValid, message));
+        DatabaseValidationResult validationResult = await databaseSetupValidator.ValidateAsync(
+            new DatabaseConnectionInput(
+                request.Host,
+                request.Port,
+                request.Database,
+                request.Username,
+                request.Password,
+                request.ConnectionString),
+            cancellationToken);
+
+        return Result<ValidateDatabaseResponse>.Success(new ValidateDatabaseResponse(
+            validationResult.IsValid,
+            validationResult.Message,
+            validationResult.ErrorCategory,
+            validationResult.PendingMigrationCount,
+            validationResult.LastAppliedMigration,
+            validationResult.LatestKnownMigration));
     }
 }

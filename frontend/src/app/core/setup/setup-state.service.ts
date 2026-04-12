@@ -90,7 +90,7 @@ export class SetupStateService {
     return status.isCompleted;
   }
 
-  private resolveAccessToken(): string {
+  resolveAccessToken(): string {
     if (typeof localStorage === 'undefined') {
       return '';
     }

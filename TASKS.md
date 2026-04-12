@@ -2057,3 +2057,16 @@
     - `rg -n "system_settings|ISystemSettingRepository|SetupSettingKeys" backend/Domain backend/Application backend/Infrastructure`
     - `rg -n "SetupCompletionPreconditionMiddleware|UseMiddleware<SetupCompletionPreconditionMiddleware>" backend/API`
     - `rg -n "setupCompletionGuard|setupPageGuard|path: 'setup'" frontend/src/app`
+
+- Setup database onboarding UX update (2026-04-12):
+  - Added setup DB form support for either segmented connection fields (`host/port/database/username/password`) or a full connection string.
+  - Wired setup actions to backend endpoints:
+    - `POST /api/v1/setup/validate-db` via "Bağlantıyı Test Et" action.
+    - `POST /api/v1/setup/apply-migrations` via "Migration Uygula" action.
+  - Added CQRS command flow for applying migrations and expanded DB validation/migration responses with migration metadata (`pendingMigrationCount`, `lastAppliedMigration`, `latestKnownMigration`).
+  - Added actionable error classification (`auth`, `network`, `db_not_found`) to DB validation and migration operations.
+  - Surfaced migration status and latest migration details in setup result panel.
+  - Reproducible command evidence:
+    - `rg -n "ApplyMigrations|ValidateDatabaseCommand\\(|ErrorCategory|PendingMigrationCount|LatestKnownMigration" backend/Application backend/API`
+    - `rg -n "DatabaseSetupErrorClassifier|DatabaseMigrationSetupService|DatabaseConnectionStringFactory" backend/Infrastructure/Persistence`
+    - `rg -n "Bağlantıyı Test Et|Migration Uygula|Migration Durumu|Hata Sınıfı" frontend/src/app/features/setup`
