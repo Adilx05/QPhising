@@ -7,4 +7,5 @@ public static class SetupSettingKeys
     public const string ValidatedDatabaseConfiguration = "setup.db.validated_configuration";
     public const string PersistedDatabaseConfiguration = "setup.db.persisted_configuration";
     public const string PersistedDatabaseConfigurationSavedAtUtc = "setup.db.persisted_configuration_saved_at_utc";
+    public const string SsoReady = "setup.sso.ready";
 }

@@ -9,4 +9,5 @@ public sealed record SetupStatusResponse(
     bool IsCompleted,
     DateTimeOffset? CompletedAtUtc,
     bool HasPersistedDatabaseConfiguration,
-    DateTimeOffset? PersistedDatabaseConfigurationSavedAtUtc);
+    DateTimeOffset? PersistedDatabaseConfigurationSavedAtUtc,
+    bool IsSsoReady);

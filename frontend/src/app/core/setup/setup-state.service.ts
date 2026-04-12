@@ -6,12 +6,14 @@ import { AuthService } from '../auth/auth.service';
 interface SetupStatusApiResponse {
   isCompleted: boolean;
   completedAtUtc: string | null;
+  isSsoReady: boolean;
 }
 
 export interface SetupStateSnapshot {
   isLoading: boolean;
   isCompleted: boolean;
   completedAtUtc: string | null;
+  isSsoReady: boolean;
   lastCheckedAtUtc: string | null;
   errorMessage: string | null;
 }
@@ -26,6 +28,7 @@ export class SetupStateService {
     isLoading: false,
     isCompleted: false,
     completedAtUtc: null,
+    isSsoReady: false,
     lastCheckedAtUtc: null,
     errorMessage: null
   });
@@ -41,6 +44,7 @@ export class SetupStateService {
           isLoading: false,
           isCompleted: true,
           completedAtUtc: null,
+          isSsoReady: true,
           lastCheckedAtUtc: new Date().toISOString(),
           errorMessage: null
         };
@@ -65,6 +69,7 @@ export class SetupStateService {
         isLoading: false,
         isCompleted: payload.isCompleted,
         completedAtUtc: payload.completedAtUtc,
+        isSsoReady: payload.isSsoReady,
         lastCheckedAtUtc: new Date().toISOString(),
         errorMessage: null
       };
@@ -76,6 +81,7 @@ export class SetupStateService {
         ...this.state(),
         isLoading: false,
         isCompleted: false,
+        isSsoReady: false,
         lastCheckedAtUtc: new Date().toISOString(),
         errorMessage: error instanceof Error ? error.message : 'Unable to load setup status.'
       };
