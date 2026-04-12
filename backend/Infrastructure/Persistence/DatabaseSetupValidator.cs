@@ -49,9 +49,10 @@ public sealed class DatabaseSetupValidator : IDatabaseSetupValidator
         catch (Exception exception)
         {
             string errorCategory = DatabaseSetupErrorClassifier.Classify(exception);
+            string maskedError = SetupSecretsMasker.MaskSecrets(exception.Message);
             return new DatabaseValidationResult(
                 false,
-                $"Database validation failed: {exception.Message}",
+                $"Database validation failed: {maskedError}",
                 errorCategory,
                 0,
                 null,

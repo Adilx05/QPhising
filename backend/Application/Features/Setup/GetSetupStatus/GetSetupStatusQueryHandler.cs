@@ -22,7 +22,23 @@ public sealed class GetSetupStatusQueryHandler(ISystemSettingRepository systemSe
             ? parsedCompletedAtUtc
             : null;
 
-        SetupStatusResponse response = new(isCompleted, completedAtUtc);
+        var persistedDatabaseConfigurationSetting = await systemSettingRepository.GetByKeyAsync(SetupSettingKeys.PersistedDatabaseConfiguration, cancellationToken);
+        bool hasPersistedDatabaseConfiguration = !string.IsNullOrWhiteSpace(persistedDatabaseConfigurationSetting?.Value);
+
+        var persistedDatabaseConfigurationSavedAtSetting = await systemSettingRepository.GetByKeyAsync(SetupSettingKeys.PersistedDatabaseConfigurationSavedAtUtc, cancellationToken);
+        DateTimeOffset? persistedDatabaseConfigurationSavedAtUtc = DateTimeOffset.TryParse(
+            persistedDatabaseConfigurationSavedAtSetting?.Value,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.RoundtripKind,
+            out DateTimeOffset parsedPersistedDatabaseConfigurationSavedAtUtc)
+            ? parsedPersistedDatabaseConfigurationSavedAtUtc
+            : null;
+
+        SetupStatusResponse response = new(
+            isCompleted,
+            completedAtUtc,
+            hasPersistedDatabaseConfiguration,
+            persistedDatabaseConfigurationSavedAtUtc);
 
         return Result<SetupStatusResponse>.Success(response);
     }
