@@ -955,6 +955,15 @@
 
 ### Execution Notes
 
+- Setup experience update (2026-04-12):
+  - Refactored `features/setup` into explicit module → route → container hierarchy by adding a shell container (`SetupPageComponent`) with child route composition and a dedicated wizard container (`SetupWizardPageComponent`).
+  - Added a reusable wizard shell presentational component with step indicator, back/next controls, and a setup status panel aligned to PrimeNG + Tailwind conventions.
+  - Replaced legacy setup status service with `SetupStateService`, wired live `GET /api/setup/status` polling, and integrated completion-driven redirect to `/dashboard` when setup is finalized.
+  - Updated root and wildcard redirects to target `setup/wizard` to preserve deterministic entry into the new setup flow.
+  - Reproducible command evidence:
+    - `npm run build` (from `frontend/`)
+    - `rg -n "SetupWizardPageComponent|SetupWizardShellComponent|setup/wizard|SetupStateService" frontend/src/app`
+
 - Subtask completion update (2026-03-27):
   - Established a feature-based Angular module map with dedicated modules for `dashboard`, `campaigns`, `templates`, `tracking`, `tasks`, `analytics`, and `exports`.
   - Implemented smart/dumb separation in each feature via `containers/*-page.component` (smart orchestration) and `components/*` presentational table/summary components consuming `@Input` models.

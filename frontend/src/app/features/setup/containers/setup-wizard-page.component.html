@@ -1,0 +1,9 @@
+<app-setup-wizard-shell
+  [steps]="steps"
+  [activeStepIndex]="activeStepIndex()"
+  [state]="setupState()"
+  [canGoBack]="canGoBack()"
+  [canGoNext]="canGoNext()"
+  (back)="goBack()"
+  (next)="goNext()"
+  (refresh)="refreshStatus()"></app-setup-wizard-shell>

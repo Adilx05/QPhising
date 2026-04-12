@@ -1,21 +1,21 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, CanMatchFn, Route, Router, UrlSegment, UrlTree } from '@angular/router';
 
-import { SetupStatusService } from './setup-status.service';
+import { SetupStateService } from './setup-state.service';
 
 async function evaluateAppRoute(): Promise<true | UrlTree> {
-  const setupStatusService = inject(SetupStatusService);
+  const setupStateService = inject(SetupStateService);
   const router = inject(Router);
 
-  const isCompleted = await setupStatusService.isSetupCompleted();
+  const isCompleted = await setupStateService.isSetupCompleted();
   return isCompleted ? true : router.createUrlTree(['/setup']);
 }
 
 async function evaluateSetupRoute(): Promise<true | UrlTree> {
-  const setupStatusService = inject(SetupStatusService);
+  const setupStateService = inject(SetupStateService);
   const router = inject(Router);
 
-  const isCompleted = await setupStatusService.isSetupCompleted();
+  const isCompleted = await setupStateService.isSetupCompleted();
   return isCompleted ? router.createUrlTree(['/dashboard']) : true;
 }
 

@@ -14,7 +14,7 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'setup'
+    redirectTo: 'setup/wizard'
   },
   {
     path: 'setup',
@@ -78,7 +78,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'setup'
+    redirectTo: 'setup/wizard'
   }
 ];
 
