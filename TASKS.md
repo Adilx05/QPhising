@@ -172,6 +172,18 @@
     - `rg -n "Health_Endpoints_Should_Be_Anonymous_And_Return_Json|/health/live|/health/ready|X-Correlation-ID" backend/API.IntegrationTests/HealthChecksEndpointsTests.cs`
     - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj`
 
+- Maintenance update (2026-04-12):
+  - Setup finalize flow was hardened:
+    - Verified DB connection configuration is now persisted into the writable `system_setting` config store when `validate-db` succeeds (`setup.db.validated_configuration`).
+    - During `finalize`, the verified DB configuration is promoted to persisted setup config (`setup.db.persisted_configuration`) and the persistence timestamp is recorded.
+    - `setup/status` response was expanded to return persisted DB config presence and persisted timestamp so restart persistence can be verified.
+  - Secret masking improvements:
+    - DB validation/migration error messages now mask `Password`, `User Id`, and JSON `password`/`secret` values to prevent plaintext leakage.
+  - Reproducible command evidence:
+    - `dotnet test backend/API.IntegrationTests/API.IntegrationTests.csproj --filter SetupFinalizePersistenceTests`
+    - `rg -n "ValidatedDatabaseConfiguration|PersistedDatabaseConfiguration|PersistedDatabaseConfigurationSavedAtUtc" backend/Application/Features/Setup`
+    - `rg -n "SetupSecretsMasker|MaskSecrets" backend/Infrastructure/Persistence`
+
 
 ---
 

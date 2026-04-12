@@ -41,9 +41,10 @@ public sealed class DatabaseMigrationSetupService : IDatabaseMigrationSetupServi
         catch (Exception exception)
         {
             string errorCategory = DatabaseSetupErrorClassifier.Classify(exception);
+            string maskedError = SetupSecretsMasker.MaskSecrets(exception.Message);
             return new DatabaseMigrationApplyResult(
                 false,
-                $"Migration failed: {exception.Message}",
+                $"Migration failed: {maskedError}",
                 errorCategory,
                 0,
                 0,
