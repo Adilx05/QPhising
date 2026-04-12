@@ -205,6 +205,36 @@
       "UpstreamHttpMethod": ["Get"]
     },
     {
+      "DownstreamPathTemplate": "/api/setup{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "api",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/setup{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Options"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/v{version}/setup{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "api",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v{version}/setup{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Options"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/campaigns{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
