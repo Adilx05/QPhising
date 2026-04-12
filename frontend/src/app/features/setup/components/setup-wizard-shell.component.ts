@@ -33,12 +33,21 @@ export class SetupWizardShellComponent {
   };
   @Input({ required: true }) isValidatingDb = false;
   @Input({ required: true }) isApplyingMigrations = false;
+  @Input({ required: true }) ssoForm!: FormGroup;
+  @Input({ required: true }) ssoOperation!: {
+    success: boolean;
+    message: string;
+    technicalReason: string | null;
+    fieldErrors: Record<string, string[]>;
+  } | null;
+  @Input({ required: true }) isValidatingSso = false;
 
   @Output() readonly back = new EventEmitter<void>();
   @Output() readonly next = new EventEmitter<void>();
   @Output() readonly refresh = new EventEmitter<void>();
   @Output() readonly testDbConnection = new EventEmitter<void>();
   @Output() readonly applyMigrations = new EventEmitter<void>();
+  @Output() readonly validateSso = new EventEmitter<void>();
 
 
   protected get currentStep(): SetupWizardStep {
@@ -67,5 +76,11 @@ export class SetupWizardShellComponent {
       default:
         return 'Review details and adjust configuration before retrying.';
     }
+  }
+
+  protected getSsoErrorEntries(fieldErrors: Record<string, string[]>): Array<{ field: string; message: string }> {
+    return Object.entries(fieldErrors).flatMap(([field, messages]) =>
+      messages.map((message) => ({ field, message }))
+    );
   }
 }

@@ -1642,6 +1642,17 @@
     - `rg -n "WriteAsJsonAsync\(|options: null|contentType: \"application/problem\+json\"" backend/API/ExceptionHandling/GlobalExceptionHandler.cs`
     - `dotnet build backend/QPhising.Backend.sln` *(fails in current environment: `dotnet` not installed)*
 
+- Setup SSO validation contract hardening update (2026-04-12):
+  - Added setup SSO request payload fields across API/backend/frontend: `authority`, `realm`, `clientId`, `clientSecret`, `audience`.
+  - Extended `POST /api/v1/setup/validate-sso` CQRS flow to execute realm metadata + token endpoint validation and return field-based errors with technical reason codes (`realm_not_found`, `client_not_found`, `credentials_invalid`, etc.).
+  - Persisted SSO readiness into setup state (`setup.sso.ready`) on each validation attempt, and exposed readiness via setup status response (`isSsoReady`).
+  - Updated setup wizard UI to collect SSO inputs and render both technical reason + alan-bazlı hata mesajları.
+  - Reproducible command evidence:
+    - `rg -n "ValidateSsoCommand|ValidateSsoResponse|SsoReady|isSsoReady" backend/Application backend/API`
+    - `rg -n "SsoSetupValidator|client_not_found|credentials_invalid|token_endpoint" backend/Infrastructure/Security`
+    - `rg -n "ssoForm|validateSso|technicalReason|fieldErrors" frontend/src/app/features/setup frontend/src/app/core/setup`
+
+
 ---
 
 ## 18. [-] Frontend–Backend Integration and Production Data Flow

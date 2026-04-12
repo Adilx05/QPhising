@@ -74,6 +74,20 @@ export class SetupWizardPageComponent implements OnInit, OnDestroy {
   });
   protected readonly isValidatingDb = signal(false);
   protected readonly isApplyingMigrations = signal(false);
+  protected readonly ssoForm = this.formBuilder.group({
+    authority: ['', [Validators.required]],
+    realm: ['', [Validators.required]],
+    clientId: ['', [Validators.required]],
+    clientSecret: ['', [Validators.required]],
+    audience: ['', [Validators.required]]
+  });
+  protected readonly ssoOperation = signal<{
+    success: boolean;
+    message: string;
+    technicalReason: string | null;
+    fieldErrors: Record<string, string[]>;
+  } | null>(null);
+  protected readonly isValidatingSso = signal(false);
 
   async ngOnInit(): Promise<void> {
     await this.refreshStatus();
@@ -121,6 +135,50 @@ export class SetupWizardPageComponent implements OnInit, OnDestroy {
     this.isApplyingMigrations.set(true);
     await this.executeDbAction('/api/setup/apply-migrations', 'migrate');
     this.isApplyingMigrations.set(false);
+  }
+
+  protected async validateSsoConfiguration(): Promise<void> {
+    this.isValidatingSso.set(true);
+
+    try {
+      const response = await fetch(`${OpenAPI.BASE}/api/setup/validate-sso`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.setupStateService.resolveAccessToken()}`
+        },
+        body: JSON.stringify(this.ssoForm.getRawValue())
+      });
+
+      const payload = (await response.json()) as {
+        isValid: boolean;
+        message: string;
+        technicalReason?: string | null;
+        fieldErrors?: Record<string, string[]>;
+      };
+
+      this.ssoOperation.set({
+        success: payload.isValid,
+        message: payload.message,
+        technicalReason: payload.technicalReason ?? null,
+        fieldErrors: payload.fieldErrors ?? {}
+      });
+
+      if (payload.isValid) {
+        await this.refreshStatus();
+      }
+    } catch (error) {
+      this.ssoOperation.set({
+        success: false,
+        message: error instanceof Error ? error.message : 'SSO validation failed.',
+        technicalReason: 'network_error',
+        fieldErrors: {
+          authority: ['Unable to reach SSO validation endpoint.']
+        }
+      });
+    } finally {
+      this.isValidatingSso.set(false);
+    }
   }
 
   private startStatusPolling(): void {

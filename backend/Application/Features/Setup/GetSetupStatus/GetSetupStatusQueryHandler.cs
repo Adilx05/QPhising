@@ -34,11 +34,15 @@ public sealed class GetSetupStatusQueryHandler(ISystemSettingRepository systemSe
             ? parsedPersistedDatabaseConfigurationSavedAtUtc
             : null;
 
+        var ssoReadySetting = await systemSettingRepository.GetByKeyAsync(SetupSettingKeys.SsoReady, cancellationToken);
+        bool isSsoReady = bool.TryParse(ssoReadySetting?.Value, out bool parsedSsoReady) && parsedSsoReady;
+
         SetupStatusResponse response = new(
             isCompleted,
             completedAtUtc,
             hasPersistedDatabaseConfiguration,
-            persistedDatabaseConfigurationSavedAtUtc);
+            persistedDatabaseConfigurationSavedAtUtc,
+            isSsoReady);
 
         return Result<SetupStatusResponse>.Success(response);
     }

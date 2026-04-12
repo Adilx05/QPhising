@@ -44,9 +44,9 @@ public sealed class SetupController(IMediator mediator) : ControllerBase
 
     [HttpPost("validate-sso")]
     [ProducesResponseType(typeof(ValidateSsoResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ValidateSso(CancellationToken cancellationToken)
+    public async Task<IActionResult> ValidateSso([FromBody] ValidateSsoCommand command, CancellationToken cancellationToken)
     {
-        Result<ValidateSsoResponse> result = await mediator.Send(new ValidateSsoCommand(), cancellationToken);
+        Result<ValidateSsoResponse> result = await mediator.Send(command, cancellationToken);
         return ToActionResult(result, "Unable to validate SSO configuration");
     }
 
