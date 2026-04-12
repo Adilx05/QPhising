@@ -12,6 +12,7 @@ using QPhising.API.ExceptionHandling;
 using QPhising.API.Realtime;
 using QPhising.API.Setup;
 using QPhising.Application.Common.Abstractions;
+using QPhising.Application.Common.Abstractions.Setup;
 using QPhising.Application.DependencyInjection;
 using QPhising.Infrastructure.DependencyInjection;
 using Serilog.Context;
@@ -145,6 +146,8 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ISetupAuditContext, HttpSetupAuditContext>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IAnalyticsRealtimeNotifier, SignalRAnalyticsRealtimeNotifier>();
 builder.Services.AddApiVersioning(options =>
