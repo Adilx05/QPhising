@@ -20,7 +20,12 @@ export class AuthService {
 
   async initialize(): Promise<void> {
     this.processAuthorizeCallback();
-    this.appStateStore.hydrateSessionFromTokenClaims(this.resolveTokenClaims());
+    const tokenClaims = this.resolveTokenClaims();
+    if (!tokenClaims) {
+      this.clearAccessToken();
+    }
+
+    this.appStateStore.hydrateSessionFromTokenClaims(tokenClaims);
 
     const callbackReturnUrl = this.resolveAndConsumeReturnUrl();
     if (callbackReturnUrl && this.router.url !== callbackReturnUrl) {
@@ -153,10 +158,29 @@ export class AuthService {
 
     try {
       const claimsJson = this.decodeBase64Url(segments[1]);
-      return JSON.parse(claimsJson) as TokenClaims;
+      const parsedClaims = JSON.parse(claimsJson) as TokenClaims;
+      if (!this.isTokenTemporallyValid(parsedClaims)) {
+        return null;
+      }
+
+      return parsedClaims;
     } catch {
       return null;
     }
+  }
+
+  private isTokenTemporallyValid(claims: TokenClaims): boolean {
+    const nowEpochSeconds = Math.floor(Date.now() / 1000);
+
+    if (typeof claims.nbf === 'number' && claims.nbf > nowEpochSeconds) {
+      return false;
+    }
+
+    if (typeof claims.exp === 'number' && claims.exp <= nowEpochSeconds) {
+      return false;
+    }
+
+    return true;
   }
 
   private resolveAuthorizeEndpoint(): string {
