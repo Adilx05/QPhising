@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { SaveSetupConfigurationRequest } from '../models/SaveSetupConfigurationRequest';
 import type { SetupDependencyTestResult } from '../models/SetupDependencyTestResult';
+import type { SetupGuardDecisionResult } from '../models/SetupGuardDecisionResult';
 import type { SetupStatusResult } from '../models/SetupStatusResult';
 import type { TestDatabaseConnectionRequest } from '../models/TestDatabaseConnectionRequest';
 import type { TestKeycloakConnectionRequest } from '../models/TestKeycloakConnectionRequest';
@@ -21,6 +22,16 @@ export class SetupService {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/setup/status',
+    });
+  }
+  /**
+   * @returns SetupGuardDecisionResult OK
+   * @throws ApiError
+   */
+  public static getApiSetupGuardDecision(): CancelablePromise<SetupGuardDecisionResult> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/api/setup/guard-decision',
     });
   }
   /**

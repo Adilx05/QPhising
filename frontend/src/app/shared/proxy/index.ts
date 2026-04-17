@@ -11,7 +11,9 @@ export type { AssertProxyContractSyncRequest } from './models/AssertProxyContrac
 export type { ProxyContractSyncConflictResponse } from './models/ProxyContractSyncConflictResponse';
 export { ProxyDriftValidationStatus } from './models/ProxyDriftValidationStatus';
 export type { SaveSetupConfigurationRequest } from './models/SaveSetupConfigurationRequest';
+export { SetupAccessState } from './models/SetupAccessState';
 export type { SetupDependencyTestResult } from './models/SetupDependencyTestResult';
+export type { SetupGuardDecisionResult } from './models/SetupGuardDecisionResult';
 export { SetupReadinessState } from './models/SetupReadinessState';
 export type { SetupStatusResult } from './models/SetupStatusResult';
 export type { TestDatabaseConnectionRequest } from './models/TestDatabaseConnectionRequest';
