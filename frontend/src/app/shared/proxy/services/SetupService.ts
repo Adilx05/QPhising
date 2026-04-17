@@ -13,6 +13,7 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class SetupService {
   /**
+   * Get current setup readiness status.
    * @returns SetupStatusResult OK
    * @throws ApiError
    */
@@ -23,6 +24,7 @@ export class SetupService {
     });
   }
   /**
+   * Validate database connectivity using the supplied connection string.
    * @returns SetupDependencyTestResult OK
    * @throws ApiError
    */
@@ -39,6 +41,7 @@ export class SetupService {
     });
   }
   /**
+   * Validate Redis connectivity using the supplied connection string.
    * @returns SetupDependencyTestResult OK
    * @throws ApiError
    */
@@ -55,6 +58,7 @@ export class SetupService {
     });
   }
   /**
+   * Validate Keycloak authority, realm, and client credentials.
    * @returns SetupDependencyTestResult OK
    * @throws ApiError
    */
@@ -71,6 +75,7 @@ export class SetupService {
     });
   }
   /**
+   * Persist setup configuration after successful dependency checks.
    * @returns SetupStatusResult OK
    * @throws ApiError
    */
