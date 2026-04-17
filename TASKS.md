@@ -188,15 +188,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T23:24:00Z
   - Owner: Codex
   - Notes: Expanded the checked-in OpenAPI fixture to include all setup-controller endpoints and setup DTO schemas, then tightened both proxy-generation scripts to require setup paths (`/api/setup/status`, `/test-db`, `/test-redis`, `/test-keycloak`, `/save`) in addition to proxy-validation before generation can proceed; verified existing generated `SetupService` and setup DTO proxies already cover all setup routes. Attempted to rerun `./scripts/generate-proxy.sh` against the fixture, but npm registry access is blocked in this environment (403), so no generated artifact updates were produced. Files touched: `frontend/openapi/proxy-validation.swagger.json`, `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`.
-- [ ] 3.6
+- [x] 3.6
   - Title: Frontend integration for setup flow using generated setup proxy
   - Description: Frontend integration for setup flow using generated setup proxy
   - Deliverables:
     - Frontend integration for setup flow using generated setup proxy
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T23:24:00Z
+  - FinishedAt: 2026-04-17T23:25:19Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added setup-flow frontend data-access integration that uses generated `SetupService` only for setup status retrieval, dependency connection tests (`test-db`, `test-redis`, `test-keycloak`), and setup persistence (`save`), plus a setup data-access barrel export for feature-side consumption. Files touched: `frontend/src/app/features/setup/data-access/setup-flow.client.ts`, `frontend/src/app/features/setup/data-access/index.ts`.
 
 ## Phase 4 - Setup Wizard Gating & UX Completion
 
