@@ -52,3 +52,5 @@ app.UseAuthorization();
 app.MapHealthChecks("/health/live");
 
 await app.UseOcelot();
+
+app.Run();
