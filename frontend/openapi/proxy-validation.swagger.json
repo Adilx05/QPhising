@@ -1,0 +1,88 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "QPhising API",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/proxy-validation/assert-sync": {
+      "post": {
+        "tags": [
+          "ProxyValidation"
+        ],
+        "operationId": "ProxyValidation_AssertSync",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssertProxyContractSyncRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProxyContractSyncConflictResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AssertProxyContractSyncRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "swaggerContractPath": {
+            "type": "string",
+            "nullable": true
+          },
+          "proxyGenerationStampPath": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProxyContractSyncConflictResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "swaggerLastModifiedUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "proxyGeneratedAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "suggestedRegenerationCommand": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}
