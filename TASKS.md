@@ -97,15 +97,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T21:47:06Z
   - Owner: Codex
   - Notes: Added `POST /api/proxy-validation/assert-sync` endpoint that invokes `AssertProxyContractSyncCommand` through MediatR and returns `409` conflict payload on contract drift; wired API to Application project + MediatR registrations and introduced `FileTimestampProxyContractDriftValidator` as the concrete validator for command/query execution. Files touched: `backend/API/Controllers/ProxyValidationController.cs`, `backend/API/Contracts/ProxyValidation/*`, `backend/API/Services/ProxyValidation/FileTimestampProxyContractDriftValidator.cs`, `backend/API/Program.cs`, `backend/API/QPhising.Api.csproj`.
-- [ ] 2.4
+- [x] 2.4
   - Title: Swagger validation gate integration for proxy generation preconditions
   - Description: Swagger validation gate integration for proxy generation preconditions
   - Deliverables:
     - Swagger validation gate integration for proxy generation preconditions
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T21:48:00Z
+  - FinishedAt: 2026-04-17T21:50:32Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added Swagger precondition gates to both proxy generation scripts: they now fail fast when Swagger cannot be fetched, is invalid JSON, lacks OpenAPI metadata/paths, or does not include required proxy-validation endpoint `/api/proxy-validation/assert-sync`. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`.
 - [ ] 2.5
   - Title: Proxy generation script finalization
   - Description: Proxy generation script finalization. Scope: cross-platform + deterministic outputs.
