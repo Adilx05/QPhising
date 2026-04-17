@@ -23,6 +23,11 @@ public sealed class SetupController : ControllerBase
     public Task<SetupStatusResult> GetStatus(CancellationToken cancellationToken) =>
         _sender.Send(new GetSetupStatusQuery(), cancellationToken);
 
+    [HttpGet("guard-decision")]
+    [ProducesResponseType(typeof(SetupGuardDecisionResult), StatusCodes.Status200OK)]
+    public Task<SetupGuardDecisionResult> GetGuardDecision(CancellationToken cancellationToken) =>
+        _sender.Send(new GetSetupGuardDecisionQuery(), cancellationToken);
+
     [HttpPost("test-db")]
     [ProducesResponseType(typeof(SetupDependencyTestResult), StatusCodes.Status200OK)]
     public Task<SetupDependencyTestResult> TestDatabaseConnection(
