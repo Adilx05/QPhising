@@ -106,15 +106,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T21:50:32Z
   - Owner: Codex
   - Notes: Added Swagger precondition gates to both proxy generation scripts: they now fail fast when Swagger cannot be fetched, is invalid JSON, lacks OpenAPI metadata/paths, or does not include required proxy-validation endpoint `/api/proxy-validation/assert-sync`. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`.
-- [ ] 2.5
+- [x] 2.5
   - Title: Proxy generation script finalization
   - Description: Proxy generation script finalization. Scope: cross-platform + deterministic outputs.
   - Deliverables:
     - cross-platform + deterministic outputs
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T21:52:00Z
+  - FinishedAt: 2026-04-17T21:54:21Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Finalized both proxy generation scripts for deterministic cross-platform output by pinning the generator package version (`openapi-typescript-codegen@0.29.0` with `GENERATOR_VERSION` override), fetching Swagger once into a local temp file before generation, and normalizing generated text artifacts to LF line endings after generation; also documented the determinism behavior in README proxy-generation notes. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`, `README.md`.
 - [ ] 2.6
   - Title: Frontend integration verification using generated clients only
   - Description: Frontend integration verification using generated clients only

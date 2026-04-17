@@ -28,5 +28,7 @@ Use the repeatable proxy scripts under `scripts/` to regenerate TypeScript API c
 
 Both scripts:
 - read OpenAPI/Swagger from the provided URL (default: `http://localhost:5000/swagger/v1/swagger.json`),
+- validate required Swagger metadata and endpoint prerequisites before generation,
+- pin `openapi-typescript-codegen` to a deterministic version (`0.29.0` by default, override with `GENERATOR_VERSION`),
 - regenerate clients into `frontend/src/app/shared/proxy`,
-- replace previous generated output for deterministic day-to-day development.
+- replace previous generated output and normalize generated text line endings to LF for deterministic cross-platform diffs.
