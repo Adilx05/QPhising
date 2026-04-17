@@ -1,6 +1,8 @@
 using MediatR;
 using QPhising.Api.Services.ProxyValidation;
+using QPhising.Api.Services.Setup;
 using QPhising.Application.Contracts.Abstractions.ProxyValidation;
+using QPhising.Application.Contracts.Abstractions.Setup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +27,16 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddHealthChecks();
+builder.Services.AddDataProtection();
+builder.Services.AddHttpClient(nameof(SetupDependencyConnectionTester), client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(QPhising.Application.CQRS.Commands.ProxyValidation.AssertProxyContractSyncCommand).Assembly));
 builder.Services.AddScoped<IProxyContractDriftValidator, FileTimestampProxyContractDriftValidator>();
+builder.Services.AddScoped<ISetupDependencyConnectionTester, SetupDependencyConnectionTester>();
+builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>();
+builder.Services.AddSingleton<ISetupConfigurationRepository, JsonFileSetupConfigurationRepository>();
 
 var app = builder.Build();
 

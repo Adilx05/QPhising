@@ -161,15 +161,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T22:11:32Z
   - Owner: Codex
   - Notes: Implemented Setup application CQRS flow for status/test/save with MediatR queries/commands + FluentValidation validators, introduced setup application abstractions (`ISetupConfigurationRepository`, `ISetupDependencyConnectionTester`, `ISetupSecretCipher`) and response contracts, and wired Application to Domain through a new Domain project file and project reference. Files touched: `backend/Application/CQRS/Queries/Setup/*`, `backend/Application/CQRS/Commands/Setup/*`, `backend/Application/Contracts/Abstractions/Setup/*`, `backend/Application/Contracts/Responses/Setup/*`, `backend/Application/QPhising.Application.csproj`, `backend/Domain/QPhising.Domain.csproj`.
-- [ ] 3.3
+- [x] 3.3
   - Title: Endpoint implementation
   - Description: Endpoint implementation. Scope: `/api/setup/status`, `/test-db`, `/test-keycloak`, `/test-redis`, `/save`.
   - Deliverables:
     - `/api/setup/status`, `/test-db`, `/test-keycloak`, `/test-redis`, `/save`
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T22:31:00Z
+  - FinishedAt: 2026-04-17T22:37:16Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added `SetupController` with all Phase 3.3 setup endpoints wired to MediatR commands/queries, introduced API request contracts for setup actions, and completed DI composition by registering setup application abstractions with concrete implementations (`JsonFileSetupConfigurationRepository`, `SetupDependencyConnectionTester`, `DataProtectionSetupSecretCipher`) so setup handlers can be activated successfully.
 - [ ] 3.4
   - Title: Swagger contract verification for setup endpoints and examples
   - Description: Swagger contract verification for setup endpoints and examples
