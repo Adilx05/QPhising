@@ -22,15 +22,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T08:25:00Z
   - Owner: Codex
   - Notes: Partial evidence only: skeleton layer folders exist (`backend/Domain/.gitkeep`, `backend/Application/.gitkeep`, `backend/API/.gitkeep`, `backend/Infrastructure/.gitkeep`) with mtime 2026-04-17T20:44:26Z, but no bounded-context subfolders/files were found under `backend/Domain` during audit (`find backend/Domain -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
-- [ ] 1.2
+- [x] 1.2
   - Title: Application logic baseline
   - Description: Application logic baseline. Scope: CQRS project scaffolding + contracts folders.
   - Deliverables:
     - CQRS project scaffolding + contracts folders
   - StartedAt: 2026-04-17T08:25:00Z
-  - FinishedAt: 2026-04-17T08:35:00Z
+  - FinishedAt: 2026-04-17T21:40:00Z
   - Owner: Codex
-  - Notes: Status corrected to Pending after audit: only `backend/Application/.gitkeep` exists (mtime 2026-04-17T20:44:26Z); no CQRS scaffolding or contracts folders/files were found (`find backend/Application -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
+  - Notes: Added Application-layer baseline scaffolding for CQRS and contracts by creating `backend/Application/CQRS/{Commands,Queries,Behaviors}` and `backend/Application/Contracts/{Abstractions,Requests,Responses}` with tracked placeholders; kept changes limited to this subtask scope and TASKS status update.
 - [ ] 1.3
   - Title: Endpoint baseline
   - Description: Endpoint baseline. Scope: API host skeleton and controller structure.
