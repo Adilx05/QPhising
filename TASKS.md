@@ -209,15 +209,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T23:28:42Z
   - Owner: Codex
   - Notes: Added setup-gating domain model by introducing `SetupAccessState` and `SetupCompletionPolicy.ResolveAccessState(...)`, and refined `SetupAggregate` readiness/completion invariants with explicit `IsSetupCompleted` state so main-app access depends on explicit completion rather than partial configuration. Files touched: `backend/Domain/Setup/Enums/SetupAccessState.cs`, `backend/Domain/Setup/Policies/SetupCompletionPolicy.cs`, `backend/Domain/Setup/Aggregates/SetupAggregate.cs`.
-- [ ] 4.2
+- [x] 4.2
   - Title: Application logic for setup-complete checks, redirect decisions, and guard contracts
   - Description: Application logic for setup-complete checks, redirect decisions, and guard contracts
   - Deliverables:
     - Application logic for setup-complete checks, redirect decisions, and guard contracts
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T23:29:00Z
+  - FinishedAt: 2026-04-17T23:33:38Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added setup-guard application contracts and CQRS query flow to resolve setup access state and redirect target using `SetupCompletionPolicy`, including `GetSetupGuardDecisionQuery` + handler/validator and `SetupGuardDecisionResult` for route-guard consumption. Files touched: `backend/Application/CQRS/Queries/Setup/GetSetupGuardDecisionQuery.cs`, `backend/Application/CQRS/Queries/Setup/GetSetupGuardDecisionQueryHandler.cs`, `backend/Application/CQRS/Queries/Setup/GetSetupGuardDecisionQueryValidator.cs`, `backend/Application/Contracts/Responses/Setup/SetupGuardDecisionResult.cs`.
 - [ ] 4.3
   - Title: Endpoint for setup completion/readiness and guarded app-access checks
   - Description: Endpoint for setup completion/readiness and guarded app-access checks
