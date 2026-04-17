@@ -127,15 +127,15 @@ Metadata required for every subtask:
 
 ## Phase 3 - Setup Wizard Backend APIs
 
-- [ ] 3.1
+- [x] 3.1
   - Title: Backend domain/model for setup aggregate, readiness state, and secure config value objects
   - Description: Backend domain/model for setup aggregate, readiness state, and secure config value objects
   - Deliverables:
     - Backend domain/model for setup aggregate, readiness state, and secure config value objects
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T22:02:00Z
+  - FinishedAt: 2026-04-17T22:06:55Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added Setup domain model primitives in `backend/Domain/Setup` including `SetupAggregate` for setup completion/readiness invariants, `SetupReadinessState` enum, and `SecureConfigValue` value object for non-empty secure configuration ciphertext handling and masked preview support.
 - [ ] 3.2
   - Title: Application logic
   - Description: Application logic. Scope: commands/queries/handlers/validators for status, test, save.
