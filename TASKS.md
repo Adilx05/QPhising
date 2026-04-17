@@ -13,7 +13,7 @@ Metadata required for every subtask:
 
 ## Phase 1 - Repository Reset & Bootstrap
 
-- [x] 1.1
+- [-] 1.1
   - Title: Backend domain/model baseline
   - Description: Backend domain/model baseline. Scope: solution skeleton, bounded contexts, domain folders.
   - Deliverables:
@@ -21,8 +21,8 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T08:10:00Z
   - FinishedAt: 2026-04-17T08:25:00Z
   - Owner: Codex
-  - Notes: Repository reset and clean architecture folder topology established.
-- [x] 1.2
+  - Notes: Partial evidence only: skeleton layer folders exist (`backend/Domain/.gitkeep`, `backend/Application/.gitkeep`, `backend/API/.gitkeep`, `backend/Infrastructure/.gitkeep`) with mtime 2026-04-17T20:44:26Z, but no bounded-context subfolders/files were found under `backend/Domain` during audit (`find backend/Domain -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
+- [ ] 1.2
   - Title: Application logic baseline
   - Description: Application logic baseline. Scope: CQRS project scaffolding + contracts folders.
   - Deliverables:
@@ -30,8 +30,8 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T08:25:00Z
   - FinishedAt: 2026-04-17T08:35:00Z
   - Owner: Codex
-  - Notes: Application layer scaffolded for backend-first flow.
-- [x] 1.3
+  - Notes: Status corrected to Pending after audit: only `backend/Application/.gitkeep` exists (mtime 2026-04-17T20:44:26Z); no CQRS scaffolding or contracts folders/files were found (`find backend/Application -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
+- [ ] 1.3
   - Title: Endpoint baseline
   - Description: Endpoint baseline. Scope: API host skeleton and controller structure.
   - Deliverables:
@@ -39,8 +39,8 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T08:35:00Z
   - FinishedAt: 2026-04-17T08:45:00Z
   - Owner: Codex
-  - Notes: HTTP entrypoint structure created with transport-only intent.
-- [x] 1.4
+  - Notes: Status corrected to Pending after audit: only `backend/API/.gitkeep` exists (mtime 2026-04-17T20:44:26Z); no API host files or controller structure artifacts were found (`find backend/API -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
+- [ ] 1.4
   - Title: Swagger baseline
   - Description: Swagger baseline. Scope: OpenAPI bootstrapping verified.
   - Deliverables:
@@ -48,7 +48,7 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T08:45:00Z
   - FinishedAt: 2026-04-17T08:50:00Z
   - Owner: Codex
-  - Notes: Swagger foundation included in bootstrap baseline.
+  - Notes: Status corrected to Pending after audit: no Swagger/OpenAPI bootstrap artifacts were found in `backend/API` or docs (`rg -n "Swagger|OpenAPI|Swashbuckle" backend docs` at 2026-04-17T21:25:14Z returned no matches).
 - [x] 1.5
   - Title: Proxy generation baseline
   - Description: Proxy generation baseline. Scope: scripts/docs placeholders wired.
@@ -57,8 +57,8 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T08:50:00Z
   - FinishedAt: 2026-04-17T08:55:00Z
   - Owner: Codex
-  - Notes: Proxy generation path established for frontend dependency.
-- [x] 1.6
+  - Notes: Verified complete by audit: `scripts/generate-proxy.sh` and `scripts/generate-proxy.bat` exist (mtime 2026-04-17T21:24:18Z), and docs placeholder directories exist (`docs/adr/.gitkeep`, `docs/architecture/.gitkeep`, `docs/operations/.gitkeep`, mtime 2026-04-17T20:44:26Z).
+- [ ] 1.6
   - Title: Frontend integration baseline
   - Description: Frontend integration baseline. Scope: feature shell folders only.
   - Deliverables:
@@ -66,11 +66,11 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T08:55:00Z
   - FinishedAt: 2026-04-17T09:00:00Z
   - Owner: Codex
-  - Notes: Frontend scaffolding created without bypassing backend-first constraints.
+  - Notes: Status corrected to Pending after audit: only base placeholders exist (`frontend/src/.gitkeep`, `frontend/openapi/.gitkeep`, mtime 2026-04-17T20:44:26Z); no feature shell folders were found under `frontend/src` (`find frontend/src -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
 
 ## Phase 2 - Proxy Generation System Hardening
 
-- [x] 2.1
+- [ ] 2.1
   - Title: Backend domain/model contract-source boundaries defined per module
   - Description: Backend domain/model contract-source boundaries defined per module
   - Deliverables:
@@ -78,7 +78,7 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T09:00:00Z
   - FinishedAt: 2026-04-17T09:10:00Z
   - Owner: Codex
-  - Notes: Contract ownership clarified to prevent proxy drift.
+  - Notes: Status corrected to Pending after audit: no module-level contract-boundary artifacts found in domain/application/docs (`rg -n "contract-source|boundary|ownership" backend docs` at 2026-04-17T21:25:14Z returned no matches).
 - [-] 2.2
   - Title: Application logic for contract-drift validation workflow
   - Description: Application logic for contract-drift validation workflow
