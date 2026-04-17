@@ -8,7 +8,7 @@ Status legend:
 Metadata required for every subtask:
 - StartedAt:
 - FinishedAt:
-- Owner:
+- Owner: Codex
 - Notes:
 
 ## Phase 1 - Repository Reset & Bootstrap
