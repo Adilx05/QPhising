@@ -75,7 +75,7 @@ if (!swagger.paths || typeof swagger.paths !== "object") {
 }
 
 if (!Object.prototype.hasOwnProperty.call(swagger.paths, requiredPath)) {
-  console.error(`Error: required path '${requiredPath}' was not found in Swagger. Run backend contract updates first.`);
+  console.error(`Error: required path "${requiredPath}" was not found in Swagger. Run backend contract updates first.`);
   process.exit(1);
 }
 ' "${output_file}"; then
