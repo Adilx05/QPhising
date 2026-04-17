@@ -27,22 +27,78 @@ Status legend:
 - 2026-04-17: Added repeatable proxy generation scripts for Bash and Windows Batch.
 - 2026-04-17: Added usage documentation and command examples to `README.md`.
 
-## Phase 3 - Setup Wizard Architecture
+## Phase 3 - Setup Wizard + Setup Backend APIs
 
-- [ ] Define setup domain concepts (setup state, completion rules, invariants).
-- [ ] Define application contracts/commands/queries for setup flow.
-- [ ] Define API surface for setup-only endpoints and bootstrap checks.
-- [ ] Define frontend route-guard and redirect architecture (block app until setup complete).
-- [ ] Define end-to-end setup sequence diagram (API + Gateway + UI integration path).
-
-## Phase 4 - Setup Backend APIs
-
-- [ ] Implement setup aggregate/entity and required value objects.
-- [ ] Implement infrastructure configuration/repository for setup state.
-- [ ] Implement setup commands/queries and MediatR handlers.
-- [ ] Implement FluentValidation validators for setup requests.
-- [ ] Expose setup endpoints (ProblemDetails + auth scope rules where applicable).
-- [ ] Expose setup Swagger contracts and verify proxy generation output.
+- [ ] Setup aggregate/config model creation (domain)
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
+- [ ] Setup commands/queries and DTO contracts (application)
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
+- [ ] Validators for each request
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
+- [ ] Handlers for status/test/save operations
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
+- [ ] API controller endpoints:
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
+  - [ ] GET `/api/setup/status`
+    - StartedAt:
+    - FinishedAt:
+    - Owner:
+    - Notes:
+  - [ ] POST `/api/setup/test-db`
+    - StartedAt:
+    - FinishedAt:
+    - Owner:
+    - Notes:
+  - [ ] POST `/api/setup/test-keycloak`
+    - StartedAt:
+    - FinishedAt:
+    - Owner:
+    - Notes:
+  - [ ] POST `/api/setup/test-redis`
+    - StartedAt:
+    - FinishedAt:
+    - Owner:
+    - Notes:
+  - [ ] POST `/api/setup/save`
+    - StartedAt:
+    - FinishedAt:
+    - Owner:
+    - Notes:
+- [ ] Swagger verification task
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
+- [ ] Proxy regeneration task
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
+- [ ] Frontend setup flow tasks using generated proxy only
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
+- [ ] Route-guard task to block non-setup routes until completion
+  - StartedAt:
+  - FinishedAt:
+  - Owner:
+  - Notes:
 
 ## Phase 5 - Runtime Configuration Persistence
 
