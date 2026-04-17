@@ -38,7 +38,7 @@ public sealed class SetupDependencyConnectionTester : ISetupDependencyConnection
     }
 
     public async Task<SetupDependencyTestResult> TestKeycloakAsync(
-        string authority,
+        Uri authority,
         string realm,
         string clientId,
         string clientSecret,
@@ -46,12 +46,13 @@ public sealed class SetupDependencyConnectionTester : ISetupDependencyConnection
     {
         try
         {
-            if (!Uri.TryCreate(authority, UriKind.Absolute, out var authorityUri))
+            ArgumentNullException.ThrowIfNull(authority);
+            if (!authority.IsAbsoluteUri)
             {
                 return new SetupDependencyTestResult("keycloak", false, "Authority must be a valid absolute URI.");
             }
 
-            var normalizedAuthority = authorityUri.AbsoluteUri.TrimEnd('/');
+            var normalizedAuthority = authority.AbsoluteUri.TrimEnd('/');
             var discoveryUri = new Uri($"{normalizedAuthority}/realms/{realm}/.well-known/openid-configuration");
 
             var httpClient = _httpClientFactory.CreateClient(nameof(SetupDependencyConnectionTester));
@@ -86,7 +87,7 @@ public sealed class SetupDependencyConnectionTester : ISetupDependencyConnection
 
             return new SetupDependencyTestResult("keycloak", true);
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or ArgumentException)
         {
             return new SetupDependencyTestResult("keycloak", false, ex.Message);
         }
