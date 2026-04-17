@@ -7,6 +7,8 @@ namespace QPhising.Domain.Setup.Aggregates;
 
 public sealed class SetupAggregate
 {
+    public bool IsSetupCompleted { get; private set; }
+
     public bool IsDatabaseConfigured { get; private set; }
 
     public bool IsKeycloakConfigured { get; private set; }
@@ -82,6 +84,7 @@ public sealed class SetupAggregate
             throw new InvalidOperationException("Setup cannot be completed until all required services are configured.");
         }
 
+        IsSetupCompleted = true;
         ReadinessState = SetupReadinessState.Ready;
     }
 
@@ -89,13 +92,18 @@ public sealed class SetupAggregate
 
     private void UpdateReadinessState()
     {
-        if (ReadinessState == SetupReadinessState.Ready)
+        if (IsSetupCompleted)
         {
+            ReadinessState = SetupReadinessState.Ready;
             return;
         }
 
-        ReadinessState = IsFullyConfigured()
-            ? SetupReadinessState.Ready
-            : SetupReadinessState.InProgress;
+        if (!IsDatabaseConfigured && !IsKeycloakConfigured && !IsRedisConfigured)
+        {
+            ReadinessState = SetupReadinessState.NotStarted;
+            return;
+        }
+
+        ReadinessState = SetupReadinessState.InProgress;
     }
 }
