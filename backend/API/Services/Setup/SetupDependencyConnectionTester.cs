@@ -1,7 +1,7 @@
-using System.Data.Common;
 using System.Net.Sockets;
 using System.Text;
-using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using QPhising.Application.Contracts.Abstractions.Setup;
 using QPhising.Application.Contracts.Responses.Setup;
 
@@ -20,18 +20,18 @@ public sealed class SetupDependencyConnectionTester : ISetupDependencyConnection
     {
         try
         {
-            var builder = new SqlConnectionStringBuilder(connectionString)
-            {
-                ConnectTimeout = Math.Clamp(new SqlConnectionStringBuilder(connectionString).ConnectTimeout, 1, 10)
-            };
+            var options = new DbContextOptionsBuilder<PostgresConnectivityDbContext>()
+                .UseNpgsql(connectionString, npgsqlOptions => npgsqlOptions.CommandTimeout(10))
+                .Options;
 
-            await using var connection = new SqlConnection(builder.ConnectionString);
-            await connection.OpenAsync(cancellationToken);
-            await connection.CloseAsync();
+            await using var dbContext = new PostgresConnectivityDbContext(options);
+            var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken);
 
-            return new SetupDependencyTestResult("database", true);
+            return canConnect
+                ? new SetupDependencyTestResult("database", true)
+                : new SetupDependencyTestResult("database", false, "Unable to connect to PostgreSQL database.");
         }
-        catch (Exception ex) when (ex is SqlException or InvalidOperationException or ArgumentException or DbException)
+        catch (Exception ex) when (ex is NpgsqlException or InvalidOperationException or ArgumentException)
         {
             return new SetupDependencyTestResult("database", false, ex.Message);
         }
@@ -149,5 +149,13 @@ public sealed class SetupDependencyConnectionTester : ISetupDependencyConnection
         }
 
         return (hostAndPort[0], port);
+    }
+
+    private sealed class PostgresConnectivityDbContext : DbContext
+    {
+        public PostgresConnectivityDbContext(DbContextOptions<PostgresConnectivityDbContext> options)
+            : base(options)
+        {
+        }
     }
 }

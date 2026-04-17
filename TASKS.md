@@ -169,7 +169,7 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T22:31:00Z
   - FinishedAt: 2026-04-17T22:37:16Z
   - Owner: Codex
-  - Notes: Added `SetupController` with all Phase 3.3 setup endpoints wired to MediatR commands/queries, introduced API request contracts for setup actions, and completed DI composition by registering setup application abstractions with concrete implementations (`JsonFileSetupConfigurationRepository`, `SetupDependencyConnectionTester`, `DataProtectionSetupSecretCipher`) so setup handlers can be activated successfully.
+  - Notes: Added `SetupController` with all Phase 3.3 setup endpoints wired to MediatR commands/queries, introduced API request contracts for setup actions, and completed DI composition by registering setup application abstractions with concrete implementations (`JsonFileSetupConfigurationRepository`, `SetupDependencyConnectionTester`, `DataProtectionSetupSecretCipher`) so setup handlers can be activated successfully; database connectivity test implementation is PostgreSQL-oriented via EF Core/Npgsql (no SQL Server dependency).
 - [ ] 3.4
   - Title: Swagger contract verification for setup endpoints and examples
   - Description: Swagger contract verification for setup endpoints and examples
