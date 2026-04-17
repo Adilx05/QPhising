@@ -26,7 +26,7 @@ if errorlevel 1 (
 echo Validating Swagger preconditions from: %SWAGGER_URL%
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop';" ^
-  "$requiredPath='/api/proxy-validation/assert-sync';" ^
+  "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/setup/status','/api/setup/test-db','/api/setup/test-redis','/api/setup/test-keycloak','/api/setup/save');" ^
   "$swaggerUrl='%SWAGGER_URL%';" ^
   "$swaggerFile='%SWAGGER_FILE%';" ^
   "try {" ^
@@ -53,9 +53,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "  Write-Error 'Swagger document is missing paths.';" ^
   "  exit 1;" ^
   "}" ^
-  "if (-not $swagger.paths.PSObject.Properties.Name.Contains($requiredPath)) {" ^
-  "  Write-Error ('Required path ''{0}'' was not found in Swagger. Run backend contract updates first.' -f $requiredPath);" ^
-  "  exit 1;" ^
+  "foreach ($requiredPath in $requiredPaths) {" ^
+  "  if (-not $swagger.paths.PSObject.Properties.Name.Contains($requiredPath)) {" ^
+  "    Write-Error ('Required path ''{0}'' was not found in Swagger. Run backend contract updates first.' -f $requiredPath);" ^
+  "    exit 1;" ^
+  "  }" ^
   "}" ^
   "[System.IO.File]::WriteAllText($swaggerFile, $response.Content, (New-Object System.Text.UTF8Encoding($false)));" ^
   "exit 0"

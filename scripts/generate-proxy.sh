@@ -49,7 +49,14 @@ download_and_validate_swagger_document() {
 
   if ! node -e '
 const fs = require("fs");
-const requiredPath = "/api/proxy-validation/assert-sync";
+const requiredPaths = [
+  "/api/proxy-validation/assert-sync",
+  "/api/setup/status",
+  "/api/setup/test-db",
+  "/api/setup/test-redis",
+  "/api/setup/test-keycloak",
+  "/api/setup/save"
+];
 let swagger;
 
 try {
@@ -74,9 +81,11 @@ if (!swagger.paths || typeof swagger.paths !== "object") {
   process.exit(1);
 }
 
-if (!Object.prototype.hasOwnProperty.call(swagger.paths, requiredPath)) {
-  console.error(`Error: required path "${requiredPath}" was not found in Swagger. Run backend contract updates first.`);
-  process.exit(1);
+for (const requiredPath of requiredPaths) {
+  if (!Object.prototype.hasOwnProperty.call(swagger.paths, requiredPath)) {
+    console.error(`Error: required path "${requiredPath}" was not found in Swagger. Run backend contract updates first.`);
+    process.exit(1);
+  }
 }
 ' "${output_file}"; then
     exit 1
