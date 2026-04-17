@@ -88,15 +88,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T21:43:27Z
   - Owner: Codex
   - Notes: Added Application-layer CQRS workflow for stale-proxy detection with query/validator/handler and enforcement command that throws `ProxyContractDriftException` on drift; introduced proxy validation contracts (`IProxyContractDriftValidator`, result/status records) and a dedicated `backend/Application/QPhising.Application.csproj` to host MediatR + FluentValidation-based logic.
-- [ ] 2.3
+- [x] 2.3
   - Title: Endpoint for proxy validation/check command invocation
   - Description: Endpoint for proxy validation/check command invocation
   - Deliverables:
     - Endpoint for proxy validation/check command invocation
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T21:44:00Z
+  - FinishedAt: 2026-04-17T21:47:06Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added `POST /api/proxy-validation/assert-sync` endpoint that invokes `AssertProxyContractSyncCommand` through MediatR and returns `409` conflict payload on contract drift; wired API to Application project + MediatR registrations and introduced `FileTimestampProxyContractDriftValidator` as the concrete validator for command/query execution. Files touched: `backend/API/Controllers/ProxyValidationController.cs`, `backend/API/Contracts/ProxyValidation/*`, `backend/API/Services/ProxyValidation/FileTimestampProxyContractDriftValidator.cs`, `backend/API/Program.cs`, `backend/API/QPhising.Api.csproj`.
 - [ ] 2.4
   - Title: Swagger validation gate integration for proxy generation preconditions
   - Description: Swagger validation gate integration for proxy generation preconditions
