@@ -218,15 +218,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T23:33:38Z
   - Owner: Codex
   - Notes: Added setup-guard application contracts and CQRS query flow to resolve setup access state and redirect target using `SetupCompletionPolicy`, including `GetSetupGuardDecisionQuery` + handler/validator and `SetupGuardDecisionResult` for route-guard consumption. Files touched: `backend/Application/CQRS/Queries/Setup/GetSetupGuardDecisionQuery.cs`, `backend/Application/CQRS/Queries/Setup/GetSetupGuardDecisionQueryHandler.cs`, `backend/Application/CQRS/Queries/Setup/GetSetupGuardDecisionQueryValidator.cs`, `backend/Application/Contracts/Responses/Setup/SetupGuardDecisionResult.cs`.
-- [ ] 4.3
+- [x] 4.3
   - Title: Endpoint for setup completion/readiness and guarded app-access checks
   - Description: Endpoint for setup completion/readiness and guarded app-access checks
   - Deliverables:
     - Endpoint for setup completion/readiness and guarded app-access checks
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T23:35:00Z
+  - FinishedAt: 2026-04-17T23:36:30Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added setup gating endpoint `GET /api/setup/guard-decision` in `SetupController`, returning `SetupGuardDecisionResult` through MediatR `GetSetupGuardDecisionQuery` so clients can evaluate setup completion/readiness and enforce guarded main-app access redirects. Files touched: `backend/API/Controllers/SetupController.cs`.
 - [ ] 4.4
   - Title: Swagger verification for gating/readiness contracts
   - Description: Swagger verification for gating/readiness contracts
