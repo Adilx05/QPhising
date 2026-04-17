@@ -15,11 +15,17 @@ Status legend:
 
 ## Phase 2 - Proxy Generation System
 
+- [x] Create cross-platform proxy generation scripts (`scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`).
+- [x] Parameterize scripts to support overriding the Swagger URL while keeping a local default.
+- [x] Validate fixed output path regeneration (`frontend/src/app/shared/proxy`) and fail when generation output is missing.
+- [x] Document repeatable day-to-day usage workflow for developers.
 - [ ] Define OpenAPI source-of-truth boundaries per backend service.
-- [ ] Add proxy generation configuration (tooling, output folders, naming standards).
-- [ ] Create generation command scripts for local/dev CI usage.
 - [ ] Add contract drift validation (fail when proxies are stale vs Swagger).
-- [ ] Add developer docs for regeneration workflow and troubleshooting.
+
+### Phase 2 Notes / Evidence
+
+- 2026-04-17: Added repeatable proxy generation scripts for Bash and Windows Batch.
+- 2026-04-17: Added usage documentation and command examples to `README.md`.
 
 ## Phase 3 - Setup Wizard Architecture
 
