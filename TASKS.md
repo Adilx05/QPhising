@@ -245,15 +245,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T23:42:58Z
   - Owner: Codex
   - Notes: Updated proxy-generation precondition gates in both scripts to require `/api/setup/guard-decision` so setup-gating contract drift is caught before generation; attempted `./scripts/generate-proxy.sh file://.../frontend/openapi/proxy-validation.swagger.json` refresh, but npm registry access is blocked in this environment (403), then restored existing generated proxy artifacts unchanged.
-- [ ] 4.6
+- [x] 4.6
   - Title: Frontend integration
   - Description: Frontend integration. Scope: route guards + redirect to setup until complete.
   - Deliverables:
     - route guards + redirect to setup until complete
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T23:45:00Z
+  - FinishedAt: 2026-04-17T23:46:50Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added setup-gating frontend integration by introducing setup guard data-access helpers backed by generated `SetupService.getApiSetupGuardDecision`, plus Angular route guards (`CanActivate`/`CanMatch`) that redirect to the backend-recommended setup path until setup is complete. Files touched: `frontend/src/app/features/setup/data-access/setup-guard.client.ts`, `frontend/src/app/features/setup/data-access/index.ts`, `frontend/src/app/core/guards/setup-completion.guard.ts`, `frontend/src/app/core/guards/index.ts`.
 
 ## Phase 5 - Runtime Configuration Persistence
 
