@@ -25,6 +25,7 @@ export class SetupService {
     });
   }
   /**
+   * Resolve setup-gating decision for setup wizard and main application access.
    * @returns SetupGuardDecisionResult OK
    * @throws ApiError
    */
