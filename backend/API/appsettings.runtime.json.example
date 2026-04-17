@@ -1,0 +1,17 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=qphising;Username=qphising;Password=change-me"
+  },
+  "Authentication": {
+    "Jwt": {
+      "Authority": "https://localhost:8444/realms/qphising",
+      "Audience": "qphising-api"
+    }
+  },
+  "Keycloak": {
+    "ClientSecret": "set-at-runtime"
+  },
+  "Redis": {
+    "Configuration": "localhost:6379"
+  }
+}
