@@ -58,6 +58,26 @@
         }
       }
     },
+    "/api/setup/guard-decision": {
+      "get": {
+        "tags": [
+          "Setup"
+        ],
+        "operationId": "Setup_GetGuardDecision",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupGuardDecisionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/setup/test-db": {
       "post": {
         "tags": [
@@ -288,6 +308,39 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "SetupAccessState": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "SetupGuardDecisionResult": {
+        "type": "object",
+        "required": [
+          "accessState",
+          "recommendedRedirectPath"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "accessState": {
+            "$ref": "#/components/schemas/SetupAccessState"
+          },
+          "isSetupCompleted": {
+            "type": "boolean"
+          },
+          "allowSetupWizard": {
+            "type": "boolean"
+          },
+          "allowMainApplication": {
+            "type": "boolean"
+          },
+          "recommendedRedirectPath": {
+            "type": "string"
+          }
+        }
       },
       "SetupStatusResult": {
         "type": "object",

@@ -27,6 +27,13 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             return;
         }
 
+        if (method == "GET" && path == "/api/setup/guard-decision")
+        {
+            operation.Summary ??= "Resolve setup-gating decision for setup wizard and main application access.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateGuardDecisionResponseExample());
+            return;
+        }
+
         if (method == "POST" && path == "/api/setup/test-db")
         {
             operation.Summary ??= "Validate database connectivity using the supplied connection string.";
@@ -103,6 +110,18 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             ["isKeycloakConfigured"] = new OpenApiBoolean(true),
             ["isRedisConfigured"] = new OpenApiBoolean(true),
             ["readinessState"] = new OpenApiInteger(2)
+        };
+    }
+
+    private static OpenApiObject CreateGuardDecisionResponseExample()
+    {
+        return new OpenApiObject
+        {
+            ["accessState"] = new OpenApiInteger(1),
+            ["isSetupCompleted"] = new OpenApiBoolean(false),
+            ["allowSetupWizard"] = new OpenApiBoolean(true),
+            ["allowMainApplication"] = new OpenApiBoolean(false),
+            ["recommendedRedirectPath"] = new OpenApiString("/setup")
         };
     }
 
