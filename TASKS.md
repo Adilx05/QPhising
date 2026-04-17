@@ -58,15 +58,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T08:55:00Z
   - Owner: Codex
   - Notes: Verified complete by audit: `scripts/generate-proxy.sh` and `scripts/generate-proxy.bat` exist (mtime 2026-04-17T21:24:18Z), and docs placeholder directories exist (`docs/adr/.gitkeep`, `docs/architecture/.gitkeep`, `docs/operations/.gitkeep`, mtime 2026-04-17T20:44:26Z).
-- [ ] 1.6
+- [x] 1.6
   - Title: Frontend integration baseline
   - Description: Frontend integration baseline. Scope: feature shell folders only.
   - Deliverables:
     - feature shell folders only
-  - StartedAt: 2026-04-17T08:55:00Z
-  - FinishedAt: 2026-04-17T09:00:00Z
+  - StartedAt: 2026-04-17T22:26:00Z
+  - FinishedAt: 2026-04-17T22:28:00Z
   - Owner: Codex
-  - Notes: Status corrected to Pending after audit: only base placeholders exist (`frontend/src/.gitkeep`, `frontend/openapi/.gitkeep`, mtime 2026-04-17T20:44:26Z); no feature shell folders were found under `frontend/src` (`find frontend/src -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
+  - Notes: Added feature-shell folder structure under `frontend/src/app` with tracked placeholders for `core`, `shared`, and `features` modules (`setup`, `auth`, `dashboard`) by adding `.gitkeep` files only; no frontend implementation code was introduced in this baseline subtask.
 
 ## Phase 2 - Proxy Generation System Hardening
 
