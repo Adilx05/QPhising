@@ -187,3 +187,7 @@ Status legend:
 - [ ] No placeholder/fake data remains (document audit of removed mocks/stubs and impacted files).
 - [ ] `TASKS.md` updated with evidence (link each completed task to concrete proof: commands, logs, screenshots, or artifacts).
 - [ ] Security and role rules verified for protected endpoints (evidence of JWT auth + `Admin`/`Operator`/`Viewer` authorization checks).
+
+## Notes
+
+- 2026-04-17: Verified the top-level directories documented in `README.md` already exist with matching names: `backend/`, `gateway/`, `worker/`, `frontend/`, `docs/`, and `scripts/`. No naming changes were required.
