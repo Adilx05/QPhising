@@ -179,15 +179,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T23:03:02Z
   - Owner: Codex
   - Notes: Added `SetupEndpointsExamplesOperationFilter` and wired it through `AddSwaggerGen` so all setup endpoints (`/api/setup/status`, `/test-db`, `/test-redis`, `/test-keycloak`, `/save`) now expose explicit request/response examples in OpenAPI output for contract verification and downstream proxy generation clarity. Files touched: `backend/API/Swagger/SetupEndpointsExamplesOperationFilter.cs`, `backend/API/Program.cs`.
-- [ ] 3.5
+- [x] 3.5
   - Title: Proxy generation for setup controller and DTOs
   - Description: Proxy generation for setup controller and DTOs
   - Deliverables:
     - Proxy generation for setup controller and DTOs
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T23:16:00Z
+  - FinishedAt: 2026-04-17T23:24:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Expanded the checked-in OpenAPI fixture to include all setup-controller endpoints and setup DTO schemas, then tightened both proxy-generation scripts to require setup paths (`/api/setup/status`, `/test-db`, `/test-redis`, `/test-keycloak`, `/save`) in addition to proxy-validation before generation can proceed; verified existing generated `SetupService` and setup DTO proxies already cover all setup routes. Attempted to rerun `./scripts/generate-proxy.sh` against the fixture, but npm registry access is blocked in this environment (403), so no generated artifact updates were produced. Files touched: `frontend/openapi/proxy-validation.swagger.json`, `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`.
 - [ ] 3.6
   - Title: Frontend integration for setup flow using generated setup proxy
   - Description: Frontend integration for setup flow using generated setup proxy

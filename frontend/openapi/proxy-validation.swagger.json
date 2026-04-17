@@ -37,31 +37,171 @@
           }
         }
       }
+    },
+    "/api/setup/status": {
+      "get": {
+        "tags": [
+          "Setup"
+        ],
+        "operationId": "Setup_GetStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupStatusResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/setup/test-db": {
+      "post": {
+        "tags": [
+          "Setup"
+        ],
+        "operationId": "Setup_TestDb",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDatabaseConnectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupDependencyTestResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/setup/test-redis": {
+      "post": {
+        "tags": [
+          "Setup"
+        ],
+        "operationId": "Setup_TestRedis",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestRedisConnectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupDependencyTestResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/setup/test-keycloak": {
+      "post": {
+        "tags": [
+          "Setup"
+        ],
+        "operationId": "Setup_TestKeycloak",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestKeycloakConnectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupDependencyTestResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/setup/save": {
+      "post": {
+        "tags": [
+          "Setup"
+        ],
+        "operationId": "Setup_Save",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSetupConfigurationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupStatusResult"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "AssertProxyContractSyncRequest": {
         "type": "object",
+        "required": [
+          "swaggerContractPath",
+          "proxyGenerationStampPath"
+        ],
         "additionalProperties": false,
         "properties": {
           "swaggerContractPath": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "proxyGenerationStampPath": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         }
       },
       "ProxyContractSyncConflictResponse": {
         "type": "object",
+        "required": [
+          "status"
+        ],
         "additionalProperties": false,
         "properties": {
           "status": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/ProxyDriftValidationStatus"
           },
           "message": {
             "type": "string",
@@ -78,6 +218,132 @@
             "nullable": true
           },
           "suggestedRegenerationCommand": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProxyDriftValidationStatus": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "SaveSetupConfigurationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "databaseConnectionString": {
+            "type": "string",
+            "nullable": true
+          },
+          "redisConnectionString": {
+            "type": "string",
+            "nullable": true
+          },
+          "keycloakAuthority": {
+            "type": "string",
+            "nullable": true
+          },
+          "keycloakRealm": {
+            "type": "string",
+            "nullable": true
+          },
+          "keycloakClientId": {
+            "type": "string",
+            "nullable": true
+          },
+          "keycloakClientSecret": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SetupDependencyTestResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dependency": {
+            "type": "string",
+            "nullable": true
+          },
+          "succeeded": {
+            "type": "boolean"
+          },
+          "failureReason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SetupReadinessState": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "SetupStatusResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "isDatabaseConfigured": {
+            "type": "boolean"
+          },
+          "isKeycloakConfigured": {
+            "type": "boolean"
+          },
+          "isRedisConfigured": {
+            "type": "boolean"
+          },
+          "readinessState": {
+            "$ref": "#/components/schemas/SetupReadinessState"
+          }
+        }
+      },
+      "TestDatabaseConnectionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "connectionString": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TestKeycloakConnectionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "authority": {
+            "type": "string",
+            "nullable": true
+          },
+          "realm": {
+            "type": "string",
+            "nullable": true
+          },
+          "clientId": {
+            "type": "string",
+            "nullable": true
+          },
+          "clientSecret": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TestRedisConnectionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "connectionString": {
             "type": "string",
             "nullable": true
           }
