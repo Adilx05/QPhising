@@ -2,8 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type AssertProxyContractSyncRequest = {
-  swaggerContractPath: string;
-  proxyGenerationStampPath: string;
+export type SetupDependencyTestResult = {
+  dependency?: string | null;
+  succeeded?: boolean;
+  failureReason?: string | null;
 };
 

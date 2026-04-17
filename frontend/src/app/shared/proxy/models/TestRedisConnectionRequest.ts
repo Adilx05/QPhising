@@ -2,8 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type AssertProxyContractSyncRequest = {
-  swaggerContractPath: string;
-  proxyGenerationStampPath: string;
+export type TestRedisConnectionRequest = {
+  connectionString?: string | null;
 };
 

@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 set "SCRIPT_DIR=%~dp0"
 for %%I in ("%SCRIPT_DIR%..") do set "REPO_ROOT=%%~fI"
-set "DEFAULT_SWAGGER_URL=http://localhost:5000/swagger/v1/swagger.json"
+set "DEFAULT_SWAGGER_URL=https://localhost:7050/swagger/v1/swagger.json"
 set "SWAGGER_URL=%~1"
 if "%SWAGGER_URL%"=="" set "SWAGGER_URL=%DEFAULT_SWAGGER_URL%"
 set "OUTPUT_DIR=%REPO_ROOT%\frontend\src\app\shared\proxy"
