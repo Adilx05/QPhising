@@ -136,15 +136,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T22:06:55Z
   - Owner: Codex
   - Notes: Added Setup domain model primitives in `backend/Domain/Setup` including `SetupAggregate` for setup completion/readiness invariants, `SetupReadinessState` enum, and `SecureConfigValue` value object for non-empty secure configuration ciphertext handling and masked preview support.
-- [ ] 3.2
+- [x] 3.2
   - Title: Application logic
   - Description: Application logic. Scope: commands/queries/handlers/validators for status, test, save.
   - Deliverables:
     - commands/queries/handlers/validators for status, test, save
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T22:08:00Z
+  - FinishedAt: 2026-04-17T22:11:32Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented Setup application CQRS flow for status/test/save with MediatR queries/commands + FluentValidation validators, introduced setup application abstractions (`ISetupConfigurationRepository`, `ISetupDependencyConnectionTester`, `ISetupSecretCipher`) and response contracts, and wired Application to Domain through a new Domain project file and project reference. Files touched: `backend/Application/CQRS/Queries/Setup/*`, `backend/Application/CQRS/Commands/Setup/*`, `backend/Application/Contracts/Abstractions/Setup/*`, `backend/Application/Contracts/Responses/Setup/*`, `backend/Application/QPhising.Application.csproj`, `backend/Domain/QPhising.Domain.csproj`.
 - [ ] 3.3
   - Title: Endpoint implementation
   - Description: Endpoint implementation. Scope: `/api/setup/status`, `/test-db`, `/test-keycloak`, `/test-redis`, `/save`.
