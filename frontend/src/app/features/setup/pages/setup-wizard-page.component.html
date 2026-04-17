@@ -1,0 +1,73 @@
+<div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
+  <p-card header="İlk Kurulum" subheader="QPhising runtime bağımlılıklarını doğrulayın ve kaydedin.">
+    <form [formGroup]="form" class="space-y-4">
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700" for="databaseConnectionString">Database Connection String</label>
+        <input id="databaseConnectionString" pInputText class="w-full" formControlName="databaseConnectionString" />
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700" for="redisConnectionString">Redis Connection String</label>
+        <input id="redisConnectionString" pInputText class="w-full" formControlName="redisConnectionString" />
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="keycloakAuthority">Keycloak Authority</label>
+          <input id="keycloakAuthority" pInputText class="w-full" formControlName="keycloakAuthority" />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="keycloakRealm">Keycloak Realm</label>
+          <input id="keycloakRealm" pInputText class="w-full" formControlName="keycloakRealm" />
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="keycloakClientId">Keycloak Client Id</label>
+          <input id="keycloakClientId" pInputText class="w-full" formControlName="keycloakClientId" />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="keycloakClientSecret">Keycloak Client Secret</label>
+          <p-password
+            inputId="keycloakClientSecret"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [feedback]="false"
+            formControlName="keycloakClientSecret"
+          ></p-password>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3 pt-2">
+        <p-button label="DB Test" icon="pi pi-database" [outlined]="true" [disabled]="isBusy()" (onClick)="testDatabase()"></p-button>
+        <p-button label="Redis Test" icon="pi pi-bolt" [outlined]="true" [disabled]="isBusy()" (onClick)="testRedis()"></p-button>
+        <p-button label="Keycloak Test" icon="pi pi-shield" [outlined]="true" [disabled]="isBusy()" (onClick)="testKeycloak()"></p-button>
+        <p-button label="Kaydet" icon="pi pi-save" severity="primary" [loading]="isBusy()" (onClick)="save()"></p-button>
+      </div>
+    </form>
+  </p-card>
+
+  <div class="space-y-4">
+    <p-card header="Kurulum Durumu">
+      <ul class="m-0 list-none space-y-2 p-0 text-sm text-slate-700">
+        <li><strong>Readiness:</strong> {{ status()?.readinessState ?? 'unknown' }}</li>
+        <li><strong>Completed:</strong> {{ setupCompleted() ? 'Yes' : 'No' }}</li>
+      </ul>
+    </p-card>
+
+    <p-card header="Bağlantı Test Sonuçları">
+      <ul class="m-0 list-none space-y-2 p-0 text-sm text-slate-700">
+        <li><strong>Database:</strong> {{ dbTestResult()?.isSuccess === true ? 'OK' : 'Not tested' }}</li>
+        <li><strong>Redis:</strong> {{ redisTestResult()?.isSuccess === true ? 'OK' : 'Not tested' }}</li>
+        <li><strong>Keycloak:</strong> {{ keycloakTestResult()?.isSuccess === true ? 'OK' : 'Not tested' }}</li>
+      </ul>
+    </p-card>
+
+    <p-card *ngIf="feedback()" header="Mesaj">
+      <p class="m-0 text-sm text-slate-700">{{ feedback() }}</p>
+    </p-card>
+  </div>
+</div>
