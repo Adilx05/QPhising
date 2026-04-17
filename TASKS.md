@@ -79,15 +79,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T21:40:04Z
   - Owner: Codex
   - Notes: Defined module-level contract-source boundaries in `backend/Domain/Contracts/ModuleContractBoundaries.md` and established bounded-context domain folders plus `backend/Domain/README.md` to formalize ownership per module and layer separation expectations.
-- [-] 2.2
+- [x] 2.2
   - Title: Application logic for contract-drift validation workflow
   - Description: Application logic for contract-drift validation workflow
   - Deliverables:
     - Application logic for contract-drift validation workflow
   - StartedAt: 2026-04-17T09:10:00Z
-  - FinishedAt: 
+  - FinishedAt: 2026-04-17T21:43:27Z
   - Owner: Codex
-  - Notes: Implement stale-proxy detection workflow and failure semantics.
+  - Notes: Added Application-layer CQRS workflow for stale-proxy detection with query/validator/handler and enforcement command that throws `ProxyContractDriftException` on drift; introduced proxy validation contracts (`IProxyContractDriftValidator`, result/status records) and a dedicated `backend/Application/QPhising.Application.csproj` to host MediatR + FluentValidation-based logic.
 - [ ] 2.3
   - Title: Endpoint for proxy validation/check command invocation
   - Description: Endpoint for proxy validation/check command invocation
