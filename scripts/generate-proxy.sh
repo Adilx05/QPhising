@@ -52,6 +52,7 @@ const fs = require("fs");
 const requiredPaths = [
   "/api/proxy-validation/assert-sync",
   "/api/setup/status",
+  "/api/setup/guard-decision",
   "/api/setup/test-db",
   "/api/setup/test-redis",
   "/api/setup/test-keycloak",
