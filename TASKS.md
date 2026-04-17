@@ -200,15 +200,15 @@ Metadata required for every subtask:
 
 ## Phase 4 - Setup Wizard Gating & UX Completion
 
-- [ ] 4.1
+- [x] 4.1
   - Title: Backend domain/model for setup completion policy and access state
   - Description: Backend domain/model for setup completion policy and access state
   - Deliverables:
     - Backend domain/model for setup completion policy and access state
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T23:24:00Z
+  - FinishedAt: 2026-04-17T23:28:42Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added setup-gating domain model by introducing `SetupAccessState` and `SetupCompletionPolicy.ResolveAccessState(...)`, and refined `SetupAggregate` readiness/completion invariants with explicit `IsSetupCompleted` state so main-app access depends on explicit completion rather than partial configuration. Files touched: `backend/Domain/Setup/Enums/SetupAccessState.cs`, `backend/Domain/Setup/Policies/SetupCompletionPolicy.cs`, `backend/Domain/Setup/Aggregates/SetupAggregate.cs`.
 - [ ] 4.2
   - Title: Application logic for setup-complete checks, redirect decisions, and guard contracts
   - Description: Application logic for setup-complete checks, redirect decisions, and guard contracts
