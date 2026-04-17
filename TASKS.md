@@ -13,32 +13,56 @@ Metadata required for every subtask:
 
 ## Phase 1 - Repository Reset & Bootstrap
 
-- [x] 1.1 Backend domain/model baseline (solution skeleton, bounded contexts, domain folders)
+- [x] 1.1
+  - Title: Backend domain/model baseline
+  - Description: Backend domain/model baseline. Scope: solution skeleton, bounded contexts, domain folders.
+  - Deliverables:
+    - solution skeleton, bounded contexts, domain folders
   - StartedAt: 2026-04-17T08:10:00Z
   - FinishedAt: 2026-04-17T08:25:00Z
   - Owner: Codex
   - Notes: Repository reset and clean architecture folder topology established.
-- [x] 1.2 Application logic baseline (CQRS project scaffolding + contracts folders)
+- [x] 1.2
+  - Title: Application logic baseline
+  - Description: Application logic baseline. Scope: CQRS project scaffolding + contracts folders.
+  - Deliverables:
+    - CQRS project scaffolding + contracts folders
   - StartedAt: 2026-04-17T08:25:00Z
   - FinishedAt: 2026-04-17T08:35:00Z
   - Owner: Codex
   - Notes: Application layer scaffolded for backend-first flow.
-- [x] 1.3 Endpoint baseline (API host skeleton and controller structure)
+- [x] 1.3
+  - Title: Endpoint baseline
+  - Description: Endpoint baseline. Scope: API host skeleton and controller structure.
+  - Deliverables:
+    - API host skeleton and controller structure
   - StartedAt: 2026-04-17T08:35:00Z
   - FinishedAt: 2026-04-17T08:45:00Z
   - Owner: Codex
   - Notes: HTTP entrypoint structure created with transport-only intent.
-- [x] 1.4 Swagger baseline (OpenAPI bootstrapping verified)
+- [x] 1.4
+  - Title: Swagger baseline
+  - Description: Swagger baseline. Scope: OpenAPI bootstrapping verified.
+  - Deliverables:
+    - OpenAPI bootstrapping verified
   - StartedAt: 2026-04-17T08:45:00Z
   - FinishedAt: 2026-04-17T08:50:00Z
   - Owner: Codex
   - Notes: Swagger foundation included in bootstrap baseline.
-- [x] 1.5 Proxy generation baseline (scripts/docs placeholders wired)
+- [x] 1.5
+  - Title: Proxy generation baseline
+  - Description: Proxy generation baseline. Scope: scripts/docs placeholders wired.
+  - Deliverables:
+    - scripts/docs placeholders wired
   - StartedAt: 2026-04-17T08:50:00Z
   - FinishedAt: 2026-04-17T08:55:00Z
   - Owner: Codex
   - Notes: Proxy generation path established for frontend dependency.
-- [x] 1.6 Frontend integration baseline (feature shell folders only)
+- [x] 1.6
+  - Title: Frontend integration baseline
+  - Description: Frontend integration baseline. Scope: feature shell folders only.
+  - Deliverables:
+    - feature shell folders only
   - StartedAt: 2026-04-17T08:55:00Z
   - FinishedAt: 2026-04-17T09:00:00Z
   - Owner: Codex
@@ -46,597 +70,1029 @@ Metadata required for every subtask:
 
 ## Phase 2 - Proxy Generation System Hardening
 
-- [x] 2.1 Backend domain/model contract-source boundaries defined per module
+- [x] 2.1
+  - Title: Backend domain/model contract-source boundaries defined per module
+  - Description: Backend domain/model contract-source boundaries defined per module
+  - Deliverables:
+    - Backend domain/model contract-source boundaries defined per module
   - StartedAt: 2026-04-17T09:00:00Z
   - FinishedAt: 2026-04-17T09:10:00Z
   - Owner: Codex
   - Notes: Contract ownership clarified to prevent proxy drift.
-- [-] 2.2 Application logic for contract-drift validation workflow
+- [-] 2.2
+  - Title: Application logic for contract-drift validation workflow
+  - Description: Application logic for contract-drift validation workflow
+  - Deliverables:
+    - Application logic for contract-drift validation workflow
   - StartedAt: 2026-04-17T09:10:00Z
-  - FinishedAt:
+  - FinishedAt: 
   - Owner: Codex
   - Notes: Implement stale-proxy detection workflow and failure semantics.
-- [ ] 2.3 Endpoint for proxy validation/check command invocation
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 2.4 Swagger validation gate integration for proxy generation preconditions
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 2.5 Proxy generation script finalization (cross-platform + deterministic outputs)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 2.6 Frontend integration verification using generated clients only
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 2.3
+  - Title: Endpoint for proxy validation/check command invocation
+  - Description: Endpoint for proxy validation/check command invocation
+  - Deliverables:
+    - Endpoint for proxy validation/check command invocation
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 2.4
+  - Title: Swagger validation gate integration for proxy generation preconditions
+  - Description: Swagger validation gate integration for proxy generation preconditions
+  - Deliverables:
+    - Swagger validation gate integration for proxy generation preconditions
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 2.5
+  - Title: Proxy generation script finalization
+  - Description: Proxy generation script finalization. Scope: cross-platform + deterministic outputs.
+  - Deliverables:
+    - cross-platform + deterministic outputs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 2.6
+  - Title: Frontend integration verification using generated clients only
+  - Description: Frontend integration verification using generated clients only
+  - Deliverables:
+    - Frontend integration verification using generated clients only
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 3 - Setup Wizard Backend APIs
 
-- [ ] 3.1 Backend domain/model for setup aggregate, readiness state, and secure config value objects
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 3.2 Application logic (commands/queries/handlers/validators for status, test, save)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 3.3 Endpoint implementation (`/api/setup/status`, `/test-db`, `/test-keycloak`, `/test-redis`, `/save`)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 3.4 Swagger contract verification for setup endpoints and examples
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 3.5 Proxy generation for setup controller and DTOs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 3.6 Frontend integration for setup flow using generated setup proxy
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 3.1
+  - Title: Backend domain/model for setup aggregate, readiness state, and secure config value objects
+  - Description: Backend domain/model for setup aggregate, readiness state, and secure config value objects
+  - Deliverables:
+    - Backend domain/model for setup aggregate, readiness state, and secure config value objects
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 3.2
+  - Title: Application logic
+  - Description: Application logic. Scope: commands/queries/handlers/validators for status, test, save.
+  - Deliverables:
+    - commands/queries/handlers/validators for status, test, save
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 3.3
+  - Title: Endpoint implementation
+  - Description: Endpoint implementation. Scope: `/api/setup/status`, `/test-db`, `/test-keycloak`, `/test-redis`, `/save`.
+  - Deliverables:
+    - `/api/setup/status`, `/test-db`, `/test-keycloak`, `/test-redis`, `/save`
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 3.4
+  - Title: Swagger contract verification for setup endpoints and examples
+  - Description: Swagger contract verification for setup endpoints and examples
+  - Deliverables:
+    - Swagger contract verification for setup endpoints and examples
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 3.5
+  - Title: Proxy generation for setup controller and DTOs
+  - Description: Proxy generation for setup controller and DTOs
+  - Deliverables:
+    - Proxy generation for setup controller and DTOs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 3.6
+  - Title: Frontend integration for setup flow using generated setup proxy
+  - Description: Frontend integration for setup flow using generated setup proxy
+  - Deliverables:
+    - Frontend integration for setup flow using generated setup proxy
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 4 - Setup Wizard Gating & UX Completion
 
-- [ ] 4.1 Backend domain/model for setup completion policy and access state
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 4.2 Application logic for setup-complete checks, redirect decisions, and guard contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 4.3 Endpoint for setup completion/readiness and guarded app-access checks
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 4.4 Swagger verification for gating/readiness contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 4.5 Proxy generation refresh for setup gating contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 4.6 Frontend integration (route guards + redirect to setup until complete)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 4.1
+  - Title: Backend domain/model for setup completion policy and access state
+  - Description: Backend domain/model for setup completion policy and access state
+  - Deliverables:
+    - Backend domain/model for setup completion policy and access state
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 4.2
+  - Title: Application logic for setup-complete checks, redirect decisions, and guard contracts
+  - Description: Application logic for setup-complete checks, redirect decisions, and guard contracts
+  - Deliverables:
+    - Application logic for setup-complete checks, redirect decisions, and guard contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 4.3
+  - Title: Endpoint for setup completion/readiness and guarded app-access checks
+  - Description: Endpoint for setup completion/readiness and guarded app-access checks
+  - Deliverables:
+    - Endpoint for setup completion/readiness and guarded app-access checks
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 4.4
+  - Title: Swagger verification for gating/readiness contracts
+  - Description: Swagger verification for gating/readiness contracts
+  - Deliverables:
+    - Swagger verification for gating/readiness contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 4.5
+  - Title: Proxy generation refresh for setup gating contracts
+  - Description: Proxy generation refresh for setup gating contracts
+  - Deliverables:
+    - Proxy generation refresh for setup gating contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 4.6
+  - Title: Frontend integration
+  - Description: Frontend integration. Scope: route guards + redirect to setup until complete.
+  - Deliverables:
+    - route guards + redirect to setup until complete
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 5 - Runtime Configuration Persistence
 
-- [ ] 5.1 Backend domain/model for runtime configuration aggregate and secret-handling rules
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 5.2 Application logic for read/write/update configuration use cases + validators
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 5.3 Endpoint implementation for configuration operations and readiness checks
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 5.4 Swagger verification for runtime configuration contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 5.5 Proxy generation for runtime configuration APIs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 5.6 Frontend integration for secure runtime configuration management screens
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 5.1
+  - Title: Backend domain/model for runtime configuration aggregate and secret-handling rules
+  - Description: Backend domain/model for runtime configuration aggregate and secret-handling rules
+  - Deliverables:
+    - Backend domain/model for runtime configuration aggregate and secret-handling rules
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 5.2
+  - Title: Application logic for read/write/update configuration use cases + validators
+  - Description: Application logic for read/write/update configuration use cases + validators
+  - Deliverables:
+    - Application logic for read/write/update configuration use cases + validators
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 5.3
+  - Title: Endpoint implementation for configuration operations and readiness checks
+  - Description: Endpoint implementation for configuration operations and readiness checks
+  - Deliverables:
+    - Endpoint implementation for configuration operations and readiness checks
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 5.4
+  - Title: Swagger verification for runtime configuration contracts
+  - Description: Swagger verification for runtime configuration contracts
+  - Deliverables:
+    - Swagger verification for runtime configuration contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 5.5
+  - Title: Proxy generation for runtime configuration APIs
+  - Description: Proxy generation for runtime configuration APIs
+  - Deliverables:
+    - Proxy generation for runtime configuration APIs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 5.6
+  - Title: Frontend integration for secure runtime configuration management screens
+  - Description: Frontend integration for secure runtime configuration management screens
+  - Deliverables:
+    - Frontend integration for secure runtime configuration management screens
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 6 - Backend Foundation
 
-- [ ] 6.1 Backend domain/model shared primitives (entity/value object/domain event base)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 6.2 Application logic cross-cutting pipeline behaviors (validation/logging/authz)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 6.3 Endpoint pipeline integration (ProblemDetails, middleware, DI wiring)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 6.4 Swagger standard behavior checks for global error/auth response documentation
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 6.5 Proxy generation compatibility validation against base API conventions
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 6.6 Frontend integration baseline for common API error/auth handling
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 6.1
+  - Title: Backend domain/model shared primitives
+  - Description: Backend domain/model shared primitives. Scope: entity/value object/domain event base.
+  - Deliverables:
+    - entity/value object/domain event base
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 6.2
+  - Title: Application logic cross-cutting pipeline behaviors
+  - Description: Application logic cross-cutting pipeline behaviors. Scope: validation/logging/authz.
+  - Deliverables:
+    - validation/logging/authz
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 6.3
+  - Title: Endpoint pipeline integration
+  - Description: Endpoint pipeline integration. Scope: ProblemDetails, middleware, DI wiring.
+  - Deliverables:
+    - ProblemDetails, middleware, DI wiring
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 6.4
+  - Title: Swagger standard behavior checks for global error/auth response documentation
+  - Description: Swagger standard behavior checks for global error/auth response documentation
+  - Deliverables:
+    - Swagger standard behavior checks for global error/auth response documentation
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 6.5
+  - Title: Proxy generation compatibility validation against base API conventions
+  - Description: Proxy generation compatibility validation against base API conventions
+  - Deliverables:
+    - Proxy generation compatibility validation against base API conventions
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 6.6
+  - Title: Frontend integration baseline for common API error/auth handling
+  - Description: Frontend integration baseline for common API error/auth handling
+  - Deliverables:
+    - Frontend integration baseline for common API error/auth handling
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 7 - Swagger Standards
 
-- [ ] 7.1 Backend domain/model conventions for API resource naming and version scope
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 7.2 Application logic conventions for operation IDs, response envelopes, and examples
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 7.3 Endpoint annotation updates to enforce standard OpenAPI metadata
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 7.4 Swagger generation quality gate in CI/local checks
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 7.5 Proxy generation validation against standardized Swagger docs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 7.6 Frontend integration sanity check across standardized generated proxies
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 7.1
+  - Title: Backend domain/model conventions for API resource naming and version scope
+  - Description: Backend domain/model conventions for API resource naming and version scope
+  - Deliverables:
+    - Backend domain/model conventions for API resource naming and version scope
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 7.2
+  - Title: Application logic conventions for operation IDs, response envelopes, and examples
+  - Description: Application logic conventions for operation IDs, response envelopes, and examples
+  - Deliverables:
+    - Application logic conventions for operation IDs, response envelopes, and examples
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 7.3
+  - Title: Endpoint annotation updates to enforce standard OpenAPI metadata
+  - Description: Endpoint annotation updates to enforce standard OpenAPI metadata
+  - Deliverables:
+    - Endpoint annotation updates to enforce standard OpenAPI metadata
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 7.4
+  - Title: Swagger generation quality gate in CI/local checks
+  - Description: Swagger generation quality gate in CI/local checks
+  - Deliverables:
+    - Swagger generation quality gate in CI/local checks
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 7.5
+  - Title: Proxy generation validation against standardized Swagger docs
+  - Description: Proxy generation validation against standardized Swagger docs
+  - Deliverables:
+    - Proxy generation validation against standardized Swagger docs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 7.6
+  - Title: Frontend integration sanity check across standardized generated proxies
+  - Description: Frontend integration sanity check across standardized generated proxies
+  - Deliverables:
+    - Frontend integration sanity check across standardized generated proxies
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 8 - Gateway (Ocelot)
 
-- [ ] 8.1 Backend domain/model for gateway route ownership and module map definitions
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 8.2 Application logic for route policy composition (auth forwarding, claims mapping)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 8.3 Endpoint/gateway route implementation and middleware behavior
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 8.4 Swagger alignment check for gateway-exposed downstream services
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 8.5 Proxy generation consistency check with gateway routing strategy
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 8.6 Frontend integration smoke validation through gateway paths
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 8.1
+  - Title: Backend domain/model for gateway route ownership and module map definitions
+  - Description: Backend domain/model for gateway route ownership and module map definitions
+  - Deliverables:
+    - Backend domain/model for gateway route ownership and module map definitions
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 8.2
+  - Title: Application logic for route policy composition
+  - Description: Application logic for route policy composition. Scope: auth forwarding, claims mapping.
+  - Deliverables:
+    - auth forwarding, claims mapping
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 8.3
+  - Title: Endpoint/gateway route implementation and middleware behavior
+  - Description: Endpoint/gateway route implementation and middleware behavior
+  - Deliverables:
+    - Endpoint/gateway route implementation and middleware behavior
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 8.4
+  - Title: Swagger alignment check for gateway-exposed downstream services
+  - Description: Swagger alignment check for gateway-exposed downstream services
+  - Deliverables:
+    - Swagger alignment check for gateway-exposed downstream services
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 8.5
+  - Title: Proxy generation consistency check with gateway routing strategy
+  - Description: Proxy generation consistency check with gateway routing strategy
+  - Deliverables:
+    - Proxy generation consistency check with gateway routing strategy
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 8.6
+  - Title: Frontend integration smoke validation through gateway paths
+  - Description: Frontend integration smoke validation through gateway paths
+  - Deliverables:
+    - Frontend integration smoke validation through gateway paths
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 9 - Identity (Keycloak)
 
-- [ ] 9.1 Backend domain/model for role model (`Admin`, `Operator`, `Viewer`) and claims mapping
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 9.2 Application logic for authorization policies and token validation flows
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 9.3 Endpoint protection and policy binding across protected resources
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 9.4 Swagger security scheme and protected endpoint authorization metadata verification
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 9.5 Proxy generation refresh for secured endpoints and auth headers
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 9.6 Frontend integration for authenticated flows and role-based UX access
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 9.1
+  - Title: Backend domain/model for role model (`Admin`, `Operator`, `Viewer`) and claims mapping
+  - Description: Backend domain/model for role model (`Admin`, `Operator`, `Viewer`) and claims mapping
+  - Deliverables:
+    - Backend domain/model for role model (`Admin`, `Operator`, `Viewer`) and claims mapping
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 9.2
+  - Title: Application logic for authorization policies and token validation flows
+  - Description: Application logic for authorization policies and token validation flows
+  - Deliverables:
+    - Application logic for authorization policies and token validation flows
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 9.3
+  - Title: Endpoint protection and policy binding across protected resources
+  - Description: Endpoint protection and policy binding across protected resources
+  - Deliverables:
+    - Endpoint protection and policy binding across protected resources
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 9.4
+  - Title: Swagger security scheme and protected endpoint authorization metadata verification
+  - Description: Swagger security scheme and protected endpoint authorization metadata verification
+  - Deliverables:
+    - Swagger security scheme and protected endpoint authorization metadata verification
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 9.5
+  - Title: Proxy generation refresh for secured endpoints and auth headers
+  - Description: Proxy generation refresh for secured endpoints and auth headers
+  - Deliverables:
+    - Proxy generation refresh for secured endpoints and auth headers
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 9.6
+  - Title: Frontend integration for authenticated flows and role-based UX access
+  - Description: Frontend integration for authenticated flows and role-based UX access
+  - Deliverables:
+    - Frontend integration for authenticated flows and role-based UX access
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 10 - Database & Migrations
 
-- [ ] 10.1 Backend domain/model persistence boundaries and aggregate mappings
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 10.2 Application logic for transactional consistency, repositories, and unit-of-work rules
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 10.3 Endpoint behavior validation against persisted workflows
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 10.4 Swagger contract checks for persistence-backed request/response models
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 10.5 Proxy generation refresh for migration-aligned contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 10.6 Frontend integration verification with database-backed live flows
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 10.1
+  - Title: Backend domain/model persistence boundaries and aggregate mappings
+  - Description: Backend domain/model persistence boundaries and aggregate mappings
+  - Deliverables:
+    - Backend domain/model persistence boundaries and aggregate mappings
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 10.2
+  - Title: Application logic for transactional consistency, repositories, and unit-of-work rules
+  - Description: Application logic for transactional consistency, repositories, and unit-of-work rules
+  - Deliverables:
+    - Application logic for transactional consistency, repositories, and unit-of-work rules
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 10.3
+  - Title: Endpoint behavior validation against persisted workflows
+  - Description: Endpoint behavior validation against persisted workflows
+  - Deliverables:
+    - Endpoint behavior validation against persisted workflows
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 10.4
+  - Title: Swagger contract checks for persistence-backed request/response models
+  - Description: Swagger contract checks for persistence-backed request/response models
+  - Deliverables:
+    - Swagger contract checks for persistence-backed request/response models
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 10.5
+  - Title: Proxy generation refresh for migration-aligned contracts
+  - Description: Proxy generation refresh for migration-aligned contracts
+  - Deliverables:
+    - Proxy generation refresh for migration-aligned contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 10.6
+  - Title: Frontend integration verification with database-backed live flows
+  - Description: Frontend integration verification with database-backed live flows
+  - Deliverables:
+    - Frontend integration verification with database-backed live flows
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 11 - Campaign Module
 
-- [ ] 11.1 Backend domain/model for campaign entities, value objects, and lifecycle rules
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 11.2 Application logic for campaign CQRS handlers and validators
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 11.3 Endpoint implementation for campaign CRUD/lifecycle actions
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 11.4 Swagger verification for campaign contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 11.5 Proxy generation for campaign APIs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 11.6 Frontend integration for campaign features using generated proxies
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 11.1
+  - Title: Backend domain/model for campaign entities, value objects, and lifecycle rules
+  - Description: Backend domain/model for campaign entities, value objects, and lifecycle rules
+  - Deliverables:
+    - Backend domain/model for campaign entities, value objects, and lifecycle rules
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 11.2
+  - Title: Application logic for campaign CQRS handlers and validators
+  - Description: Application logic for campaign CQRS handlers and validators
+  - Deliverables:
+    - Application logic for campaign CQRS handlers and validators
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 11.3
+  - Title: Endpoint implementation for campaign CRUD/lifecycle actions
+  - Description: Endpoint implementation for campaign CRUD/lifecycle actions
+  - Deliverables:
+    - Endpoint implementation for campaign CRUD/lifecycle actions
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 11.4
+  - Title: Swagger verification for campaign contracts
+  - Description: Swagger verification for campaign contracts
+  - Deliverables:
+    - Swagger verification for campaign contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 11.5
+  - Title: Proxy generation for campaign APIs
+  - Description: Proxy generation for campaign APIs
+  - Deliverables:
+    - Proxy generation for campaign APIs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 11.6
+  - Title: Frontend integration for campaign features using generated proxies
+  - Description: Frontend integration for campaign features using generated proxies
+  - Deliverables:
+    - Frontend integration for campaign features using generated proxies
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 12 - Template Module
 
-- [ ] 12.1 Backend domain/model for template content, metadata, and versioning constraints
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 12.2 Application logic for template commands/queries and validation
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 12.3 Endpoint implementation for template operations
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 12.4 Swagger verification for template endpoint contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 12.5 Proxy generation for template APIs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 12.6 Frontend integration for template management via generated proxies
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 12.1
+  - Title: Backend domain/model for template content, metadata, and versioning constraints
+  - Description: Backend domain/model for template content, metadata, and versioning constraints
+  - Deliverables:
+    - Backend domain/model for template content, metadata, and versioning constraints
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 12.2
+  - Title: Application logic for template commands/queries and validation
+  - Description: Application logic for template commands/queries and validation
+  - Deliverables:
+    - Application logic for template commands/queries and validation
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 12.3
+  - Title: Endpoint implementation for template operations
+  - Description: Endpoint implementation for template operations
+  - Deliverables:
+    - Endpoint implementation for template operations
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 12.4
+  - Title: Swagger verification for template endpoint contracts
+  - Description: Swagger verification for template endpoint contracts
+  - Deliverables:
+    - Swagger verification for template endpoint contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 12.5
+  - Title: Proxy generation for template APIs
+  - Description: Proxy generation for template APIs
+  - Deliverables:
+    - Proxy generation for template APIs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 12.6
+  - Title: Frontend integration for template management via generated proxies
+  - Description: Frontend integration for template management via generated proxies
+  - Deliverables:
+    - Frontend integration for template management via generated proxies
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 13 - Tracking Module
 
-- [ ] 13.1 Backend domain/model for tracking events, correlations, and transitions
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 13.2 Application logic for tracking ingestion/query handlers and validators
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 13.3 Endpoint implementation for tracking ingest and retrieval
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 13.4 Swagger verification for tracking contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 13.5 Proxy generation for tracking APIs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 13.6 Frontend integration for tracking views via generated proxies
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 13.1
+  - Title: Backend domain/model for tracking events, correlations, and transitions
+  - Description: Backend domain/model for tracking events, correlations, and transitions
+  - Deliverables:
+    - Backend domain/model for tracking events, correlations, and transitions
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 13.2
+  - Title: Application logic for tracking ingestion/query handlers and validators
+  - Description: Application logic for tracking ingestion/query handlers and validators
+  - Deliverables:
+    - Application logic for tracking ingestion/query handlers and validators
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 13.3
+  - Title: Endpoint implementation for tracking ingest and retrieval
+  - Description: Endpoint implementation for tracking ingest and retrieval
+  - Deliverables:
+    - Endpoint implementation for tracking ingest and retrieval
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 13.4
+  - Title: Swagger verification for tracking contracts
+  - Description: Swagger verification for tracking contracts
+  - Deliverables:
+    - Swagger verification for tracking contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 13.5
+  - Title: Proxy generation for tracking APIs
+  - Description: Proxy generation for tracking APIs
+  - Deliverables:
+    - Proxy generation for tracking APIs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 13.6
+  - Title: Frontend integration for tracking views via generated proxies
+  - Description: Frontend integration for tracking views via generated proxies
+  - Deliverables:
+    - Frontend integration for tracking views via generated proxies
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 14 - Background Jobs
 
-- [ ] 14.1 Backend domain/model for job types, retry/idempotency policies
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 14.2 Application logic for job dispatch/execution and guardrails
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 14.3 Endpoint implementation for operational job status/control
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 14.4 Swagger verification for background job operational contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 14.5 Proxy generation for job operations endpoints
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 14.6 Frontend integration for job monitoring and controls
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 14.1
+  - Title: Backend domain/model for job types, retry/idempotency policies
+  - Description: Backend domain/model for job types, retry/idempotency policies
+  - Deliverables:
+    - Backend domain/model for job types, retry/idempotency policies
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 14.2
+  - Title: Application logic for job dispatch/execution and guardrails
+  - Description: Application logic for job dispatch/execution and guardrails
+  - Deliverables:
+    - Application logic for job dispatch/execution and guardrails
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 14.3
+  - Title: Endpoint implementation for operational job status/control
+  - Description: Endpoint implementation for operational job status/control
+  - Deliverables:
+    - Endpoint implementation for operational job status/control
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 14.4
+  - Title: Swagger verification for background job operational contracts
+  - Description: Swagger verification for background job operational contracts
+  - Deliverables:
+    - Swagger verification for background job operational contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 14.5
+  - Title: Proxy generation for job operations endpoints
+  - Description: Proxy generation for job operations endpoints
+  - Deliverables:
+    - Proxy generation for job operations endpoints
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 14.6
+  - Title: Frontend integration for job monitoring and controls
+  - Description: Frontend integration for job monitoring and controls
+  - Deliverables:
+    - Frontend integration for job monitoring and controls
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 15 - Analytics
 
-- [ ] 15.1 Backend domain/model for analytics metrics and aggregation boundaries
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 15.2 Application logic for analytics queries/services and validation rules
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 15.3 Endpoint implementation for analytics data retrieval
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 15.4 Swagger verification for analytics contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 15.5 Proxy generation for analytics APIs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 15.6 Frontend integration for analytics dashboards with real API data
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 15.1
+  - Title: Backend domain/model for analytics metrics and aggregation boundaries
+  - Description: Backend domain/model for analytics metrics and aggregation boundaries
+  - Deliverables:
+    - Backend domain/model for analytics metrics and aggregation boundaries
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 15.2
+  - Title: Application logic for analytics queries/services and validation rules
+  - Description: Application logic for analytics queries/services and validation rules
+  - Deliverables:
+    - Application logic for analytics queries/services and validation rules
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 15.3
+  - Title: Endpoint implementation for analytics data retrieval
+  - Description: Endpoint implementation for analytics data retrieval
+  - Deliverables:
+    - Endpoint implementation for analytics data retrieval
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 15.4
+  - Title: Swagger verification for analytics contracts
+  - Description: Swagger verification for analytics contracts
+  - Deliverables:
+    - Swagger verification for analytics contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 15.5
+  - Title: Proxy generation for analytics APIs
+  - Description: Proxy generation for analytics APIs
+  - Deliverables:
+    - Proxy generation for analytics APIs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 15.6
+  - Title: Frontend integration for analytics dashboards with real API data
+  - Description: Frontend integration for analytics dashboards with real API data
+  - Deliverables:
+    - Frontend integration for analytics dashboards with real API data
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 16 - Export System
 
-- [ ] 16.1 Backend domain/model for export request lifecycle and audit fields
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 16.2 Application logic for export commands/queries and validation
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 16.3 Endpoint implementation for export request/status/download
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 16.4 Swagger verification for export contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 16.5 Proxy generation for export APIs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 16.6 Frontend integration for export flows using generated proxies
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 16.1
+  - Title: Backend domain/model for export request lifecycle and audit fields
+  - Description: Backend domain/model for export request lifecycle and audit fields
+  - Deliverables:
+    - Backend domain/model for export request lifecycle and audit fields
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 16.2
+  - Title: Application logic for export commands/queries and validation
+  - Description: Application logic for export commands/queries and validation
+  - Deliverables:
+    - Application logic for export commands/queries and validation
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 16.3
+  - Title: Endpoint implementation for export request/status/download
+  - Description: Endpoint implementation for export request/status/download
+  - Deliverables:
+    - Endpoint implementation for export request/status/download
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 16.4
+  - Title: Swagger verification for export contracts
+  - Description: Swagger verification for export contracts
+  - Deliverables:
+    - Swagger verification for export contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 16.5
+  - Title: Proxy generation for export APIs
+  - Description: Proxy generation for export APIs
+  - Deliverables:
+    - Proxy generation for export APIs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 16.6
+  - Title: Frontend integration for export flows using generated proxies
+  - Description: Frontend integration for export flows using generated proxies
+  - Deliverables:
+    - Frontend integration for export flows using generated proxies
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 17 - Frontend Platform (Generated Proxies Only)
 
-- [ ] 17.1 Backend domain/model confirmation for all frontend-required contracts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 17.2 Application logic readiness validation for all consumed use cases
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 17.3 Endpoint readiness verification before UI implementation
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 17.4 Swagger completeness validation for all frontend feature APIs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 17.5 Full proxy regeneration + drift check and commit of generated artifacts
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 17.6 Frontend integration completion (guards, forms, role access, real API UX states)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 17.1
+  - Title: Backend domain/model confirmation for all frontend-required contracts
+  - Description: Backend domain/model confirmation for all frontend-required contracts
+  - Deliverables:
+    - Backend domain/model confirmation for all frontend-required contracts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 17.2
+  - Title: Application logic readiness validation for all consumed use cases
+  - Description: Application logic readiness validation for all consumed use cases
+  - Deliverables:
+    - Application logic readiness validation for all consumed use cases
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 17.3
+  - Title: Endpoint readiness verification before UI implementation
+  - Description: Endpoint readiness verification before UI implementation
+  - Deliverables:
+    - Endpoint readiness verification before UI implementation
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 17.4
+  - Title: Swagger completeness validation for all frontend feature APIs
+  - Description: Swagger completeness validation for all frontend feature APIs
+  - Deliverables:
+    - Swagger completeness validation for all frontend feature APIs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 17.5
+  - Title: Full proxy regeneration + drift check and commit of generated artifacts
+  - Description: Full proxy regeneration + drift check and commit of generated artifacts
+  - Deliverables:
+    - Full proxy regeneration + drift check and commit of generated artifacts
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 17.6
+  - Title: Frontend integration completion
+  - Description: Frontend integration completion. Scope: guards, forms, role access, real API UX states.
+  - Deliverables:
+    - guards, forms, role access, real API UX states
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 18 - Build / Publish Scripts
 
-- [ ] 18.1 Backend domain/model for release artifact boundaries and package manifest rules
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 18.2 Application logic for build/test/publish orchestration workflow
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 18.3 Endpoint/tool entrypoints for script execution and environment validation
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 18.4 Swagger verification for any build/publish operational APIs
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 18.5 Proxy generation update for operational endpoints (if exposed)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 18.6 Frontend integration for release/operator tooling surfaces (if applicable)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 18.1
+  - Title: Backend domain/model for release artifact boundaries and package manifest rules
+  - Description: Backend domain/model for release artifact boundaries and package manifest rules
+  - Deliverables:
+    - Backend domain/model for release artifact boundaries and package manifest rules
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 18.2
+  - Title: Application logic for build/test/publish orchestration workflow
+  - Description: Application logic for build/test/publish orchestration workflow
+  - Deliverables:
+    - Application logic for build/test/publish orchestration workflow
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 18.3
+  - Title: Endpoint/tool entrypoints for script execution and environment validation
+  - Description: Endpoint/tool entrypoints for script execution and environment validation
+  - Deliverables:
+    - Endpoint/tool entrypoints for script execution and environment validation
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 18.4
+  - Title: Swagger verification for any build/publish operational APIs
+  - Description: Swagger verification for any build/publish operational APIs
+  - Deliverables:
+    - Swagger verification for any build/publish operational APIs
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 18.5
+  - Title: Proxy generation update for operational endpoints
+  - Description: Proxy generation update for operational endpoints. Scope: if exposed.
+  - Deliverables:
+    - if exposed
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 18.6
+  - Title: Frontend integration for release/operator tooling surfaces
+  - Description: Frontend integration for release/operator tooling surfaces. Scope: if applicable.
+  - Deliverables:
+    - if applicable
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Phase 19 - Final Validation & Production Readiness
 
-- [ ] 19.1 Backend domain/model audit (no placeholder/fake model artifacts remain)
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 19.2 Application logic audit + full test execution evidence
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 19.3 Endpoint/runtime smoke validation and security behavior verification
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 19.4 Swagger final verification across all modules
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 19.5 Final proxy regeneration + zero-drift confirmation
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
-- [ ] 19.6 Frontend integration final compile/sanity validation with real APIs only
-  - StartedAt:
-  - FinishedAt:
-  - Owner:
-  - Notes:
+- [ ] 19.1
+  - Title: Backend domain/model audit
+  - Description: Backend domain/model audit. Scope: no placeholder/fake model artifacts remain.
+  - Deliverables:
+    - no placeholder/fake model artifacts remain
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 19.2
+  - Title: Application logic audit + full test execution evidence
+  - Description: Application logic audit + full test execution evidence
+  - Deliverables:
+    - Application logic audit + full test execution evidence
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 19.3
+  - Title: Endpoint/runtime smoke validation and security behavior verification
+  - Description: Endpoint/runtime smoke validation and security behavior verification
+  - Deliverables:
+    - Endpoint/runtime smoke validation and security behavior verification
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 19.4
+  - Title: Swagger final verification across all modules
+  - Description: Swagger final verification across all modules
+  - Deliverables:
+    - Swagger final verification across all modules
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 19.5
+  - Title: Final proxy regeneration + zero-drift confirmation
+  - Description: Final proxy regeneration + zero-drift confirmation
+  - Deliverables:
+    - Final proxy regeneration + zero-drift confirmation
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
+- [ ] 19.6
+  - Title: Frontend integration final compile/sanity validation with real APIs only
+  - Description: Frontend integration final compile/sanity validation with real APIs only
+  - Deliverables:
+    - Frontend integration final compile/sanity validation with real APIs only
+  - StartedAt: 
+  - FinishedAt: 
+  - Owner: Codex
+  - Notes: 
 
 ## Definition of Done (Cross-Phase Exit Criteria)
 
