@@ -1,31 +1,32 @@
 # OS / Editor
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
 .vscode/
 .idea/
 
-# Node / Angular
-node_modules/
-dist/
-.angular/
-coverage/
-
 # .NET
-bin/
-obj/
+**/bin/
+**/obj/
 *.user
 *.suo
-*.pdb
-.vs/
 
-# Docker / env
+# Node
+frontend/node_modules/
+frontend/dist/
+npm-debug.log*
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
+
+# Coverage / reports
+coverage/
+TestResults/
+
+# Secrets
 .env
 .env.*
-
-# Logs
-*.log
-logs/
-
-# Tooling
-*.swp
-*.tmp
+*.secrets.json
