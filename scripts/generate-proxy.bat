@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 set "SCRIPT_DIR=%~dp0"
 for %%I in ("%SCRIPT_DIR%..") do set "REPO_ROOT=%%~fI"
-set "DEFAULT_SWAGGER_URL=http://localhost:5000/swagger/v1/swagger.json"
+set "DEFAULT_SWAGGER_URL=https://localhost:7050/swagger/v1/swagger.json"
 set "SWAGGER_URL=%~1"
 if "%SWAGGER_URL%"=="" set "SWAGGER_URL=%DEFAULT_SWAGGER_URL%"
 set "OUTPUT_DIR=%REPO_ROOT%\frontend\src\app\shared\proxy"
@@ -92,7 +92,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "  if ($normalized -ne $content) {" ^
   "    [System.IO.File]::WriteAllText($_.FullName, $normalized, (New-Object System.Text.UTF8Encoding($false)));" ^
   "  }" ^
-  "}" ^
+  "};" ^
   "exit 0"
 if errorlevel 1 (
   if exist "%SWAGGER_FILE%" del /f /q "%SWAGGER_FILE%" >nul 2>nul

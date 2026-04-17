@@ -130,7 +130,7 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T21:52:00Z
   - FinishedAt: 2026-04-17T21:54:21Z
   - Owner: Codex
-  - Notes: Finalized both proxy generation scripts for deterministic cross-platform output by pinning the generator package version (`openapi-typescript-codegen@0.29.0` with `GENERATOR_VERSION` override), fetching Swagger once into a local temp file before generation, and normalizing generated text artifacts to LF line endings after generation; also documented the determinism behavior in README proxy-generation notes. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`, `README.md`.
+  - Notes: Finalized both proxy generation scripts for deterministic cross-platform output by pinning the generator package version (`openapi-typescript-codegen@0.29.0` with `GENERATOR_VERSION` override), fetching Swagger once into a local temp file before generation, and normalizing generated text artifacts to LF line endings after generation; fixed a PowerShell command-separator issue in `scripts/generate-proxy.bat` that could break line-ending normalization on Windows; also documented the determinism behavior in README proxy-generation notes. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`, `README.md`.
 - [x] 2.6
   - Title: Frontend integration verification using generated clients only
   - Description: Frontend integration verification using generated clients only
@@ -161,15 +161,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T22:11:32Z
   - Owner: Codex
   - Notes: Implemented Setup application CQRS flow for status/test/save with MediatR queries/commands + FluentValidation validators, introduced setup application abstractions (`ISetupConfigurationRepository`, `ISetupDependencyConnectionTester`, `ISetupSecretCipher`) and response contracts, and wired Application to Domain through a new Domain project file and project reference. Files touched: `backend/Application/CQRS/Queries/Setup/*`, `backend/Application/CQRS/Commands/Setup/*`, `backend/Application/Contracts/Abstractions/Setup/*`, `backend/Application/Contracts/Responses/Setup/*`, `backend/Application/QPhising.Application.csproj`, `backend/Domain/QPhising.Domain.csproj`.
-- [ ] 3.3
+- [x] 3.3
   - Title: Endpoint implementation
   - Description: Endpoint implementation. Scope: `/api/setup/status`, `/test-db`, `/test-keycloak`, `/test-redis`, `/save`.
   - Deliverables:
     - `/api/setup/status`, `/test-db`, `/test-keycloak`, `/test-redis`, `/save`
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T22:31:00Z
+  - FinishedAt: 2026-04-17T22:37:16Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added `SetupController` with all Phase 3.3 setup endpoints wired to MediatR commands/queries, introduced API request contracts for setup actions, and completed DI composition by registering setup application abstractions with concrete implementations (`JsonFileSetupConfigurationRepository`, `SetupDependencyConnectionTester`, `DataProtectionSetupSecretCipher`) so setup handlers can be activated successfully; database connectivity test implementation is PostgreSQL-oriented via EF Core/Npgsql (no SQL Server dependency); adjusted Keycloak tester signature to match application contract (`Uri authority`) to satisfy interface implementation and compile-time contract compliance.
 - [ ] 3.4
   - Title: Swagger contract verification for setup endpoints and examples
   - Description: Swagger contract verification for setup endpoints and examples

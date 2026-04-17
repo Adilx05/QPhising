@@ -1,30 +1,29 @@
 /* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
 import type { AssertProxyContractSyncRequest } from '../models/AssertProxyContractSyncRequest';
-import type { ProxyContractSyncConflictResponse } from '../models/ProxyContractSyncConflictResponse';
+import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
-
+import { request as __request } from '../core/request';
 export class ProxyValidationService {
-  public static async proxyValidationAssertSync(
-    requestBody?: AssertProxyContractSyncRequest
-  ): Promise<void> {
-    const response = await fetch(`${OpenAPI.BASE}/api/proxy-validation/assert-sync`, {
+  /**
+   * @returns void
+   * @throws ApiError
+   */
+  public static postApiProxyValidationAssertSync({
+    requestBody,
+  }: {
+    requestBody?: AssertProxyContractSyncRequest,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
       method: 'POST',
-      credentials: OpenAPI.WITH_CREDENTIALS ? 'include' : 'same-origin',
-      headers: {
-        'Content-Type': 'application/json'
+      url: '/api/proxy-validation/assert-sync',
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        409: `Conflict`,
       },
-      body: JSON.stringify(requestBody ?? {})
     });
-
-    if (response.status === 204) {
-      return;
-    }
-
-    if (response.status === 409) {
-      const conflict = (await response.json()) as ProxyContractSyncConflictResponse;
-      throw new Error(conflict.message ?? 'Proxy contract drift detected.');
-    }
-
-    throw new Error(`Unexpected response status: ${response.status}`);
   }
 }
