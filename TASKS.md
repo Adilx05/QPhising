@@ -31,15 +31,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T21:40:00Z
   - Owner: Codex
   - Notes: Added Application-layer baseline scaffolding for CQRS and contracts by creating `backend/Application/CQRS/{Commands,Queries,Behaviors}` and `backend/Application/Contracts/{Abstractions,Requests,Responses}` with tracked placeholders; kept changes limited to this subtask scope and TASKS status update.
-- [ ] 1.3
+- [x] 1.3
   - Title: Endpoint baseline
   - Description: Endpoint baseline. Scope: API host skeleton and controller structure.
   - Deliverables:
     - API host skeleton and controller structure
   - StartedAt: 2026-04-17T08:35:00Z
-  - FinishedAt: 2026-04-17T08:45:00Z
+  - FinishedAt: 2026-04-17T21:31:22Z
   - Owner: Codex
-  - Notes: Status corrected to Pending after audit: only `backend/API/.gitkeep` exists (mtime 2026-04-17T20:44:26Z); no API host files or controller structure artifacts were found (`find backend/API -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
+  - Notes: Implemented API host skeleton in `backend/API` with `QPhising.Api.csproj`, minimal `Program.cs` wiring for controllers, and baseline `Controllers/HealthController.cs` route (`GET /api/health`) to establish controller structure.
 - [ ] 1.4
   - Title: Swagger baseline
   - Description: Swagger baseline. Scope: OpenAPI bootstrapping verified.
