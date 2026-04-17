@@ -1,6 +1,7 @@
 using MediatR;
 using QPhising.Api.Services.ProxyValidation;
 using QPhising.Api.Services.Setup;
+using QPhising.Api.Swagger;
 using QPhising.Application.Contracts.Abstractions.ProxyValidation;
 using QPhising.Application.Contracts.Abstractions.Setup;
 
@@ -12,7 +13,10 @@ var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.OperationFilter<SetupEndpointsExamplesOperationFilter>();
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendCors", policy =>

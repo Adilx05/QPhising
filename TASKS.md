@@ -170,15 +170,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T22:37:16Z
   - Owner: Codex
   - Notes: Added `SetupController` with all Phase 3.3 setup endpoints wired to MediatR commands/queries, introduced API request contracts for setup actions, and completed DI composition by registering setup application abstractions with concrete implementations (`JsonFileSetupConfigurationRepository`, `SetupDependencyConnectionTester`, `DataProtectionSetupSecretCipher`) so setup handlers can be activated successfully; database connectivity test implementation is PostgreSQL-oriented via EF Core/Npgsql (no SQL Server dependency); adjusted Keycloak tester signature to match application contract (`Uri authority`) to satisfy interface implementation and compile-time contract compliance.
-- [ ] 3.4
+- [x] 3.4
   - Title: Swagger contract verification for setup endpoints and examples
   - Description: Swagger contract verification for setup endpoints and examples
   - Deliverables:
     - Swagger contract verification for setup endpoints and examples
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T22:58:00Z
+  - FinishedAt: 2026-04-17T23:03:02Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added `SetupEndpointsExamplesOperationFilter` and wired it through `AddSwaggerGen` so all setup endpoints (`/api/setup/status`, `/test-db`, `/test-redis`, `/test-keycloak`, `/save`) now expose explicit request/response examples in OpenAPI output for contract verification and downstream proxy generation clarity. Files touched: `backend/API/Swagger/SetupEndpointsExamplesOperationFilter.cs`, `backend/API/Program.cs`.
 - [ ] 3.5
   - Title: Proxy generation for setup controller and DTOs
   - Description: Proxy generation for setup controller and DTOs
