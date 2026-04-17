@@ -11,7 +11,8 @@ Thumbs.db
 **/obj/
 *.user
 *.suo
-
+*.vs/
+.vs/
 # Node
 frontend/node_modules/
 frontend/dist/
@@ -30,6 +31,6 @@ TestResults/
 .env
 .env.*
 *.secrets.json
-
+*.angular/
 # Runtime setup overlays (generated after first-run setup)
 **/appsettings.runtime.json
