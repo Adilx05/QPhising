@@ -130,7 +130,7 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-17T21:52:00Z
   - FinishedAt: 2026-04-17T21:54:21Z
   - Owner: Codex
-  - Notes: Finalized both proxy generation scripts for deterministic cross-platform output by pinning the generator package version (`openapi-typescript-codegen@0.29.0` with `GENERATOR_VERSION` override), fetching Swagger once into a local temp file before generation, and normalizing generated text artifacts to LF line endings after generation; also documented the determinism behavior in README proxy-generation notes. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`, `README.md`.
+  - Notes: Finalized both proxy generation scripts for deterministic cross-platform output by pinning the generator package version (`openapi-typescript-codegen@0.29.0` with `GENERATOR_VERSION` override), fetching Swagger once into a local temp file before generation, and normalizing generated text artifacts to LF line endings after generation; fixed a PowerShell command-separator issue in `scripts/generate-proxy.bat` that could break line-ending normalization on Windows; also documented the determinism behavior in README proxy-generation notes. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`, `README.md`.
 - [x] 2.6
   - Title: Frontend integration verification using generated clients only
   - Description: Frontend integration verification using generated clients only

@@ -92,7 +92,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "  if ($normalized -ne $content) {" ^
   "    [System.IO.File]::WriteAllText($_.FullName, $normalized, (New-Object System.Text.UTF8Encoding($false)));" ^
   "  }" ^
-  "}" ^
+  "};" ^
   "exit 0"
 if errorlevel 1 (
   if exist "%SWAGGER_FILE%" del /f /q "%SWAGGER_FILE%" >nul 2>nul
