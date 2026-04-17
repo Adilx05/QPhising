@@ -1,0 +1,8 @@
+{
+  "Authentication": {
+    "Jwt": {
+      "Authority": "https://localhost:8444/realms/qphising",
+      "Audience": "qphising-gateway"
+    }
+  }
+}

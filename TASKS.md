@@ -11,6 +11,22 @@ Metadata required for every subtask:
 - Owner:
 - Notes:
 
+## Foundation Track - Configuration & Startup Standardization
+
+- [x] F.1
+  - Title: Solution-wide appsettings + launch profile normalization
+  - Description: Standardize API/Gateway configuration baselines, environment overlays, runtime override support, and local startup profiles before continuing feature development.
+  - Deliverables:
+    - appsettings/appsettings.Development/appsettings.Production for runnable services
+    - appsettings.runtime.json overlay pattern (gitignored) for setup wizard compatibility
+    - launchSettings profiles with stable non-conflicting API/Gateway ports
+    - Ocelot route config baseline + environment override files
+    - solution wiring for simultaneous API + Gateway local startup
+  - StartedAt: 2026-04-17T23:05:00Z
+  - FinishedAt: 2026-04-17T23:20:00Z
+  - Owner: Codex
+  - Notes: Added standardized configuration and launch baselines under `backend/API` and new runnable `backend/Gateway` host with clean environment layering and runtime override compatibility.
+
 ## Phase 1 - Repository Reset & Bootstrap
 
 - [-] 1.1

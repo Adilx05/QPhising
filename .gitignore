@@ -30,3 +30,6 @@ TestResults/
 .env
 .env.*
 *.secrets.json
+
+# Runtime setup overlays (generated after first-run setup)
+**/appsettings.runtime.json

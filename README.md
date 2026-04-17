@@ -1,23 +1,53 @@
 # QPhising
 
-This repository has been reset in Phase 0 and now contains a clean, production-oriented skeleton.
+This repository contains a production-oriented Clean Architecture foundation for QPhising.
 
 ## Structure
 
-- `backend/` - Domain/Application/Infrastructure/API layers
-- `gateway/` - Edge gateway and cross-cutting middleware scaffolding
-- `worker/` - Background processing scaffolding
-- `frontend/` - Angular application and generated API client location
-- `docs/` - Architecture decisions and operational documentation
-- `scripts/` - Development and compose helper scripts
+- `backend/` - Domain/Application/API/Gateway runnable services.
+- `frontend/` - Angular application and generated API client location.
+- `docs/` - Architecture decisions and operational documentation.
+- `scripts/` - Development and helper scripts.
 
-## Next Steps
+## Configuration Model
 
-Follow `TASKS.md` sequentially for implementation phases.
+Runnable backend projects (`backend/API`, `backend/Gateway`) use the same layered configuration model:
 
-## Proxy Generation (Phase 2)
+1. `appsettings.json` (base defaults)
+2. `appsettings.{Environment}.json` (environment override)
+3. `appsettings.runtime.json` (optional setup-wizard runtime overlay)
 
-Use the repeatable proxy scripts under `scripts/` to regenerate TypeScript API clients from a running backend Swagger endpoint.
+`appsettings.runtime.json` is intentionally gitignored and should be created by setup/runtime provisioning. Example templates:
+
+- `backend/API/appsettings.runtime.json.example`
+- `backend/Gateway/appsettings.runtime.json.example`
+
+## Local Startup
+
+### API
+
+- HTTP: `http://localhost:5050`
+- HTTPS: `https://localhost:7050`
+- Swagger: enabled in Development or when `FeatureFlags:SwaggerEnabled=true`
+
+### Gateway
+
+- HTTP: `http://localhost:8080`
+- HTTPS: `https://localhost:8443`
+- Routes in `backend/Gateway/ocelot*.json`
+
+### Visual Studio Multi-Startup
+
+Set multiple startup projects:
+
+1. `QPhising.Api`
+2. `QPhising.Gateway`
+
+This starts API and Gateway together with non-conflicting ports.
+
+## Proxy Generation
+
+Use repeatable proxy scripts under `scripts/` to regenerate TypeScript API clients from a running backend Swagger endpoint.
 
 - Linux/macOS:
   - `./scripts/generate-proxy.sh`
@@ -27,8 +57,9 @@ Use the repeatable proxy scripts under `scripts/` to regenerate TypeScript API c
   - `scripts\generate-proxy.bat http://localhost:5050/swagger/v1/swagger.json`
 
 Both scripts:
-- read OpenAPI/Swagger from the provided URL (default: `http://localhost:5000/swagger/v1/swagger.json`),
+
+- read OpenAPI/Swagger from the provided URL,
 - validate required Swagger metadata and endpoint prerequisites before generation,
-- pin `openapi-typescript-codegen` to a deterministic version (`0.29.0` by default, override with `GENERATOR_VERSION`),
+- pin `openapi-typescript-codegen` to deterministic version `0.29.0` (override with `GENERATOR_VERSION`),
 - regenerate clients into `frontend/src/app/shared/proxy`,
-- replace previous generated output and normalize generated text line endings to LF for deterministic cross-platform diffs.
+- normalize generated text line endings to LF for deterministic cross-platform diffs.
