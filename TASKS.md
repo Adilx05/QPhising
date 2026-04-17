@@ -70,15 +70,15 @@ Metadata required for every subtask:
 
 ## Phase 2 - Proxy Generation System Hardening
 
-- [ ] 2.1
+- [x] 2.1
   - Title: Backend domain/model contract-source boundaries defined per module
   - Description: Backend domain/model contract-source boundaries defined per module
   - Deliverables:
     - Backend domain/model contract-source boundaries defined per module
   - StartedAt: 2026-04-17T09:00:00Z
-  - FinishedAt: 2026-04-17T09:10:00Z
+  - FinishedAt: 2026-04-17T21:40:04Z
   - Owner: Codex
-  - Notes: Status corrected to Pending after audit: no module-level contract-boundary artifacts found in domain/application/docs (`rg -n "contract-source|boundary|ownership" backend docs` at 2026-04-17T21:25:14Z returned no matches).
+  - Notes: Defined module-level contract-source boundaries in `backend/Domain/Contracts/ModuleContractBoundaries.md` and established bounded-context domain folders plus `backend/Domain/README.md` to formalize ownership per module and layer separation expectations.
 - [-] 2.2
   - Title: Application logic for contract-drift validation workflow
   - Description: Application logic for contract-drift validation workflow
