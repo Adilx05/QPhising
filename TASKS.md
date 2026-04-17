@@ -176,3 +176,14 @@ Status legend:
 - [ ] Verify setup wizard gating and runtime configuration persistence behavior.
 - [ ] Verify security baseline (JWT auth, role authorization, input validation, ProblemDetails).
 - [ ] Remove residual placeholders/dead code and finalize production-readiness checklist.
+
+## Definition of Done
+
+- [ ] Backend build passes (attach command + timestamp + result, e.g., `dotnet build` logs in task evidence).
+- [ ] Runtime behavior verified (record executed runtime checks, scenarios, and observed outcomes).
+- [ ] Swagger reflects contract changes (capture generated OpenAPI diff/snapshot and endpoint verification evidence).
+- [ ] Proxies regenerated and synced (record regeneration command, changed files, and zero-drift validation result).
+- [ ] Frontend compile passes (attach compile command output, e.g., `npm run build`/`ng build`, with timestamp).
+- [ ] No placeholder/fake data remains (document audit of removed mocks/stubs and impacted files).
+- [ ] `TASKS.md` updated with evidence (link each completed task to concrete proof: commands, logs, screenshots, or artifacts).
+- [ ] Security and role rules verified for protected endpoints (evidence of JWT auth + `Admin`/`Operator`/`Viewer` authorization checks).
