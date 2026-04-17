@@ -227,15 +227,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-17T23:36:30Z
   - Owner: Codex
   - Notes: Added setup gating endpoint `GET /api/setup/guard-decision` in `SetupController`, returning `SetupGuardDecisionResult` through MediatR `GetSetupGuardDecisionQuery` so clients can evaluate setup completion/readiness and enforce guarded main-app access redirects. Files touched: `backend/API/Controllers/SetupController.cs`.
-- [ ] 4.4
+- [x] 4.4
   - Title: Swagger verification for gating/readiness contracts
   - Description: Swagger verification for gating/readiness contracts
   - Deliverables:
     - Swagger verification for gating/readiness contracts
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-17T23:40:00Z
+  - FinishedAt: 2026-04-17T23:44:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Verified setup gating/readiness Swagger contract coverage by extending setup endpoint OpenAPI examples with `GET /api/setup/guard-decision` response payload example and syncing the checked-in Swagger fixture with the new path plus `SetupGuardDecisionResult`/`SetupAccessState` schemas for contract validation. Files touched: `backend/API/Swagger/SetupEndpointsExamplesOperationFilter.cs`, `frontend/openapi/proxy-validation.swagger.json`.
 - [ ] 4.5
   - Title: Proxy generation refresh for setup gating contracts
   - Description: Proxy generation refresh for setup gating contracts
