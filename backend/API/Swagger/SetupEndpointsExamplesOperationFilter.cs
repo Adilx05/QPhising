@@ -112,6 +112,100 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             operation.Summary ??= "Update runtime configuration values selectively.";
             SetRequestExample(operation, CreateRuntimeConfigurationUpdateRequestExample());
             SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateRuntimeConfigurationResponseExample());
+            return;
+        }
+
+        if (method == "GET" && path == "/api/campaigns")
+        {
+            operation.Summary ??= "List campaigns with lifecycle and targeting details.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), new OpenApiArray
+            {
+                CreateCampaignResponseExample()
+            });
+            return;
+        }
+
+        if (method == "GET" && path == "/api/campaigns/{campaignid}")
+        {
+            operation.Summary ??= "Get a campaign by identifier.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample());
+            return;
+        }
+
+        if (method == "POST" && path == "/api/campaigns")
+        {
+            operation.Summary ??= "Create a new campaign in Draft lifecycle state.";
+            SetRequestExample(operation, CreateCampaignRequestExample());
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample());
+            return;
+        }
+
+        if (method == "PUT" && path == "/api/campaigns/{campaignid}")
+        {
+            operation.Summary ??= "Update mutable campaign details while preserving lifecycle history.";
+            SetRequestExample(operation, new OpenApiObject
+            {
+                ["name"] = new OpenApiString("Quarterly Security Awareness Campaign")
+            });
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample());
+            return;
+        }
+
+        if (method == "POST" && path == "/api/campaigns/{campaignid}/targets")
+        {
+            operation.Summary ??= "Add an email target to a campaign.";
+            SetRequestExample(operation, new OpenApiObject
+            {
+                ["emailAddress"] = new OpenApiString("analyst@example.com")
+            });
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample());
+            return;
+        }
+
+        if (method == "DELETE" && path == "/api/campaigns/{campaignid}/targets/{targetid}")
+        {
+            operation.Summary ??= "Remove a target from a campaign.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample());
+            return;
+        }
+
+        if (method == "POST" && path == "/api/campaigns/{campaignid}/schedule")
+        {
+            operation.Summary ??= "Schedule campaign execution window.";
+            SetRequestExample(operation, new OpenApiObject
+            {
+                ["startsAtUtc"] = new OpenApiString("2026-05-01T09:00:00Z"),
+                ["endsAtUtc"] = new OpenApiString("2026-05-08T09:00:00Z")
+            });
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateScheduledCampaignResponseExample());
+            return;
+        }
+
+        if (method == "POST" && path == "/api/campaigns/{campaignid}/start")
+        {
+            operation.Summary ??= "Transition a scheduled campaign to Active.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample(lifecycleState: 2));
+            return;
+        }
+
+        if (method == "POST" && path == "/api/campaigns/{campaignid}/pause")
+        {
+            operation.Summary ??= "Pause an active campaign.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample(lifecycleState: 3));
+            return;
+        }
+
+        if (method == "POST" && path == "/api/campaigns/{campaignid}/complete")
+        {
+            operation.Summary ??= "Complete a campaign lifecycle.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample(lifecycleState: 4));
+            return;
+        }
+
+        if (method == "POST" && path == "/api/campaigns/{campaignid}/cancel")
+        {
+            operation.Summary ??= "Cancel a campaign lifecycle.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample(lifecycleState: 5));
         }
     }
 
@@ -179,6 +273,49 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             ["isKeycloakConfigured"] = new OpenApiBoolean(true),
             ["isReadyForProtectedRuntime"] = new OpenApiBoolean(true),
             ["updatedAtUtc"] = new OpenApiString("2026-04-18T06:49:16Z")
+        };
+    }
+
+    private static OpenApiObject CreateCampaignRequestExample()
+    {
+        return new OpenApiObject
+        {
+            ["name"] = new OpenApiString("Quarterly Security Awareness Campaign"),
+            ["templateId"] = new OpenApiString("7d6f5ca5-8f98-4659-af5a-1ed7cb7f3f1c")
+        };
+    }
+
+    private static OpenApiObject CreateScheduledCampaignResponseExample()
+    {
+        return CreateCampaignResponseExample(
+            lifecycleState: 1,
+            startsAtUtc: "2026-05-01T09:00:00Z",
+            endsAtUtc: "2026-05-08T09:00:00Z");
+    }
+
+    private static OpenApiObject CreateCampaignResponseExample(
+        int lifecycleState = 0,
+        string? startsAtUtc = null,
+        string? endsAtUtc = null)
+    {
+        return new OpenApiObject
+        {
+            ["id"] = new OpenApiString("c136af52-9309-4832-89a4-fcd7fd53dc58"),
+            ["name"] = new OpenApiString("Quarterly Security Awareness Campaign"),
+            ["templateId"] = new OpenApiString("7d6f5ca5-8f98-4659-af5a-1ed7cb7f3f1c"),
+            ["lifecycleState"] = new OpenApiInteger(lifecycleState),
+            ["startsAtUtc"] = startsAtUtc is null ? new OpenApiNull() : new OpenApiString(startsAtUtc),
+            ["endsAtUtc"] = endsAtUtc is null ? new OpenApiNull() : new OpenApiString(endsAtUtc),
+            ["createdAtUtc"] = new OpenApiString("2026-04-18T13:31:00Z"),
+            ["updatedAtUtc"] = new OpenApiString("2026-04-18T13:40:00Z"),
+            ["targets"] = new OpenApiArray
+            {
+                new OpenApiObject
+                {
+                    ["id"] = new OpenApiString("0528d1ef-3fa0-4f0d-b984-02584f27c079"),
+                    ["emailAddress"] = new OpenApiString("analyst@example.com")
+                }
+            }
         };
     }
 

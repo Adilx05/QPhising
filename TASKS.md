@@ -626,15 +626,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T13:36:59Z
   - Owner: Codex
   - Notes: Implemented `CampaignController` with CQRS-backed CRUD/lifecycle HTTP endpoints under `api/campaigns` (list/get/create/update/delete, target add/remove, and schedule/start/pause/complete/cancel actions), introduced campaign API request contracts, and applied role-based authorization per operation (`ViewerOrAbove` read, `OperatorOrAbove` mutating, `AdminOnly` delete/cancel). Files touched: `backend/API/Controllers/CampaignController.cs`, `backend/API/Contracts/Campaign/*`.
-- [ ] 11.4
+- [x] 11.4
   - Title: Swagger verification for campaign contracts
   - Description: Swagger verification for campaign contracts
   - Deliverables:
     - Swagger verification for campaign contracts
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T13:40:00Z
+  - FinishedAt: 2026-04-18T13:44:04Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Verified campaign API Swagger contract coverage by extending API OpenAPI operation examples/summaries for all campaign CRUD/lifecycle routes and syncing the checked-in Swagger fixture with campaign paths, request DTOs, and response schemas (`CampaignResult`, `CampaignTargetResult`, `CampaignLifecycleState`) to keep downstream proxy generation contract-accurate. Files touched: `backend/API/Swagger/SetupEndpointsExamplesOperationFilter.cs`, `frontend/openapi/proxy-validation.swagger.json`.
 - [ ] 11.5
   - Title: Proxy generation for campaign APIs
   - Description: Proxy generation for campaign APIs
