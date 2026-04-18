@@ -994,7 +994,7 @@ Metadata required for every subtask:
   - StartedAt: 2026-04-18T14:50:00Z
   - FinishedAt: 
   - Owner: Codex
-  - Notes: In progress by user request: applied Sakai-inspired UI foundation uplift for frontend shell and setup/runtime pages with consistent layout tokens, navigation shell, and real API-backed dashboard state cards (no fake KPI data). 2026-04-18: fixed backend startup DI blocker by registering `IGatewayRoutePolicySettingsProvider` and adding configuration-backed provider implementation in API host services. 2026-04-18: aligned `backend/API.Tests/QPhising.Api.Tests.csproj` target framework to `net10.0` and added the test project to `QPhising.slnx` so solution-level operations include test coverage.
+  - Notes: In progress by user request: applied Sakai-inspired UI foundation uplift for frontend shell and setup/runtime pages with consistent layout tokens, navigation shell, and real API-backed dashboard state cards (no fake KPI data). 2026-04-18: fixed backend startup DI blocker by registering `IGatewayRoutePolicySettingsProvider` and adding configuration-backed provider implementation in API host services. 2026-04-18: aligned `backend/API.Tests/QPhising.Api.Tests.csproj` target framework to `net10.0` and added the test project to `QPhising.slnx` so solution-level operations include test coverage. 2026-04-18: aligned `ConfigurationController` route names to required Swagger operation IDs (`Configuration_GetCurrent`, `Configuration_Save`, `Configuration_Update`) so Windows proxy generation pre-validation passes.
 
 ## Phase 18 - Build / Publish Scripts
 
