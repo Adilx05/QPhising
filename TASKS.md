@@ -428,15 +428,15 @@ Metadata required for every subtask:
 
 ## Phase 8 - Gateway (Ocelot)
 
-- [ ] 8.1
+- [x] 8.1
   - Title: Backend domain/model for gateway route ownership and module map definitions
   - Description: Backend domain/model for gateway route ownership and module map definitions
   - Deliverables:
     - Backend domain/model for gateway route ownership and module map definitions
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T17:05:00Z
+  - FinishedAt: 2026-04-18T17:14:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added Gateway domain ownership model primitives under `backend/Domain/Gateway` (`GatewayModule`, `GatewayRouteTemplate`, `GatewayRouteOwnershipDefinition`, `GatewayRouteOwnershipMap`) and documented canonical route-to-module ownership/auth posture baseline in `backend/Domain/Contracts/GatewayRouteOwnershipModuleMap.md` aligned to existing Ocelot upstream paths.
 - [ ] 8.2
   - Title: Application logic for route policy composition
   - Description: Application logic for route policy composition. Scope: auth forwarding, claims mapping.
