@@ -1,7 +1,10 @@
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using QPhising.Api.Middleware;
 using QPhising.Api.Security;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using QPhising.Api.Services.Gateway;
@@ -16,6 +19,7 @@ using QPhising.Application.Contracts.Abstractions.ProxyValidation;
 using QPhising.Application.Contracts.Abstractions.RuntimeConfiguration;
 using QPhising.Application.Contracts.Abstractions.Setup;
 using QPhising.Application.CQRS.Behaviors;
+using QPhising.Application.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +51,30 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddHealthChecks();
 builder.Services.AddDataProtection();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtOptions = builder.Configuration.GetSection("Authentication:Jwt").Get<JwtValidationOptions>() ?? new JwtValidationOptions();
+        options.Authority = jwtOptions.Authority;
+        options.Audience = jwtOptions.Audience;
+        options.RequireHttpsMetadata = jwtOptions.RequireHttpsMetadata;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            NameClaimType = "preferred_username",
+            RoleClaimType = "roles"
+        };
+    });
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var policy in IdentityAuthorizationPolicies.CreateDefaultDefinitions())
+    {
+        options.AddPolicy(policy.PolicyName, configurePolicy =>
+        {
+            configurePolicy.RequireAuthenticatedUser();
+            configurePolicy.RequireRole(policy.RequiredRoles.ToArray());
+        });
+    }
+});
 builder.Services.AddHttpClient(nameof(SetupDependencyConnectionTester), client =>
 {
     client.Timeout = TimeSpan.FromSeconds(10);
@@ -106,6 +134,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseCors("FrontendCors");
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthChecks("/health/live");
 app.MapControllers();

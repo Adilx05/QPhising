@@ -503,15 +503,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T10:05:20Z
   - Owner: Codex
   - Notes: Added Identity application-layer CQRS flows for (1) authorization policy catalog retrieval and (2) access-token validation via abstraction-backed validator + domain role/claim resolution (`IdentityRoleClaimMap`), with dedicated FluentValidation validators and identity response contracts for downstream API endpoint binding in the next subtask. Files touched: `backend/Application/CQRS/{Queries,Commands}/Identity/*`, `backend/Application/Contracts/Abstractions/Authorization/IAccessTokenValidator.cs`, `backend/Application/Contracts/Responses/Identity/*`, `backend/Application/Security/IdentityAuthorizationPolicies.cs`. Follow-up correction (2026-04-18T18:40:00Z): wired API DI for `IAccessTokenValidator` with concrete `KeycloakAccessTokenValidator` and OIDC metadata configuration manager/options binding so `ValidateAccessTokenCommandHandler` can be activated successfully at runtime. Files touched: `backend/API/Program.cs`, `backend/API/Services/Identity/KeycloakAccessTokenValidator.cs`, `backend/API/QPhising.Api.csproj`.
-- [ ] 9.3
+- [x] 9.3
   - Title: Endpoint protection and policy binding across protected resources
   - Description: Endpoint protection and policy binding across protected resources
   - Deliverables:
     - Endpoint protection and policy binding across protected resources
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T10:10:00Z
+  - FinishedAt: 2026-04-18T10:18:44Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Enabled JWT bearer authentication and authorization policy registration in API startup, then bound policy-based protection across protected controllers/resources (`/api/configuration`, `/api/gateway/route-policies`, `/api/proxy-validation/assert-sync`) with role policy granularity (`AdminOnly`, `OperatorOrAbove`, `ViewerOrAbove`) while leaving setup/health endpoints accessible for setup flow requirements. Files touched: `backend/API/Program.cs`, `backend/API/Controllers/ConfigurationController.cs`, `backend/API/Controllers/GatewayController.cs`, `backend/API/Controllers/ProxyValidationController.cs`.
 - [ ] 9.4
   - Title: Swagger security scheme and protected endpoint authorization metadata verification
   - Description: Swagger security scheme and protected endpoint authorization metadata verification
