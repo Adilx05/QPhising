@@ -27,6 +27,7 @@ echo Validating Swagger preconditions from: %SWAGGER_URL%
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop';" ^
   "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/configuration','/api/setup/status','/api/setup/guard-decision','/api/setup/test-db','/api/setup/test-redis','/api/setup/test-keycloak','/api/setup/save');" ^
+  "$protectedPaths=@('/api/proxy-validation/assert-sync','/api/configuration');" ^
   "$httpMethods=@('get','post','put','patch','delete','head','options','trace');" ^
   "$requiredProblemStatusCodes=@('400','401','403','500');" ^
   "$problemDetailsSchemaRef='#/components/schemas/ProblemDetails';" ^
@@ -67,6 +68,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "  Write-Error 'Swagger document is missing components.schemas.ProblemDetails required for standardized error contracts.';" ^
   "  exit 1;" ^
   "}" ^
+  "$bearerSecurityScheme = $swagger.components.securitySchemes.Bearer;" ^
+  "if (-not $bearerSecurityScheme -or $bearerSecurityScheme.type -ne 'http' -or $bearerSecurityScheme.scheme -ne 'bearer') {" ^
+  "  Write-Error 'Swagger document is missing components.securitySchemes.Bearer (HTTP bearer) required for secured proxy generation.';" ^
+  "  exit 1;" ^
+  "}" ^
   "foreach ($pathProperty in $swagger.paths.PSObject.Properties) {" ^
   "  $path = $pathProperty.Name;" ^
   "  $pathItem = $pathProperty.Value;" ^
@@ -82,6 +88,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "    if (-not $operation.responses) {" ^
   "      Write-Error ('Operation ''{0}'' is missing responses.' -f $operationName);" ^
   "      exit 1;" ^
+  "    }" ^
+  "    if ($protectedPaths.Contains($path)) {" ^
+  "      $hasBearerSecurity = $false;" ^
+  "      if ($operation.security) {" ^
+  "        foreach ($securityRequirement in $operation.security) {" ^
+  "          if ($securityRequirement.PSObject.Properties.Name.Contains('Bearer')) {" ^
+  "            $hasBearerSecurity = $true;" ^
+  "            break;" ^
+  "          }" ^
+  "        }" ^
+  "      }" ^
+  "      if (-not $hasBearerSecurity) {" ^
+  "        Write-Error ('Protected operation ''{0}'' is missing Bearer security requirement.' -f $operationName);" ^
+  "        exit 1;" ^
+  "      }" ^
   "    }" ^
   "    foreach ($statusCode in $requiredProblemStatusCodes) {" ^
   "      $response = $operation.responses.$statusCode;" ^

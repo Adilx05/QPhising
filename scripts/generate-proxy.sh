@@ -59,6 +59,10 @@ const requiredPaths = [
   "/api/setup/test-keycloak",
   "/api/setup/save"
 ];
+const protectedPaths = [
+  "/api/proxy-validation/assert-sync",
+  "/api/configuration"
+];
 const httpMethods = new Set(["get", "post", "put", "patch", "delete", "head", "options", "trace"]);
 const requiredProblemStatusCodes = ["400", "401", "403", "500"];
 let swagger;
@@ -103,6 +107,20 @@ if (!hasProblemDetailsSchema) {
   process.exit(1);
 }
 
+const bearerSecurityScheme =
+  swagger.components &&
+  swagger.components.securitySchemes &&
+  swagger.components.securitySchemes.Bearer;
+
+if (
+  !bearerSecurityScheme ||
+  bearerSecurityScheme.type !== "http" ||
+  bearerSecurityScheme.scheme !== "bearer"
+) {
+  console.error("Error: Swagger document is missing components.securitySchemes.Bearer (HTTP bearer) required for secured proxy generation.");
+  process.exit(1);
+}
+
 for (const [path, pathItem] of Object.entries(swagger.paths)) {
   if (!pathItem || typeof pathItem !== "object") {
     continue;
@@ -127,6 +145,23 @@ for (const [path, pathItem] of Object.entries(swagger.paths)) {
     if (!operation.responses || typeof operation.responses !== "object") {
       console.error(`Error: operation "${operationName}" is missing responses.`);
       process.exit(1);
+    }
+
+    if (protectedPaths.includes(path)) {
+      const securityRequirements = operation.security;
+      const hasBearerRequirement =
+        Array.isArray(securityRequirements) &&
+        securityRequirements.some(
+          (requirement) =>
+            requirement &&
+            typeof requirement === "object" &&
+            Object.prototype.hasOwnProperty.call(requirement, "Bearer")
+        );
+
+      if (!hasBearerRequirement) {
+        console.error(`Error: protected operation "${operationName}" is missing Bearer security requirement.`);
+        process.exit(1);
+      }
     }
 
     for (const statusCode of requiredProblemStatusCodes) {
