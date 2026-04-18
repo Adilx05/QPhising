@@ -521,15 +521,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T19:23:00Z
   - Owner: Codex
   - Notes: Added Swagger JWT bearer security definition and authorization-aware operation filter so protected endpoints automatically emit security requirements plus 401/403 metadata; synchronized checked-in OpenAPI fixture with Bearer security scheme and authorization metadata for secured routes currently represented in the fixture (`/api/configuration` and `/api/proxy-validation/assert-sync`). Files touched: `backend/API/Program.cs`, `backend/API/Swagger/AuthorizationMetadataOperationFilter.cs`, `frontend/openapi/proxy-validation.swagger.json`.
-- [ ] 9.5
+- [x] 9.5
   - Title: Proxy generation refresh for secured endpoints and auth headers
   - Description: Proxy generation refresh for secured endpoints and auth headers
   - Deliverables:
     - Proxy generation refresh for secured endpoints and auth headers
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T10:28:00Z
+  - FinishedAt: 2026-04-18T10:33:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Hardened proxy generation preconditions for secured endpoints by requiring OpenAPI `components.securitySchemes.Bearer` (HTTP bearer) and Bearer security requirements on protected operations (`/api/configuration`, `/api/proxy-validation/assert-sync`) in both Unix and Windows generator scripts. Attempted proxy regeneration using local checked-in Swagger fixture (`./scripts/generate-proxy.sh file:///workspace/QPhising/frontend/openapi/proxy-validation.swagger.json`), but npm registry access is blocked (403), so generated artifacts remained unchanged. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`.
 - [ ] 9.6
   - Title: Frontend integration for authenticated flows and role-based UX access
   - Description: Frontend integration for authenticated flows and role-based UX access
