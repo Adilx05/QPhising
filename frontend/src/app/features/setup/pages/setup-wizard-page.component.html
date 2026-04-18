@@ -3,30 +3,55 @@
     <form [formGroup]="form" class="space-y-4">
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="databaseConnectionString">Database Connection String</label>
-        <input id="databaseConnectionString" pInputText class="w-full" formControlName="databaseConnectionString" />
+        <input
+          id="databaseConnectionString"
+          pInputText
+          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          formControlName="databaseConnectionString"
+        />
       </div>
 
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="redisConnectionString">Redis Connection String</label>
-        <input id="redisConnectionString" pInputText class="w-full" formControlName="redisConnectionString" />
+        <input
+          id="redisConnectionString"
+          pInputText
+          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          formControlName="redisConnectionString"
+        />
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="keycloakAuthority">Keycloak Authority</label>
-          <input id="keycloakAuthority" pInputText class="w-full" formControlName="keycloakAuthority" />
+          <input
+            id="keycloakAuthority"
+            pInputText
+            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            formControlName="keycloakAuthority"
+          />
         </div>
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="keycloakRealm">Keycloak Realm</label>
-          <input id="keycloakRealm" pInputText class="w-full" formControlName="keycloakRealm" />
+          <input
+            id="keycloakRealm"
+            pInputText
+            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            formControlName="keycloakRealm"
+          />
         </div>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="keycloakClientId">Keycloak Client Id</label>
-          <input id="keycloakClientId" pInputText class="w-full" formControlName="keycloakClientId" />
+          <input
+            id="keycloakClientId"
+            pInputText
+            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            formControlName="keycloakClientId"
+          />
         </div>
 
         <div class="space-y-2">
@@ -34,7 +59,7 @@
           <p-password
             inputId="keycloakClientSecret"
             styleClass="w-full"
-            inputStyleClass="w-full"
+            inputStyleClass="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             [feedback]="false"
             formControlName="keycloakClientSecret"
           ></p-password>
@@ -42,10 +67,46 @@
       </div>
 
       <div class="flex flex-wrap gap-3 pt-2">
-        <p-button label="DB Test" icon="pi pi-database" [outlined]="true" [disabled]="isBusy()" (onClick)="testDatabase()"></p-button>
-        <p-button label="Redis Test" icon="pi pi-bolt" [outlined]="true" [disabled]="isBusy()" (onClick)="testRedis()"></p-button>
-        <p-button label="Keycloak Test" icon="pi pi-shield" [outlined]="true" [disabled]="isBusy()" (onClick)="testKeycloak()"></p-button>
-        <p-button label="Kaydet" icon="pi pi-save" severity="primary" [loading]="isBusy()" (onClick)="save()"></p-button>
+        <button
+          pButton
+          type="button"
+          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isBusy()"
+          (click)="testDatabase()"
+        >
+          <i class="pi pi-database"></i>
+          <span>DB Test</span>
+        </button>
+        <button
+          pButton
+          type="button"
+          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isBusy()"
+          (click)="testRedis()"
+        >
+          <i class="pi pi-bolt"></i>
+          <span>Redis Test</span>
+        </button>
+        <button
+          pButton
+          type="button"
+          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isBusy()"
+          (click)="testKeycloak()"
+        >
+          <i class="pi pi-shield"></i>
+          <span>Keycloak Test</span>
+        </button>
+        <button
+          pButton
+          type="button"
+          class="inline-flex items-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isBusy()"
+          (click)="save()"
+        >
+          <i class="pi" [ngClass]="isBusy() ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+          <span>{{ isBusy() ? 'Kaydediliyor...' : 'Kaydet' }}</span>
+        </button>
       </div>
     </form>
   </p-card>
