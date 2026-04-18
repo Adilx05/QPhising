@@ -551,15 +551,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T12:26:50Z
   - Owner: Codex
   - Notes: Added persistence-boundary domain models under `backend/Domain/Persistence` (storage kind enum, aggregate boundary/field mapping models, and default aggregate map for setup/runtime configuration), plus contract-source documentation in `backend/Domain/Contracts/PersistenceAggregateMappings.md` and README module reference update.
-- [ ] 10.2
+- [x] 10.2
   - Title: Application logic for transactional consistency, repositories, and unit-of-work rules
   - Description: Application logic for transactional consistency, repositories, and unit-of-work rules
   - Deliverables:
     - Application logic for transactional consistency, repositories, and unit-of-work rules
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T15:55:00Z
+  - FinishedAt: 2026-04-18T16:05:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added application-layer transactional abstractions (`ITransactionalRequest`, `IUnitOfWork`) and `UnitOfWorkBehavior` pipeline enforcement; marked write commands (`SaveSetupConfiguration`, `SaveRuntimeConfiguration`, `UpdateRuntimeConfiguration`) as transactional requests; wired API to a `FileBackedUnitOfWork` implementation that serializes file-backed writes for consistency. Files touched: `backend/Application/Contracts/Abstractions/Persistence/*`, `backend/Application/CQRS/Behaviors/UnitOfWorkBehavior.cs`, transactional command records under `backend/Application/CQRS/Commands/{Setup,RuntimeConfiguration}`, and `backend/API/{Program.cs,Services/Persistence/FileBackedUnitOfWork.cs}`.
 - [ ] 10.3
   - Title: Endpoint behavior validation against persisted workflows
   - Description: Endpoint behavior validation against persisted workflows
