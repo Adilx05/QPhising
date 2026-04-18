@@ -13,7 +13,7 @@ public sealed class GatewayRouteTemplate : IEquatable<GatewayRouteTemplate>
 
         var normalizedValue = value.Trim();
 
-        if (!normalizedValue.StartsWith('/', StringComparison.Ordinal))
+        if (!normalizedValue.StartsWith("/", StringComparison.Ordinal))
         {
             throw new ArgumentException("Gateway route template must start with '/'.", nameof(value));
         }
