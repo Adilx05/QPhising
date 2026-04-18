@@ -1,9 +1,11 @@
 using MediatR;
 using QPhising.Api.Services.ProxyValidation;
 using QPhising.Api.Services.Setup;
+using QPhising.Api.Services.RuntimeConfiguration;
 using QPhising.Api.Swagger;
 using QPhising.Application.Contracts.Abstractions.ProxyValidation;
 using QPhising.Application.Contracts.Abstractions.Setup;
+using QPhising.Application.Contracts.Abstractions.RuntimeConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +42,9 @@ builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof
 builder.Services.AddScoped<IProxyContractDriftValidator, FileTimestampProxyContractDriftValidator>();
 builder.Services.AddScoped<ISetupDependencyConnectionTester, SetupDependencyConnectionTester>();
 builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>();
+builder.Services.AddScoped<IRuntimeConfigurationSecretCipher, DataProtectionRuntimeConfigurationSecretCipher>();
 builder.Services.AddSingleton<ISetupConfigurationRepository, JsonFileSetupConfigurationRepository>();
+builder.Services.AddSingleton<IRuntimeConfigurationRepository, JsonFileRuntimeConfigurationRepository>();
 
 var app = builder.Build();
 

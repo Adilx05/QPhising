@@ -21,6 +21,38 @@ public sealed class RuntimeConfigurationAggregate
 
     public DateTimeOffset UpdatedAtUtc { get; private set; } = DateTimeOffset.MinValue;
 
+
+    public static RuntimeConfigurationAggregate Rehydrate(
+        string databaseConnectionCipherText,
+        string redisConnectionCipherText,
+        string keycloakAuthority,
+        string keycloakRealm,
+        string keycloakClientId,
+        string keycloakClientSecretCipherText,
+        DateTimeOffset updatedAtUtc)
+    {
+        if (!Uri.TryCreate(keycloakAuthority, UriKind.Absolute, out var authorityUri))
+        {
+            throw new ArgumentException("Keycloak authority must be an absolute URI.", nameof(keycloakAuthority));
+        }
+
+        var aggregate = new RuntimeConfigurationAggregate
+        {
+            DatabaseConnectionCipherText = RuntimeConfigurationSecretPolicy.RequireSecret(databaseConnectionCipherText, nameof(databaseConnectionCipherText)),
+            RedisConnectionCipherText = RuntimeConfigurationSecretPolicy.RequireSecret(redisConnectionCipherText, nameof(redisConnectionCipherText)),
+            KeycloakClientSecretCipherText = RuntimeConfigurationSecretPolicy.RequireSecret(keycloakClientSecretCipherText, nameof(keycloakClientSecretCipherText)),
+            KeycloakAuthority = authorityUri.AbsoluteUri.TrimEnd('/'),
+            KeycloakRealm = string.IsNullOrWhiteSpace(keycloakRealm)
+                ? throw new ArgumentException("Keycloak realm is required.", nameof(keycloakRealm))
+                : keycloakRealm.Trim(),
+            KeycloakClientId = string.IsNullOrWhiteSpace(keycloakClientId)
+                ? throw new ArgumentException("Keycloak client ID is required.", nameof(keycloakClientId))
+                : keycloakClientId.Trim(),
+            UpdatedAtUtc = updatedAtUtc == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow : updatedAtUtc
+        };
+
+        return aggregate;
+    }
     public bool HasAnyValueConfigured =>
         DatabaseConnectionCipherText is not null ||
         RedisConnectionCipherText is not null ||
