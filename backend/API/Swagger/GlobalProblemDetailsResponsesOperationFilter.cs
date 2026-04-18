@@ -23,20 +23,30 @@ public sealed class GlobalProblemDetailsResponsesOperationFilter : IOperationFil
 
         foreach (var (statusCode, description) in DefaultProblemResponses)
         {
-            if (operation.Responses.ContainsKey(statusCode))
+            if (!operation.Responses.TryGetValue(statusCode, out var response))
             {
+                operation.Responses[statusCode] = new OpenApiResponse
+                {
+                    Description = description,
+                    Content = new Dictionary<string, OpenApiMediaType>
+                    {
+                        ["application/problem+json"] = new() { Schema = schema },
+                        ["application/json"] = new() { Schema = schema }
+                    }
+                };
+
                 continue;
             }
 
-            operation.Responses[statusCode] = new OpenApiResponse
+            if (string.IsNullOrWhiteSpace(response.Description))
             {
-                Description = description,
-                Content = new Dictionary<string, OpenApiMediaType>
-                {
-                    ["application/problem+json"] = new() { Schema = schema },
-                    ["application/json"] = new() { Schema = schema }
-                }
-            };
+                response.Description = description;
+            }
+
+            response.Content ??= new Dictionary<string, OpenApiMediaType>();
+
+            response.Content["application/problem+json"] = new OpenApiMediaType { Schema = schema };
+            response.Content["application/json"] = new OpenApiMediaType { Schema = schema };
         }
     }
 }
