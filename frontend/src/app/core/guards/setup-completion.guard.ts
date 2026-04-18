@@ -1,4 +1,5 @@
 import { inject } from '@angular/core';
+import { resolveApiError } from '../http/api-error-handler';
 import { Router, type CanActivateFn, type CanMatchFn, type UrlTree } from '@angular/router';
 import {
   allowsMainApplicationAccess,
@@ -10,13 +11,23 @@ const toRedirectTree = (router: Router, redirectPath: string): UrlTree =>
   router.parseUrl(redirectPath);
 
 const resolveMainAppAccess = async (router: Router): Promise<boolean | UrlTree> => {
-  const decision = await getSetupGuardDecision();
+  try {
+    const decision = await getSetupGuardDecision();
 
-  if (allowsMainApplicationAccess(decision)) {
-    return true;
+    if (allowsMainApplicationAccess(decision)) {
+      return true;
+    }
+
+    return toRedirectTree(router, getRecommendedRedirectPath(decision));
+  } catch (error) {
+    const resolvedError = resolveApiError(error);
+
+    if (resolvedError.isAuthenticationError || resolvedError.isAuthorizationError) {
+      return toRedirectTree(router, '/setup');
+    }
+
+    return toRedirectTree(router, '/setup');
   }
-
-  return toRedirectTree(router, getRecommendedRedirectPath(decision));
 };
 
 export const setupCompletionCanActivateGuard: CanActivateFn = async () => {

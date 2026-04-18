@@ -359,15 +359,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T07:31:05Z
   - Owner: Codex
   - Notes: Hardened both proxy-generation scripts with base API convention gates to fail fast when Swagger misses `components.schemas.ProblemDetails`, any operation `operationId`, or standardized `400/401/403/500` ProblemDetails responses; synchronized `frontend/openapi/proxy-validation.swagger.json` to include those conventions so offline fixture validation remains aligned with runtime API behavior.
-- [ ] 6.6
+- [x] 6.6
   - Title: Frontend integration baseline for common API error/auth handling
   - Description: Frontend integration baseline for common API error/auth handling
   - Deliverables:
     - Frontend integration baseline for common API error/auth handling
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T07:32:00Z
+  - FinishedAt: 2026-04-18T07:36:18Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added shared frontend API error resolver `core/http/api-error-handler.ts` to normalize ProblemDetails messages and explicit 401/403 messaging, then integrated it into setup/runtime pages so API failures surface consistently. Updated setup completion route guard to centralize auth/error resolution and fail closed by redirecting to `/setup` when guard-decision API fails. Files touched: `frontend/src/app/core/http/api-error-handler.ts`, `frontend/src/app/features/setup/pages/setup-wizard-page.component.ts`, `frontend/src/app/features/setup/pages/runtime-configuration-page.component.ts`, `frontend/src/app/core/guards/setup-completion.guard.ts`.
 
 ## Phase 7 - Swagger Standards
 

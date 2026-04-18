@@ -6,6 +6,7 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import type { RuntimeConfigurationResult } from '../../../shared/proxy';
+import { resolveApiError } from '../../../core/http/api-error-handler';
 import {
   getRuntimeConfigurationStatus,
   saveRuntimeConfiguration,
@@ -105,10 +106,6 @@ export class RuntimeConfigurationPageComponent {
   }
 
   private resolveErrorMessage(error: unknown): string {
-    if (error instanceof Error && error.message.trim().length > 0) {
-      return error.message;
-    }
-
-    return 'Runtime konfigürasyon işlemi tamamlanamadı. API erişimini kontrol edin.';
+    return resolveApiError(error).message;
   }
 }
