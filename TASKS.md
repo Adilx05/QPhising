@@ -512,15 +512,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T10:18:44Z
   - Owner: Codex
   - Notes: Enabled JWT bearer authentication and authorization policy registration in API startup, then bound policy-based protection across protected controllers/resources (`/api/configuration`, `/api/gateway/route-policies`, `/api/proxy-validation/assert-sync`) with role policy granularity (`AdminOnly`, `OperatorOrAbove`, `ViewerOrAbove`) while leaving setup/health endpoints accessible for setup flow requirements. Files touched: `backend/API/Program.cs`, `backend/API/Controllers/ConfigurationController.cs`, `backend/API/Controllers/GatewayController.cs`, `backend/API/Controllers/ProxyValidationController.cs`.
-- [ ] 9.4
+- [x] 9.4
   - Title: Swagger security scheme and protected endpoint authorization metadata verification
   - Description: Swagger security scheme and protected endpoint authorization metadata verification
   - Deliverables:
     - Swagger security scheme and protected endpoint authorization metadata verification
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T19:10:00Z
+  - FinishedAt: 2026-04-18T19:23:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added Swagger JWT bearer security definition and authorization-aware operation filter so protected endpoints automatically emit security requirements plus 401/403 metadata; synchronized checked-in OpenAPI fixture with Bearer security scheme and authorization metadata for secured routes currently represented in the fixture (`/api/configuration` and `/api/proxy-validation/assert-sync`). Files touched: `backend/API/Program.cs`, `backend/API/Swagger/AuthorizationMetadataOperationFilter.cs`, `frontend/openapi/proxy-validation.swagger.json`.
 - [ ] 9.5
   - Title: Proxy generation refresh for secured endpoints and auth headers
   - Description: Proxy generation refresh for secured endpoints and auth headers
