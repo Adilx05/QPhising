@@ -455,15 +455,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T09:16:54Z
   - Owner: Codex
   - Notes: Implemented gateway route-policy endpoint in API via `GET /api/gateway/route-policies` (MediatR query passthrough) and added Gateway middleware that forwards authenticated JWT claims into downstream headers based on configurable `Gateway:RoutePolicies:ClaimsToHeaders` mappings; updated gateway runtime/appsettings policy configuration defaults to align middleware behavior with route policy composition settings. Files touched: `backend/API/Controllers/GatewayController.cs`, `backend/Gateway/Program.cs`, `backend/Gateway/Middleware/ClaimsToHeadersForwardingMiddleware.cs`, `backend/Gateway/Services/ConfigurationGatewayRoutePolicySettingsProvider.cs`, `backend/Gateway/Configuration/GatewayRoutePolicySettings.cs`, `backend/Gateway/appsettings.json`, `backend/Gateway/appsettings.runtime.json.example`.
-- [ ] 8.4
+- [x] 8.4
   - Title: Swagger alignment check for gateway-exposed downstream services
   - Description: Swagger alignment check for gateway-exposed downstream services
   - Deliverables:
     - Swagger alignment check for gateway-exposed downstream services
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T09:20:00Z
+  - FinishedAt: 2026-04-18T09:23:18Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added cross-platform gateway/Swagger alignment validation scripts to assert Ocelot API routes map to real Swagger operations and allow matching HTTP methods; documented usage in README. Files touched: `scripts/check-gateway-swagger-alignment.js`, `scripts/check-gateway-swagger-alignment.sh`, `scripts/check-gateway-swagger-alignment.bat`, `README.md`.
 - [ ] 8.5
   - Title: Proxy generation consistency check with gateway routing strategy
   - Description: Proxy generation consistency check with gateway routing strategy

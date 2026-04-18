@@ -58,6 +58,19 @@ Use the Swagger quality gate scripts to validate OpenAPI contract standards in l
 
 The CI workflow `.github/workflows/swagger-quality-gate.yml` runs the same gate against `frontend/openapi/proxy-validation.swagger.json` on pushes and pull requests.
 
+## Gateway/Swagger Alignment Check
+
+Use gateway alignment scripts to verify that Ocelot API routes are backed by matching downstream Swagger operations.
+
+- Linux/macOS:
+  - `./scripts/check-gateway-swagger-alignment.sh`
+  - `./scripts/check-gateway-swagger-alignment.sh --swagger frontend/openapi/proxy-validation.swagger.json --ocelot backend/Gateway/ocelot.json`
+- Windows:
+  - `scripts\check-gateway-swagger-alignment.bat`
+  - `scripts\check-gateway-swagger-alignment.bat --swagger frontend\openapi\proxy-validation.swagger.json --ocelot backend\Gateway\ocelot.json`
+
+The check fails when an API route in Ocelot has no matching Swagger path or does not permit all matching Swagger HTTP methods.
+
 ## Proxy Generation
 
 Use repeatable proxy scripts under `scripts/` to regenerate TypeScript API clients from a running backend Swagger endpoint.
