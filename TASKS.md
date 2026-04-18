@@ -416,15 +416,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T08:53:02Z
   - Owner: Codex
   - Notes: Added deterministic proxy-validation checks against the standardized Swagger fixture via new cross-platform scripts (`scripts/validate-proxy-generation.sh`, `scripts/validate-proxy-generation.bat`) that run swagger quality gates, regenerate proxies, and fail on drift under `frontend/src/app/shared/proxy`; added CI workflow `.github/workflows/proxy-generation-validation.yml` and README usage docs.
-- [ ] 7.6
+- [x] 7.6
   - Title: Frontend integration sanity check across standardized generated proxies
   - Description: Frontend integration sanity check across standardized generated proxies
   - Deliverables:
     - Frontend integration sanity check across standardized generated proxies
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T16:20:00Z
+  - FinishedAt: 2026-04-18T16:24:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Executed frontend sanity verification against standardized generated proxies by confirming all feature data-access integrations resolve via `frontend/src/app/shared/proxy` exports and completing a production Angular build (`npm run build`) without compile errors. Build succeeded; observed existing non-blocking warnings for initial bundle budget and CommonJS `form-data` usage in generated proxy request core.
 
 ## Phase 8 - Gateway (Ocelot)
 
