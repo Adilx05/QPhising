@@ -11,7 +11,7 @@ public interface IOpenApiExampleProvider<out TResponse>
 /// <summary>
 /// Provides canonical request and response examples for an API contract.
 /// </summary>
-public interface IOpenApiExampleProvider<in TRequest, out TResponse> : IOpenApiExampleProvider<TResponse>
+public interface IOpenApiExampleProvider<TRequest, out TResponse> : IOpenApiExampleProvider<TResponse>
 {
     TRequest BuildRequestExample();
 }
