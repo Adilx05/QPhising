@@ -380,15 +380,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T07:40:39Z
   - Owner: Codex
   - Notes: Added Domain-owned API naming/versioning convention model (`ApiResourceName`, `ApiVersionScope`, `ApiResourceConvention`) plus `backend/Domain/Contracts/ApiResourceNamingAndVersionScope.md` to define canonical resource segment rules and explicit version-scope semantics for downstream Swagger standardization.
-- [ ] 7.2
+- [x] 7.2
   - Title: Application logic conventions for operation IDs, response envelopes, and examples
   - Description: Application logic conventions for operation IDs, response envelopes, and examples
   - Deliverables:
     - Application logic conventions for operation IDs, response envelopes, and examples
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T07:41:00Z
+  - FinishedAt: 2026-04-18T07:44:49Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented reusable Application-layer OpenAPI convention primitives: `OpenApiOperationIdConvention` for canonical operation-id generation/validation, `ApiResponseEnvelope<TData>` for standardized success envelopes, and `IOpenApiExampleProvider` contracts for deterministic request/response example definitions; documented adoption rules in `backend/Application/Contracts/OpenApiOperationConventions.md`.
 - [ ] 7.3
   - Title: Endpoint annotation updates to enforce standard OpenAPI metadata
   - Description: Endpoint annotation updates to enforce standard OpenAPI metadata
