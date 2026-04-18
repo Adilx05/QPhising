@@ -24,6 +24,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.OperationFilter<GlobalProblemDetailsResponsesOperationFilter>();
     options.OperationFilter<SetupEndpointsExamplesOperationFilter>();
 });
 builder.Services.AddCors(options =>

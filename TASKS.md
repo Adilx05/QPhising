@@ -341,15 +341,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T10:31:00Z
   - Owner: Codex
   - Notes: Added API-wide endpoint pipeline integration by wiring ProblemDetails-based exception middleware, MediatR cross-cutting behaviors (logging/authorization/validation), validator discovery, and `ICurrentUserContext` HttpContext adapter in DI; simplified proxy-validation controller to rely on centralized exception handling. Files touched: `backend/API/Program.cs`, `backend/API/Middleware/ProblemDetailsExceptionMiddleware.cs`, `backend/API/Security/HttpContextCurrentUserContext.cs`, `backend/API/Controllers/ProxyValidationController.cs`, `backend/API/QPhising.Api.csproj`.
-- [ ] 6.4
+- [x] 6.4
   - Title: Swagger standard behavior checks for global error/auth response documentation
   - Description: Swagger standard behavior checks for global error/auth response documentation
   - Deliverables:
     - Swagger standard behavior checks for global error/auth response documentation
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T07:22:00Z
+  - FinishedAt: 2026-04-18T07:25:33Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added global Swagger operation filter `GlobalProblemDetailsResponsesOperationFilter` and registered it in API Swagger configuration so every endpoint documents standardized ProblemDetails responses for `400`, `401`, `403`, and `500` (including both `application/problem+json` and `application/json`) aligned with centralized exception/auth middleware behavior. Files touched: `backend/API/Swagger/GlobalProblemDetailsResponsesOperationFilter.cs`, `backend/API/Program.cs`.
 - [ ] 6.5
   - Title: Proxy generation compatibility validation against base API conventions
   - Description: Proxy generation compatibility validation against base API conventions
