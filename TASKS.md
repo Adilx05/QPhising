@@ -275,15 +275,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T06:43:43Z
   - Owner: Codex
   - Notes: Implemented runtime-configuration application CQRS for read/write/update flows with FluentValidation and MediatR handlers, including repository/secret-cipher abstractions and result DTO mapping from domain aggregate readiness/configuration state. Files touched: `backend/Application/CQRS/Queries/RuntimeConfiguration/*`, `backend/Application/CQRS/Commands/RuntimeConfiguration/*`, `backend/Application/Contracts/Abstractions/RuntimeConfiguration/*`, `backend/Application/Contracts/Responses/RuntimeConfiguration/RuntimeConfigurationResult.cs`.
-- [ ] 5.3
+- [x] 5.3
   - Title: Endpoint implementation for configuration operations and readiness checks
   - Description: Endpoint implementation for configuration operations and readiness checks
   - Deliverables:
     - Endpoint implementation for configuration operations and readiness checks
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T06:45:00Z
+  - FinishedAt: 2026-04-18T06:49:16Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented runtime configuration API endpoints at `/api/configuration` (`GET`, `POST`, `PATCH`) wired to MediatR runtime configuration query/commands, plus concrete API-layer repository/secret-cipher services for runtime persistence in `appsettings.runtime.json` under `RuntimeConfigurationState` with timestamp-preserving aggregate rehydration. Files touched: `backend/API/Controllers/ConfigurationController.cs`, `backend/API/Contracts/RuntimeConfiguration/*`, `backend/API/Services/RuntimeConfiguration/*`, `backend/API/Program.cs`, `backend/Domain/RuntimeConfiguration/Aggregates/RuntimeConfigurationAggregate.cs`.
 - [ ] 5.4
   - Title: Swagger verification for runtime configuration contracts
   - Description: Swagger verification for runtime configuration contracts
