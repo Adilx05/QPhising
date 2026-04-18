@@ -485,15 +485,15 @@ Metadata required for every subtask:
 
 ## Phase 9 - Identity (Keycloak)
 
-- [ ] 9.1
+- [x] 9.1
   - Title: Backend domain/model for role model (`Admin`, `Operator`, `Viewer`) and claims mapping
   - Description: Backend domain/model for role model (`Admin`, `Operator`, `Viewer`) and claims mapping
   - Deliverables:
     - Backend domain/model for role model (`Admin`, `Operator`, `Viewer`) and claims mapping
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T09:47:00Z
+  - FinishedAt: 2026-04-18T09:50:56Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added Identity domain role model and claim-mapping source-of-truth under `backend/Domain/Identity` (`IdentityRole`, `IdentityClaim`, `IdentityRoleClaimMapping`, `IdentityRoleClaimMap`) with default Keycloak-compatible claim-path mappings; documented canonical mapping contract in `backend/Domain/Contracts/IdentityRoleClaimMapping.md`.
 - [ ] 9.2
   - Title: Application logic for authorization policies and token validation flows
   - Description: Application logic for authorization policies and token validation flows
