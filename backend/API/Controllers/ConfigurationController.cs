@@ -9,6 +9,7 @@ namespace QPhising.Api.Controllers;
 
 [ApiController]
 [Route("api/configuration")]
+[Produces("application/json", "application/problem+json")]
 public sealed class ConfigurationController : ControllerBase
 {
     private readonly ISender _sender;
@@ -18,12 +19,13 @@ public sealed class ConfigurationController : ControllerBase
         _sender = sender;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "GetRuntimeConfiguration")]
     [ProducesResponseType(typeof(RuntimeConfigurationResult), StatusCodes.Status200OK)]
     public Task<RuntimeConfigurationResult> GetCurrent(CancellationToken cancellationToken) =>
         _sender.Send(new GetRuntimeConfigurationQuery(), cancellationToken);
 
-    [HttpPost]
+    [HttpPost(Name = "SaveRuntimeConfiguration")]
+    [Consumes("application/json")]
     [ProducesResponseType(typeof(RuntimeConfigurationResult), StatusCodes.Status200OK)]
     public Task<RuntimeConfigurationResult> Save(
         [FromBody] SaveRuntimeConfigurationRequest request,
@@ -38,7 +40,8 @@ public sealed class ConfigurationController : ControllerBase
                 request.KeycloakClientSecret),
             cancellationToken);
 
-    [HttpPatch]
+    [HttpPatch(Name = "UpdateRuntimeConfiguration")]
+    [Consumes("application/json")]
     [ProducesResponseType(typeof(RuntimeConfigurationResult), StatusCodes.Status200OK)]
     public Task<RuntimeConfigurationResult> Update(
         [FromBody] UpdateRuntimeConfigurationRequest request,

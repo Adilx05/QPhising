@@ -7,6 +7,7 @@ namespace QPhising.Api.Controllers;
 
 [ApiController]
 [Route("api/proxy-validation")]
+[Produces("application/json", "application/problem+json")]
 public sealed class ProxyValidationController : ControllerBase
 {
     private readonly ISender _sender;
@@ -16,7 +17,8 @@ public sealed class ProxyValidationController : ControllerBase
         _sender = sender;
     }
 
-    [HttpPost("assert-sync")]
+    [HttpPost("assert-sync", Name = "AssertSyncProxyValidation")]
+    [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> AssertSync(
