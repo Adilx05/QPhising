@@ -332,15 +332,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T07:16:49Z
   - Owner: Codex
   - Notes: Implemented Application-layer MediatR pipeline behaviors for validation, structured request logging, and authorization checks, plus reusable authorization abstractions (`ICurrentUserContext`, `IAuthorizableRequest`) and an explicit `ApplicationAuthorizationException` for denied access handling. Files touched: `backend/Application/CQRS/Behaviors/ValidationBehavior.cs`, `backend/Application/CQRS/Behaviors/RequestLoggingBehavior.cs`, `backend/Application/CQRS/Behaviors/AuthorizationBehavior.cs`, `backend/Application/Contracts/Abstractions/Authorization/*`, `backend/Application/Exceptions/ApplicationAuthorizationException.cs`.
-- [ ] 6.3
+- [x] 6.3
   - Title: Endpoint pipeline integration
   - Description: Endpoint pipeline integration. Scope: ProblemDetails, middleware, DI wiring.
   - Deliverables:
     - ProblemDetails, middleware, DI wiring
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T10:20:00Z
+  - FinishedAt: 2026-04-18T10:31:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added API-wide endpoint pipeline integration by wiring ProblemDetails-based exception middleware, MediatR cross-cutting behaviors (logging/authorization/validation), validator discovery, and `ICurrentUserContext` HttpContext adapter in DI; simplified proxy-validation controller to rely on centralized exception handling. Files touched: `backend/API/Program.cs`, `backend/API/Middleware/ProblemDetailsExceptionMiddleware.cs`, `backend/API/Security/HttpContextCurrentUserContext.cs`, `backend/API/Controllers/ProxyValidationController.cs`, `backend/API/QPhising.Api.csproj`.
 - [ ] 6.4
   - Title: Swagger standard behavior checks for global error/auth response documentation
   - Description: Swagger standard behavior checks for global error/auth response documentation

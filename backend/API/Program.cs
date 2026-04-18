@@ -1,11 +1,16 @@
+using FluentValidation;
 using MediatR;
+using QPhising.Api.Middleware;
+using QPhising.Api.Security;
 using QPhising.Api.Services.ProxyValidation;
-using QPhising.Api.Services.Setup;
 using QPhising.Api.Services.RuntimeConfiguration;
+using QPhising.Api.Services.Setup;
 using QPhising.Api.Swagger;
+using QPhising.Application.Contracts.Abstractions.Authorization;
 using QPhising.Application.Contracts.Abstractions.ProxyValidation;
-using QPhising.Application.Contracts.Abstractions.Setup;
 using QPhising.Application.Contracts.Abstractions.RuntimeConfiguration;
+using QPhising.Application.Contracts.Abstractions.Setup;
+using QPhising.Application.CQRS.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +19,8 @@ builder.Configuration.AddJsonFile("appsettings.runtime.json", optional: true, re
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 
 builder.Services.AddControllers();
+builder.Services.AddProblemDetails();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -38,7 +45,15 @@ builder.Services.AddHttpClient(nameof(SetupDependencyConnectionTester), client =
 {
     client.Timeout = TimeSpan.FromSeconds(10);
 });
-builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(QPhising.Application.CQRS.Commands.ProxyValidation.AssertProxyContractSyncCommand).Assembly));
+builder.Services.AddValidatorsFromAssembly(typeof(QPhising.Application.CQRS.Commands.ProxyValidation.AssertProxyContractSyncCommand).Assembly);
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssembly(typeof(QPhising.Application.CQRS.Commands.ProxyValidation.AssertProxyContractSyncCommand).Assembly);
+    config.AddOpenBehavior(typeof(RequestLoggingBehavior<,>));
+    config.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
+    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
+builder.Services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
 builder.Services.AddScoped<IProxyContractDriftValidator, FileTimestampProxyContractDriftValidator>();
 builder.Services.AddScoped<ISetupDependencyConnectionTester, SetupDependencyConnectionTester>();
 builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>();
@@ -47,6 +62,8 @@ builder.Services.AddSingleton<ISetupConfigurationRepository, JsonFileSetupConfig
 builder.Services.AddSingleton<IRuntimeConfigurationRepository, JsonFileRuntimeConfigurationRepository>();
 
 var app = builder.Build();
+
+app.UseMiddleware<ProblemDetailsExceptionMiddleware>();
 
 var swaggerEnabled = app.Environment.IsDevelopment() || app.Configuration.GetValue("FeatureFlags:SwaggerEnabled", false);
 if (swaggerEnabled)

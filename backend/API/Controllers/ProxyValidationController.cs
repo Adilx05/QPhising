@@ -18,29 +18,15 @@ public sealed class ProxyValidationController : ControllerBase
 
     [HttpPost("assert-sync")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProxyContractSyncConflictResponse), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> AssertSync(
         [FromBody] AssertProxyContractSyncRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            await _sender.Send(
-                new AssertProxyContractSyncCommand(request.SwaggerContractPath, request.ProxyGenerationStampPath),
-                cancellationToken);
+        await _sender.Send(
+            new AssertProxyContractSyncCommand(request.SwaggerContractPath, request.ProxyGenerationStampPath),
+            cancellationToken);
 
-            return NoContent();
-        }
-        catch (ProxyContractDriftException ex)
-        {
-            return Conflict(new ProxyContractSyncConflictResponse
-            {
-                Status = ex.ValidationResult.Status,
-                Message = ex.ValidationResult.Message,
-                SwaggerLastModifiedUtc = ex.ValidationResult.SwaggerLastModifiedUtc,
-                ProxyGeneratedAtUtc = ex.ValidationResult.ProxyGeneratedAtUtc,
-                SuggestedRegenerationCommand = ex.ValidationResult.SuggestedRegenerationCommand
-            });
-        }
+        return NoContent();
     }
 }
