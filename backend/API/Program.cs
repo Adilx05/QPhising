@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.OpenApi.Models;
+using QPhising.Api.Services.Campaign;
 using QPhising.Api.Services.Gateway;
 using QPhising.Api.Services.Identity;
 using QPhising.Api.Services.Persistence;
@@ -16,6 +17,7 @@ using QPhising.Api.Services.RuntimeConfiguration;
 using QPhising.Api.Services.Setup;
 using QPhising.Api.Swagger;
 using QPhising.Application.Contracts.Abstractions.Authorization;
+using QPhising.Application.Contracts.Abstractions.Campaign;
 using QPhising.Application.Contracts.Abstractions.Gateway;
 using QPhising.Application.Contracts.Abstractions.Persistence;
 using QPhising.Application.Contracts.Abstractions.ProxyValidation;
@@ -138,6 +140,7 @@ builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>(
 builder.Services.AddScoped<IRuntimeConfigurationSecretCipher, DataProtectionRuntimeConfigurationSecretCipher>();
 builder.Services.AddSingleton<ISetupConfigurationRepository, JsonFileSetupConfigurationRepository>();
 builder.Services.AddSingleton<IRuntimeConfigurationRepository, JsonFileRuntimeConfigurationRepository>();
+builder.Services.AddSingleton<ICampaignRepository, InMemoryCampaignRepository>();
 
 var app = builder.Build();
 
