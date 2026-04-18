@@ -1,17 +1,16 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using QPhising.Api.Middleware;
 using QPhising.Api.Security;
-using Microsoft.AspNetCore.Authorization;
+using QPhising.Api.Infrastructure.Persistence;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.OpenApi.Models;
-using QPhising.Api.Services.Campaign;
 using QPhising.Api.Services.Gateway;
 using QPhising.Api.Services.Identity;
-using QPhising.Api.Services.Persistence;
 using QPhising.Api.Services.ProxyValidation;
 using QPhising.Api.Services.RuntimeConfiguration;
 using QPhising.Api.Services.Setup;
@@ -133,18 +132,66 @@ builder.Services.AddMediatR(config =>
 builder.Services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
 builder.Services.AddScoped<IAccessTokenValidator, KeycloakAccessTokenValidator>();
 builder.Services.AddScoped<IGatewayRoutePolicySettingsProvider, ConfigurationGatewayRoutePolicySettingsProvider>();
-builder.Services.AddSingleton<IUnitOfWork, FileBackedUnitOfWork>();
+builder.Services.AddDbContext<QPhisingDbContext>((serviceProvider, options) =>
+{
+    var connectionString = serviceProvider.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection");
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException("Connection string 'DefaultConnection' is required.");
+    }
+
+    options.UseNpgsql(connectionString);
+});
+builder.Services.AddScoped<IUnitOfWork, EfCoreUnitOfWork>();
+builder.Services.AddScoped<ICampaignRepository, EfCoreCampaignRepository>();
 builder.Services.AddScoped<IProxyContractDriftValidator, FileTimestampProxyContractDriftValidator>();
 builder.Services.AddScoped<ISetupDependencyConnectionTester, SetupDependencyConnectionTester>();
 builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>();
 builder.Services.AddScoped<IRuntimeConfigurationSecretCipher, DataProtectionRuntimeConfigurationSecretCipher>();
 builder.Services.AddSingleton<ISetupConfigurationRepository, JsonFileSetupConfigurationRepository>();
 builder.Services.AddSingleton<IRuntimeConfigurationRepository, JsonFileRuntimeConfigurationRepository>();
-builder.Services.AddSingleton<ICampaignRepository, InMemoryCampaignRepository>();
 
 var app = builder.Build();
 
 app.UseMiddleware<ProblemDetailsExceptionMiddleware>();
+
+var shouldRunMigrations = app.Environment.IsDevelopment() ||
+                          app.Configuration.GetValue("Database:ApplyMigrationsOnStartup", false);
+
+if (shouldRunMigrations)
+{
+    using var migrationScope = app.Services.CreateScope();
+    var logger = migrationScope.ServiceProvider.GetRequiredService<ILoggerFactory>()
+        .CreateLogger("DatabaseMigration");
+    var dbContext = migrationScope.ServiceProvider.GetRequiredService<QPhisingDbContext>();
+
+    try
+    {
+        logger.LogInformation(
+            "Applying EF Core migrations for context {DbContext} in environment {EnvironmentName}.",
+            nameof(QPhisingDbContext),
+            app.Environment.EnvironmentName);
+
+        dbContext.Database.Migrate();
+
+        logger.LogInformation("EF Core migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogCritical(
+            ex,
+            "Failed to apply EF Core migrations for context {DbContext}.",
+            nameof(QPhisingDbContext));
+
+        var continueOnMigrationFailure = app.Configuration.GetValue("Database:ContinueOnMigrationFailure", false);
+        if (!continueOnMigrationFailure)
+        {
+            throw;
+        }
+
+        logger.LogWarning("Continuing startup due to Database:ContinueOnMigrationFailure=true.");
+    }
+}
 
 var swaggerEnabled = app.Environment.IsDevelopment() || app.Configuration.GetValue("FeatureFlags:SwaggerEnabled", false);
 if (swaggerEnabled)

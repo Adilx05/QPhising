@@ -13,4 +13,4 @@ Defines application-layer expectations for write consistency across repositories
 
 ## Current baseline
 
-`FileBackedUnitOfWork` serializes writes for file-backed repositories to avoid concurrent write races while persistence is migrated to database-backed infrastructure.
+`EfCoreUnitOfWork` executes transactional requests through a single scoped EF Core `DbContext` and commits tracked changes at the unit-of-work boundary.
