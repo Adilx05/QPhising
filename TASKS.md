@@ -494,15 +494,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T09:50:56Z
   - Owner: Codex
   - Notes: Added Identity domain role model and claim-mapping source-of-truth under `backend/Domain/Identity` (`IdentityRole`, `IdentityClaim`, `IdentityRoleClaimMapping`, `IdentityRoleClaimMap`) with default Keycloak-compatible claim-path mappings; documented canonical mapping contract in `backend/Domain/Contracts/IdentityRoleClaimMapping.md`.
-- [ ] 9.2
+- [x] 9.2
   - Title: Application logic for authorization policies and token validation flows
   - Description: Application logic for authorization policies and token validation flows
   - Deliverables:
     - Application logic for authorization policies and token validation flows
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T10:00:00Z
+  - FinishedAt: 2026-04-18T10:05:20Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added Identity application-layer CQRS flows for (1) authorization policy catalog retrieval and (2) access-token validation via abstraction-backed validator + domain role/claim resolution (`IdentityRoleClaimMap`), with dedicated FluentValidation validators and identity response contracts for downstream API endpoint binding in the next subtask. Files touched: `backend/Application/CQRS/{Queries,Commands}/Identity/*`, `backend/Application/Contracts/Abstractions/Authorization/IAccessTokenValidator.cs`, `backend/Application/Contracts/Responses/Identity/*`, `backend/Application/Security/IdentityAuthorizationPolicies.cs`.
 - [ ] 9.3
   - Title: Endpoint protection and policy binding across protected resources
   - Description: Endpoint protection and policy binding across protected resources
