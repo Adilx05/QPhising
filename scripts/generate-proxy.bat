@@ -27,6 +27,7 @@ echo Validating Swagger preconditions from: %SWAGGER_URL%
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop';" ^
   "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/configuration','/api/setup/status','/api/setup/guard-decision','/api/setup/test-db','/api/setup/test-redis','/api/setup/test-keycloak','/api/setup/save');" ^
+  "$requiredOperations=@(@{Method='get';Path='/api/configuration';OperationId='Configuration_GetCurrent'},@{Method='post';Path='/api/configuration';OperationId='Configuration_Save'},@{Method='patch';Path='/api/configuration';OperationId='Configuration_Update'});" ^
   "$protectedPaths=@('/api/proxy-validation/assert-sync','/api/configuration');" ^
   "$httpMethods=@('get','post','put','patch','delete','head','options','trace');" ^
   "$requiredProblemStatusCodes=@('400','401','403','500');" ^
@@ -61,6 +62,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "foreach ($requiredPath in $requiredPaths) {" ^
   "  if (-not $swagger.paths.PSObject.Properties.Name.Contains($requiredPath)) {" ^
   "    Write-Error ('Required path ''{0}'' was not found in Swagger. Run backend contract updates first.' -f $requiredPath);" ^
+  "    exit 1;" ^
+  "  }" ^
+  "}" ^
+  "foreach ($requiredOperation in $requiredOperations) {" ^
+  "  $pathItem = $swagger.paths.($requiredOperation.Path);" ^
+  "  if (-not $pathItem) {" ^
+  "    Write-Error ('Required operation ''{0} {1}'' was not found in Swagger.' -f $requiredOperation.Method.ToUpperInvariant(), $requiredOperation.Path);" ^
+  "    exit 1;" ^
+  "  }" ^
+  "  $operation = $pathItem.($requiredOperation.Method);" ^
+  "  if (-not $operation) {" ^
+  "    Write-Error ('Required operation ''{0} {1}'' was not found in Swagger.' -f $requiredOperation.Method.ToUpperInvariant(), $requiredOperation.Path);" ^
+  "    exit 1;" ^
+  "  }" ^
+  "  if ([string]$operation.operationId -ne [string]$requiredOperation.OperationId) {" ^
+  "    Write-Error ('Required operation ''{0} {1}'' must use operationId ''{2}''.' -f $requiredOperation.Method.ToUpperInvariant(), $requiredOperation.Path, $requiredOperation.OperationId);" ^
   "    exit 1;" ^
   "  }" ^
   "}" ^

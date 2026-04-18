@@ -59,6 +59,11 @@ const requiredPaths = [
   "/api/setup/test-keycloak",
   "/api/setup/save"
 ];
+const requiredOperations = [
+  { method: "get", path: "/api/configuration", operationId: "Configuration_GetCurrent" },
+  { method: "post", path: "/api/configuration", operationId: "Configuration_Save" },
+  { method: "patch", path: "/api/configuration", operationId: "Configuration_Update" }
+];
 const protectedPaths = [
   "/api/proxy-validation/assert-sync",
   "/api/configuration"
@@ -92,6 +97,20 @@ if (!swagger.paths || typeof swagger.paths !== "object") {
 for (const requiredPath of requiredPaths) {
   if (!Object.prototype.hasOwnProperty.call(swagger.paths, requiredPath)) {
     console.error(`Error: required path "${requiredPath}" was not found in Swagger. Run backend contract updates first.`);
+    process.exit(1);
+  }
+}
+
+for (const requiredOperation of requiredOperations) {
+  const pathItem = swagger.paths[requiredOperation.path];
+  const operation = pathItem && pathItem[requiredOperation.method];
+  if (!operation || typeof operation !== "object") {
+    console.error(`Error: required operation "${requiredOperation.method.toUpperCase()} ${requiredOperation.path}" was not found in Swagger.`);
+    process.exit(1);
+  }
+
+  if (operation.operationId !== requiredOperation.operationId) {
+    console.error(`Error: required operation "${requiredOperation.method.toUpperCase()} ${requiredOperation.path}" must use operationId "${requiredOperation.operationId}".`);
     process.exit(1);
   }
 }
