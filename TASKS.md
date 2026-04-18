@@ -473,15 +473,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T09:27:10Z
   - Owner: Codex
   - Notes: Added cross-platform proxy/gateway consistency validation scripts that assert generated proxy service operations (method + path) are covered by Ocelot upstream route templates, integrated the check into proxy drift validation scripts, and documented usage in README. Files touched: `scripts/check-proxy-gateway-consistency.js`, `scripts/check-proxy-gateway-consistency.sh`, `scripts/check-proxy-gateway-consistency.bat`, `scripts/validate-proxy-generation.sh`, `scripts/validate-proxy-generation.bat`, `README.md`.
-- [ ] 8.6
+- [x] 8.6
   - Title: Frontend integration smoke validation through gateway paths
   - Description: Frontend integration smoke validation through gateway paths
   - Deliverables:
     - Frontend integration smoke validation through gateway paths
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T09:40:00Z
+  - FinishedAt: 2026-04-18T09:46:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added cross-platform frontend gateway smoke validation scripts (`scripts/check-frontend-gateway-smoke.{js,sh,bat}`) that probe setup/runtime/gateway endpoints through Gateway base URL and fail with actionable diagnostics when API/Gateway are unavailable; wired npm command `smoke:gateway` in `frontend/package.json` for developer execution.
 
 ## Phase 9 - Identity (Keycloak)
 
