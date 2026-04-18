@@ -10,6 +10,7 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class TemplateService {
   /**
+   * List templates with lifecycle and version metadata.
    * @returns TemplateResult OK
    * @throws ApiError
    */
@@ -26,6 +27,7 @@ export class TemplateService {
     });
   }
   /**
+   * Create a new draft template.
    * @returns TemplateResult OK
    * @throws ApiError
    */
@@ -48,6 +50,7 @@ export class TemplateService {
     });
   }
   /**
+   * Get a template by identifier.
    * @returns TemplateResult OK
    * @throws ApiError
    */
@@ -71,6 +74,7 @@ export class TemplateService {
     });
   }
   /**
+   * Update mutable fields for an existing draft template.
    * @returns TemplateResult OK
    * @throws ApiError
    */
@@ -98,6 +102,7 @@ export class TemplateService {
     });
   }
   /**
+   * Delete a template.
    * @returns void
    * @throws ApiError
    */
@@ -121,6 +126,7 @@ export class TemplateService {
     });
   }
   /**
+   * Publish a draft template for campaign usage.
    * @returns TemplateResult OK
    * @throws ApiError
    */
@@ -144,6 +150,7 @@ export class TemplateService {
     });
   }
   /**
+   * Archive a template to prevent future use.
    * @returns TemplateResult OK
    * @throws ApiError
    */
