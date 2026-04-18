@@ -193,6 +193,82 @@
           }
         }
       }
+    },
+    "/api/configuration": {
+      "get": {
+        "tags": [
+          "Configuration"
+        ],
+        "operationId": "Configuration_GetCurrent",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeConfigurationResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Configuration"
+        ],
+        "operationId": "Configuration_Save",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveRuntimeConfigurationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeConfigurationResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Configuration"
+        ],
+        "operationId": "Configuration_Update",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRuntimeConfigurationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeConfigurationResult"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -399,6 +475,93 @@
           "connectionString": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "SaveRuntimeConfigurationRequest": {
+        "type": "object",
+        "required": [
+          "databaseConnectionString",
+          "redisConnectionString",
+          "keycloakAuthority",
+          "keycloakRealm",
+          "keycloakClientId",
+          "keycloakClientSecret"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "databaseConnectionString": {
+            "type": "string"
+          },
+          "redisConnectionString": {
+            "type": "string"
+          },
+          "keycloakAuthority": {
+            "type": "string"
+          },
+          "keycloakRealm": {
+            "type": "string"
+          },
+          "keycloakClientId": {
+            "type": "string"
+          },
+          "keycloakClientSecret": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateRuntimeConfigurationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "databaseConnectionString": {
+            "type": "string",
+            "nullable": true
+          },
+          "redisConnectionString": {
+            "type": "string",
+            "nullable": true
+          },
+          "keycloakAuthority": {
+            "type": "string",
+            "nullable": true
+          },
+          "keycloakRealm": {
+            "type": "string",
+            "nullable": true
+          },
+          "keycloakClientId": {
+            "type": "string",
+            "nullable": true
+          },
+          "keycloakClientSecret": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RuntimeConfigurationResult": {
+        "type": "object",
+        "required": [
+          "updatedAtUtc"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "isDatabaseConfigured": {
+            "type": "boolean"
+          },
+          "isRedisConfigured": {
+            "type": "boolean"
+          },
+          "isKeycloakConfigured": {
+            "type": "boolean"
+          },
+          "isReadyForProtectedRuntime": {
+            "type": "boolean"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       }
