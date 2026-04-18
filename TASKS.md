@@ -323,15 +323,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T09:08:00Z
   - Owner: Codex
   - Notes: Added domain shared primitives under `backend/Domain/Common` with production-ready base types for `Entity<TId>` (identity + domain-event collection management), `ValueObject` (structural equality semantics), and `DomainEvent` (event identity + occurrence timestamp) to establish consistent domain modeling foundations for upcoming modules.
-- [ ] 6.2
+- [x] 6.2
   - Title: Application logic cross-cutting pipeline behaviors
   - Description: Application logic cross-cutting pipeline behaviors. Scope: validation/logging/authz.
   - Deliverables:
     - validation/logging/authz
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T07:12:00Z
+  - FinishedAt: 2026-04-18T07:16:49Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented Application-layer MediatR pipeline behaviors for validation, structured request logging, and authorization checks, plus reusable authorization abstractions (`ICurrentUserContext`, `IAuthorizableRequest`) and an explicit `ApplicationAuthorizationException` for denied access handling. Files touched: `backend/Application/CQRS/Behaviors/ValidationBehavior.cs`, `backend/Application/CQRS/Behaviors/RequestLoggingBehavior.cs`, `backend/Application/CQRS/Behaviors/AuthorizationBehavior.cs`, `backend/Application/Contracts/Abstractions/Authorization/*`, `backend/Application/Exceptions/ApplicationAuthorizationException.cs`.
 - [ ] 6.3
   - Title: Endpoint pipeline integration
   - Description: Endpoint pipeline integration. Scope: ProblemDetails, middleware, DI wiring.
