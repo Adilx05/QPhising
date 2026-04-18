@@ -398,15 +398,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T08:31:39Z
   - Owner: Codex
   - Notes: Added explicit endpoint metadata annotations across API controllers to strengthen OpenAPI consistency: named routes for deterministic operation identity, controller-level `Produces` media types, and `Consumes("application/json")` on JSON body endpoints. Files touched: `backend/API/Controllers/SetupController.cs`, `backend/API/Controllers/ConfigurationController.cs`, `backend/API/Controllers/ProxyValidationController.cs`, `backend/API/Controllers/HealthController.cs`.
-- [ ] 7.4
+- [x] 7.4
   - Title: Swagger generation quality gate in CI/local checks
   - Description: Swagger generation quality gate in CI/local checks
   - Deliverables:
     - Swagger generation quality gate in CI/local checks
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T15:05:00Z
+  - FinishedAt: 2026-04-18T15:18:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added cross-platform local Swagger quality gate scripts (`scripts/check-swagger-quality.sh`, `scripts/check-swagger-quality.bat`) and a CI workflow (`.github/workflows/swagger-quality-gate.yml`) that validates standardized OpenAPI conventions against the checked-in Swagger fixture; documented local usage in README.
 - [ ] 7.5
   - Title: Proxy generation validation against standardized Swagger docs
   - Description: Proxy generation validation against standardized Swagger docs

@@ -45,6 +45,19 @@ Set multiple startup projects:
 
 This starts API and Gateway together with non-conflicting ports.
 
+## Swagger Quality Gate
+
+Use the Swagger quality gate scripts to validate OpenAPI contract standards in local workflows and CI.
+
+- Linux/macOS:
+  - `./scripts/check-swagger-quality.sh`
+  - `./scripts/check-swagger-quality.sh http://localhost:5050/swagger/v1/swagger.json`
+- Windows:
+  - `scripts\check-swagger-quality.bat`
+  - `scripts\check-swagger-quality.bat https://localhost:7050/swagger/v1/swagger.json`
+
+The CI workflow `.github/workflows/swagger-quality-gate.yml` runs the same gate against `frontend/openapi/proxy-validation.swagger.json` on pushes and pull requests.
+
 ## Proxy Generation
 
 Use repeatable proxy scripts under `scripts/` to regenerate TypeScript API clients from a running backend Swagger endpoint.

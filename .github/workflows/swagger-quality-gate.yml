@@ -1,0 +1,23 @@
+name: Swagger Quality Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  swagger-quality-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate standardized Swagger document
+        run: ./scripts/check-swagger-quality.sh ./frontend/openapi/proxy-validation.swagger.json
