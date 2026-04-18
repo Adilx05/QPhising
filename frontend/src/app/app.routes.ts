@@ -11,6 +11,7 @@ import { CampaignsPageComponent } from './features/campaigns/pages/campaigns-pag
 import { DashboardPageComponent } from './features/dashboard/pages/dashboard-page.component';
 import { RuntimeConfigurationPageComponent } from './features/setup/pages/runtime-configuration-page.component';
 import { SetupWizardPageComponent } from './features/setup/pages/setup-wizard-page.component';
+import { TemplatesPageComponent } from './features/templates/pages/templates-page.component';
 
 export const appRoutes: Routes = [
   {
@@ -38,6 +39,16 @@ export const appRoutes: Routes = [
   {
     path: 'campaigns',
     component: CampaignsPageComponent,
+    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    data: {
+      requiredRole: 'Viewer'
+    }
+  },
+
+  {
+    path: 'templates',
+    component: TemplatesPageComponent,
     canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
     canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
     data: {
