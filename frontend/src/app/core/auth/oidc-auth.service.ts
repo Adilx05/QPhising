@@ -68,15 +68,15 @@ const resolveRuntimeConfig = (): OidcRuntimeConfig => {
 
   const authority = typeof runtime.__QPHISING_AUTHORITY__ === 'string' && runtime.__QPHISING_AUTHORITY__.trim().length > 0
     ? runtime.__QPHISING_AUTHORITY__.trim()
-    : 'http://localhost:8081';
+    : 'http://localhost:6060';
 
   const realm = typeof runtime.__QPHISING_REALM__ === 'string' && runtime.__QPHISING_REALM__.trim().length > 0
     ? runtime.__QPHISING_REALM__.trim()
-    : 'qphising';
+    : 'QPhising';
 
   const clientId = typeof runtime.__QPHISING_CLIENT_ID__ === 'string' && runtime.__QPHISING_CLIENT_ID__.trim().length > 0
     ? runtime.__QPHISING_CLIENT_ID__.trim()
-    : 'qphising-frontend';
+    : 'qphising';
 
   const postLogoutRedirectUri =
     typeof runtime.__QPHISING_POST_LOGOUT_REDIRECT_URI__ === 'string' && runtime.__QPHISING_POST_LOGOUT_REDIRECT_URI__.trim().length > 0
