@@ -35,6 +35,11 @@ import { AuthSessionService } from './core/auth/auth-session';
             <i class="pi pi-megaphone text-sm"></i>
             <span>Campaigns</span>
           </a>
+
+          <a *ngIf="canViewTemplates()" routerLink="/templates" routerLinkActive="is-active" class="nav-item">
+            <i class="pi pi-file-edit text-sm"></i>
+            <span>Templates</span>
+          </a>
         </nav>
       </aside>
 
@@ -48,6 +53,7 @@ import { AuthSessionService } from './core/auth/auth-session';
               <a class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">Setup</a>
               <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">Config</a>
               <a *ngIf="canViewCampaigns()" class="mobile-nav-item" routerLink="/campaigns" routerLinkActive="is-active">Campaigns</a>
+              <a *ngIf="canViewTemplates()" class="mobile-nav-item" routerLink="/templates" routerLinkActive="is-active">Templates</a>
             </nav>
 
             <div class="hidden items-center gap-3 rounded-full border px-3 py-1.5 text-xs font-medium lg:flex"
@@ -77,6 +83,10 @@ export class AppComponent {
   }
 
   protected canViewCampaigns(): boolean {
+    return this.authSessionService.hasRequiredRole('Viewer');
+  }
+
+  protected canViewTemplates(): boolean {
     return this.authSessionService.hasRequiredRole('Viewer');
   }
 }
