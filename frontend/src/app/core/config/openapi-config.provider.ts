@@ -1,6 +1,6 @@
-import { APP_INITIALIZER, EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
+import { APP_INITIALIZER, EnvironmentProviders, inject, makeEnvironmentProviders } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { getAccessToken } from '../auth/auth-session';
+import { AuthSessionService } from '../auth/auth-session';
 import { OpenAPI } from '../../shared/proxy';
 
 const resolveApiBaseUrl = (): string => {
@@ -13,9 +13,9 @@ const resolveApiBaseUrl = (): string => {
   return environment.apiBaseUrl;
 };
 
-const configureOpenApiClient = (): void => {
+const configureOpenApiClient = (authSessionService: AuthSessionService): void => {
   OpenAPI.BASE = resolveApiBaseUrl();
-  OpenAPI.TOKEN = () => Promise.resolve(getAccessToken() ?? '');
+  OpenAPI.TOKEN = () => Promise.resolve(authSessionService.getAccessToken() ?? '');
 };
 
 export const provideOpenApiConfiguration = (): EnvironmentProviders =>
@@ -23,6 +23,10 @@ export const provideOpenApiConfiguration = (): EnvironmentProviders =>
     {
       provide: APP_INITIALIZER,
       multi: true,
-      useFactory: () => () => configureOpenApiClient()
+      useFactory: () => {
+        const authSessionService = inject(AuthSessionService);
+
+        return () => configureOpenApiClient(authSessionService);
+      }
     }
   ]);

@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { Router, type ActivatedRouteSnapshot, type CanActivateFn, type CanMatchFn, type Route, type RouterStateSnapshot, type UrlSegment, type UrlTree } from '@angular/router';
-import { getAuthSession, hasRequiredRole, type IdentityRole } from '../auth/auth-session';
+import { AuthSessionService, type IdentityRole } from '../auth/auth-session';
+import { OidcAuthService } from '../auth/oidc-auth.service';
 
 const resolveRequiredRole = (source: ActivatedRouteSnapshot | Route): IdentityRole | null => {
   const role = source.data?.['requiredRole'];
@@ -13,39 +14,64 @@ const resolveRequiredRole = (source: ActivatedRouteSnapshot | Route): IdentityRo
 };
 
 const resolveUnauthorizedRedirect = (router: Router, targetUrl: string): UrlTree =>
-  router.createUrlTree(['/setup'], {
+  router.createUrlTree(['/auth/unauthorized'], {
     queryParams: {
       returnUrl: targetUrl,
-      reason: 'unauthorized'
+      reason: 'insufficient-role'
     }
   });
 
-const resolveAuthentication = (router: Router, targetUrl: string): boolean | UrlTree => {
-  const session = getAuthSession();
+const resolveAuthentication = (
+  router: Router,
+  oidcAuthService: OidcAuthService,
+  authSessionService: AuthSessionService,
+  targetUrl: string
+): boolean => {
+  const session = authSessionService.getAuthSession();
 
-  return session.isAuthenticated ? true : resolveUnauthorizedRedirect(router, targetUrl);
+  if (session.isAuthenticated) {
+    return true;
+  }
+
+  void oidcAuthService.login(targetUrl).catch(() => {
+    void router.navigate(['/auth/unauthorized'], {
+      queryParams: {
+        returnUrl: targetUrl,
+        reason: 'login-failed'
+      }
+    });
+  });
+
+  return false;
 };
 
-const resolveAuthorization = (router: Router, requiredRole: IdentityRole | null, targetUrl: string): boolean | UrlTree => {
+const resolveAuthorization = (
+  router: Router,
+  authSessionService: AuthSessionService,
+  requiredRole: IdentityRole | null,
+  targetUrl: string
+): boolean | UrlTree => {
   if (requiredRole === null) {
     return true;
   }
 
-  return hasRequiredRole(requiredRole) ? true : resolveUnauthorizedRedirect(router, targetUrl);
+  return authSessionService.hasRequiredRole(requiredRole) ? true : resolveUnauthorizedRedirect(router, targetUrl);
 };
 
 const authorizeNavigation = (
   router: Router,
+  oidcAuthService: OidcAuthService,
+  authSessionService: AuthSessionService,
   targetUrl: string,
   requiredRole: IdentityRole | null
 ): boolean | UrlTree => {
-  const authenticationResult = resolveAuthentication(router, targetUrl);
+  const authenticationResult = resolveAuthentication(router, oidcAuthService, authSessionService, targetUrl);
 
   if (authenticationResult !== true) {
     return authenticationResult;
   }
 
-  return resolveAuthorization(router, requiredRole, targetUrl);
+  return resolveAuthorization(router, authSessionService, requiredRole, targetUrl);
 };
 
 export const authenticationCanActivateGuard: CanActivateFn = (
@@ -53,8 +79,10 @@ export const authenticationCanActivateGuard: CanActivateFn = (
   state: RouterStateSnapshot
 ) => {
   const router = inject(Router);
+  const oidcAuthService = inject(OidcAuthService);
+  const authSessionService = inject(AuthSessionService);
 
-  return authorizeNavigation(router, state.url, resolveRequiredRole(route));
+  return authorizeNavigation(router, oidcAuthService, authSessionService, state.url, resolveRequiredRole(route));
 };
 
 export const authenticationCanMatchGuard: CanMatchFn = (
@@ -62,7 +90,9 @@ export const authenticationCanMatchGuard: CanMatchFn = (
   segments: UrlSegment[]
 ) => {
   const router = inject(Router);
+  const oidcAuthService = inject(OidcAuthService);
+  const authSessionService = inject(AuthSessionService);
   const url = `/${segments.map((segment) => segment.path).join('/')}`;
 
-  return authorizeNavigation(router, url, resolveRequiredRole(route));
+  return authorizeNavigation(router, oidcAuthService, authSessionService, url, resolveRequiredRole(route));
 };

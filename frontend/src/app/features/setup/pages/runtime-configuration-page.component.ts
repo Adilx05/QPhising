@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import type { RuntimeConfigurationResult } from '../../../shared/proxy';
-import { hasRequiredRole } from '../../../core/auth/auth-session';
+import { AuthSessionService } from '../../../core/auth/auth-session';
 import { resolveApiError } from '../../../core/http/api-error-handler';
 import {
   getRuntimeConfigurationStatus,
@@ -34,17 +34,20 @@ export class RuntimeConfigurationPageComponent {
     keycloakClientSecret: ['', [Validators.required]]
   });
 
-  public constructor(private readonly formBuilder: FormBuilder) {
+  public constructor(
+    private readonly formBuilder: FormBuilder,
+    private readonly authSessionService: AuthSessionService
+  ) {
     void this.refreshStatus();
   }
 
 
   protected canUpdateRuntimeConfiguration(): boolean {
-    return hasRequiredRole('Operator');
+    return this.authSessionService.hasRequiredRole('Operator');
   }
 
   protected canSaveRuntimeConfiguration(): boolean {
-    return hasRequiredRole('Admin');
+    return this.authSessionService.hasRequiredRole('Admin');
   }
 
   protected async saveAll(): Promise<void> {

@@ -1,41 +1,9 @@
+import { Injectable } from '@angular/core';
+import { OidcAuthService } from './oidc-auth.service';
+
 export const identityRoles = ['Admin', 'Operator', 'Viewer'] as const;
 
 export type IdentityRole = (typeof identityRoles)[number];
-
-const runtimeToken = (): string | null => {
-  const token = (globalThis as { __QPHISING_ACCESS_TOKEN__?: unknown }).__QPHISING_ACCESS_TOKEN__;
-
-  return typeof token === 'string' && token.trim().length > 0 ? token.trim() : null;
-};
-
-const storageToken = (): string | null => {
-  const candidates = ['qphising.accessToken', 'qphising_access_token', 'access_token'];
-
-  for (const key of candidates) {
-    const localValue = globalThis.localStorage?.getItem(key);
-    if (typeof localValue === 'string' && localValue.trim().length > 0) {
-      return localValue.trim();
-    }
-
-    const sessionValue = globalThis.sessionStorage?.getItem(key);
-    if (typeof sessionValue === 'string' && sessionValue.trim().length > 0) {
-      return sessionValue.trim();
-    }
-  }
-
-  return null;
-};
-
-const decodeBase64Url = (value: string): string | null => {
-  try {
-    const padded = value.padEnd(Math.ceil(value.length / 4) * 4, '=');
-    const base64 = padded.replace(/-/g, '+').replace(/_/g, '/');
-
-    return globalThis.atob(base64);
-  } catch {
-    return null;
-  }
-};
 
 interface KeycloakRealmAccess {
   roles?: unknown;
@@ -51,25 +19,6 @@ interface JwtPayloadShape {
   realm_access?: KeycloakRealmAccess;
   resource_access?: Record<string, KeycloakResourceAccess>;
 }
-
-const decodePayload = (token: string): JwtPayloadShape | null => {
-  const parts = token.split('.');
-
-  if (parts.length < 2) {
-    return null;
-  }
-
-  const payloadJson = decodeBase64Url(parts[1]);
-  if (payloadJson === null) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(payloadJson) as JwtPayloadShape;
-  } catch {
-    return null;
-  }
-};
 
 const normalizeRole = (value: string): IdentityRole | null => {
   const normalized = value.trim().toLowerCase();
@@ -140,34 +89,41 @@ export interface AuthSession {
   roles: Set<IdentityRole>;
 }
 
-export const getAccessToken = (): string | null => runtimeToken() ?? storageToken();
+@Injectable({ providedIn: 'root' })
+export class AuthSessionService {
+  public constructor(private readonly oidcAuthService: OidcAuthService) {}
 
-export const getAuthSession = (): AuthSession => {
-  const accessToken = getAccessToken();
+  public getAccessToken(): string | null {
+    return this.oidcAuthService.getSession()?.accessToken ?? null;
+  }
 
-  if (accessToken === null) {
+  public getAuthSession(): AuthSession {
+    const oidcSession = this.oidcAuthService.getSession();
+
+    if (oidcSession === null) {
+      return {
+        accessToken: null,
+        isAuthenticated: false,
+        roles: new Set<IdentityRole>()
+      };
+    }
+
     return {
-      accessToken: null,
-      isAuthenticated: false,
-      roles: new Set<IdentityRole>()
+      accessToken: oidcSession.accessToken,
+      isAuthenticated: true,
+      roles: resolveRolesFromPayload(this.oidcAuthService.getTokenClaims() as JwtPayloadShape)
     };
   }
 
-  return {
-    accessToken,
-    isAuthenticated: true,
-    roles: resolveRolesFromPayload(decodePayload(accessToken))
-  };
-};
+  public hasRequiredRole(requiredRole: IdentityRole): boolean {
+    const { roles } = this.getAuthSession();
 
-export const hasRequiredRole = (requiredRole: IdentityRole): boolean => {
-  const { roles } = getAuthSession();
-
-  for (const role of roles) {
-    if (roleRanks[role] >= roleRanks[requiredRole]) {
-      return true;
+    for (const role of roles) {
+      if (roleRanks[role] >= roleRanks[requiredRole]) {
+        return true;
+      }
     }
-  }
 
-  return false;
-};
+    return false;
+  }
+}

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { getAuthSession, hasRequiredRole } from './core/auth/auth-session';
+import { AuthSessionService } from './core/auth/auth-session';
 
 @Component({
   selector: 'app-root',
@@ -66,15 +66,17 @@ import { getAuthSession, hasRequiredRole } from './core/auth/auth-session';
   `
 })
 export class AppComponent {
+  public constructor(private readonly authSessionService: AuthSessionService) {}
+
   protected isAuthenticated(): boolean {
-    return getAuthSession().isAuthenticated;
+    return this.authSessionService.getAuthSession().isAuthenticated;
   }
 
   protected canViewConfiguration(): boolean {
-    return hasRequiredRole('Viewer');
+    return this.authSessionService.hasRequiredRole('Viewer');
   }
 
   protected canViewCampaigns(): boolean {
-    return hasRequiredRole('Viewer');
+    return this.authSessionService.hasRequiredRole('Viewer');
   }
 }
