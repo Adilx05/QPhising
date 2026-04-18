@@ -266,15 +266,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T06:39:50Z
   - Owner: Codex
   - Notes: Added Runtime Configuration domain baseline with `RuntimeConfigurationAggregate` for persisted runtime settings/state checks plus dedicated secret-handling rules via `RuntimeSecretValue` and `RuntimeConfigurationSecretPolicy`; files touched: `backend/Domain/RuntimeConfiguration/Aggregates/RuntimeConfigurationAggregate.cs`, `backend/Domain/RuntimeConfiguration/ValueObjects/RuntimeSecretValue.cs`, `backend/Domain/RuntimeConfiguration/Policies/RuntimeConfigurationSecretPolicy.cs`.
-- [ ] 5.2
+- [x] 5.2
   - Title: Application logic for read/write/update configuration use cases + validators
   - Description: Application logic for read/write/update configuration use cases + validators
   - Deliverables:
     - Application logic for read/write/update configuration use cases + validators
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T06:40:00Z
+  - FinishedAt: 2026-04-18T06:43:43Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented runtime-configuration application CQRS for read/write/update flows with FluentValidation and MediatR handlers, including repository/secret-cipher abstractions and result DTO mapping from domain aggregate readiness/configuration state. Files touched: `backend/Application/CQRS/Queries/RuntimeConfiguration/*`, `backend/Application/CQRS/Commands/RuntimeConfiguration/*`, `backend/Application/Contracts/Abstractions/RuntimeConfiguration/*`, `backend/Application/Contracts/Responses/RuntimeConfiguration/RuntimeConfigurationResult.cs`.
 - [ ] 5.3
   - Title: Endpoint implementation for configuration operations and readiness checks
   - Description: Endpoint implementation for configuration operations and readiness checks
