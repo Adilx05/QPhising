@@ -560,15 +560,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T16:05:00Z
   - Owner: Codex
   - Notes: Added application-layer transactional abstractions (`ITransactionalRequest`, `IUnitOfWork`) and `UnitOfWorkBehavior` pipeline enforcement; marked write commands (`SaveSetupConfiguration`, `SaveRuntimeConfiguration`, `UpdateRuntimeConfiguration`) as transactional requests; wired API to a `FileBackedUnitOfWork` implementation that serializes file-backed writes for consistency. Files touched: `backend/Application/Contracts/Abstractions/Persistence/*`, `backend/Application/CQRS/Behaviors/UnitOfWorkBehavior.cs`, transactional command records under `backend/Application/CQRS/Commands/{Setup,RuntimeConfiguration}`, and `backend/API/{Program.cs,Services/Persistence/FileBackedUnitOfWork.cs}`.
-- [ ] 10.3
+- [x] 10.3
   - Title: Endpoint behavior validation against persisted workflows
   - Description: Endpoint behavior validation against persisted workflows
   - Deliverables:
     - Endpoint behavior validation against persisted workflows
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T12:30:00Z
+  - FinishedAt: 2026-04-18T12:36:54Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added API integration-test coverage for persisted endpoint workflows by introducing `backend/API.Tests` with authenticated in-memory host wiring and endpoint tests that verify setup save->status and runtime configuration save->get persistence behavior. Touched files: `backend/API/Program.cs`, `backend/API.Tests/QPhising.Api.Tests.csproj`, `backend/API.Tests/Infrastructure/TestApiFactory.cs`, `backend/API.Tests/Infrastructure/TestAuthHandler.cs`, `backend/API.Tests/EndpointPersistenceWorkflowTests.cs`. Validation command attempted: `dotnet test backend/API.Tests/QPhising.Api.Tests.csproj` (blocked in this environment because .NET SDK is unavailable).
 - [ ] 10.4
   - Title: Swagger contract checks for persistence-backed request/response models
   - Description: Swagger contract checks for persistence-backed request/response models
