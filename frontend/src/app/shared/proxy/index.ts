@@ -8,8 +8,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AssertProxyContractSyncRequest } from './models/AssertProxyContractSyncRequest';
-export type { ProxyContractSyncConflictResponse } from './models/ProxyContractSyncConflictResponse';
-export { ProxyDriftValidationStatus } from './models/ProxyDriftValidationStatus';
+export type { ProblemDetails } from './models/ProblemDetails';
 export type { RuntimeConfigurationResult } from './models/RuntimeConfigurationResult';
 export type { SaveRuntimeConfigurationRequest } from './models/SaveRuntimeConfigurationRequest';
 export type { SaveSetupConfigurationRequest } from './models/SaveSetupConfigurationRequest';
