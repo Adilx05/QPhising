@@ -599,15 +599,15 @@ Metadata required for every subtask:
 
 ## Phase 11 - Campaign Module
 
-- [ ] 11.1
+- [x] 11.1
   - Title: Backend domain/model for campaign entities, value objects, and lifecycle rules
   - Description: Backend domain/model for campaign entities, value objects, and lifecycle rules
   - Deliverables:
     - Backend domain/model for campaign entities, value objects, and lifecycle rules
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T13:10:00Z
+  - FinishedAt: 2026-04-18T13:13:50Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added campaign domain baseline under `backend/Domain/Campaign` including `CampaignAggregate` lifecycle invariants, `CampaignName` and `CampaignScheduleWindow` value objects, `CampaignTarget` entity email validation, and `CampaignLifecyclePolicy` + `CampaignLifecycleState` transitions (Draft/Scheduled/Active/Paused/Completed/Cancelled).
 - [ ] 11.2
   - Title: Application logic for campaign CQRS handlers and validators
   - Description: Application logic for campaign CQRS handlers and validators
