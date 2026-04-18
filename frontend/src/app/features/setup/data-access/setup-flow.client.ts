@@ -7,6 +7,29 @@ import {
   type TestRedisConnectionRequest,
   type SetupDependencyTestResult
 } from '../../../shared/proxy';
+import { resolveProxyServiceMethod } from './proxy-service-method.resolver';
+
+
+const getApiSetupStatus = resolveProxyServiceMethod<[], Promise<SetupStatusResult>>(
+  SetupService,
+  'getApiSetupStatus'
+);
+const postApiSetupTestDb = resolveProxyServiceMethod<
+  [{ requestBody?: TestDatabaseConnectionRequest }],
+  Promise<SetupDependencyTestResult>
+>(SetupService, 'postApiSetupTestDb');
+const postApiSetupTestRedis = resolveProxyServiceMethod<
+  [{ requestBody?: TestRedisConnectionRequest }],
+  Promise<SetupDependencyTestResult>
+>(SetupService, 'postApiSetupTestRedis');
+const postApiSetupTestKeycloak = resolveProxyServiceMethod<
+  [{ requestBody?: TestKeycloakConnectionRequest }],
+  Promise<SetupDependencyTestResult>
+>(SetupService, 'postApiSetupTestKeycloak');
+const postApiSetupSave = resolveProxyServiceMethod<
+  [{ requestBody?: SaveSetupConfigurationRequest }],
+  Promise<SetupStatusResult>
+>(SetupService, 'postApiSetupSave');
 
 export interface SetupConfigurationInput {
   databaseConnectionString: string;
@@ -18,7 +41,7 @@ export interface SetupConfigurationInput {
 }
 
 export const getSetupStatus = async (): Promise<SetupStatusResult> =>
-  SetupService.getApiSetupStatus();
+  getApiSetupStatus();
 
 export const testDatabaseConnection = async (
   connectionString: string
@@ -27,7 +50,7 @@ export const testDatabaseConnection = async (
     connectionString
   };
 
-  return SetupService.postApiSetupTestDb({ requestBody: request });
+  return postApiSetupTestDb({ requestBody: request });
 };
 
 export const testRedisConnection = async (
@@ -37,7 +60,7 @@ export const testRedisConnection = async (
     connectionString
   };
 
-  return SetupService.postApiSetupTestRedis({ requestBody: request });
+  return postApiSetupTestRedis({ requestBody: request });
 };
 
 export const testKeycloakConnection = async (
@@ -53,7 +76,7 @@ export const testKeycloakConnection = async (
     clientSecret
   };
 
-  return SetupService.postApiSetupTestKeycloak({ requestBody: request });
+  return postApiSetupTestKeycloak({ requestBody: request });
 };
 
 export const saveSetupConfiguration = async (
@@ -68,5 +91,5 @@ export const saveSetupConfiguration = async (
     keycloakClientSecret: input.keycloakClientSecret
   };
 
-  return SetupService.postApiSetupSave({ requestBody: request });
+  return postApiSetupSave({ requestBody: request });
 };
