@@ -437,15 +437,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T17:14:00Z
   - Owner: Codex
   - Notes: Added Gateway domain ownership model primitives under `backend/Domain/Gateway` (`GatewayModule`, `GatewayRouteTemplate`, `GatewayRouteOwnershipDefinition`, `GatewayRouteOwnershipMap`) and documented canonical route-to-module ownership/auth posture baseline in `backend/Domain/Contracts/GatewayRouteOwnershipModuleMap.md` aligned to existing Ocelot upstream paths.
-- [ ] 8.2
+- [x] 8.2
   - Title: Application logic for route policy composition
   - Description: Application logic for route policy composition. Scope: auth forwarding, claims mapping.
   - Deliverables:
     - auth forwarding, claims mapping
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T09:04:00Z
+  - FinishedAt: 2026-04-18T09:07:47Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added Application-layer gateway route policy composition CQRS query/handler/validator and gateway policy contracts under `backend/Application` to compose authentication forwarding posture and claim-to-header mappings from domain-owned route ownership definitions (`GatewayRouteOwnershipMap`) plus configurable policy settings provider abstraction.
 - [ ] 8.3
   - Title: Endpoint/gateway route implementation and middleware behavior
   - Description: Endpoint/gateway route implementation and middleware behavior
