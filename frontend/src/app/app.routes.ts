@@ -5,6 +5,7 @@ import {
   setupCompletionCanActivateGuard,
   setupCompletionCanMatchGuard
 } from './core/guards';
+import { CampaignsPageComponent } from './features/campaigns/pages/campaigns-page.component';
 import { DashboardPageComponent } from './features/dashboard/pages/dashboard-page.component';
 import { RuntimeConfigurationPageComponent } from './features/setup/pages/runtime-configuration-page.component';
 import { SetupWizardPageComponent } from './features/setup/pages/setup-wizard-page.component';
@@ -17,6 +18,16 @@ export const appRoutes: Routes = [
   {
     path: 'dashboard',
     component: DashboardPageComponent,
+    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    data: {
+      requiredRole: 'Viewer'
+    }
+  },
+
+  {
+    path: 'campaigns',
+    component: CampaignsPageComponent,
     canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
     canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
     data: {

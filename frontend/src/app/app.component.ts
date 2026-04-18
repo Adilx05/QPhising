@@ -30,6 +30,11 @@ import { getAuthSession, hasRequiredRole } from './core/auth/auth-session';
             <i class="pi pi-sliders-h text-sm"></i>
             <span>Runtime Configuration</span>
           </a>
+
+          <a *ngIf="canViewCampaigns()" routerLink="/campaigns" routerLinkActive="is-active" class="nav-item">
+            <i class="pi pi-megaphone text-sm"></i>
+            <span>Campaigns</span>
+          </a>
         </nav>
       </aside>
 
@@ -42,6 +47,7 @@ import { getAuthSession, hasRequiredRole } from './core/auth/auth-session';
               <a class="mobile-nav-item" routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
               <a class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">Setup</a>
               <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">Config</a>
+              <a *ngIf="canViewCampaigns()" class="mobile-nav-item" routerLink="/campaigns" routerLinkActive="is-active">Campaigns</a>
             </nav>
 
             <div class="hidden items-center gap-3 rounded-full border px-3 py-1.5 text-xs font-medium lg:flex"
@@ -65,6 +71,10 @@ export class AppComponent {
   }
 
   protected canViewConfiguration(): boolean {
+    return hasRequiredRole('Viewer');
+  }
+
+  protected canViewCampaigns(): boolean {
     return hasRequiredRole('Viewer');
   }
 }
