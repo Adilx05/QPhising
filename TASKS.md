@@ -608,15 +608,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T13:13:50Z
   - Owner: Codex
   - Notes: Added campaign domain baseline under `backend/Domain/Campaign` including `CampaignAggregate` lifecycle invariants, `CampaignName` and `CampaignScheduleWindow` value objects, `CampaignTarget` entity email validation, and `CampaignLifecyclePolicy` + `CampaignLifecycleState` transitions (Draft/Scheduled/Active/Paused/Completed/Cancelled).
-- [ ] 11.2
+- [x] 11.2
   - Title: Application logic for campaign CQRS handlers and validators
   - Description: Application logic for campaign CQRS handlers and validators
   - Deliverables:
     - Application logic for campaign CQRS handlers and validators
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T13:20:00Z
+  - FinishedAt: 2026-04-18T13:27:03Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented Campaign Application-layer CQRS flow with FluentValidation validators and MediatR handlers for create/update/delete, targeting management, lifecycle transitions (schedule/start/pause/complete/cancel), and retrieval (get/list); introduced campaign contracts for repository abstraction and response DTO mapping from domain aggregates. Files touched: `backend/Application/Contracts/Abstractions/Campaign/ICampaignRepository.cs`, `backend/Application/Contracts/Responses/Campaign/*`, `backend/Application/CQRS/Commands/Campaign/*`, `backend/Application/CQRS/Queries/Campaign/*`.
 - [ ] 11.3
   - Title: Endpoint implementation for campaign CRUD/lifecycle actions
   - Description: Endpoint implementation for campaign CRUD/lifecycle actions
