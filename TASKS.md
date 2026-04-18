@@ -683,15 +683,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T16:38:00Z
   - Owner: Codex
   - Notes: Added secured `TemplateController` endpoints for list/get/create/update/publish/archive/delete under `/api/templates`, wired each route to existing Template CQRS handlers via MediatR, and introduced API request contracts for create/update payloads. Files touched: `backend/API/Controllers/TemplateController.cs`, `backend/API/Contracts/Template/CreateTemplateRequest.cs`, `backend/API/Contracts/Template/UpdateTemplateRequest.cs`.
-- [ ] 12.4
+- [x] 12.4
   - Title: Swagger verification for template endpoint contracts
   - Description: Swagger verification for template endpoint contracts
   - Deliverables:
     - Swagger verification for template endpoint contracts
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T16:08:06Z
+  - FinishedAt: 2026-04-18T16:08:06Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Extended Swagger operation examples to cover all template endpoints (`/api/templates`, `/{templateId}`, `/{templateId}/publish`, `/{templateId}/archive`) and synchronized the checked-in OpenAPI fixture with template paths plus `TemplateResult`, template lifecycle enum, and create/update request schemas for contract verification. Files touched: `backend/API/Swagger/SetupEndpointsExamplesOperationFilter.cs`, `frontend/openapi/proxy-validation.swagger.json`.
 - [ ] 12.5
   - Title: Proxy generation for template APIs
   - Description: Proxy generation for template APIs
