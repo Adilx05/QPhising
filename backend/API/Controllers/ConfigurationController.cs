@@ -1,15 +1,18 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QPhising.Api.Contracts.RuntimeConfiguration;
 using QPhising.Application.Contracts.Responses.RuntimeConfiguration;
 using QPhising.Application.CQRS.Commands.RuntimeConfiguration;
 using QPhising.Application.CQRS.Queries.RuntimeConfiguration;
+using QPhising.Application.Security;
 
 namespace QPhising.Api.Controllers;
 
 [ApiController]
 [Route("api/configuration")]
 [Produces("application/json", "application/problem+json")]
+[Authorize(Policy = IdentityAuthorizationPolicies.ViewerOrAbove)]
 public sealed class ConfigurationController : ControllerBase
 {
     private readonly ISender _sender;
@@ -27,6 +30,7 @@ public sealed class ConfigurationController : ControllerBase
     [HttpPost(Name = "SaveRuntimeConfiguration")]
     [Consumes("application/json")]
     [ProducesResponseType(typeof(RuntimeConfigurationResult), StatusCodes.Status200OK)]
+    [Authorize(Policy = IdentityAuthorizationPolicies.AdminOnly)]
     public Task<RuntimeConfigurationResult> Save(
         [FromBody] SaveRuntimeConfigurationRequest request,
         CancellationToken cancellationToken) =>
@@ -43,6 +47,7 @@ public sealed class ConfigurationController : ControllerBase
     [HttpPatch(Name = "UpdateRuntimeConfiguration")]
     [Consumes("application/json")]
     [ProducesResponseType(typeof(RuntimeConfigurationResult), StatusCodes.Status200OK)]
+    [Authorize(Policy = IdentityAuthorizationPolicies.OperatorOrAbove)]
     public Task<RuntimeConfigurationResult> Update(
         [FromBody] UpdateRuntimeConfigurationRequest request,
         CancellationToken cancellationToken) =>

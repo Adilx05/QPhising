@@ -1,13 +1,16 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QPhising.Api.Contracts.ProxyValidation;
 using QPhising.Application.CQRS.Commands.ProxyValidation;
+using QPhising.Application.Security;
 
 namespace QPhising.Api.Controllers;
 
 [ApiController]
 [Route("api/proxy-validation")]
 [Produces("application/json", "application/problem+json")]
+[Authorize(Policy = IdentityAuthorizationPolicies.AdminOnly)]
 public sealed class ProxyValidationController : ControllerBase
 {
     private readonly ISender _sender;
