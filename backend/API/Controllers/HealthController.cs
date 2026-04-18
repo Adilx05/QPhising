@@ -4,9 +4,10 @@ namespace QPhising.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
 public sealed class HealthController : ControllerBase
 {
-    [HttpGet]
+    [HttpGet(Name = "GetHealth")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Get()
     {

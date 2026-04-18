@@ -389,15 +389,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T07:44:49Z
   - Owner: Codex
   - Notes: Implemented reusable Application-layer OpenAPI convention primitives: `OpenApiOperationIdConvention` for canonical operation-id generation/validation, `ApiResponseEnvelope<TData>` for standardized success envelopes, and `IOpenApiExampleProvider` contracts for deterministic request/response example definitions; documented adoption rules in `backend/Application/Contracts/OpenApiOperationConventions.md`.
-- [ ] 7.3
+- [x] 7.3
   - Title: Endpoint annotation updates to enforce standard OpenAPI metadata
   - Description: Endpoint annotation updates to enforce standard OpenAPI metadata
   - Deliverables:
     - Endpoint annotation updates to enforce standard OpenAPI metadata
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T08:31:39Z
+  - FinishedAt: 2026-04-18T08:31:39Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added explicit endpoint metadata annotations across API controllers to strengthen OpenAPI consistency: named routes for deterministic operation identity, controller-level `Produces` media types, and `Consumes("application/json")` on JSON body endpoints. Files touched: `backend/API/Controllers/SetupController.cs`, `backend/API/Controllers/ConfigurationController.cs`, `backend/API/Controllers/ProxyValidationController.cs`, `backend/API/Controllers/HealthController.cs`.
 - [ ] 7.4
   - Title: Swagger generation quality gate in CI/local checks
   - Description: Swagger generation quality gate in CI/local checks
