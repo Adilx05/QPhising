@@ -314,15 +314,15 @@ Metadata required for every subtask:
 
 ## Phase 6 - Backend Foundation
 
-- [ ] 6.1
+- [x] 6.1
   - Title: Backend domain/model shared primitives
   - Description: Backend domain/model shared primitives. Scope: entity/value object/domain event base.
   - Deliverables:
     - entity/value object/domain event base
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T09:05:00Z
+  - FinishedAt: 2026-04-18T09:08:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added domain shared primitives under `backend/Domain/Common` with production-ready base types for `Entity<TId>` (identity + domain-event collection management), `ValueObject` (structural equality semantics), and `DomainEvent` (event identity + occurrence timestamp) to establish consistent domain modeling foundations for upcoming modules.
 - [ ] 6.2
   - Title: Application logic cross-cutting pipeline behaviors
   - Description: Application logic cross-cutting pipeline behaviors. Scope: validation/logging/authz.
