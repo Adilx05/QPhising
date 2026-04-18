@@ -4,8 +4,59 @@
 
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #0f172a;
+  background-color: #f8fafc;
 }
 
 body {
   margin: 0;
+  background: radial-gradient(circle at top right, #eff6ff 0%, #f8fafc 55%);
+}
+
+.app-shell {
+  @apply flex min-h-screen;
+}
+
+.nav-item {
+  @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900;
+}
+
+.nav-item.is-active {
+  @apply bg-blue-50 text-blue-700 shadow-sm;
+}
+
+.mobile-nav-item {
+  @apply rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600;
+}
+
+.mobile-nav-item.is-active {
+  @apply bg-blue-50 text-blue-700;
+}
+
+.surface-card {
+  @apply rounded-2xl border border-slate-200/80 bg-white shadow-sm;
+}
+
+.page-title {
+  @apply text-2xl font-semibold tracking-tight text-slate-900;
+}
+
+.page-subtitle {
+  @apply mt-2 text-sm text-slate-500;
+}
+
+.status-chip {
+  @apply inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium;
+}
+
+.status-chip-success {
+  @apply border-emerald-200 bg-emerald-50 text-emerald-700;
+}
+
+.status-chip-muted {
+  @apply border-slate-200 bg-slate-100 text-slate-600;
+}
+
+.status-chip-warning {
+  @apply border-amber-200 bg-amber-50 text-amber-700;
 }

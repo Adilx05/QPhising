@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import type { RuntimeConfigurationResult } from '../../../shared/proxy';
@@ -17,7 +16,7 @@ import {
 @Component({
   selector: 'app-runtime-configuration-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, CardModule, InputTextModule, PasswordModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule, PasswordModule],
   templateUrl: './runtime-configuration-page.component.html'
 })
 export class RuntimeConfigurationPageComponent {

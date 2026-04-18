@@ -29,15 +29,15 @@ Metadata required for every subtask:
 
 ## Phase 1 - Repository Reset & Bootstrap
 
-- [-] 1.1
+- [x] 1.1
   - Title: Backend domain/model baseline
   - Description: Backend domain/model baseline. Scope: solution skeleton, bounded contexts, domain folders.
   - Deliverables:
     - solution skeleton, bounded contexts, domain folders
   - StartedAt: 2026-04-17T08:10:00Z
-  - FinishedAt: 2026-04-17T08:25:00Z
+  - FinishedAt: 2026-04-18T14:45:00Z
   - Owner: Codex
-  - Notes: Partial evidence only: skeleton layer folders exist (`backend/Domain/.gitkeep`, `backend/Application/.gitkeep`, `backend/API/.gitkeep`, `backend/Infrastructure/.gitkeep`) with mtime 2026-04-17T20:44:26Z, but no bounded-context subfolders/files were found under `backend/Domain` during audit (`find backend/Domain -mindepth 2` at 2026-04-17T21:25:14Z returned empty).
+  - Notes: Completion evidence refreshed: bounded-context domain folders and concrete domain artifacts now exist under `backend/Domain` (e.g., `Setup`, `RuntimeConfiguration`, `ApiConventions`, `Contracts`), satisfying baseline deliverables beyond initial skeleton placeholders.
 - [x] 1.2
   - Title: Application logic baseline
   - Description: Application logic baseline. Scope: CQRS project scaffolding + contracts folders.
@@ -986,15 +986,15 @@ Metadata required for every subtask:
   - FinishedAt: 
   - Owner: Codex
   - Notes: 
-- [ ] 17.6
+- [-] 17.6
   - Title: Frontend integration completion
   - Description: Frontend integration completion. Scope: guards, forms, role access, real API UX states.
   - Deliverables:
     - guards, forms, role access, real API UX states
-  - StartedAt: 
+  - StartedAt: 2026-04-18T14:50:00Z
   - FinishedAt: 
   - Owner: Codex
-  - Notes: 
+  - Notes: In progress by user request: applied Sakai-inspired UI foundation uplift for frontend shell and setup/runtime pages with consistent layout tokens, navigation shell, and real API-backed dashboard state cards (no fake KPI data).
 
 ## Phase 18 - Build / Publish Scripts
 
