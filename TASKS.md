@@ -542,15 +542,15 @@ Metadata required for every subtask:
 
 ## Phase 10 - Database & Migrations
 
-- [ ] 10.1
+- [x] 10.1
   - Title: Backend domain/model persistence boundaries and aggregate mappings
   - Description: Backend domain/model persistence boundaries and aggregate mappings
   - Deliverables:
     - Backend domain/model persistence boundaries and aggregate mappings
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T12:26:50Z
+  - FinishedAt: 2026-04-18T12:26:50Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added persistence-boundary domain models under `backend/Domain/Persistence` (storage kind enum, aggregate boundary/field mapping models, and default aggregate map for setup/runtime configuration), plus contract-source documentation in `backend/Domain/Contracts/PersistenceAggregateMappings.md` and README module reference update.
 - [ ] 10.2
   - Title: Application logic for transactional consistency, repositories, and unit-of-work rules
   - Description: Application logic for transactional consistency, repositories, and unit-of-work rules

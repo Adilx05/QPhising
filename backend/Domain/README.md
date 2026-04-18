@@ -14,7 +14,10 @@ Modules:
 - Exports
 - Identity
 - Gateway
+- Persistence
 
 Contract-source rules are documented in `Contracts/ModuleContractBoundaries.md`.
 
 API naming/version conventions are documented in `Contracts/ApiResourceNamingAndVersionScope.md`.
+
+Persistence aggregate mapping rules are documented in `Contracts/PersistenceAggregateMappings.md`.
