@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
+using System.Text.Json;
 using QPhising.Api.Services.Gateway;
 using QPhising.Api.Services.Identity;
 using QPhising.Api.Services.ProxyValidation;
@@ -83,6 +85,85 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             NameClaimType = "preferred_username",
             RoleClaimType = "roles"
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtRoleClaimMapper");
+
+                try
+                {
+                    var identity = context.Principal?.Identity as ClaimsIdentity;
+                    if (identity is null)
+                    {
+                        return Task.CompletedTask;
+                    }
+
+                    var discoveredRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                    var existingRoles = identity.FindAll(ClaimTypes.Role)
+                        .Select(static claim => claim.Value)
+                        .Where(static role => !string.IsNullOrWhiteSpace(role));
+                    discoveredRoles.UnionWith(existingRoles);
+
+                    static IEnumerable<string> ExtractRolesFromJsonArray(JsonElement rolesElement)
+                    {
+                        if (rolesElement.ValueKind != JsonValueKind.Array)
+                        {
+                            return Enumerable.Empty<string>();
+                        }
+
+                        return rolesElement.EnumerateArray()
+                            .Where(static element => element.ValueKind == JsonValueKind.String)
+                            .Select(static element => element.GetString())
+                            .Where(static role => !string.IsNullOrWhiteSpace(role))
+                            .Select(static role => role!.Trim());
+                    }
+
+                    var realmAccessClaim = identity.FindFirst("realm_access")?.Value;
+                    if (!string.IsNullOrWhiteSpace(realmAccessClaim))
+                    {
+                        using var realmAccessDocument = JsonDocument.Parse(realmAccessClaim);
+                        if (realmAccessDocument.RootElement.TryGetProperty("roles", out var realmRolesElement))
+                        {
+                            discoveredRoles.UnionWith(ExtractRolesFromJsonArray(realmRolesElement));
+                        }
+                    }
+
+                    var resourceAccessClaim = identity.FindFirst("resource_access")?.Value;
+                    if (!string.IsNullOrWhiteSpace(resourceAccessClaim))
+                    {
+                        using var resourceAccessDocument = JsonDocument.Parse(resourceAccessClaim);
+                        if (resourceAccessDocument.RootElement.TryGetProperty("qphising", out var qphisingResourceElement) &&
+                            qphisingResourceElement.TryGetProperty("roles", out var qphisingRolesElement))
+                        {
+                            discoveredRoles.UnionWith(ExtractRolesFromJsonArray(qphisingRolesElement));
+                        }
+                    }
+
+                    foreach (var role in discoveredRoles)
+                    {
+                        if (!identity.HasClaim(ClaimTypes.Role, role))
+                        {
+                            identity.AddClaim(new Claim(ClaimTypes.Role, role));
+                        }
+
+                        if (!identity.HasClaim("roles", role))
+                        {
+                            identity.AddClaim(new Claim("roles", role));
+                        }
+                    }
+                }
+                catch (Exception exception)
+                {
+                    logger.LogWarning(exception, "JWT role claim mapping failed.");
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 builder.Services.AddAuthorization(options =>
