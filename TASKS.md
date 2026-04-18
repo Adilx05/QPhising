@@ -257,15 +257,15 @@ Metadata required for every subtask:
 
 ## Phase 5 - Runtime Configuration Persistence
 
-- [ ] 5.1
+- [x] 5.1
   - Title: Backend domain/model for runtime configuration aggregate and secret-handling rules
   - Description: Backend domain/model for runtime configuration aggregate and secret-handling rules
   - Deliverables:
     - Backend domain/model for runtime configuration aggregate and secret-handling rules
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T06:37:00Z
+  - FinishedAt: 2026-04-18T06:39:50Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added Runtime Configuration domain baseline with `RuntimeConfigurationAggregate` for persisted runtime settings/state checks plus dedicated secret-handling rules via `RuntimeSecretValue` and `RuntimeConfigurationSecretPolicy`; files touched: `backend/Domain/RuntimeConfiguration/Aggregates/RuntimeConfigurationAggregate.cs`, `backend/Domain/RuntimeConfiguration/ValueObjects/RuntimeSecretValue.cs`, `backend/Domain/RuntimeConfiguration/Policies/RuntimeConfigurationSecretPolicy.cs`.
 - [ ] 5.2
   - Title: Application logic for read/write/update configuration use cases + validators
   - Description: Application logic for read/write/update configuration use cases + validators
