@@ -62,6 +62,63 @@ partial class QPhisingDbContextModelSnapshot : ModelSnapshot
                 b.ToTable("campaigns", (string)null);
             });
 
+
+
+        modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.TemplateEntity", b =>
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uuid")
+                    .HasColumnName("id");
+
+                b.Property<string>("Body")
+                    .IsRequired()
+                    .HasMaxLength(200000)
+                    .HasColumnType("character varying(200000)")
+                    .HasColumnName("body");
+
+                b.Property<DateTimeOffset>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("created_at_utc");
+
+                b.Property<string>("Description")
+                    .HasMaxLength(500)
+                    .HasColumnType("character varying(500)")
+                    .HasColumnName("description");
+
+                b.Property<int>("LifecycleState")
+                    .HasColumnType("integer")
+                    .HasColumnName("lifecycle_state");
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(120)
+                    .HasColumnType("character varying(120)")
+                    .HasColumnName("name");
+
+                b.Property<string>("Subject")
+                    .IsRequired()
+                    .HasMaxLength(180)
+                    .HasColumnType("character varying(180)")
+                    .HasColumnName("subject");
+
+                b.Property<string>("Tags")
+                    .IsRequired()
+                    .HasColumnType("jsonb")
+                    .HasColumnName("tags");
+
+                b.Property<DateTimeOffset>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("updated_at_utc");
+
+                b.Property<int>("Version")
+                    .HasColumnType("integer")
+                    .HasColumnName("version");
+
+                b.HasKey("Id");
+
+                b.ToTable("templates", (string)null);
+            });
+
         modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignTargetEntity", b =>
             {
                 b.Property<Guid>("Id")
