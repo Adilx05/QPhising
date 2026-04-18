@@ -12,7 +12,7 @@ const normalizeRedirectPath = (path: string | null | undefined): string => {
 };
 
 export const getSetupGuardDecision = async (): Promise<SetupGuardDecisionResult> =>
-  SetupService.getApiSetupGuardDecision();
+  SetupService.getGuardDecisionSetup();
 
 export const allowsMainApplicationAccess = (decision: SetupGuardDecisionResult): boolean =>
   decision.allowMainApplication === true && decision.accessState === MAIN_APPLICATION_ACCESS_STATE;

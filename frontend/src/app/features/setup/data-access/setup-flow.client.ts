@@ -18,7 +18,7 @@ export interface SetupConfigurationInput {
 }
 
 export const getSetupStatus = async (): Promise<SetupStatusResult> =>
-  SetupService.getApiSetupStatus();
+  SetupService.getStatusSetup();
 
 export const testDatabaseConnection = async (
   connectionString: string
@@ -27,7 +27,7 @@ export const testDatabaseConnection = async (
     connectionString
   };
 
-  return SetupService.postApiSetupTestDb({ requestBody: request });
+  return SetupService.testDatabaseConnectionSetup({ requestBody: request });
 };
 
 export const testRedisConnection = async (
@@ -37,7 +37,7 @@ export const testRedisConnection = async (
     connectionString
   };
 
-  return SetupService.postApiSetupTestRedis({ requestBody: request });
+  return SetupService.testRedisConnectionSetup({ requestBody: request });
 };
 
 export const testKeycloakConnection = async (
@@ -53,7 +53,7 @@ export const testKeycloakConnection = async (
     clientSecret
   };
 
-  return SetupService.postApiSetupTestKeycloak({ requestBody: request });
+  return SetupService.testKeycloakConnectionSetup({ requestBody: request });
 };
 
 export const saveSetupConfiguration = async (
@@ -68,5 +68,5 @@ export const saveSetupConfiguration = async (
     keycloakClientSecret: input.keycloakClientSecret
   };
 
-  return SetupService.postApiSetupSave({ requestBody: request });
+  return SetupService.saveSetup({ requestBody: request });
 };
