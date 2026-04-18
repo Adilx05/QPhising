@@ -446,15 +446,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T09:07:47Z
   - Owner: Codex
   - Notes: Added Application-layer gateway route policy composition CQRS query/handler/validator and gateway policy contracts under `backend/Application` to compose authentication forwarding posture and claim-to-header mappings from domain-owned route ownership definitions (`GatewayRouteOwnershipMap`) plus configurable policy settings provider abstraction.
-- [ ] 8.3
+- [x] 8.3
   - Title: Endpoint/gateway route implementation and middleware behavior
   - Description: Endpoint/gateway route implementation and middleware behavior
   - Deliverables:
     - Endpoint/gateway route implementation and middleware behavior
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T09:10:00Z
+  - FinishedAt: 2026-04-18T09:16:54Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented gateway route-policy endpoint in API via `GET /api/gateway/route-policies` (MediatR query passthrough) and added Gateway middleware that forwards authenticated JWT claims into downstream headers based on configurable `Gateway:RoutePolicies:ClaimsToHeaders` mappings; updated gateway runtime/appsettings policy configuration defaults to align middleware behavior with route policy composition settings. Files touched: `backend/API/Controllers/GatewayController.cs`, `backend/Gateway/Program.cs`, `backend/Gateway/Middleware/ClaimsToHeadersForwardingMiddleware.cs`, `backend/Gateway/Services/ConfigurationGatewayRoutePolicySettingsProvider.cs`, `backend/Gateway/Configuration/GatewayRoutePolicySettings.cs`, `backend/Gateway/appsettings.json`, `backend/Gateway/appsettings.runtime.json.example`.
 - [ ] 8.4
   - Title: Swagger alignment check for gateway-exposed downstream services
   - Description: Swagger alignment check for gateway-exposed downstream services
