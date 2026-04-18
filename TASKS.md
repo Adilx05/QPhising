@@ -284,15 +284,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T06:49:16Z
   - Owner: Codex
   - Notes: Implemented runtime configuration API endpoints at `/api/configuration` (`GET`, `POST`, `PATCH`) wired to MediatR runtime configuration query/commands, plus concrete API-layer repository/secret-cipher services for runtime persistence in `appsettings.runtime.json` under `RuntimeConfigurationState` with timestamp-preserving aggregate rehydration. Files touched: `backend/API/Controllers/ConfigurationController.cs`, `backend/API/Contracts/RuntimeConfiguration/*`, `backend/API/Services/RuntimeConfiguration/*`, `backend/API/Program.cs`, `backend/Domain/RuntimeConfiguration/Aggregates/RuntimeConfigurationAggregate.cs`.
-- [ ] 5.4
+- [x] 5.4
   - Title: Swagger verification for runtime configuration contracts
   - Description: Swagger verification for runtime configuration contracts
   - Deliverables:
     - Swagger verification for runtime configuration contracts
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T06:53:00Z
+  - FinishedAt: 2026-04-18T06:55:51Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Verified runtime-configuration contract coverage in Swagger by extending operation examples for `GET/POST/PATCH /api/configuration` and syncing the checked-in OpenAPI fixture with runtime configuration paths plus request/response schemas (`SaveRuntimeConfigurationRequest`, `UpdateRuntimeConfigurationRequest`, `RuntimeConfigurationResult`). Files touched: `backend/API/Swagger/SetupEndpointsExamplesOperationFilter.cs`, `frontend/openapi/proxy-validation.swagger.json`.
 - [ ] 5.5
   - Title: Proxy generation for runtime configuration APIs
   - Description: Proxy generation for runtime configuration APIs

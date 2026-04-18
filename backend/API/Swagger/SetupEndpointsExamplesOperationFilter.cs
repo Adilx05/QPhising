@@ -89,6 +89,29 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
                 ["isRedisConfigured"] = new OpenApiBoolean(true),
                 ["readinessState"] = new OpenApiInteger(2)
             });
+            return;
+        }
+
+        if (method == "GET" && path == "/api/configuration")
+        {
+            operation.Summary ??= "Get current persisted runtime configuration readiness state.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateRuntimeConfigurationResponseExample());
+            return;
+        }
+
+        if (method == "POST" && path == "/api/configuration")
+        {
+            operation.Summary ??= "Persist full runtime configuration payload.";
+            SetRequestExample(operation, CreateRuntimeConfigurationSaveRequestExample());
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateRuntimeConfigurationResponseExample());
+            return;
+        }
+
+        if (method == "PATCH" && path == "/api/configuration")
+        {
+            operation.Summary ??= "Update runtime configuration values selectively.";
+            SetRequestExample(operation, CreateRuntimeConfigurationUpdateRequestExample());
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateRuntimeConfigurationResponseExample());
         }
     }
 
@@ -122,6 +145,40 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             ["allowSetupWizard"] = new OpenApiBoolean(true),
             ["allowMainApplication"] = new OpenApiBoolean(false),
             ["recommendedRedirectPath"] = new OpenApiString("/setup")
+        };
+    }
+
+    private static OpenApiObject CreateRuntimeConfigurationSaveRequestExample()
+    {
+        return new OpenApiObject
+        {
+            ["databaseConnectionString"] = new OpenApiString("Host=localhost;Port=5432;Database=qphising;Username=qphising_user;Password=StrongPassword!123"),
+            ["redisConnectionString"] = new OpenApiString("localhost:6379,password=StrongPassword!123,ssl=False,abortConnect=False"),
+            ["keycloakAuthority"] = new OpenApiString("https://keycloak.local/auth"),
+            ["keycloakRealm"] = new OpenApiString("qphising"),
+            ["keycloakClientId"] = new OpenApiString("qphising-api"),
+            ["keycloakClientSecret"] = new OpenApiString("super-secret-client-key")
+        };
+    }
+
+    private static OpenApiObject CreateRuntimeConfigurationUpdateRequestExample()
+    {
+        return new OpenApiObject
+        {
+            ["redisConnectionString"] = new OpenApiString("localhost:6380,password=StrongPassword!123,ssl=False,abortConnect=False"),
+            ["keycloakClientSecret"] = new OpenApiString("rotated-super-secret-client-key")
+        };
+    }
+
+    private static OpenApiObject CreateRuntimeConfigurationResponseExample()
+    {
+        return new OpenApiObject
+        {
+            ["isDatabaseConfigured"] = new OpenApiBoolean(true),
+            ["isRedisConfigured"] = new OpenApiBoolean(true),
+            ["isKeycloakConfigured"] = new OpenApiBoolean(true),
+            ["isReadyForProtectedRuntime"] = new OpenApiBoolean(true),
+            ["updatedAtUtc"] = new OpenApiString("2026-04-18T06:49:16Z")
         };
     }
 
