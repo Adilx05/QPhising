@@ -674,15 +674,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T15:45:35Z
   - Owner: Codex
   - Notes: Implemented Template CQRS application layer with commands/queries/handlers/validators for create, update, publish, archive, delete, get-by-id, and list operations; added template repository contract and template response contract mapping from domain aggregate. Files touched: `backend/Application/Contracts/Abstractions/Template/ITemplateRepository.cs`, `backend/Application/Contracts/Responses/Template/TemplateResult.cs`, `backend/Application/CQRS/Commands/Template/*`, `backend/Application/CQRS/Queries/Template/*`. Build verification attempted via `dotnet build backend/Application/QPhising.Application.csproj` but .NET SDK is unavailable in this environment (`dotnet: command not found`).
-- [ ] 12.3
+- [x] 12.3
   - Title: Endpoint implementation for template operations
   - Description: Endpoint implementation for template operations
   - Deliverables:
     - Endpoint implementation for template operations
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T16:30:00Z
+  - FinishedAt: 2026-04-18T16:38:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added secured `TemplateController` endpoints for list/get/create/update/publish/archive/delete under `/api/templates`, wired each route to existing Template CQRS handlers via MediatR, and introduced API request contracts for create/update payloads. Files touched: `backend/API/Controllers/TemplateController.cs`, `backend/API/Contracts/Template/CreateTemplateRequest.cs`, `backend/API/Contracts/Template/UpdateTemplateRequest.cs`.
 - [ ] 12.4
   - Title: Swagger verification for template endpoint contracts
   - Description: Swagger verification for template endpoint contracts
