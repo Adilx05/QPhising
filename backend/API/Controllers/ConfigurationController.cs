@@ -22,12 +22,12 @@ public sealed class ConfigurationController : ControllerBase
         _sender = sender;
     }
 
-    [HttpGet(Name = "GetRuntimeConfiguration")]
+    [HttpGet(Name = "Configuration_GetCurrent")]
     [ProducesResponseType(typeof(RuntimeConfigurationResult), StatusCodes.Status200OK)]
     public Task<RuntimeConfigurationResult> GetCurrent(CancellationToken cancellationToken) =>
         _sender.Send(new GetRuntimeConfigurationQuery(), cancellationToken);
 
-    [HttpPost(Name = "SaveRuntimeConfiguration")]
+    [HttpPost(Name = "Configuration_Save")]
     [Consumes("application/json")]
     [ProducesResponseType(typeof(RuntimeConfigurationResult), StatusCodes.Status200OK)]
     [Authorize(Policy = IdentityAuthorizationPolicies.AdminOnly)]
@@ -44,7 +44,7 @@ public sealed class ConfigurationController : ControllerBase
                 request.KeycloakClientSecret),
             cancellationToken);
 
-    [HttpPatch(Name = "UpdateRuntimeConfiguration")]
+    [HttpPatch(Name = "Configuration_Update")]
     [Consumes("application/json")]
     [ProducesResponseType(typeof(RuntimeConfigurationResult), StatusCodes.Status200OK)]
     [Authorize(Policy = IdentityAuthorizationPolicies.OperatorOrAbove)]
