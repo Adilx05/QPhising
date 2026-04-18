@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { resolveApiError } from '../../../core/http/api-error-handler';
-import { hasRequiredRole } from '../../../core/auth/auth-session';
+import { AuthSessionService } from '../../../core/auth/auth-session';
 import {
   CampaignLifecycleState,
   type CampaignResult,
@@ -161,14 +161,14 @@ export class CampaignsPageComponent {
   protected readonly campaigns = signal<CampaignResult[]>([]);
   protected readonly targetDrafts = signal<Record<string, string>>({});
   protected readonly scheduleDrafts = signal<Record<string, { startsAtUtc: string; endsAtUtc: string }>>({});
-  protected readonly canOperate = computed(() => hasRequiredRole('Operator'));
+  protected readonly canOperate = computed(() => this.authSessionService.hasRequiredRole('Operator'));
 
   protected readonly createForm = {
     name: '',
     templateId: ''
   };
 
-  public constructor() {
+  public constructor(private readonly authSessionService: AuthSessionService) {
     void this.refresh();
   }
 
