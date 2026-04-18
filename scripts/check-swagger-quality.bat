@@ -11,6 +11,20 @@ echo Running Swagger quality gate: %SWAGGER_SOURCE%
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop';" ^
   "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/configuration','/api/setup/status','/api/setup/guard-decision','/api/setup/test-db','/api/setup/test-redis','/api/setup/test-keycloak','/api/setup/save');" ^
+  "$persistenceContractChecks=@(" ^
+  "  @{ Method='post'; Path='/api/setup/save'; RequestSchemaRef='#/components/schemas/SaveSetupConfigurationRequest'; ResponseSchemaRef='#/components/schemas/SetupStatusResult' }," ^
+  "  @{ Method='get'; Path='/api/setup/status'; ResponseSchemaRef='#/components/schemas/SetupStatusResult' }," ^
+  "  @{ Method='get'; Path='/api/configuration'; ResponseSchemaRef='#/components/schemas/RuntimeConfigurationResult' }," ^
+  "  @{ Method='post'; Path='/api/configuration'; RequestSchemaRef='#/components/schemas/SaveRuntimeConfigurationRequest'; ResponseSchemaRef='#/components/schemas/RuntimeConfigurationResult' }," ^
+  "  @{ Method='patch'; Path='/api/configuration'; RequestSchemaRef='#/components/schemas/UpdateRuntimeConfigurationRequest'; ResponseSchemaRef='#/components/schemas/RuntimeConfigurationResult' }" ^
+  ");" ^
+  "$requiredSchemaProperties=@(" ^
+  "  @{ Schema='SaveSetupConfigurationRequest'; Properties=@('databaseConnectionString','redisConnectionString','keycloakAuthority','keycloakRealm','keycloakClientId','keycloakClientSecret') }," ^
+  "  @{ Schema='SetupStatusResult'; Properties=@('isDatabaseConfigured','isKeycloakConfigured','isRedisConfigured','readinessState') }," ^
+  "  @{ Schema='SaveRuntimeConfigurationRequest'; Properties=@('databaseConnectionString','redisConnectionString','keycloakAuthority','keycloakRealm','keycloakClientId','keycloakClientSecret') }," ^
+  "  @{ Schema='UpdateRuntimeConfigurationRequest'; Properties=@('databaseConnectionString','redisConnectionString','keycloakAuthority','keycloakRealm','keycloakClientId','keycloakClientSecret') }," ^
+  "  @{ Schema='RuntimeConfigurationResult'; Properties=@('isDatabaseConfigured','isRedisConfigured','isKeycloakConfigured','isReadyForProtectedRuntime','updatedAtUtc') }" ^
+  ");" ^
   "$httpMethods=@('get','post','put','patch','delete','head','options','trace');" ^
   "$requiredProblemStatusCodes=@('400','401','403','500');" ^
   "$problemDetailsSchemaRef='#/components/schemas/ProblemDetails';" ^
@@ -88,6 +102,51 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "        Write-Error ('Operation ''{0}'' {1} response must reference {2}.' -f $operationName, $statusCode, $problemDetailsSchemaRef);" ^
   "        exit 1;" ^
   "      }" ^
+  "    }" ^
+  "  }" ^
+  "}" ^
+  "$schemas = $swagger.components.schemas;" ^
+  "foreach ($contractCheck in $persistenceContractChecks) {" ^
+  "  $pathItem = $swagger.paths.PSObject.Properties[$contractCheck.Path].Value;" ^
+  "  if (-not $pathItem) {" ^
+  "    Write-Error ('Persistence contract path ''{0}'' was not found.' -f $contractCheck.Path);" ^
+  "    exit 1;" ^
+  "  }" ^
+  "  $operation = $pathItem.PSObject.Properties[$contractCheck.Method].Value;" ^
+  "  $operationName = ('{0} {1}' -f $contractCheck.Method.ToUpperInvariant(), $contractCheck.Path);" ^
+  "  if (-not $operation) {" ^
+  "    Write-Error ('Persistence contract operation ''{0}'' was not found.' -f $operationName);" ^
+  "    exit 1;" ^
+  "  }" ^
+  "  if ($contractCheck.ContainsKey('RequestSchemaRef')) {" ^
+  "    $requestRef = $operation.requestBody.content.'application/json'.schema.'$ref';" ^
+  "    if ($requestRef -ne $contractCheck.RequestSchemaRef) {" ^
+  "      Write-Error ('Operation ''{0}'' request schema must reference {1}.' -f $operationName, $contractCheck.RequestSchemaRef);" ^
+  "      exit 1;" ^
+  "    }" ^
+  "  }" ^
+  "  if ($contractCheck.ContainsKey('ResponseSchemaRef')) {" ^
+  "    $responseRef = $operation.responses.'200'.content.'application/json'.schema.'$ref';" ^
+  "    if ($responseRef -ne $contractCheck.ResponseSchemaRef) {" ^
+  "      Write-Error ('Operation ''{0}'' 200 response schema must reference {1}.' -f $operationName, $contractCheck.ResponseSchemaRef);" ^
+  "      exit 1;" ^
+  "    }" ^
+  "  }" ^
+  "}" ^
+  "foreach ($schemaCheck in $requiredSchemaProperties) {" ^
+  "  $schema = $schemas.PSObject.Properties[$schemaCheck.Schema].Value;" ^
+  "  if (-not $schema) {" ^
+  "    Write-Error ('Required schema ''{0}'' was not found.' -f $schemaCheck.Schema);" ^
+  "    exit 1;" ^
+  "  }" ^
+  "  if (-not $schema.properties) {" ^
+  "    Write-Error ('Schema ''{0}'' is missing properties.' -f $schemaCheck.Schema);" ^
+  "    exit 1;" ^
+  "  }" ^
+  "  foreach ($propertyName in $schemaCheck.Properties) {" ^
+  "    if (-not $schema.properties.PSObject.Properties.Name.Contains($propertyName)) {" ^
+  "      Write-Error ('Schema ''{0}'' is missing ''{1}'' property.' -f $schemaCheck.Schema, $propertyName);" ^
+  "      exit 1;" ^
   "    }" ^
   "  }" ^
   "}" ^
