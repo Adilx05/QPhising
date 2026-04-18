@@ -2,5 +2,6 @@
   <Project Path="backend\Domain\QPhising.Domain.csproj" />
   <Project Path="backend\Application\QPhising.Application.csproj" />
   <Project Path="backend\API\QPhising.Api.csproj" />
+  <Project Path="backend\API.Tests\QPhising.Api.Tests.csproj" />
   <Project Path="backend\Gateway\QPhising.Gateway.csproj" />
 </Solution>
