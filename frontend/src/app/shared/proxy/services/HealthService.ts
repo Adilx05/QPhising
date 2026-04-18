@@ -10,10 +10,16 @@ export class HealthService {
    * @returns any OK
    * @throws ApiError
    */
-  public static getApiHealth(): CancelablePromise<any> {
+  public static getHealth(): CancelablePromise<any> {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/Health',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
 }

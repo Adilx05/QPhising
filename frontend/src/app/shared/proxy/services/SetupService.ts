@@ -18,10 +18,16 @@ export class SetupService {
    * @returns SetupStatusResult OK
    * @throws ApiError
    */
-  public static getApiSetupStatus(): CancelablePromise<SetupStatusResult> {
+  public static getStatusSetup(): CancelablePromise<SetupStatusResult> {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/setup/status',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
   /**
@@ -29,10 +35,16 @@ export class SetupService {
    * @returns SetupGuardDecisionResult OK
    * @throws ApiError
    */
-  public static getApiSetupGuardDecision(): CancelablePromise<SetupGuardDecisionResult> {
+  public static getGuardDecisionSetup(): CancelablePromise<SetupGuardDecisionResult> {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/setup/guard-decision',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
   /**
@@ -40,7 +52,7 @@ export class SetupService {
    * @returns SetupDependencyTestResult OK
    * @throws ApiError
    */
-  public static postApiSetupTestDb({
+  public static testDatabaseConnectionSetup({
     requestBody,
   }: {
     requestBody?: TestDatabaseConnectionRequest,
@@ -50,6 +62,12 @@ export class SetupService {
       url: '/api/setup/test-db',
       body: requestBody,
       mediaType: 'application/json',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
   /**
@@ -57,7 +75,7 @@ export class SetupService {
    * @returns SetupDependencyTestResult OK
    * @throws ApiError
    */
-  public static postApiSetupTestRedis({
+  public static testRedisConnectionSetup({
     requestBody,
   }: {
     requestBody?: TestRedisConnectionRequest,
@@ -67,6 +85,12 @@ export class SetupService {
       url: '/api/setup/test-redis',
       body: requestBody,
       mediaType: 'application/json',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
   /**
@@ -74,7 +98,7 @@ export class SetupService {
    * @returns SetupDependencyTestResult OK
    * @throws ApiError
    */
-  public static postApiSetupTestKeycloak({
+  public static testKeycloakConnectionSetup({
     requestBody,
   }: {
     requestBody?: TestKeycloakConnectionRequest,
@@ -84,6 +108,12 @@ export class SetupService {
       url: '/api/setup/test-keycloak',
       body: requestBody,
       mediaType: 'application/json',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
   /**
@@ -91,7 +121,7 @@ export class SetupService {
    * @returns SetupStatusResult OK
    * @throws ApiError
    */
-  public static postApiSetupSave({
+  public static saveSetup({
     requestBody,
   }: {
     requestBody?: SaveSetupConfigurationRequest,
@@ -101,6 +131,12 @@ export class SetupService {
       url: '/api/setup/save',
       body: requestBody,
       mediaType: 'application/json',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
 }

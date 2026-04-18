@@ -11,7 +11,7 @@ export class ProxyValidationService {
    * @returns void
    * @throws ApiError
    */
-  public static postApiProxyValidationAssertSync({
+  public static assertSyncProxyValidation({
     requestBody,
   }: {
     requestBody?: AssertProxyContractSyncRequest,
@@ -22,7 +22,11 @@ export class ProxyValidationService {
       body: requestBody,
       mediaType: 'application/json',
       errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
         409: `Conflict`,
+        500: `Internal Server Error`,
       },
     });
   }

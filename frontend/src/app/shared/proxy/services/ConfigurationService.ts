@@ -14,10 +14,16 @@ export class ConfigurationService {
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
-  public static getApiConfiguration(): CancelablePromise<RuntimeConfigurationResult> {
+  public static getRuntimeConfiguration(): CancelablePromise<RuntimeConfigurationResult> {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/configuration',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
   /**
@@ -25,7 +31,7 @@ export class ConfigurationService {
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
-  public static postApiConfiguration({
+  public static saveRuntimeConfiguration({
     requestBody,
   }: {
     requestBody?: SaveRuntimeConfigurationRequest,
@@ -35,6 +41,12 @@ export class ConfigurationService {
       url: '/api/configuration',
       body: requestBody,
       mediaType: 'application/json',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
   /**
@@ -42,7 +54,7 @@ export class ConfigurationService {
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
-  public static patchApiConfiguration({
+  public static updateRuntimeConfiguration({
     requestBody,
   }: {
     requestBody?: UpdateRuntimeConfigurationRequest,
@@ -52,6 +64,12 @@ export class ConfigurationService {
       url: '/api/configuration',
       body: requestBody,
       mediaType: 'application/json',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
     });
   }
 }
