@@ -45,6 +45,53 @@ Set multiple startup projects:
 
 This starts API and Gateway together with non-conflicting ports.
 
+## Database Bootstrap & EF Core Migrations
+
+The API now uses EF Core with Npgsql for schema lifecycle management (`UseNpgsql(connectionString)`) and applies migrations on startup in Development by default.
+
+### 1) Configure local PostgreSQL connection
+
+Set `ConnectionStrings:DefaultConnection` in:
+
+- `backend/API/appsettings.runtime.json` (recommended for local overrides), or
+- environment variable `ConnectionStrings__DefaultConnection`.
+
+Example:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=qphising;Username=qphising;Password=change-me"
+  }
+}
+```
+
+### 2) Startup migration behavior
+
+Database settings (under `Database`):
+
+- `ApplyMigrationsOnStartup`: force migrations during startup (default `true` in Development, `false` otherwise).
+- `ContinueOnMigrationFailure`: continue startup after migration failure (`false` recommended for fail-fast behavior).
+
+The API logs migration attempts and failures with structured log entries.
+
+### 3) Run migrations manually (recommended for controlled environments)
+
+From `backend/API`:
+
+- Create a migration:
+  - `dotnet ef migrations add <MigrationName> --output-dir Infrastructure/Persistence/Migrations`
+- Apply migrations to DB:
+  - `dotnet ef database update`
+- List migrations:
+  - `dotnet ef migrations list`
+
+EF migration history is stored in the default `__EFMigrationsHistory` table.
+
+### 4) Setup wizard `test-db` endpoint scope
+
+`POST /api/setup/test-db` remains a connectivity check only (`CanConnect`) and does **not** create/update schema. Schema lifecycle is managed exclusively via EF Core migrations.
+
 ## Swagger Quality Gate
 
 Use the Swagger quality gate scripts to validate OpenAPI contract standards in local workflows and CI.

@@ -16,6 +16,27 @@ public sealed class CampaignAggregate : Entity<Guid>
     private readonly List<CampaignTarget> _targets = [];
 
     public CampaignAggregate(Guid id, CampaignName name, Guid templateId)
+        : this(
+            id,
+            name,
+            templateId,
+            CampaignLifecycleState.Draft,
+            scheduleWindow: null,
+            createdAtUtc: DateTimeOffset.UtcNow,
+            updatedAtUtc: null,
+            targets: null)
+    {
+    }
+
+    private CampaignAggregate(
+        Guid id,
+        CampaignName name,
+        Guid templateId,
+        CampaignLifecycleState lifecycleState,
+        CampaignScheduleWindow? scheduleWindow,
+        DateTimeOffset createdAtUtc,
+        DateTimeOffset? updatedAtUtc,
+        IEnumerable<CampaignTarget>? targets)
         : base(id)
     {
         ArgumentNullException.ThrowIfNull(name);
@@ -27,9 +48,15 @@ public sealed class CampaignAggregate : Entity<Guid>
 
         Name = name;
         TemplateId = templateId;
-        LifecycleState = CampaignLifecycleState.Draft;
-        CreatedAtUtc = DateTimeOffset.UtcNow;
-        UpdatedAtUtc = CreatedAtUtc;
+        LifecycleState = lifecycleState;
+        ScheduleWindow = scheduleWindow;
+        CreatedAtUtc = createdAtUtc;
+        UpdatedAtUtc = updatedAtUtc ?? createdAtUtc;
+
+        if (targets is not null)
+        {
+            _targets.AddRange(targets);
+        }
     }
 
     public CampaignName Name { get; private set; }
@@ -114,6 +141,29 @@ public sealed class CampaignAggregate : Entity<Guid>
     public void Complete() => TransitionTo(CampaignLifecycleState.Completed);
 
     public void Cancel() => TransitionTo(CampaignLifecycleState.Cancelled);
+
+    public static CampaignAggregate Rehydrate(
+        Guid id,
+        CampaignName name,
+        Guid templateId,
+        CampaignLifecycleState lifecycleState,
+        CampaignScheduleWindow? scheduleWindow,
+        DateTimeOffset createdAtUtc,
+        DateTimeOffset updatedAtUtc,
+        IEnumerable<CampaignTarget> targets)
+    {
+        ArgumentNullException.ThrowIfNull(targets);
+
+        return new CampaignAggregate(
+            id,
+            name,
+            templateId,
+            lifecycleState,
+            scheduleWindow,
+            createdAtUtc,
+            updatedAtUtc,
+            targets);
+    }
 
     private void TransitionTo(CampaignLifecycleState nextState)
     {

@@ -1,0 +1,99 @@
+using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using QPhising.Api.Infrastructure.Persistence;
+
+#nullable disable
+
+namespace QPhising.Api.Infrastructure.Persistence.Migrations;
+
+[DbContext(typeof(QPhisingDbContext))]
+partial class QPhisingDbContextModelSnapshot : ModelSnapshot
+{
+    protected override void BuildModel(ModelBuilder modelBuilder)
+    {
+#pragma warning disable 612, 618
+        modelBuilder
+            .HasAnnotation("ProductVersion", "9.0.4")
+            .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+        NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+        modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignEntity", b =>
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uuid")
+                    .HasColumnName("id");
+
+                b.Property<DateTimeOffset>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("created_at_utc");
+
+                b.Property<int>("LifecycleState")
+                    .HasColumnType("integer")
+                    .HasColumnName("lifecycle_state");
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(120)
+                    .HasColumnType("character varying(120)")
+                    .HasColumnName("name");
+
+                b.Property<DateTimeOffset?>("ScheduleEndsAtUtc")
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("schedule_ends_at_utc");
+
+                b.Property<DateTimeOffset?>("ScheduleStartsAtUtc")
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("schedule_starts_at_utc");
+
+                b.Property<Guid>("TemplateId")
+                    .HasColumnType("uuid")
+                    .HasColumnName("template_id");
+
+                b.Property<DateTimeOffset>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("updated_at_utc");
+
+                b.HasKey("Id");
+
+                b.ToTable("campaigns", (string)null);
+            });
+
+        modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignTargetEntity", b =>
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uuid")
+                    .HasColumnName("id");
+
+                b.Property<Guid>("CampaignId")
+                    .HasColumnType("uuid")
+                    .HasColumnName("campaign_id");
+
+                b.Property<string>("EmailAddress")
+                    .IsRequired()
+                    .HasMaxLength(320)
+                    .HasColumnType("character varying(320)")
+                    .HasColumnName("email_address");
+
+                b.HasKey("Id");
+
+                b.HasIndex("CampaignId", "EmailAddress")
+                    .IsUnique();
+
+                b.ToTable("campaign_targets", (string)null);
+            });
+
+        modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignTargetEntity", b =>
+            {
+                b.HasOne("QPhising.Api.Infrastructure.Persistence.Entities.CampaignEntity", null)
+                    .WithMany("Targets")
+                    .HasForeignKey("CampaignId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+#pragma warning restore 612, 618
+    }
+}

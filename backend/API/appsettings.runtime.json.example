@@ -2,6 +2,10 @@
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Port=5432;Database=qphising;Username=qphising;Password=change-me"
   },
+  "Database": {
+    "ApplyMigrationsOnStartup": false,
+    "ContinueOnMigrationFailure": false
+  },
   "Authentication": {
     "Jwt": {
       "Authority": "https://localhost:8444/realms/qphising",
