@@ -4,21 +4,6 @@ import {
   type SaveRuntimeConfigurationRequest,
   type UpdateRuntimeConfigurationRequest
 } from '../../../shared/proxy';
-import { resolveProxyServiceMethod } from './proxy-service-method.resolver';
-
-
-const getApiConfiguration = resolveProxyServiceMethod<[], Promise<RuntimeConfigurationResult>>(
-  ConfigurationService,
-  'getApiConfiguration'
-);
-const postApiConfiguration = resolveProxyServiceMethod<
-  [{ requestBody?: SaveRuntimeConfigurationRequest }],
-  Promise<RuntimeConfigurationResult>
->(ConfigurationService, 'postApiConfiguration');
-const patchApiConfiguration = resolveProxyServiceMethod<
-  [{ requestBody?: UpdateRuntimeConfigurationRequest }],
-  Promise<RuntimeConfigurationResult>
->(ConfigurationService, 'patchApiConfiguration');
 
 export interface RuntimeConfigurationInput {
   databaseConnectionString: string;
@@ -30,7 +15,7 @@ export interface RuntimeConfigurationInput {
 }
 
 export const getRuntimeConfigurationStatus = async (): Promise<RuntimeConfigurationResult> =>
-  getApiConfiguration();
+  ConfigurationService.getApiConfiguration();
 
 export const saveRuntimeConfiguration = async (
   input: RuntimeConfigurationInput
@@ -44,7 +29,7 @@ export const saveRuntimeConfiguration = async (
     keycloakClientSecret: input.keycloakClientSecret
   };
 
-  return postApiConfiguration({ requestBody: request });
+  return ConfigurationService.postApiConfiguration({ requestBody: request });
 };
 
 export const updateRuntimeConfiguration = async (
@@ -59,7 +44,7 @@ export const updateRuntimeConfiguration = async (
     keycloakClientSecret: normalizeOptionalValue(input.keycloakClientSecret)
   };
 
-  return patchApiConfiguration({ requestBody: request });
+  return ConfigurationService.patchApiConfiguration({ requestBody: request });
 };
 
 const normalizeOptionalValue = (value: string | undefined): string | undefined => {
