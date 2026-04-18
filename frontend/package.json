@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "smoke:gateway": "node ../scripts/check-frontend-gateway-smoke.js --base-url http://localhost:8080"
+    "smoke:gateway": "node ../scripts/check-frontend-gateway-smoke.js --base-url http://localhost:8080",
+    "smoke:live-flows": "node ../scripts/check-frontend-live-flows.js --base-url http://localhost:8080"
   },
   "dependencies": {
     "@angular/animations": "19.2.20",

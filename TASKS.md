@@ -587,15 +587,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T13:00:00Z
   - Owner: Codex
   - Notes: Refreshed migration-aligned proxy generation guardrails by requiring runtime-configuration CRUD operation IDs (`Configuration_GetCurrent`, `Configuration_Save`, `Configuration_Update`) during Swagger pre-validation in both Linux/Windows proxy-generation scripts, then executed proxy generation against the checked-in fixture; generation remains blocked in this environment by npm registry 403, but pre-validation and Swagger quality checks pass and checked-in proxies remain the current deterministic baseline. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`.
-- [ ] 10.6
+- [x] 10.6
   - Title: Frontend integration verification with database-backed live flows
   - Description: Frontend integration verification with database-backed live flows
   - Deliverables:
     - Frontend integration verification with database-backed live flows
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T21:10:00Z
+  - FinishedAt: 2026-04-18T21:18:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added a dedicated live-flow verification harness (`scripts/check-frontend-live-flows.js`) that executes setup save/status plus runtime configuration save/get/patch/get against gateway APIs with strict JSON/status assertions, including optional bearer-token support for secured environments. Wired the script into frontend npm workflows via `smoke:live-flows` for repeatable frontend-to-API persistence checks. Files touched: `scripts/check-frontend-live-flows.js`, `frontend/package.json`.
 
 ## Phase 11 - Campaign Module
 
