@@ -530,15 +530,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T10:33:00Z
   - Owner: Codex
   - Notes: Hardened proxy generation preconditions for secured endpoints by requiring OpenAPI `components.securitySchemes.Bearer` (HTTP bearer) and Bearer security requirements on protected operations (`/api/configuration`, `/api/proxy-validation/assert-sync`) in both Unix and Windows generator scripts. Attempted proxy regeneration using local checked-in Swagger fixture (`./scripts/generate-proxy.sh file:///workspace/QPhising/frontend/openapi/proxy-validation.swagger.json`), but npm registry access is blocked (403), so generated artifacts remained unchanged. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`.
-- [ ] 9.6
+- [x] 9.6
   - Title: Frontend integration for authenticated flows and role-based UX access
   - Description: Frontend integration for authenticated flows and role-based UX access
   - Deliverables:
     - Frontend integration for authenticated flows and role-based UX access
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T20:40:00Z
+  - FinishedAt: 2026-04-18T20:54:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented frontend authentication + role-aware UX integration by adding JWT session/token parsing (Keycloak-compatible role extraction from claims), wiring generated OpenAPI client bearer token resolution from runtime/storage token sources, introducing authentication/role route guards for protected routes, and applying role-gated navigation/actions in shell/runtime-configuration UI (Viewer visibility, Operator update, Admin save). Files touched: `frontend/src/app/core/auth/auth-session.ts`, `frontend/src/app/core/config/openapi-config.provider.ts`, `frontend/src/app/core/guards/authentication.guard.ts`, `frontend/src/app/core/guards/index.ts`, `frontend/src/app/app.routes.ts`, `frontend/src/app/app.component.ts`, `frontend/src/app/features/setup/pages/runtime-configuration-page.component.ts`, `frontend/src/app/features/setup/pages/runtime-configuration-page.component.html`.
 
 ## Phase 10 - Database & Migrations
 

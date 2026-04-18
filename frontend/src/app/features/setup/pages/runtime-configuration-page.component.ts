@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import type { RuntimeConfigurationResult } from '../../../shared/proxy';
+import { hasRequiredRole } from '../../../core/auth/auth-session';
 import { resolveApiError } from '../../../core/http/api-error-handler';
 import {
   getRuntimeConfigurationStatus,
@@ -35,6 +36,15 @@ export class RuntimeConfigurationPageComponent {
 
   public constructor(private readonly formBuilder: FormBuilder) {
     void this.refreshStatus();
+  }
+
+
+  protected canUpdateRuntimeConfiguration(): boolean {
+    return hasRequiredRole('Operator');
+  }
+
+  protected canSaveRuntimeConfiguration(): boolean {
+    return hasRequiredRole('Admin');
   }
 
   protected async saveAll(): Promise<void> {

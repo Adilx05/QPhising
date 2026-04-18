@@ -1,10 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { getAuthSession, hasRequiredRole } from './core/auth/auth-session';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   template: `
     <div class="app-shell min-h-screen">
       <aside class="hidden border-r border-slate-200/80 bg-white/95 lg:flex lg:w-72 lg:flex-col">
@@ -14,29 +16,17 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
         </div>
 
         <nav class="flex-1 space-y-2 px-4 py-6">
-          <a
-            routerLink="/dashboard"
-            routerLinkActive="is-active"
-            class="nav-item"
-          >
+          <a routerLink="/dashboard" routerLinkActive="is-active" class="nav-item">
             <i class="pi pi-home text-sm"></i>
             <span>Dashboard</span>
           </a>
 
-          <a
-            routerLink="/setup"
-            routerLinkActive="is-active"
-            class="nav-item"
-          >
+          <a routerLink="/setup" routerLinkActive="is-active" class="nav-item">
             <i class="pi pi-cog text-sm"></i>
             <span>Setup Wizard</span>
           </a>
 
-          <a
-            routerLink="/configuration"
-            routerLinkActive="is-active"
-            class="nav-item"
-          >
+          <a *ngIf="canViewConfiguration()" routerLink="/configuration" routerLinkActive="is-active" class="nav-item">
             <i class="pi pi-sliders-h text-sm"></i>
             <span>Runtime Configuration</span>
           </a>
@@ -51,12 +41,13 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
             <nav class="flex items-center gap-2 text-sm lg:hidden">
               <a class="mobile-nav-item" routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
               <a class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">Setup</a>
-              <a class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">Config</a>
+              <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">Config</a>
             </nav>
 
-            <div class="hidden items-center gap-3 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 lg:flex">
-              <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-              Platform Online
+            <div class="hidden items-center gap-3 rounded-full border px-3 py-1.5 text-xs font-medium lg:flex"
+                 [ngClass]="isAuthenticated() ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'">
+              <span class="inline-block h-2 w-2 rounded-full" [ngClass]="isAuthenticated() ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+              {{ isAuthenticated() ? 'Authenticated Session' : 'Unauthenticated Session' }}
             </div>
           </div>
         </header>
@@ -68,4 +59,12 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
     </div>
   `
 })
-export class AppComponent {}
+export class AppComponent {
+  protected isAuthenticated(): boolean {
+    return getAuthSession().isAuthenticated;
+  }
+
+  protected canViewConfiguration(): boolean {
+    return hasRequiredRole('Viewer');
+  }
+}

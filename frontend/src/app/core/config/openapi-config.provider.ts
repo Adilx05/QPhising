@@ -1,5 +1,6 @@
 import { APP_INITIALIZER, EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { getAccessToken } from '../auth/auth-session';
 import { OpenAPI } from '../../shared/proxy';
 
 const resolveApiBaseUrl = (): string => {
@@ -14,6 +15,7 @@ const resolveApiBaseUrl = (): string => {
 
 const configureOpenApiClient = (): void => {
   OpenAPI.BASE = resolveApiBaseUrl();
+  OpenAPI.TOKEN = () => Promise.resolve(getAccessToken() ?? '');
 };
 
 export const provideOpenApiConfiguration = (): EnvironmentProviders =>
