@@ -57,7 +57,16 @@ const requiredPaths = [
   "/api/setup/test-db",
   "/api/setup/test-redis",
   "/api/setup/test-keycloak",
-  "/api/setup/save"
+  "/api/setup/save",
+  "/api/campaigns",
+  "/api/campaigns/{campaignId}",
+  "/api/campaigns/{campaignId}/targets",
+  "/api/campaigns/{campaignId}/targets/{targetId}",
+  "/api/campaigns/{campaignId}/schedule",
+  "/api/campaigns/{campaignId}/start",
+  "/api/campaigns/{campaignId}/pause",
+  "/api/campaigns/{campaignId}/complete",
+  "/api/campaigns/{campaignId}/cancel"
 ];
 const requiredOperations = [
   { method: "get", path: "/api/configuration", operationId: "Configuration_GetCurrent" },
