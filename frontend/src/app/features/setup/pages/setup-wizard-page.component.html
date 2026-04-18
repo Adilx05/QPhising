@@ -1,134 +1,108 @@
-<div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
-  <p-card header="İlk Kurulum" subheader="QPhising runtime bağımlılıklarını doğrulayın ve kaydedin.">
+<section class="mb-6">
+  <h1 class="page-title">Initial Setup Wizard</h1>
+  <p class="page-subtitle">QPhising bağımlılıklarını doğrulayın ve ilk çalıştırma konfigürasyonunu güvenli şekilde kaydedin.</p>
+</section>
+
+<div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+  <section class="surface-card p-5 lg:p-6">
+    <div class="mb-5 flex items-start justify-between gap-3 border-b border-slate-200 pb-4">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Dependency Configuration</h2>
+        <p class="mt-1 text-sm text-slate-500">Database, Redis ve Keycloak bilgilerini backend test endpointleriyle doğrulayın.</p>
+      </div>
+      <span class="status-chip" [ngClass]="setupCompleted() ? 'status-chip-success' : 'status-chip-warning'">
+        {{ setupCompleted() ? 'Setup Completed' : 'Setup Pending' }}
+      </span>
+    </div>
+
     <form [formGroup]="form" class="space-y-4">
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="databaseConnectionString">Database Connection String</label>
-        <input
-          id="databaseConnectionString"
-          pInputText
-          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          formControlName="databaseConnectionString"
-        />
+        <input id="databaseConnectionString" pInputText class="w-full" formControlName="databaseConnectionString" />
       </div>
 
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="redisConnectionString">Redis Connection String</label>
-        <input
-          id="redisConnectionString"
-          pInputText
-          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          formControlName="redisConnectionString"
-        />
+        <input id="redisConnectionString" pInputText class="w-full" formControlName="redisConnectionString" />
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="keycloakAuthority">Keycloak Authority</label>
-          <input
-            id="keycloakAuthority"
-            pInputText
-            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            formControlName="keycloakAuthority"
-          />
+          <input id="keycloakAuthority" pInputText class="w-full" formControlName="keycloakAuthority" />
         </div>
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="keycloakRealm">Keycloak Realm</label>
-          <input
-            id="keycloakRealm"
-            pInputText
-            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            formControlName="keycloakRealm"
-          />
+          <input id="keycloakRealm" pInputText class="w-full" formControlName="keycloakRealm" />
         </div>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="keycloakClientId">Keycloak Client Id</label>
-          <input
-            id="keycloakClientId"
-            pInputText
-            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            formControlName="keycloakClientId"
-          />
+          <input id="keycloakClientId" pInputText class="w-full" formControlName="keycloakClientId" />
         </div>
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="keycloakClientSecret">Keycloak Client Secret</label>
-          <p-password
-            inputId="keycloakClientSecret"
-            styleClass="w-full"
-            inputStyleClass="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            [feedback]="false"
-            formControlName="keycloakClientSecret"
-          ></p-password>
+          <p-password inputId="keycloakClientSecret" styleClass="w-full" inputStyleClass="w-full" [feedback]="false" formControlName="keycloakClientSecret"></p-password>
         </div>
       </div>
 
-      <div class="flex flex-wrap gap-3 pt-2">
-        <button
-          pButton
-          type="button"
-          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isBusy()"
-          (click)="testDatabase()"
-        >
-          <i class="pi pi-database"></i>
-          <span>DB Test</span>
-        </button>
-        <button
-          pButton
-          type="button"
-          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isBusy()"
-          (click)="testRedis()"
-        >
-          <i class="pi pi-bolt"></i>
-          <span>Redis Test</span>
-        </button>
-        <button
-          pButton
-          type="button"
-          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isBusy()"
-          (click)="testKeycloak()"
-        >
-          <i class="pi pi-shield"></i>
-          <span>Keycloak Test</span>
-        </button>
-        <button
-          pButton
-          type="button"
-          class="inline-flex items-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isBusy()"
-          (click)="save()"
-        >
-          <i class="pi" [ngClass]="isBusy() ? 'pi-spin pi-spinner' : 'pi-save'"></i>
-          <span>{{ isBusy() ? 'Kaydediliyor...' : 'Kaydet' }}</span>
-        </button>
+      <div class="flex flex-wrap gap-3 pt-3">
+        <button pButton type="button" severity="secondary" icon="pi pi-database" label="DB Test" [disabled]="isBusy()" (click)="testDatabase()"></button>
+        <button pButton type="button" severity="secondary" icon="pi pi-bolt" label="Redis Test" [disabled]="isBusy()" (click)="testRedis()"></button>
+        <button pButton type="button" severity="secondary" icon="pi pi-shield" label="Keycloak Test" [disabled]="isBusy()" (click)="testKeycloak()"></button>
+        <button pButton type="button" icon="pi pi-save" [label]="isBusy() ? 'Kaydediliyor...' : 'Kaydet'" [loading]="isBusy()" [disabled]="isBusy()" (click)="save()"></button>
       </div>
     </form>
-  </p-card>
+  </section>
 
-  <div class="space-y-4">
-    <p-card header="Kurulum Durumu">
-      <ul class="m-0 list-none space-y-2 p-0 text-sm text-slate-700">
-        <li><strong>Readiness:</strong> {{ status()?.readinessState ?? 'unknown' }}</li>
-        <li><strong>Completed:</strong> {{ setupCompleted() ? 'Yes' : 'No' }}</li>
+  <aside class="space-y-4">
+    <section class="surface-card p-5">
+      <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Kurulum Durumu</h3>
+      <ul class="mt-4 m-0 list-none space-y-3 p-0 text-sm text-slate-700">
+        <li class="flex items-center justify-between gap-2">
+          <span>Readiness</span>
+          <span class="status-chip status-chip-muted">{{ status()?.readinessState ?? 'unknown' }}</span>
+        </li>
+        <li class="flex items-center justify-between gap-2">
+          <span>Completed</span>
+          <span class="status-chip" [ngClass]="setupCompleted() ? 'status-chip-success' : 'status-chip-warning'">
+            {{ setupCompleted() ? 'Yes' : 'No' }}
+          </span>
+        </li>
       </ul>
-    </p-card>
+    </section>
 
-    <p-card header="Bağlantı Test Sonuçları">
-      <ul class="m-0 list-none space-y-2 p-0 text-sm text-slate-700">
-        <li><strong>Database:</strong> {{ dbTestResult()?.succeeded === true ? 'OK' : 'Not tested' }}</li>
-        <li><strong>Redis:</strong> {{ redisTestResult()?.succeeded === true ? 'OK' : 'Not tested' }}</li>
-        <li><strong>Keycloak:</strong> {{ keycloakTestResult()?.succeeded === true ? 'OK' : 'Not tested' }}</li>
+    <section class="surface-card p-5">
+      <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Bağlantı Testleri</h3>
+      <ul class="mt-4 m-0 list-none space-y-3 p-0 text-sm text-slate-700">
+        <li class="flex items-center justify-between gap-2">
+          <span>Database</span>
+          <span class="status-chip" [ngClass]="dbTestResult()?.succeeded ? 'status-chip-success' : 'status-chip-muted'">
+            {{ dbTestResult()?.succeeded ? 'OK' : 'Not tested' }}
+          </span>
+        </li>
+        <li class="flex items-center justify-between gap-2">
+          <span>Redis</span>
+          <span class="status-chip" [ngClass]="redisTestResult()?.succeeded ? 'status-chip-success' : 'status-chip-muted'">
+            {{ redisTestResult()?.succeeded ? 'OK' : 'Not tested' }}
+          </span>
+        </li>
+        <li class="flex items-center justify-between gap-2">
+          <span>Keycloak</span>
+          <span class="status-chip" [ngClass]="keycloakTestResult()?.succeeded ? 'status-chip-success' : 'status-chip-muted'">
+            {{ keycloakTestResult()?.succeeded ? 'OK' : 'Not tested' }}
+          </span>
+        </li>
       </ul>
-    </p-card>
+    </section>
 
-    <p-card *ngIf="feedback()" header="Mesaj">
-      <p class="m-0 text-sm text-slate-700">{{ feedback() }}</p>
-    </p-card>
-  </div>
+    <section *ngIf="feedback()" class="surface-card border-blue-100 bg-blue-50 p-5">
+      <h3 class="text-sm font-semibold text-blue-900">Mesaj</h3>
+      <p class="mt-2 text-sm text-blue-800">{{ feedback() }}</p>
+    </section>
+  </aside>
 </div>

@@ -1,119 +1,93 @@
-<div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
-  <p-card header="Runtime Configuration" subheader="Canlı ortam bağımlılıklarını güvenli şekilde yönetin.">
+<section class="mb-6">
+  <h1 class="page-title">Runtime Configuration</h1>
+  <p class="page-subtitle">Canlı ortam bağımlılıklarını güvenli şekilde yönetin ve değişiklikleri kontrollü uygulayın.</p>
+</section>
+
+<div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+  <section class="surface-card p-5 lg:p-6">
+    <div class="mb-5 border-b border-slate-200 pb-4">
+      <h2 class="text-lg font-semibold text-slate-900">Configuration Inputs</h2>
+      <p class="mt-1 text-sm text-slate-500">Tüm işlemler generated proxy servisleri üzerinden API'ye gönderilir.</p>
+    </div>
+
     <form [formGroup]="form" class="space-y-4">
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="runtimeDatabaseConnectionString">Database Connection String</label>
-        <input
-          id="runtimeDatabaseConnectionString"
-          pInputText
-          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          formControlName="databaseConnectionString"
-        />
+        <input id="runtimeDatabaseConnectionString" pInputText class="w-full" formControlName="databaseConnectionString" />
       </div>
 
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="runtimeRedisConnectionString">Redis Connection String</label>
-        <input
-          id="runtimeRedisConnectionString"
-          pInputText
-          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          formControlName="redisConnectionString"
-        />
+        <input id="runtimeRedisConnectionString" pInputText class="w-full" formControlName="redisConnectionString" />
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakAuthority">Keycloak Authority</label>
-          <input
-            id="runtimeKeycloakAuthority"
-            pInputText
-            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            formControlName="keycloakAuthority"
-          />
+          <input id="runtimeKeycloakAuthority" pInputText class="w-full" formControlName="keycloakAuthority" />
         </div>
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakRealm">Keycloak Realm</label>
-          <input
-            id="runtimeKeycloakRealm"
-            pInputText
-            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            formControlName="keycloakRealm"
-          />
+          <input id="runtimeKeycloakRealm" pInputText class="w-full" formControlName="keycloakRealm" />
         </div>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakClientId">Keycloak Client Id</label>
-          <input
-            id="runtimeKeycloakClientId"
-            pInputText
-            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            formControlName="keycloakClientId"
-          />
+          <input id="runtimeKeycloakClientId" pInputText class="w-full" formControlName="keycloakClientId" />
         </div>
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakClientSecret">Keycloak Client Secret</label>
-          <p-password
-            inputId="runtimeKeycloakClientSecret"
-            styleClass="w-full"
-            inputStyleClass="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            [feedback]="false"
-            formControlName="keycloakClientSecret"
-          ></p-password>
+          <p-password inputId="runtimeKeycloakClientSecret" styleClass="w-full" inputStyleClass="w-full" [feedback]="false" formControlName="keycloakClientSecret"></p-password>
         </div>
       </div>
 
-      <div class="flex flex-wrap gap-3 pt-2">
-        <button
-          pButton
-          type="button"
-          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isBusy()"
-          (click)="refreshStatus()"
-        >
-          <i class="pi pi-refresh"></i>
-          <span>Durumu Yenile</span>
-        </button>
-        <button
-          pButton
-          type="button"
-          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isBusy()"
-          (click)="updateChanged()"
-        >
-          <i class="pi pi-pencil"></i>
-          <span>Değişenleri Güncelle</span>
-        </button>
-        <button
-          pButton
-          type="button"
-          class="inline-flex items-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isBusy()"
-          (click)="saveAll()"
-        >
-          <i class="pi" [ngClass]="isBusy() ? 'pi-spin pi-spinner' : 'pi-save'"></i>
-          <span>{{ isBusy() ? 'Kaydediliyor...' : 'Tam Kaydet' }}</span>
-        </button>
+      <div class="flex flex-wrap gap-3 pt-3">
+        <button pButton type="button" severity="secondary" icon="pi pi-refresh" label="Durumu Yenile" [disabled]="isBusy()" (click)="refreshStatus()"></button>
+        <button pButton type="button" severity="secondary" icon="pi pi-pencil" label="Değişenleri Güncelle" [disabled]="isBusy()" (click)="updateChanged()"></button>
+        <button pButton type="button" icon="pi pi-save" [label]="isBusy() ? 'Kaydediliyor...' : 'Tam Kaydet'" [loading]="isBusy()" [disabled]="isBusy()" (click)="saveAll()"></button>
       </div>
     </form>
-  </p-card>
+  </section>
 
-  <div class="space-y-4">
-    <p-card header="Runtime Hazırlık Durumu">
-      <ul class="m-0 list-none space-y-2 p-0 text-sm text-slate-700">
-        <li><strong>Database:</strong> {{ status()?.isDatabaseConfigured === true ? 'Configured' : 'Missing' }}</li>
-        <li><strong>Redis:</strong> {{ status()?.isRedisConfigured === true ? 'Configured' : 'Missing' }}</li>
-        <li><strong>Keycloak:</strong> {{ status()?.isKeycloakConfigured === true ? 'Configured' : 'Missing' }}</li>
-        <li><strong>Protected Runtime Ready:</strong> {{ status()?.isReadyForProtectedRuntime === true ? 'Yes' : 'No' }}</li>
-        <li><strong>Updated At (UTC):</strong> {{ status()?.updatedAtUtc ?? '-' }}</li>
+  <aside class="space-y-4">
+    <section class="surface-card p-5">
+      <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Runtime Hazırlık</h3>
+      <ul class="mt-4 m-0 list-none space-y-3 p-0 text-sm text-slate-700">
+        <li class="flex items-center justify-between gap-2">
+          <span>Database</span>
+          <span class="status-chip" [ngClass]="status()?.isDatabaseConfigured ? 'status-chip-success' : 'status-chip-warning'">
+            {{ status()?.isDatabaseConfigured ? 'Configured' : 'Missing' }}
+          </span>
+        </li>
+        <li class="flex items-center justify-between gap-2">
+          <span>Redis</span>
+          <span class="status-chip" [ngClass]="status()?.isRedisConfigured ? 'status-chip-success' : 'status-chip-warning'">
+            {{ status()?.isRedisConfigured ? 'Configured' : 'Missing' }}
+          </span>
+        </li>
+        <li class="flex items-center justify-between gap-2">
+          <span>Keycloak</span>
+          <span class="status-chip" [ngClass]="status()?.isKeycloakConfigured ? 'status-chip-success' : 'status-chip-warning'">
+            {{ status()?.isKeycloakConfigured ? 'Configured' : 'Missing' }}
+          </span>
+        </li>
+        <li class="flex items-center justify-between gap-2">
+          <span>Protected Runtime</span>
+          <span class="status-chip" [ngClass]="status()?.isReadyForProtectedRuntime ? 'status-chip-success' : 'status-chip-warning'">
+            {{ status()?.isReadyForProtectedRuntime ? 'Ready' : 'Not Ready' }}
+          </span>
+        </li>
       </ul>
-    </p-card>
+      <p class="mt-4 text-xs text-slate-500">Updated (UTC): {{ status()?.updatedAtUtc ?? '-' }}</p>
+    </section>
 
-    <p-card *ngIf="feedback()" header="Mesaj">
-      <p class="m-0 text-sm text-slate-700">{{ feedback() }}</p>
-    </p-card>
-  </div>
+    <section *ngIf="feedback()" class="surface-card border-blue-100 bg-blue-50 p-5">
+      <h3 class="text-sm font-semibold text-blue-900">Mesaj</h3>
+      <p class="mt-2 text-sm text-blue-800">{{ feedback() }}</p>
+    </section>
+  </aside>
 </div>

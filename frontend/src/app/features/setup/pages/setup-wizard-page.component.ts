@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { SetupReadinessState, type SetupDependencyTestResult, type SetupStatusResult } from '../../../shared/proxy';
@@ -18,7 +17,7 @@ import {
 @Component({
   selector: 'app-setup-wizard-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, CardModule, InputTextModule, PasswordModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule, PasswordModule],
   templateUrl: './setup-wizard-page.component.html'
 })
 export class SetupWizardPageComponent {
