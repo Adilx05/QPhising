@@ -13,6 +13,7 @@ export { CampaignLifecycleState } from './models/CampaignLifecycleState';
 export type { CampaignResult } from './models/CampaignResult';
 export type { CampaignTargetResult } from './models/CampaignTargetResult';
 export type { CreateCampaignRequest } from './models/CreateCampaignRequest';
+export type { CreateTemplateRequest } from './models/CreateTemplateRequest';
 export { GatewayModule } from './models/GatewayModule';
 export type { GatewayRoutePolicyCompositionResult } from './models/GatewayRoutePolicyCompositionResult';
 export type { GatewayRoutePolicyDefinitionResult } from './models/GatewayRoutePolicyDefinitionResult';
@@ -26,11 +27,14 @@ export type { SetupDependencyTestResult } from './models/SetupDependencyTestResu
 export type { SetupGuardDecisionResult } from './models/SetupGuardDecisionResult';
 export { SetupReadinessState } from './models/SetupReadinessState';
 export type { SetupStatusResult } from './models/SetupStatusResult';
+export { TemplateLifecycleState } from './models/TemplateLifecycleState';
+export type { TemplateResult } from './models/TemplateResult';
 export type { TestDatabaseConnectionRequest } from './models/TestDatabaseConnectionRequest';
 export type { TestKeycloakConnectionRequest } from './models/TestKeycloakConnectionRequest';
 export type { TestRedisConnectionRequest } from './models/TestRedisConnectionRequest';
 export type { UpdateCampaignRequest } from './models/UpdateCampaignRequest';
 export type { UpdateRuntimeConfigurationRequest } from './models/UpdateRuntimeConfigurationRequest';
+export type { UpdateTemplateRequest } from './models/UpdateTemplateRequest';
 
 export { CampaignService } from './services/CampaignService';
 export { ConfigurationService } from './services/ConfigurationService';
@@ -38,3 +42,4 @@ export { GatewayService } from './services/GatewayService';
 export { HealthService } from './services/HealthService';
 export { ProxyValidationService } from './services/ProxyValidationService';
 export { SetupService } from './services/SetupService';
+export { TemplateService } from './services/TemplateService';
