@@ -433,7 +433,7 @@ Metadata required for every subtask:
   - Description: Backend domain/model for gateway route ownership and module map definitions
   - Deliverables:
     - Backend domain/model for gateway route ownership and module map definitions
-  - StartedAt: 2026-04-18T17:05:00Z
+  - StartedAt: 2026-04-18T15:35:00Z
   - FinishedAt: 2026-04-18T17:14:00Z
   - Owner: Codex
   - Notes: Added Gateway domain ownership model primitives under `backend/Domain/Gateway` (`GatewayModule`, `GatewayRouteTemplate`, `GatewayRouteOwnershipDefinition`, `GatewayRouteOwnershipMap`) and documented canonical route-to-module ownership/auth posture baseline in `backend/Domain/Contracts/GatewayRouteOwnershipModuleMap.md` aligned to existing Ocelot upstream paths.
@@ -665,15 +665,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T16:18:00Z
   - Owner: Codex
   - Notes: Added `Domain/Templates` model primitives for template lifecycle and version-safe updates: `TemplateAggregate` with immutable creation + rehydration paths and guarded version increments, plus value objects for validated name/content/metadata (`TemplateName`, `TemplateContent`, `TemplateMetadata`) and lifecycle enum `TemplateLifecycleState`. Files touched: `backend/Domain/Templates/Aggregates/TemplateAggregate.cs`, `backend/Domain/Templates/ValueObjects/TemplateName.cs`, `backend/Domain/Templates/ValueObjects/TemplateContent.cs`, `backend/Domain/Templates/ValueObjects/TemplateMetadata.cs`, `backend/Domain/Templates/Enums/TemplateLifecycleState.cs`.
-- [ ] 12.2
+- [x] 12.2
   - Title: Application logic for template commands/queries and validation
   - Description: Application logic for template commands/queries and validation
   - Deliverables:
     - Application logic for template commands/queries and validation
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T15:35:00Z
+  - FinishedAt: 2026-04-18T15:45:35Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented Template CQRS application layer with commands/queries/handlers/validators for create, update, publish, archive, delete, get-by-id, and list operations; added template repository contract and template response contract mapping from domain aggregate. Files touched: `backend/Application/Contracts/Abstractions/Template/ITemplateRepository.cs`, `backend/Application/Contracts/Responses/Template/TemplateResult.cs`, `backend/Application/CQRS/Commands/Template/*`, `backend/Application/CQRS/Queries/Template/*`. Build verification attempted via `dotnet build backend/Application/QPhising.Application.csproj` but .NET SDK is unavailable in this environment (`dotnet: command not found`).
 - [ ] 12.3
   - Title: Endpoint implementation for template operations
   - Description: Endpoint implementation for template operations
