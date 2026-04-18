@@ -6,6 +6,7 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { SetupReadinessState, type SetupDependencyTestResult, type SetupStatusResult } from '../../../shared/proxy';
+import { resolveApiError } from '../../../core/http/api-error-handler';
 import {
   getSetupStatus,
   saveSetupConfiguration,
@@ -100,10 +101,6 @@ export class SetupWizardPageComponent {
   }
 
   private resolveErrorMessage(error: unknown): string {
-    if (error instanceof Error && error.message.trim().length > 0) {
-      return error.message;
-    }
-
-    return 'İşlem tamamlanamadı. API erişimini kontrol edin.';
+    return resolveApiError(error).message;
   }
 }
