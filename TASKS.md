@@ -350,15 +350,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T07:25:33Z
   - Owner: Codex
   - Notes: Added global Swagger operation filter `GlobalProblemDetailsResponsesOperationFilter` and registered it in API Swagger configuration so every endpoint documents standardized ProblemDetails responses for `400`, `401`, `403`, and `500` (including both `application/problem+json` and `application/json`) aligned with centralized exception/auth middleware behavior. Files touched: `backend/API/Swagger/GlobalProblemDetailsResponsesOperationFilter.cs`, `backend/API/Program.cs`.
-- [ ] 6.5
+- [x] 6.5
   - Title: Proxy generation compatibility validation against base API conventions
   - Description: Proxy generation compatibility validation against base API conventions
   - Deliverables:
     - Proxy generation compatibility validation against base API conventions
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T07:29:00Z
+  - FinishedAt: 2026-04-18T07:31:05Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Hardened both proxy-generation scripts with base API convention gates to fail fast when Swagger misses `components.schemas.ProblemDetails`, any operation `operationId`, or standardized `400/401/403/500` ProblemDetails responses; synchronized `frontend/openapi/proxy-validation.swagger.json` to include those conventions so offline fixture validation remains aligned with runtime API behavior.
 - [ ] 6.6
   - Title: Frontend integration baseline for common API error/auth handling
   - Description: Frontend integration baseline for common API error/auth handling

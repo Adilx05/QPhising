@@ -47,7 +47,7 @@ download_and_validate_swagger_document() {
     exit 1
   fi
 
-  if ! node -e '
+if ! node -e '
 const fs = require("fs");
 const requiredPaths = [
   "/api/proxy-validation/assert-sync",
@@ -59,6 +59,8 @@ const requiredPaths = [
   "/api/setup/test-keycloak",
   "/api/setup/save"
 ];
+const httpMethods = new Set(["get", "post", "put", "patch", "delete", "head", "options", "trace"]);
+const requiredProblemStatusCodes = ["400", "401", "403", "500"];
 let swagger;
 
 try {
@@ -87,6 +89,62 @@ for (const requiredPath of requiredPaths) {
   if (!Object.prototype.hasOwnProperty.call(swagger.paths, requiredPath)) {
     console.error(`Error: required path "${requiredPath}" was not found in Swagger. Run backend contract updates first.`);
     process.exit(1);
+  }
+}
+
+const problemDetailsSchemaRef = "#/components/schemas/ProblemDetails";
+const hasProblemDetailsSchema =
+  swagger.components &&
+  swagger.components.schemas &&
+  Object.prototype.hasOwnProperty.call(swagger.components.schemas, "ProblemDetails");
+
+if (!hasProblemDetailsSchema) {
+  console.error("Error: Swagger document is missing components.schemas.ProblemDetails required for standardized error contracts.");
+  process.exit(1);
+}
+
+for (const [path, pathItem] of Object.entries(swagger.paths)) {
+  if (!pathItem || typeof pathItem !== "object") {
+    continue;
+  }
+
+  for (const [method, operation] of Object.entries(pathItem)) {
+    if (!httpMethods.has(method)) {
+      continue;
+    }
+
+    const operationName = `${method.toUpperCase()} ${path}`;
+    if (!operation || typeof operation !== "object") {
+      console.error(`Error: operation "${operationName}" has an invalid schema object.`);
+      process.exit(1);
+    }
+
+    if (!operation.operationId || typeof operation.operationId !== "string" || operation.operationId.trim().length === 0) {
+      console.error(`Error: operation "${operationName}" is missing a non-empty operationId.`);
+      process.exit(1);
+    }
+
+    if (!operation.responses || typeof operation.responses !== "object") {
+      console.error(`Error: operation "${operationName}" is missing responses.`);
+      process.exit(1);
+    }
+
+    for (const statusCode of requiredProblemStatusCodes) {
+      const response = operation.responses[statusCode];
+      if (!response || typeof response !== "object") {
+        console.error(`Error: operation "${operationName}" is missing standardized ${statusCode} response.`);
+        process.exit(1);
+      }
+
+      const content =
+        response.content &&
+        (response.content["application/problem+json"] || response.content["application/json"]);
+      const schemaRef = content && content.schema && content.schema.$ref;
+      if (schemaRef !== problemDetailsSchemaRef) {
+        console.error(`Error: operation "${operationName}" ${statusCode} response must reference ${problemDetailsSchemaRef}.`);
+        process.exit(1);
+      }
+    }
   }
 }
 ' "${output_file}"; then
