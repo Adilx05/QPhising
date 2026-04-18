@@ -3,30 +3,55 @@
     <form [formGroup]="form" class="space-y-4">
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="runtimeDatabaseConnectionString">Database Connection String</label>
-        <input id="runtimeDatabaseConnectionString" pInputText class="w-full" formControlName="databaseConnectionString" />
+        <input
+          id="runtimeDatabaseConnectionString"
+          pInputText
+          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          formControlName="databaseConnectionString"
+        />
       </div>
 
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="runtimeRedisConnectionString">Redis Connection String</label>
-        <input id="runtimeRedisConnectionString" pInputText class="w-full" formControlName="redisConnectionString" />
+        <input
+          id="runtimeRedisConnectionString"
+          pInputText
+          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          formControlName="redisConnectionString"
+        />
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakAuthority">Keycloak Authority</label>
-          <input id="runtimeKeycloakAuthority" pInputText class="w-full" formControlName="keycloakAuthority" />
+          <input
+            id="runtimeKeycloakAuthority"
+            pInputText
+            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            formControlName="keycloakAuthority"
+          />
         </div>
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakRealm">Keycloak Realm</label>
-          <input id="runtimeKeycloakRealm" pInputText class="w-full" formControlName="keycloakRealm" />
+          <input
+            id="runtimeKeycloakRealm"
+            pInputText
+            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            formControlName="keycloakRealm"
+          />
         </div>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakClientId">Keycloak Client Id</label>
-          <input id="runtimeKeycloakClientId" pInputText class="w-full" formControlName="keycloakClientId" />
+          <input
+            id="runtimeKeycloakClientId"
+            pInputText
+            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            formControlName="keycloakClientId"
+          />
         </div>
 
         <div class="space-y-2">
@@ -34,7 +59,7 @@
           <p-password
             inputId="runtimeKeycloakClientSecret"
             styleClass="w-full"
-            inputStyleClass="w-full"
+            inputStyleClass="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             [feedback]="false"
             formControlName="keycloakClientSecret"
           ></p-password>
@@ -42,9 +67,36 @@
       </div>
 
       <div class="flex flex-wrap gap-3 pt-2">
-        <p-button label="Durumu Yenile" icon="pi pi-refresh" [outlined]="true" [disabled]="isBusy()" (onClick)="refreshStatus()"></p-button>
-        <p-button label="Değişenleri Güncelle" icon="pi pi-pencil" [outlined]="true" [disabled]="isBusy()" (onClick)="updateChanged()"></p-button>
-        <p-button label="Tam Kaydet" icon="pi pi-save" severity="primary" [loading]="isBusy()" (onClick)="saveAll()"></p-button>
+        <button
+          pButton
+          type="button"
+          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isBusy()"
+          (click)="refreshStatus()"
+        >
+          <i class="pi pi-refresh"></i>
+          <span>Durumu Yenile</span>
+        </button>
+        <button
+          pButton
+          type="button"
+          class="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isBusy()"
+          (click)="updateChanged()"
+        >
+          <i class="pi pi-pencil"></i>
+          <span>Değişenleri Güncelle</span>
+        </button>
+        <button
+          pButton
+          type="button"
+          class="inline-flex items-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isBusy()"
+          (click)="saveAll()"
+        >
+          <i class="pi" [ngClass]="isBusy() ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+          <span>{{ isBusy() ? 'Kaydediliyor...' : 'Tam Kaydet' }}</span>
+        </button>
       </div>
     </form>
   </p-card>
