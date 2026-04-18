@@ -76,3 +76,8 @@ Both scripts:
 - pin `openapi-typescript-codegen` to deterministic version `0.29.0` (override with `GENERATOR_VERSION`),
 - regenerate clients into `frontend/src/app/shared/proxy`,
 - normalize generated text line endings to LF for deterministic cross-platform diffs.
+
+Use proxy validation scripts to assert the standardized Swagger fixture regenerates the checked-in proxies without drift:
+
+- Linux/macOS: `./scripts/validate-proxy-generation.sh`
+- Windows: `scripts\validate-proxy-generation.bat`
