@@ -701,15 +701,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T16:16:00Z
   - Owner: Codex
   - Notes: Updated both proxy-generation precondition gates to require all template API paths (`/api/templates`, `/{templateId}`, `/{templateId}/publish`, `/{templateId}/archive`) so template contract drift blocks generation early. Attempted proxy regeneration against the checked-in Swagger fixture via `./scripts/generate-proxy.sh file:///workspace/QPhising/frontend/openapi/proxy-validation.swagger.json`, but npm registry access is blocked in this environment (403), so generated artifacts remain unchanged.
-- [ ] 12.6
+- [x] 12.6
   - Title: Frontend integration for template management via generated proxies
   - Description: Frontend integration for template management via generated proxies
   - Deliverables:
     - Frontend integration for template management via generated proxies
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T16:20:12Z
+  - FinishedAt: 2026-04-18T16:20:12Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added template frontend integration using generated `TemplateService` only by implementing feature data-access wrappers and a `TemplatesPageComponent` for list/create/update/publish/archive/delete flows; wired `/templates` route with existing auth/setup guards and surfaced Templates navigation links in desktop/mobile shell. Files touched: `frontend/src/app/features/templates/data-access/*`, `frontend/src/app/features/templates/pages/templates-page.component.ts`, `frontend/src/app/app.routes.ts`, `frontend/src/app/app.component.ts`.
 
 ## Phase 13 - Tracking Module
 
