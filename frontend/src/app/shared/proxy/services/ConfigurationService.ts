@@ -10,6 +10,7 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class ConfigurationService {
   /**
+   * Get current persisted runtime configuration readiness state.
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
@@ -20,6 +21,7 @@ export class ConfigurationService {
     });
   }
   /**
+   * Persist full runtime configuration payload.
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
@@ -36,6 +38,7 @@ export class ConfigurationService {
     });
   }
   /**
+   * Update runtime configuration values selectively.
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
