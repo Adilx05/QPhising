@@ -60,9 +60,9 @@
 
     <p-card header="Bağlantı Test Sonuçları">
       <ul class="m-0 list-none space-y-2 p-0 text-sm text-slate-700">
-        <li><strong>Database:</strong> {{ dbTestResult()?.isSuccess === true ? 'OK' : 'Not tested' }}</li>
-        <li><strong>Redis:</strong> {{ redisTestResult()?.isSuccess === true ? 'OK' : 'Not tested' }}</li>
-        <li><strong>Keycloak:</strong> {{ keycloakTestResult()?.isSuccess === true ? 'OK' : 'Not tested' }}</li>
+        <li><strong>Database:</strong> {{ dbTestResult()?.succeeded === true ? 'OK' : 'Not tested' }}</li>
+        <li><strong>Redis:</strong> {{ redisTestResult()?.succeeded === true ? 'OK' : 'Not tested' }}</li>
+        <li><strong>Keycloak:</strong> {{ keycloakTestResult()?.succeeded === true ? 'OK' : 'Not tested' }}</li>
       </ul>
     </p-card>
 
