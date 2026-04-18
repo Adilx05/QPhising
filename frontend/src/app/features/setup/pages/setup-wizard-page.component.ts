@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import type { SetupDependencyTestResult, SetupStatusResult } from '../../../shared/proxy';
+import { SetupReadinessState, type SetupDependencyTestResult, type SetupStatusResult } from '../../../shared/proxy';
 import {
   getSetupStatus,
   saveSetupConfiguration,
@@ -27,7 +27,7 @@ export class SetupWizardPageComponent {
   protected readonly dbTestResult = signal<SetupDependencyTestResult | null>(null);
   protected readonly redisTestResult = signal<SetupDependencyTestResult | null>(null);
   protected readonly keycloakTestResult = signal<SetupDependencyTestResult | null>(null);
-  protected readonly setupCompleted = computed(() => this.status()?.readinessState === 'Ready');
+  protected readonly setupCompleted = computed(() => this.status()?.readinessState === SetupReadinessState._2);
 
   protected readonly form = this.formBuilder.nonNullable.group({
     databaseConnectionString: ['', [Validators.required]],
