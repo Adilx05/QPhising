@@ -15,7 +15,7 @@ export interface RuntimeConfigurationInput {
 }
 
 export const getRuntimeConfigurationStatus = async (): Promise<RuntimeConfigurationResult> =>
-  ConfigurationService.getRuntimeConfiguration();
+  ConfigurationService.configurationGetCurrent();
 
 export const saveRuntimeConfiguration = async (
   input: RuntimeConfigurationInput
@@ -29,7 +29,7 @@ export const saveRuntimeConfiguration = async (
     keycloakClientSecret: input.keycloakClientSecret
   };
 
-  return ConfigurationService.saveRuntimeConfiguration({ requestBody: request });
+  return ConfigurationService.configurationSave({ requestBody: request });
 };
 
 export const updateRuntimeConfiguration = async (
@@ -44,7 +44,7 @@ export const updateRuntimeConfiguration = async (
     keycloakClientSecret: normalizeOptionalValue(input.keycloakClientSecret)
   };
 
-  return ConfigurationService.updateRuntimeConfiguration({ requestBody: request });
+  return ConfigurationService.configurationUpdate({ requestBody: request });
 };
 
 const normalizeOptionalValue = (value: string | undefined): string | undefined => {

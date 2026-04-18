@@ -14,7 +14,7 @@ export class ConfigurationService {
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
-  public static getRuntimeConfiguration(): CancelablePromise<RuntimeConfigurationResult> {
+  public static configurationGetCurrent(): CancelablePromise<RuntimeConfigurationResult> {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/configuration',
@@ -31,7 +31,7 @@ export class ConfigurationService {
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
-  public static saveRuntimeConfiguration({
+  public static configurationSave({
     requestBody,
   }: {
     requestBody?: SaveRuntimeConfigurationRequest,
@@ -54,7 +54,7 @@ export class ConfigurationService {
    * @returns RuntimeConfigurationResult OK
    * @throws ApiError
    */
-  public static updateRuntimeConfiguration({
+  public static configurationUpdate({
     requestBody,
   }: {
     requestBody?: UpdateRuntimeConfigurationRequest,
