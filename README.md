@@ -71,6 +71,19 @@ Use gateway alignment scripts to verify that Ocelot API routes are backed by mat
 
 The check fails when an API route in Ocelot has no matching Swagger path or does not permit all matching Swagger HTTP methods.
 
+## Proxy/Gateway Consistency Check
+
+Use proxy/gateway consistency scripts to verify generated frontend proxy operations are routable through configured Ocelot upstream paths.
+
+- Linux/macOS:
+  - `./scripts/check-proxy-gateway-consistency.sh`
+  - `./scripts/check-proxy-gateway-consistency.sh --ocelot backend/Gateway/ocelot.json --proxy-dir frontend/src/app/shared/proxy/services`
+- Windows:
+  - `scripts\check-proxy-gateway-consistency.bat`
+  - `scripts\check-proxy-gateway-consistency.bat --ocelot backend\Gateway\ocelot.json --proxy-dir frontend\src\app\shared\proxy\services`
+
+The check fails if a generated service operation path/method pair is not covered by current gateway route templates.
+
 ## Proxy Generation
 
 Use repeatable proxy scripts under `scripts/` to regenerate TypeScript API clients from a running backend Swagger endpoint.

@@ -464,15 +464,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T09:23:18Z
   - Owner: Codex
   - Notes: Added cross-platform gateway/Swagger alignment validation scripts to assert Ocelot API routes map to real Swagger operations and allow matching HTTP methods; documented usage in README. Files touched: `scripts/check-gateway-swagger-alignment.js`, `scripts/check-gateway-swagger-alignment.sh`, `scripts/check-gateway-swagger-alignment.bat`, `README.md`.
-- [ ] 8.5
+- [x] 8.5
   - Title: Proxy generation consistency check with gateway routing strategy
   - Description: Proxy generation consistency check with gateway routing strategy
   - Deliverables:
     - Proxy generation consistency check with gateway routing strategy
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T09:24:00Z
+  - FinishedAt: 2026-04-18T09:27:10Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added cross-platform proxy/gateway consistency validation scripts that assert generated proxy service operations (method + path) are covered by Ocelot upstream route templates, integrated the check into proxy drift validation scripts, and documented usage in README. Files touched: `scripts/check-proxy-gateway-consistency.js`, `scripts/check-proxy-gateway-consistency.sh`, `scripts/check-proxy-gateway-consistency.bat`, `scripts/validate-proxy-generation.sh`, `scripts/validate-proxy-generation.bat`, `README.md`.
 - [ ] 8.6
   - Title: Frontend integration smoke validation through gateway paths
   - Description: Frontend integration smoke validation through gateway paths
