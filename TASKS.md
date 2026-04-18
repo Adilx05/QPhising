@@ -617,15 +617,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T13:27:03Z
   - Owner: Codex
   - Notes: Implemented Campaign Application-layer CQRS flow with FluentValidation validators and MediatR handlers for create/update/delete, targeting management, lifecycle transitions (schedule/start/pause/complete/cancel), and retrieval (get/list); introduced campaign contracts for repository abstraction and response DTO mapping from domain aggregates. Files touched: `backend/Application/Contracts/Abstractions/Campaign/ICampaignRepository.cs`, `backend/Application/Contracts/Responses/Campaign/*`, `backend/Application/CQRS/Commands/Campaign/*`, `backend/Application/CQRS/Queries/Campaign/*`.
-- [ ] 11.3
+- [x] 11.3
   - Title: Endpoint implementation for campaign CRUD/lifecycle actions
   - Description: Endpoint implementation for campaign CRUD/lifecycle actions
   - Deliverables:
     - Endpoint implementation for campaign CRUD/lifecycle actions
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T13:31:00Z
+  - FinishedAt: 2026-04-18T13:36:59Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented `CampaignController` with CQRS-backed CRUD/lifecycle HTTP endpoints under `api/campaigns` (list/get/create/update/delete, target add/remove, and schedule/start/pause/complete/cancel actions), introduced campaign API request contracts, and applied role-based authorization per operation (`ViewerOrAbove` read, `OperatorOrAbove` mutating, `AdminOnly` delete/cancel). Files touched: `backend/API/Controllers/CampaignController.cs`, `backend/API/Contracts/Campaign/*`.
 - [ ] 11.4
   - Title: Swagger verification for campaign contracts
   - Description: Swagger verification for campaign contracts
