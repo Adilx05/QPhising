@@ -27,7 +27,7 @@ export class SetupWizardPageComponent {
   protected readonly dbTestResult = signal<SetupDependencyTestResult | null>(null);
   protected readonly redisTestResult = signal<SetupDependencyTestResult | null>(null);
   protected readonly keycloakTestResult = signal<SetupDependencyTestResult | null>(null);
-  protected readonly setupCompleted = computed(() => this.status()?.isSetupCompleted === true);
+  protected readonly setupCompleted = computed(() => this.status()?.readinessState === 'Ready');
 
   protected readonly form = this.formBuilder.nonNullable.group({
     databaseConnectionString: ['', [Validators.required]],
