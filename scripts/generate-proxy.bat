@@ -26,7 +26,7 @@ if errorlevel 1 (
 echo Validating Swagger preconditions from: %SWAGGER_URL%
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop';" ^
-  "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/setup/status','/api/setup/guard-decision','/api/setup/test-db','/api/setup/test-redis','/api/setup/test-keycloak','/api/setup/save');" ^
+  "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/configuration','/api/setup/status','/api/setup/guard-decision','/api/setup/test-db','/api/setup/test-redis','/api/setup/test-keycloak','/api/setup/save');" ^
   "$swaggerUrl='%SWAGGER_URL%';" ^
   "$swaggerFile='%SWAGGER_FILE%';" ^
   "try {" ^

@@ -51,6 +51,7 @@ download_and_validate_swagger_document() {
 const fs = require("fs");
 const requiredPaths = [
   "/api/proxy-validation/assert-sync",
+  "/api/configuration",
   "/api/setup/status",
   "/api/setup/guard-decision",
   "/api/setup/test-db",
