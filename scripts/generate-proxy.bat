@@ -33,17 +33,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$swaggerUrl='%SWAGGER_URL%';" ^
   "$swaggerFile='%SWAGGER_FILE%';" ^
   "try {" ^
-  "  $response = Invoke-WebRequest -Uri $swaggerUrl -UseBasicParsing;" ^
+  "  $swaggerResponse = Invoke-WebRequest -Uri $swaggerUrl -UseBasicParsing;" ^
   "} catch {" ^
   "  Write-Error ('Failed to fetch Swagger document from ''{0}''. Ensure the API is running.' -f $swaggerUrl);" ^
   "  exit 1;" ^
   "}" ^
-  "if ([string]::IsNullOrWhiteSpace($response.Content)) {" ^
+  "$swaggerContent = [string]$swaggerResponse.Content;" ^
+  "if ([string]::IsNullOrWhiteSpace($swaggerContent)) {" ^
   "  Write-Error ('Swagger document at ''{0}'' is empty.' -f $swaggerUrl);" ^
   "  exit 1;" ^
   "}" ^
   "try {" ^
-  "  $swagger = $response.Content | ConvertFrom-Json;" ^
+  "  $swagger = $swaggerContent | ConvertFrom-Json;" ^
   "} catch {" ^
   "  Write-Error 'Swagger response is not valid JSON.';" ^
   "  exit 1;" ^
@@ -97,7 +98,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "    }" ^
   "  }" ^
   "}" ^
-  "[System.IO.File]::WriteAllText($swaggerFile, $response.Content, (New-Object System.Text.UTF8Encoding($false)));" ^
+  "$utf8NoBom = New-Object System.Text.UTF8Encoding -ArgumentList $false;" ^
+  "[System.IO.File]::WriteAllText($swaggerFile, $swaggerContent, $utf8NoBom);" ^
   "exit 0"
 if errorlevel 1 exit /b 1
 
@@ -130,7 +132,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "  $content = Get-Content -LiteralPath $_.FullName -Raw;" ^
   "  $normalized = $content -replace \"`r`n\", \"`n\";" ^
   "  if ($normalized -ne $content) {" ^
-  "    [System.IO.File]::WriteAllText($_.FullName, $normalized, (New-Object System.Text.UTF8Encoding($false)));" ^
+  "    $utf8NoBom = New-Object System.Text.UTF8Encoding -ArgumentList $false;" ^
+  "    [System.IO.File]::WriteAllText($_.FullName, $normalized, $utf8NoBom);" ^
   "  }" ^
   "};" ^
   "exit 0"
