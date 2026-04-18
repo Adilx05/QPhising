@@ -47,9 +47,17 @@
 
       <div class="flex flex-wrap gap-3 pt-3">
         <button pButton type="button" severity="secondary" icon="pi pi-refresh" label="Durumu Yenile" [disabled]="isBusy()" (click)="refreshStatus()"></button>
-        <button pButton type="button" severity="secondary" icon="pi pi-pencil" label="Değişenleri Güncelle" [disabled]="isBusy()" (click)="updateChanged()"></button>
-        <button pButton type="button" icon="pi pi-save" [label]="isBusy() ? 'Kaydediliyor...' : 'Tam Kaydet'" [loading]="isBusy()" [disabled]="isBusy()" (click)="saveAll()"></button>
+        <button pButton type="button" severity="secondary" icon="pi pi-pencil" label="Değişenleri Güncelle" [disabled]="isBusy() || !canUpdateRuntimeConfiguration()" (click)="updateChanged()"></button>
+        <button pButton type="button" icon="pi pi-save" [label]="isBusy() ? 'Kaydediliyor...' : 'Tam Kaydet'" [loading]="isBusy()" [disabled]="isBusy() || !canSaveRuntimeConfiguration()" (click)="saveAll()"></button>
       </div>
+
+
+      <p
+        *ngIf="!canUpdateRuntimeConfiguration() || !canSaveRuntimeConfiguration()"
+        class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+      >
+        Rol kısıtları aktif: güncelleme için en az Operator, tam kaydetme için Admin rolü gerekir.
+      </p>
     </form>
   </section>
 
