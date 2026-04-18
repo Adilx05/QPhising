@@ -644,15 +644,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T13:51:00Z
   - Owner: Codex
   - Notes: Updated proxy-generation precondition gates in both cross-platform scripts to require all campaign API routes so contract drift is caught before client generation (`/api/campaigns`, `/{campaignId}`, target and lifecycle action routes). Attempted `./scripts/generate-proxy.sh file:///workspace/QPhising/frontend/openapi/proxy-validation.swagger.json`; Swagger validation passed but npm package download for `openapi-typescript-codegen@0.29.0` failed in this environment with 403, so generated artifacts were restored unchanged. Files touched: `scripts/generate-proxy.sh`, `scripts/generate-proxy.bat`.
-- [ ] 11.6
+- [x] 11.6
   - Title: Frontend integration for campaign features using generated proxies
   - Description: Frontend integration for campaign features using generated proxies
   - Deliverables:
     - Frontend integration for campaign features using generated proxies
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T15:05:00Z
+  - FinishedAt: 2026-04-18T15:22:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Implemented frontend campaign management integration backed exclusively by generated `CampaignService` proxy calls (list/create/add target/schedule/start/pause/complete/cancel), added a standalone campaigns page with role-aware actions and real API feedback handling, and wired route + navigation access at `/campaigns` under existing auth/setup guards. Files touched: `frontend/src/app/features/campaigns/data-access/campaigns.client.ts`, `frontend/src/app/features/campaigns/data-access/index.ts`, `frontend/src/app/features/campaigns/pages/campaigns-page.component.ts`, `frontend/src/app/app.routes.ts`, `frontend/src/app/app.component.ts`.
 
 ## Phase 12 - Template Module
 
