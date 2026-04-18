@@ -302,15 +302,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T06:59:00Z
   - Owner: Codex
   - Notes: Updated proxy-generation Swagger precondition gates in both cross-platform scripts to require `/api/configuration` so runtime-configuration contract drift blocks generation early; attempted regeneration via `./scripts/generate-proxy.sh file:///workspace/QPhising/frontend/openapi/proxy-validation.swagger.json`, but npm registry access is blocked in this environment (403), so generated proxy artifacts were left unchanged.
-- [ ] 5.6
+- [x] 5.6
   - Title: Frontend integration for secure runtime configuration management screens
   - Description: Frontend integration for secure runtime configuration management screens
   - Deliverables:
     - Frontend integration for secure runtime configuration management screens
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T00:00:00Z
+  - FinishedAt: 2026-04-18T00:18:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added runtime-configuration frontend management screen and data-access client wired strictly to generated `ConfigurationService` (`GET/POST/PATCH /api/configuration`), including secure secret-field handling via patching changed non-empty values only and guarded route exposure at `/configuration`. Files touched: `frontend/src/app/features/setup/data-access/runtime-configuration.client.ts`, `frontend/src/app/features/setup/data-access/index.ts`, `frontend/src/app/features/setup/pages/runtime-configuration-page.component.ts`, `frontend/src/app/features/setup/pages/runtime-configuration-page.component.html`, `frontend/src/app/app.routes.ts`, `frontend/src/app/app.component.ts`.
 
 ## Phase 6 - Backend Foundation
 

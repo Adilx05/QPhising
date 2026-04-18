@@ -1,0 +1,67 @@
+<div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
+  <p-card header="Runtime Configuration" subheader="Canlı ortam bağımlılıklarını güvenli şekilde yönetin.">
+    <form [formGroup]="form" class="space-y-4">
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700" for="runtimeDatabaseConnectionString">Database Connection String</label>
+        <input id="runtimeDatabaseConnectionString" pInputText class="w-full" formControlName="databaseConnectionString" />
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700" for="runtimeRedisConnectionString">Redis Connection String</label>
+        <input id="runtimeRedisConnectionString" pInputText class="w-full" formControlName="redisConnectionString" />
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakAuthority">Keycloak Authority</label>
+          <input id="runtimeKeycloakAuthority" pInputText class="w-full" formControlName="keycloakAuthority" />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakRealm">Keycloak Realm</label>
+          <input id="runtimeKeycloakRealm" pInputText class="w-full" formControlName="keycloakRealm" />
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakClientId">Keycloak Client Id</label>
+          <input id="runtimeKeycloakClientId" pInputText class="w-full" formControlName="keycloakClientId" />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakClientSecret">Keycloak Client Secret</label>
+          <p-password
+            inputId="runtimeKeycloakClientSecret"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [feedback]="false"
+            formControlName="keycloakClientSecret"
+          ></p-password>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3 pt-2">
+        <p-button label="Durumu Yenile" icon="pi pi-refresh" [outlined]="true" [disabled]="isBusy()" (onClick)="refreshStatus()"></p-button>
+        <p-button label="Değişenleri Güncelle" icon="pi pi-pencil" [outlined]="true" [disabled]="isBusy()" (onClick)="updateChanged()"></p-button>
+        <p-button label="Tam Kaydet" icon="pi pi-save" severity="primary" [loading]="isBusy()" (onClick)="saveAll()"></p-button>
+      </div>
+    </form>
+  </p-card>
+
+  <div class="space-y-4">
+    <p-card header="Runtime Hazırlık Durumu">
+      <ul class="m-0 list-none space-y-2 p-0 text-sm text-slate-700">
+        <li><strong>Database:</strong> {{ status()?.isDatabaseConfigured === true ? 'Configured' : 'Missing' }}</li>
+        <li><strong>Redis:</strong> {{ status()?.isRedisConfigured === true ? 'Configured' : 'Missing' }}</li>
+        <li><strong>Keycloak:</strong> {{ status()?.isKeycloakConfigured === true ? 'Configured' : 'Missing' }}</li>
+        <li><strong>Protected Runtime Ready:</strong> {{ status()?.isReadyForProtectedRuntime === true ? 'Yes' : 'No' }}</li>
+        <li><strong>Updated At (UTC):</strong> {{ status()?.updatedAtUtc ?? '-' }}</li>
+      </ul>
+    </p-card>
+
+    <p-card *ngIf="feedback()" header="Mesaj">
+      <p class="m-0 text-sm text-slate-700">{{ feedback() }}</p>
+    </p-card>
+  </div>
+</div>

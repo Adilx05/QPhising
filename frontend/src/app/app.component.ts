@@ -12,6 +12,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
           <a class="text-xl font-semibold text-slate-900" routerLink="/dashboard">QPhising</a>
           <nav class="flex items-center gap-3 text-sm">
             <a class="rounded px-3 py-2 text-slate-700 hover:bg-slate-100" routerLink="/setup">Setup</a>
+            <a class="rounded px-3 py-2 text-slate-700 hover:bg-slate-100" routerLink="/configuration">Configuration</a>
             <a class="rounded px-3 py-2 text-slate-700 hover:bg-slate-100" routerLink="/dashboard">Dashboard</a>
           </nav>
         </div>
