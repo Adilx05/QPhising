@@ -569,15 +569,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T12:36:54Z
   - Owner: Codex
   - Notes: Added API integration-test coverage for persisted endpoint workflows by introducing `backend/API.Tests` with authenticated in-memory host wiring and endpoint tests that verify setup save->status and runtime configuration save->get persistence behavior. Touched files: `backend/API/Program.cs`, `backend/API.Tests/QPhising.Api.Tests.csproj`, `backend/API.Tests/Infrastructure/TestApiFactory.cs`, `backend/API.Tests/Infrastructure/TestAuthHandler.cs`, `backend/API.Tests/EndpointPersistenceWorkflowTests.cs`. Validation command attempted: `dotnet test backend/API.Tests/QPhising.Api.Tests.csproj` (blocked in this environment because .NET SDK is unavailable).
-- [ ] 10.4
+- [x] 10.4
   - Title: Swagger contract checks for persistence-backed request/response models
   - Description: Swagger contract checks for persistence-backed request/response models
   - Deliverables:
     - Swagger contract checks for persistence-backed request/response models
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T12:51:22Z
+  - FinishedAt: 2026-04-18T12:51:22Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Strengthened Swagger quality gates for persistence-backed setup/runtime contracts by validating operation-level request/response schema references and required schema properties for `/api/setup/save`, `/api/setup/status`, and `/api/configuration` (`GET`/`POST`/`PATCH`) in both Linux and Windows validation scripts. Files touched: `scripts/check-swagger-quality.sh`, `scripts/check-swagger-quality.bat`. Validation command: `./scripts/check-swagger-quality.sh` passed against `frontend/openapi/proxy-validation.swagger.json`.
 - [ ] 10.5
   - Title: Proxy generation refresh for migration-aligned contracts
   - Description: Proxy generation refresh for migration-aligned contracts

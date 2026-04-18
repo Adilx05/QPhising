@@ -61,6 +61,43 @@ const requiredPaths = [
   '/api/setup/test-keycloak',
   '/api/setup/save'
 ];
+const persistenceContractChecks = [
+  {
+    method: 'post',
+    path: '/api/setup/save',
+    requestSchemaRef: '#/components/schemas/SaveSetupConfigurationRequest',
+    responseSchemaRef: '#/components/schemas/SetupStatusResult'
+  },
+  {
+    method: 'get',
+    path: '/api/setup/status',
+    responseSchemaRef: '#/components/schemas/SetupStatusResult'
+  },
+  {
+    method: 'get',
+    path: '/api/configuration',
+    responseSchemaRef: '#/components/schemas/RuntimeConfigurationResult'
+  },
+  {
+    method: 'post',
+    path: '/api/configuration',
+    requestSchemaRef: '#/components/schemas/SaveRuntimeConfigurationRequest',
+    responseSchemaRef: '#/components/schemas/RuntimeConfigurationResult'
+  },
+  {
+    method: 'patch',
+    path: '/api/configuration',
+    requestSchemaRef: '#/components/schemas/UpdateRuntimeConfigurationRequest',
+    responseSchemaRef: '#/components/schemas/RuntimeConfigurationResult'
+  }
+];
+const requiredSchemaProperties = [
+  { schema: 'SaveSetupConfigurationRequest', properties: ['databaseConnectionString', 'redisConnectionString', 'keycloakAuthority', 'keycloakRealm', 'keycloakClientId', 'keycloakClientSecret'] },
+  { schema: 'SetupStatusResult', properties: ['isDatabaseConfigured', 'isKeycloakConfigured', 'isRedisConfigured', 'readinessState'] },
+  { schema: 'SaveRuntimeConfigurationRequest', properties: ['databaseConnectionString', 'redisConnectionString', 'keycloakAuthority', 'keycloakRealm', 'keycloakClientId', 'keycloakClientSecret'] },
+  { schema: 'UpdateRuntimeConfigurationRequest', properties: ['databaseConnectionString', 'redisConnectionString', 'keycloakAuthority', 'keycloakRealm', 'keycloakClientId', 'keycloakClientSecret'] },
+  { schema: 'RuntimeConfigurationResult', properties: ['isDatabaseConfigured', 'isRedisConfigured', 'isKeycloakConfigured', 'isReadyForProtectedRuntime', 'updatedAtUtc'] }
+];
 const httpMethods = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
 const requiredProblemStatusCodes = ['400', '401', '403', '500'];
 const problemDetailsSchemaRef = '#/components/schemas/ProblemDetails';
@@ -145,6 +182,58 @@ for (const [path, pathItem] of Object.entries(swagger.paths)) {
         console.error(`Error: operation "${operationName}" ${statusCode} response must reference ${problemDetailsSchemaRef}.`);
         process.exit(1);
       }
+    }
+  }
+}
+
+const schemas = swagger.components && swagger.components.schemas;
+if (!schemas || typeof schemas !== 'object') {
+  console.error('Error: Swagger document is missing components.schemas.');
+  process.exit(1);
+}
+
+for (const contractCheck of persistenceContractChecks) {
+  const operation = swagger.paths?.[contractCheck.path]?.[contractCheck.method];
+  const operationName = `${contractCheck.method.toUpperCase()} ${contractCheck.path}`;
+  if (!operation) {
+    console.error(`Error: persistence contract operation "${operationName}" was not found.`);
+    process.exit(1);
+  }
+
+  if (contractCheck.requestSchemaRef) {
+    const requestSchemaRef = operation.requestBody?.content?.['application/json']?.schema?.$ref;
+    if (requestSchemaRef !== contractCheck.requestSchemaRef) {
+      console.error(`Error: operation "${operationName}" request schema must reference ${contractCheck.requestSchemaRef}.`);
+      process.exit(1);
+    }
+  }
+
+  if (contractCheck.responseSchemaRef) {
+    const responseSchemaRef = operation.responses?.['200']?.content?.['application/json']?.schema?.$ref;
+    if (responseSchemaRef !== contractCheck.responseSchemaRef) {
+      console.error(`Error: operation "${operationName}" 200 response schema must reference ${contractCheck.responseSchemaRef}.`);
+      process.exit(1);
+    }
+  }
+}
+
+for (const schemaCheck of requiredSchemaProperties) {
+  const schema = schemas[schemaCheck.schema];
+  if (!schema || typeof schema !== 'object') {
+    console.error(`Error: required schema "${schemaCheck.schema}" was not found.`);
+    process.exit(1);
+  }
+
+  const properties = schema.properties;
+  if (!properties || typeof properties !== 'object') {
+    console.error(`Error: schema "${schemaCheck.schema}" is missing properties.`);
+    process.exit(1);
+  }
+
+  for (const propertyName of schemaCheck.properties) {
+    if (!Object.prototype.hasOwnProperty.call(properties, propertyName)) {
+      console.error(`Error: schema "${schemaCheck.schema}" is missing "${propertyName}" property.`);
+      process.exit(1);
     }
   }
 }
