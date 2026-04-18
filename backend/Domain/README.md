@@ -16,3 +16,5 @@ Modules:
 - Gateway
 
 Contract-source rules are documented in `Contracts/ModuleContractBoundaries.md`.
+
+API naming/version conventions are documented in `Contracts/ApiResourceNamingAndVersionScope.md`.
