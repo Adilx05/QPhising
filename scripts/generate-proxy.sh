@@ -66,7 +66,11 @@ const requiredPaths = [
   "/api/campaigns/{campaignId}/start",
   "/api/campaigns/{campaignId}/pause",
   "/api/campaigns/{campaignId}/complete",
-  "/api/campaigns/{campaignId}/cancel"
+  "/api/campaigns/{campaignId}/cancel",
+  "/api/templates",
+  "/api/templates/{templateId}",
+  "/api/templates/{templateId}/publish",
+  "/api/templates/{templateId}/archive"
 ];
 const requiredOperations = [
   { method: "get", path: "/api/configuration", operationId: "Configuration_GetCurrent" },
