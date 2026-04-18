@@ -4,5 +4,13 @@
       "Authority": "https://localhost:8444/realms/qphising",
       "Audience": "qphising-gateway"
     }
+  },
+  "Gateway": {
+    "RoutePolicies": {
+      "ClaimsToHeaders": {
+        "preferred_username": "X-QP-Username",
+        "realm_access.roles": "X-QP-Roles"
+      }
+    }
   }
 }

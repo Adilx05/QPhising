@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using QPhising.Gateway.Middleware;
+using QPhising.Gateway.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,8 @@ builder.Configuration
     .AddJsonFile("appsettings.runtime.json", optional: true, reloadOnChange: true);
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+var gatewayRoutePolicySettingsProvider = new ConfigurationGatewayRoutePolicySettingsProvider(builder.Configuration);
+var gatewayRoutePolicySettings = gatewayRoutePolicySettingsProvider.GetCurrent();
 
 builder.Services.AddCors(options =>
 {
@@ -26,8 +30,12 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = gatewayRoutePolicySettings.AuthenticationProviderKey;
+        options.DefaultChallengeScheme = gatewayRoutePolicySettings.AuthenticationProviderKey;
+    })
+    .AddJwtBearer(gatewayRoutePolicySettings.AuthenticationProviderKey, options =>
     {
         options.Authority = builder.Configuration["Authentication:Jwt:Authority"];
         options.Audience = builder.Configuration["Authentication:Jwt:Audience"];
@@ -40,6 +48,7 @@ builder.Services
 
 builder.Services.AddAuthorization();
 builder.Services.AddHealthChecks();
+builder.Services.AddSingleton(gatewayRoutePolicySettingsProvider);
 builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
@@ -47,6 +56,7 @@ var app = builder.Build();
 app.UseRouting();
 app.UseCors("GatewayCors");
 app.UseAuthentication();
+app.UseMiddleware<ClaimsToHeadersForwardingMiddleware>();
 app.UseAuthorization();
 
 app.MapHealthChecks("/health/live");
