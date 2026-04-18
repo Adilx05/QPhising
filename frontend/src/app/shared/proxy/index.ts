@@ -8,6 +8,9 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AssertProxyContractSyncRequest } from './models/AssertProxyContractSyncRequest';
+export { GatewayModule } from './models/GatewayModule';
+export type { GatewayRoutePolicyCompositionResult } from './models/GatewayRoutePolicyCompositionResult';
+export type { GatewayRoutePolicyDefinitionResult } from './models/GatewayRoutePolicyDefinitionResult';
 export type { ProblemDetails } from './models/ProblemDetails';
 export type { RuntimeConfigurationResult } from './models/RuntimeConfigurationResult';
 export type { SaveRuntimeConfigurationRequest } from './models/SaveRuntimeConfigurationRequest';
@@ -23,6 +26,7 @@ export type { TestRedisConnectionRequest } from './models/TestRedisConnectionReq
 export type { UpdateRuntimeConfigurationRequest } from './models/UpdateRuntimeConfigurationRequest';
 
 export { ConfigurationService } from './services/ConfigurationService';
+export { GatewayService } from './services/GatewayService';
 export { HealthService } from './services/HealthService';
 export { ProxyValidationService } from './services/ProxyValidationService';
 export { SetupService } from './services/SetupService';
