@@ -407,15 +407,15 @@ Metadata required for every subtask:
   - FinishedAt: 2026-04-18T15:18:00Z
   - Owner: Codex
   - Notes: Added cross-platform local Swagger quality gate scripts (`scripts/check-swagger-quality.sh`, `scripts/check-swagger-quality.bat`) and a CI workflow (`.github/workflows/swagger-quality-gate.yml`) that validates standardized OpenAPI conventions against the checked-in Swagger fixture; documented local usage in README.
-- [ ] 7.5
+- [x] 7.5
   - Title: Proxy generation validation against standardized Swagger docs
   - Description: Proxy generation validation against standardized Swagger docs
   - Deliverables:
     - Proxy generation validation against standardized Swagger docs
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T08:47:00Z
+  - FinishedAt: 2026-04-18T08:53:02Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added deterministic proxy-validation checks against the standardized Swagger fixture via new cross-platform scripts (`scripts/validate-proxy-generation.sh`, `scripts/validate-proxy-generation.bat`) that run swagger quality gates, regenerate proxies, and fail on drift under `frontend/src/app/shared/proxy`; added CI workflow `.github/workflows/proxy-generation-validation.yml` and README usage docs.
 - [ ] 7.6
   - Title: Frontend integration sanity check across standardized generated proxies
   - Description: Frontend integration sanity check across standardized generated proxies
