@@ -24,6 +24,7 @@ using QPhising.Application.Contracts.Abstractions.Persistence;
 using QPhising.Application.Contracts.Abstractions.ProxyValidation;
 using QPhising.Application.Contracts.Abstractions.RuntimeConfiguration;
 using QPhising.Application.Contracts.Abstractions.Setup;
+using QPhising.Application.Contracts.Abstractions.Template;
 using QPhising.Application.CQRS.Behaviors;
 using QPhising.Application.Security;
 
@@ -225,6 +226,7 @@ builder.Services.AddDbContext<QPhisingDbContext>((serviceProvider, options) =>
 });
 builder.Services.AddScoped<IUnitOfWork, EfCoreUnitOfWork>();
 builder.Services.AddScoped<ICampaignRepository, EfCoreCampaignRepository>();
+builder.Services.AddScoped<ITemplateRepository, EfCoreTemplateRepository>();
 builder.Services.AddScoped<IProxyContractDriftValidator, FileTimestampProxyContractDriftValidator>();
 builder.Services.AddScoped<ISetupDependencyConnectionTester, SetupDependencyConnectionTester>();
 builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>();
