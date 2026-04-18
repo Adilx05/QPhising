@@ -20,6 +20,12 @@ if errorlevel 1 (
   exit /b 1
 )
 
+call "%SCRIPT_DIR%check-proxy-gateway-consistency.bat" --ocelot "%REPO_ROOT%\backend\Gateway\ocelot.json" --proxy-dir "%REPO_ROOT%\frontend\src\app\shared\proxy\services"
+if errorlevel 1 (
+  git -C "%REPO_ROOT%" checkout -- frontend/src/app/shared/proxy >nul 2>nul
+  exit /b 1
+)
+
 git -C "%REPO_ROOT%" diff --quiet -- frontend/src/app/shared/proxy
 if errorlevel 1 (
   echo Error: generated proxies are not in sync with %SWAGGER_FIXTURE%.

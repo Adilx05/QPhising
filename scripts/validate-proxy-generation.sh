@@ -37,6 +37,7 @@ fi
 
 "${SCRIPT_DIR}/check-swagger-quality.sh" "${SWAGGER_FIXTURE}"
 "${SCRIPT_DIR}/generate-proxy.sh" "file://${SWAGGER_FIXTURE}"
+"${SCRIPT_DIR}/check-proxy-gateway-consistency.sh" --ocelot "${REPO_ROOT}/backend/Gateway/ocelot.json" --proxy-dir "${REPO_ROOT}/frontend/src/app/shared/proxy/services"
 
 if ! git -C "${REPO_ROOT}" diff --quiet -- frontend/src/app/shared/proxy; then
   echo "Error: generated proxies are not in sync with ${SWAGGER_FIXTURE}." >&2
