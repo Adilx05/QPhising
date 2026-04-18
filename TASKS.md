@@ -656,15 +656,15 @@ Metadata required for every subtask:
 
 ## Phase 12 - Template Module
 
-- [ ] 12.1
+- [x] 12.1
   - Title: Backend domain/model for template content, metadata, and versioning constraints
   - Description: Backend domain/model for template content, metadata, and versioning constraints
   - Deliverables:
     - Backend domain/model for template content, metadata, and versioning constraints
-  - StartedAt: 
-  - FinishedAt: 
+  - StartedAt: 2026-04-18T16:10:00Z
+  - FinishedAt: 2026-04-18T16:18:00Z
   - Owner: Codex
-  - Notes: 
+  - Notes: Added `Domain/Templates` model primitives for template lifecycle and version-safe updates: `TemplateAggregate` with immutable creation + rehydration paths and guarded version increments, plus value objects for validated name/content/metadata (`TemplateName`, `TemplateContent`, `TemplateMetadata`) and lifecycle enum `TemplateLifecycleState`. Files touched: `backend/Domain/Templates/Aggregates/TemplateAggregate.cs`, `backend/Domain/Templates/ValueObjects/TemplateName.cs`, `backend/Domain/Templates/ValueObjects/TemplateContent.cs`, `backend/Domain/Templates/ValueObjects/TemplateMetadata.cs`, `backend/Domain/Templates/Enums/TemplateLifecycleState.cs`.
 - [ ] 12.2
   - Title: Application logic for template commands/queries and validation
   - Description: Application logic for template commands/queries and validation
