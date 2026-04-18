@@ -206,6 +206,59 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
         {
             operation.Summary ??= "Cancel a campaign lifecycle.";
             SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample(lifecycleState: 5));
+            return;
+        }
+
+        if (method == "GET" && path == "/api/templates")
+        {
+            operation.Summary ??= "List templates with lifecycle and version metadata.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), new OpenApiArray
+            {
+                CreateTemplateResponseExample()
+            });
+            return;
+        }
+
+        if (method == "GET" && path == "/api/templates/{templateid}")
+        {
+            operation.Summary ??= "Get a template by identifier.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateTemplateResponseExample());
+            return;
+        }
+
+        if (method == "POST" && path == "/api/templates")
+        {
+            operation.Summary ??= "Create a new draft template.";
+            SetRequestExample(operation, CreateTemplateRequestExample());
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateTemplateResponseExample());
+            return;
+        }
+
+        if (method == "PUT" && path == "/api/templates/{templateid}")
+        {
+            operation.Summary ??= "Update mutable fields for an existing draft template.";
+            SetRequestExample(operation, CreateTemplateRequestExample());
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateTemplateResponseExample(version: 2));
+            return;
+        }
+
+        if (method == "POST" && path == "/api/templates/{templateid}/publish")
+        {
+            operation.Summary ??= "Publish a draft template for campaign usage.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateTemplateResponseExample(lifecycleState: 1));
+            return;
+        }
+
+        if (method == "POST" && path == "/api/templates/{templateid}/archive")
+        {
+            operation.Summary ??= "Archive a template to prevent future use.";
+            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateTemplateResponseExample(lifecycleState: 2));
+            return;
+        }
+
+        if (method == "DELETE" && path == "/api/templates/{templateid}")
+        {
+            operation.Summary ??= "Delete a template.";
         }
     }
 
@@ -316,6 +369,45 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
                     ["emailAddress"] = new OpenApiString("analyst@example.com")
                 }
             }
+        };
+    }
+
+    private static OpenApiObject CreateTemplateRequestExample()
+    {
+        return new OpenApiObject
+        {
+            ["name"] = new OpenApiString("Credential Harvesting Alert - Finance"),
+            ["subject"] = new OpenApiString("Action Required: Confirm Payroll Portal Access"),
+            ["body"] = new OpenApiString("<p>Please confirm your payroll credentials to avoid service interruption.</p>"),
+            ["description"] = new OpenApiString("Finance-focused phishing simulation template."),
+            ["tags"] = new OpenApiArray
+            {
+                new OpenApiString("finance"),
+                new OpenApiString("credential-harvest")
+            }
+        };
+    }
+
+    private static OpenApiObject CreateTemplateResponseExample(
+        int lifecycleState = 0,
+        int version = 1)
+    {
+        return new OpenApiObject
+        {
+            ["id"] = new OpenApiString("f73de4d0-0c92-4455-b181-b4b9f17de886"),
+            ["name"] = new OpenApiString("Credential Harvesting Alert - Finance"),
+            ["subject"] = new OpenApiString("Action Required: Confirm Payroll Portal Access"),
+            ["body"] = new OpenApiString("<p>Please confirm your payroll credentials to avoid service interruption.</p>"),
+            ["description"] = new OpenApiString("Finance-focused phishing simulation template."),
+            ["tags"] = new OpenApiArray
+            {
+                new OpenApiString("finance"),
+                new OpenApiString("credential-harvest")
+            },
+            ["lifecycleState"] = new OpenApiInteger(lifecycleState),
+            ["version"] = new OpenApiInteger(version),
+            ["createdAtUtc"] = new OpenApiString("2026-04-18T16:20:00Z"),
+            ["updatedAtUtc"] = new OpenApiString("2026-04-18T16:45:00Z")
         };
     }
 
