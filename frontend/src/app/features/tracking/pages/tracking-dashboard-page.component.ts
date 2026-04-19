@@ -51,7 +51,7 @@ interface AnalyticsFilters {
     <section class="mb-6">
       <h1 class="page-title">Tracking Analytics Dashboard</h1>
       <p class="page-subtitle">
-        Tracking page CRUD, publish lifecycle, analytics ve ziyaret dağılımları generated TrackingService proxy'leri ile yönetilir.
+        Manage tracking pages, publish lifecycle, and visit analytics using generated TrackingService proxies.
       </p>
     </section>
 
@@ -106,12 +106,16 @@ interface AnalyticsFilters {
         <button pButton type="button" icon="pi pi-refresh" label="Refresh" [loading]="isBusy()" (click)="refresh()"></button>
       </div>
 
-      <div class="mt-4 flex flex-wrap items-center gap-2">
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2">
+        <div class="flex flex-wrap items-center gap-2">
         <button pButton type="button" size="small" label="Asc" severity="secondary" [outlined]="gridQuery().sortDirection === 'desc'" (click)="setGridFilter('sortDirection', 'asc')"></button>
         <button pButton type="button" size="small" label="Desc" severity="secondary" [outlined]="gridQuery().sortDirection === 'asc'" (click)="setGridFilter('sortDirection', 'desc')"></button>
-        <span class="text-xs text-slate-500">Page {{ gridQuery().page }} / {{ maxPage() }}</span>
+        <span class="text-xs font-medium text-slate-600">Page {{ gridQuery().page }} / {{ maxPage() }}</span>
+        </div>
+        <div class="flex items-center gap-2">
         <button pButton type="button" size="small" icon="pi pi-angle-left" [disabled]="gridQuery().page <= 1" (click)="changePage(-1)"></button>
         <button pButton type="button" size="small" icon="pi pi-angle-right" [disabled]="gridQuery().page >= maxPage()" (click)="changePage(1)"></button>
+        </div>
       </div>
 
       <div class="mt-4 grid gap-3">
@@ -140,7 +144,7 @@ interface AnalyticsFilters {
       </div>
     </section>
 
-    <section class="mt-6 grid gap-4 xl:grid-cols-2">
+    <section class="mt-6 grid gap-4 2xl:grid-cols-2">
       <article class="surface-card p-5">
         <h2 class="text-base font-semibold text-slate-900">Tracking Page Editor</h2>
         <p class="mt-1 text-sm text-slate-500">Create or update slug/metadata/settings and manage publish lifecycle.</p>
@@ -177,7 +181,7 @@ interface AnalyticsFilters {
         <h2 class="text-base font-semibold text-slate-900">Analytics Detail</h2>
         <p class="mt-1 text-sm text-slate-500">Select a page and apply filters for summary, trends and recent events.</p>
 
-        <div class="mt-4 grid gap-3 md:grid-cols-2">
+        <div class="mt-4 grid gap-3 lg:grid-cols-2">
           <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [ngModel]="selectedPageId()" (ngModelChange)="selectPage($event)">
             <option [ngValue]="null">Choose tracking page</option>
             <option *ngFor="let page of trackingPages()" [ngValue]="page.id">{{ page.slug || page.title || page.id }}</option>
@@ -196,9 +200,12 @@ interface AnalyticsFilters {
           <input pInputText class="w-full" placeholder="Device/User-Agent filter" [(ngModel)]="analyticsFilters.userAgentFilter" />
         </div>
 
-        <div class="mt-3 flex flex-wrap gap-2">
+        <div class="mt-3 flex flex-wrap items-center gap-2">
           <button pButton type="button" label="Load Analytics" icon="pi pi-chart-line" [disabled]="isBusy() || !selectedPageId()" (click)="loadAnalytics()"></button>
-          <input pInputText class="w-28" type="number" min="5" max="200" [(ngModel)]="analyticsFilters.recentVisitLimit" />
+          <label class="inline-flex items-center gap-2 text-xs text-slate-600">
+            Recent limit
+            <input pInputText class="w-24" type="number" min="5" max="200" [(ngModel)]="analyticsFilters.recentVisitLimit" />
+          </label>
         </div>
 
         <div class="mt-4 grid gap-3 sm:grid-cols-3" *ngIf="analytics() as data">
