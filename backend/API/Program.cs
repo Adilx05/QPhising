@@ -30,8 +30,16 @@ using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.CQRS.Behaviors;
 using QPhising.Application.Security;
 using System.Threading.RateLimiting;
+using System.IO;
 
-var builder = WebApplication.CreateBuilder(args);
+// Ensure the content root (used by WebApplicationFactory in tests) exists before building the host.
+var contentRoot = Environment.GetEnvironmentVariable("ASPNETCORE_CONTENTROOT") ?? Directory.GetCurrentDirectory();
+if (!Directory.Exists(contentRoot))
+{
+    Directory.CreateDirectory(contentRoot);
+}
+
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = args, ContentRootPath = contentRoot });
 
 builder.Configuration.AddJsonFile("appsettings.runtime.json", optional: true, reloadOnChange: true);
 builder.Logging.ClearProviders();
