@@ -7,7 +7,11 @@ import {
 
 export interface CreateCampaignInput {
   name: string;
-  templateId: string;
+  trackingPageSlug: string;
+  trackingPageTitle: string;
+  destinationUrl: string;
+  trackingPageDescription: string | null;
+  templateId: string | null;
 }
 
 export interface ScheduleCampaignInput {
@@ -24,6 +28,10 @@ export const createCampaign = async (
 ): Promise<CampaignResult> => {
   const request: CreateCampaignRequest = {
     name: input.name,
+    trackingPageSlug: input.trackingPageSlug,
+    trackingPageTitle: input.trackingPageTitle,
+    destinationUrl: input.destinationUrl,
+    trackingPageDescription: input.trackingPageDescription,
     templateId: input.templateId
   };
 
@@ -56,3 +64,6 @@ export const completeCampaign = async (
 
 export const cancelCampaign = async (campaignId: string): Promise<CampaignResult> =>
   CampaignService.campaignCancel({ campaignId });
+
+export const getCampaignById = async (campaignId: string): Promise<CampaignResult> =>
+  CampaignService.campaignGetById({ campaignId });

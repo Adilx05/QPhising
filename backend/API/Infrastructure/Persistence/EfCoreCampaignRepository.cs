@@ -49,6 +49,7 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
         }
 
         existing.Name = aggregate.Name.Value;
+        existing.TrackingPageId = aggregate.TrackingPageId;
         existing.TemplateId = aggregate.TemplateId;
         existing.LifecycleState = (int)aggregate.LifecycleState;
         existing.ScheduleStartsAtUtc = aggregate.ScheduleWindow?.StartsAtUtc;
@@ -81,6 +82,7 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
         return CampaignAggregate.Rehydrate(
             entity.Id,
             new CampaignName(entity.Name),
+            entity.TrackingPageId,
             entity.TemplateId,
             (CampaignLifecycleState)entity.LifecycleState,
             scheduleWindow,
@@ -94,6 +96,7 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
         {
             Id = aggregate.Id,
             Name = aggregate.Name.Value,
+            TrackingPageId = aggregate.TrackingPageId,
             TemplateId = aggregate.TemplateId,
             LifecycleState = (int)aggregate.LifecycleState,
             ScheduleStartsAtUtc = aggregate.ScheduleWindow?.StartsAtUtc,
