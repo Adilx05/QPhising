@@ -39,6 +39,17 @@ import { getCampaignById } from '../data-access';
         </div>
       </div>
 
+      <div class="mt-4 grid gap-3 md:grid-cols-2">
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p class="text-xs font-semibold uppercase text-slate-500">Starts At (UTC)</p>
+          <p class="mt-1 text-sm text-slate-700">{{ resolveStartsAtUtc() }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p class="text-xs font-semibold uppercase text-slate-500">Ends At (UTC)</p>
+          <p class="mt-1 text-sm text-slate-700">{{ resolveEndsAtUtc() }}</p>
+        </div>
+      </div>
+
       <div *ngIf="trackingPage() as page" class="mt-4 grid gap-3 md:grid-cols-2">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p class="text-xs font-semibold uppercase text-slate-500">Slug</p>
@@ -132,6 +143,16 @@ export class CampaignDetailPageComponent {
       default:
         return 'Unknown';
     }
+  }
+
+  protected resolveStartsAtUtc(): string {
+    const value = this.campaign()?.startsAtUtc ?? this.trackingPage()?.validFromUtc;
+    return value ?? 'Not scheduled';
+  }
+
+  protected resolveEndsAtUtc(): string {
+    const value = this.campaign()?.endsAtUtc ?? this.trackingPage()?.validUntilUtc;
+    return value ?? 'Not scheduled';
   }
 
   private async loadTrackingPage(campaign: CampaignResult): Promise<void> {
