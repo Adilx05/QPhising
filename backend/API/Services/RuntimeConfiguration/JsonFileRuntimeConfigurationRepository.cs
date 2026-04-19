@@ -49,14 +49,7 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
             }
 
             var snapshot = runtimeConfigurationNode.Deserialize<RuntimeConfigurationSnapshot>(SerializerOptions);
-            return snapshot is null ? null : RuntimeConfigurationAggregate.Rehydrate(
-                snapshot.DatabaseConnectionCipherText,
-                snapshot.RedisConnectionCipherText,
-                snapshot.KeycloakAuthority,
-                snapshot.KeycloakRealm,
-                snapshot.KeycloakClientId,
-                snapshot.KeycloakClientSecretCipherText,
-                snapshot.UpdatedAtUtc);
+            return snapshot is null ? null : FromSnapshot(snapshot);
         }
         finally
         {
@@ -67,11 +60,6 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
     public async Task SaveAsync(RuntimeConfigurationAggregate aggregate, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(aggregate);
-
-        if (!aggregate.IsReadyForProtectedRuntime())
-        {
-            throw new InvalidOperationException("Runtime configuration is incomplete and cannot be persisted.");
-        }
 
         await FileGate.WaitAsync(cancellationToken);
         try
@@ -106,31 +94,52 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
 
     private static RuntimeConfigurationSnapshot ToSnapshot(RuntimeConfigurationAggregate aggregate)
     {
-        if (aggregate.DatabaseConnectionCipherText is null ||
-            aggregate.KeycloakClientSecretCipherText is null ||
-            string.IsNullOrWhiteSpace(aggregate.KeycloakAuthority) ||
-            string.IsNullOrWhiteSpace(aggregate.KeycloakRealm) ||
-            string.IsNullOrWhiteSpace(aggregate.KeycloakClientId))
-        {
-            throw new InvalidOperationException("Runtime configuration aggregate is incomplete and cannot be persisted.");
-        }
-
         return new RuntimeConfigurationSnapshot(
-            aggregate.DatabaseConnectionCipherText.CipherText,
+            aggregate.DatabaseConnectionCipherText?.CipherText,
             aggregate.RedisConnectionCipherText?.CipherText,
             aggregate.KeycloakAuthority,
             aggregate.KeycloakRealm,
             aggregate.KeycloakClientId,
-            aggregate.KeycloakClientSecretCipherText.CipherText,
+            aggregate.KeycloakClientSecretCipherText?.CipherText,
             aggregate.UpdatedAtUtc);
     }
 
+    private static RuntimeConfigurationAggregate? FromSnapshot(RuntimeConfigurationSnapshot snapshot)
+    {
+        var aggregate = new RuntimeConfigurationAggregate();
+
+        if (!string.IsNullOrWhiteSpace(snapshot.DatabaseConnectionCipherText))
+        {
+            aggregate.SetDatabaseConnection(snapshot.DatabaseConnectionCipherText);
+        }
+
+        if (!string.IsNullOrWhiteSpace(snapshot.RedisConnectionCipherText))
+        {
+            aggregate.SetRedisConnection(snapshot.RedisConnectionCipherText);
+        }
+
+        if (!string.IsNullOrWhiteSpace(snapshot.KeycloakAuthority) &&
+            !string.IsNullOrWhiteSpace(snapshot.KeycloakRealm) &&
+            !string.IsNullOrWhiteSpace(snapshot.KeycloakClientId) &&
+            !string.IsNullOrWhiteSpace(snapshot.KeycloakClientSecretCipherText) &&
+            Uri.TryCreate(snapshot.KeycloakAuthority, UriKind.Absolute, out var authorityUri))
+        {
+            aggregate.SetKeycloakConfiguration(
+                authorityUri,
+                snapshot.KeycloakRealm,
+                snapshot.KeycloakClientId,
+                snapshot.KeycloakClientSecretCipherText);
+        }
+
+        return aggregate.HasAnyValueConfigured ? aggregate : null;
+    }
+
     private sealed record RuntimeConfigurationSnapshot(
-        string DatabaseConnectionCipherText,
+        string? DatabaseConnectionCipherText,
         string? RedisConnectionCipherText,
-        string KeycloakAuthority,
-        string KeycloakRealm,
-        string KeycloakClientId,
-        string KeycloakClientSecretCipherText,
+        string? KeycloakAuthority,
+        string? KeycloakRealm,
+        string? KeycloakClientId,
+        string? KeycloakClientSecretCipherText,
         DateTimeOffset UpdatedAtUtc);
 }
