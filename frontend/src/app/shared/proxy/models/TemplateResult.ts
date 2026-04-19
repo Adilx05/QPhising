@@ -6,8 +6,7 @@ import type { TemplateLifecycleState } from './TemplateLifecycleState';
 export type TemplateResult = {
   id?: string;
   name?: string | null;
-  subject?: string | null;
-  body?: string | null;
+  htmlContent?: string | null;
   description?: string | null;
   tags?: Array<string> | null;
   lifecycleState?: TemplateLifecycleState;
@@ -15,4 +14,3 @@ export type TemplateResult = {
   createdAtUtc?: string;
   updatedAtUtc?: string;
 };
-

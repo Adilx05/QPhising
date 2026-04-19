@@ -52,8 +52,7 @@ public sealed class EfCoreTemplateRepository : ITemplateRepository
         }
 
         existing.Name = aggregate.Name.Value;
-        existing.Subject = aggregate.Content.Subject;
-        existing.Body = aggregate.Content.Body;
+        existing.HtmlContent = aggregate.Content.HtmlContent;
         existing.Description = aggregate.Metadata.Description;
         existing.Tags = SerializeTags(aggregate.Metadata.Tags);
         existing.LifecycleState = (int)aggregate.LifecycleState;
@@ -82,7 +81,7 @@ public sealed class EfCoreTemplateRepository : ITemplateRepository
         return TemplateAggregate.Rehydrate(
             entity.Id,
             new TemplateName(entity.Name),
-            new TemplateContent(entity.Subject, entity.Body),
+            new TemplateContent(entity.HtmlContent),
             new TemplateMetadata(entity.Description, DeserializeTags(entity.Tags)),
             (TemplateLifecycleState)entity.LifecycleState,
             entity.Version,
@@ -96,8 +95,7 @@ public sealed class EfCoreTemplateRepository : ITemplateRepository
         {
             Id = aggregate.Id,
             Name = aggregate.Name.Value,
-            Subject = aggregate.Content.Subject,
-            Body = aggregate.Content.Body,
+            HtmlContent = aggregate.Content.HtmlContent,
             Description = aggregate.Metadata.Description,
             Tags = SerializeTags(aggregate.Metadata.Tags),
             LifecycleState = (int)aggregate.LifecycleState,

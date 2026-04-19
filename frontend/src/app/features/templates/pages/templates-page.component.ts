@@ -18,8 +18,7 @@ import {
 
 interface TemplateDraft {
   name: string;
-  subject: string;
-  body: string;
+  htmlContent: string;
   description: string;
   tags: string;
 }
@@ -30,18 +29,22 @@ interface TemplateDraft {
   imports: [CommonModule, FormsModule, ButtonModule, InputTextModule],
   template: `
     <section class="mb-6">
-      <h1 class="page-title">Template Management</h1>
-      <p class="page-subtitle">Template işlemleri generated TemplateService proxy çağrıları üzerinden yürütülür.</p>
+      <h1 class="page-title">HTML Template Management</h1>
+      <p class="page-subtitle">Template sayfası artık e-posta için değil, direkt HTML sayfa şablonları üretmek için kullanılır.</p>
     </section>
 
     <section class="surface-card p-5">
-      <h2 class="text-base font-semibold text-slate-900">Create Template</h2>
+      <h2 class="text-base font-semibold text-slate-900">Create HTML Template</h2>
       <div class="mt-3 grid gap-3 md:grid-cols-2">
         <input pInputText [(ngModel)]="createForm.name" class="w-full" placeholder="Template name" />
-        <input pInputText [(ngModel)]="createForm.subject" class="w-full" placeholder="Page headline" />
-        <input pInputText [(ngModel)]="createForm.description" class="w-full md:col-span-2" placeholder="Description" />
-        <input pInputText [(ngModel)]="createForm.body" class="w-full md:col-span-2" placeholder="Body" />
+        <input pInputText [(ngModel)]="createForm.description" class="w-full" placeholder="Description" />
         <input pInputText [(ngModel)]="createForm.tags" class="w-full md:col-span-2" placeholder="Tags (comma-separated)" />
+        <textarea [(ngModel)]="createForm.htmlContent" class="min-h-48 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm md:col-span-2" placeholder="<html>...</html>"></textarea>
+      </div>
+
+      <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 md:col-span-2">
+        <p class="text-xs font-semibold uppercase text-slate-500">Live Preview</p>
+        <iframe class="mt-2 h-64 w-full rounded-lg border border-slate-200 bg-white" [attr.srcdoc]="createForm.htmlContent"></iframe>
       </div>
 
       <button
@@ -75,54 +78,27 @@ interface TemplateDraft {
 
         <div class="mt-3 grid gap-3 lg:grid-cols-2">
           <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Subject</p>
-            <p class="mt-1 text-sm text-slate-700">{{ templateItem.subject || '-' }}</p>
-          </div>
-
-          <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
             <p class="text-xs font-semibold uppercase text-slate-500">Tags</p>
             <p class="mt-1 text-sm text-slate-700">{{ (templateItem.tags || []).join(', ') || '-' }}</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+            <p class="text-xs font-semibold uppercase text-slate-500">Description</p>
+            <p class="mt-1 text-sm text-slate-700">{{ templateItem.description || '-' }}</p>
           </div>
         </div>
 
         <div class="mt-4 rounded-xl border border-slate-200 p-4">
           <p class="text-xs font-semibold uppercase text-slate-500">Update Template</p>
           <div class="mt-2 grid gap-2 md:grid-cols-2">
-            <input
-              pInputText
-              class="w-full"
-              placeholder="Template name"
-              [ngModel]="editDrafts()[templateItem.id || ''].name || ''"
-              (ngModelChange)="setDraftField(templateItem.id, 'name', $event)"
-            />
-            <input
-              pInputText
-              class="w-full"
-              placeholder="Subject"
-              [ngModel]="editDrafts()[templateItem.id || ''].subject || ''"
-              (ngModelChange)="setDraftField(templateItem.id, 'subject', $event)"
-            />
-            <input
-              pInputText
-              class="w-full md:col-span-2"
-              placeholder="Description"
-              [ngModel]="editDrafts()[templateItem.id || ''].description || ''"
-              (ngModelChange)="setDraftField(templateItem.id, 'description', $event)"
-            />
-            <input
-              pInputText
-              class="w-full md:col-span-2"
-              placeholder="Body"
-              [ngModel]="editDrafts()[templateItem.id || ''].body || ''"
-              (ngModelChange)="setDraftField(templateItem.id, 'body', $event)"
-            />
-            <input
-              pInputText
-              class="w-full md:col-span-2"
-              placeholder="Tags (comma-separated)"
-              [ngModel]="editDrafts()[templateItem.id || ''].tags || ''"
-              (ngModelChange)="setDraftField(templateItem.id, 'tags', $event)"
-            />
+            <input pInputText class="w-full" placeholder="Template name" [ngModel]="editDrafts()[templateItem.id || ''].name || ''" (ngModelChange)="setDraftField(templateItem.id, 'name', $event)" />
+            <input pInputText class="w-full" placeholder="Description" [ngModel]="editDrafts()[templateItem.id || ''].description || ''" (ngModelChange)="setDraftField(templateItem.id, 'description', $event)" />
+            <input pInputText class="w-full md:col-span-2" placeholder="Tags (comma-separated)" [ngModel]="editDrafts()[templateItem.id || ''].tags || ''" (ngModelChange)="setDraftField(templateItem.id, 'tags', $event)" />
+            <textarea class="min-h-48 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm md:col-span-2" placeholder="<html>...</html>" [ngModel]="editDrafts()[templateItem.id || ''].htmlContent || ''" (ngModelChange)="setDraftField(templateItem.id, 'htmlContent', $event)"></textarea>
+          </div>
+
+          <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p class="text-xs font-semibold uppercase text-slate-500">Preview</p>
+            <iframe class="mt-2 h-64 w-full rounded-lg border border-slate-200 bg-white" [attr.srcdoc]="editDrafts()[templateItem.id || ''].htmlContent || ''"></iframe>
           </div>
 
           <div class="mt-3 flex flex-wrap gap-2">
@@ -149,8 +125,7 @@ export class TemplatesPageComponent {
 
   protected readonly createForm: TemplateDraft = {
     name: '',
-    subject: '',
-    body: '',
+    htmlContent: '',
     description: '',
     tags: ''
   };
@@ -168,11 +143,10 @@ export class TemplatesPageComponent {
     await this.execute(async () => {
       await createTemplate(input);
       this.createForm.name = '';
-      this.createForm.subject = '';
-      this.createForm.body = '';
+      this.createForm.htmlContent = '';
       this.createForm.description = '';
       this.createForm.tags = '';
-      this.feedback.set('Template oluşturuldu.');
+      this.feedback.set('HTML template oluşturuldu.');
       await this.refresh();
     });
   }
@@ -225,9 +199,11 @@ export class TemplatesPageComponent {
     await this.execute(async () => {
       await deleteTemplate(templateId);
       this.templates.set(this.templates().filter((item) => item.id !== templateId));
-      const drafts = { ...this.editDrafts() };
-      delete drafts[templateId];
-      this.editDrafts.set(drafts);
+      this.editDrafts.update((drafts) => {
+        const nextDrafts = { ...drafts };
+        delete nextDrafts[templateId];
+        return nextDrafts;
+      });
       this.feedback.set('Template silindi.');
     });
   }
@@ -238,14 +214,13 @@ export class TemplatesPageComponent {
     }
 
     const existingDraft = this.editDrafts()[templateId] ?? this.mapTemplateToDraft(this.templates().find((item) => item.id === templateId));
-
-    this.editDrafts.set({
-      ...this.editDrafts(),
+    this.editDrafts.update((drafts) => ({
+      ...drafts,
       [templateId]: {
         ...existingDraft,
         [field]: value
       }
-    });
+    }));
   }
 
   protected stateLabel(state: TemplateLifecycleState | undefined): string {
@@ -262,11 +237,11 @@ export class TemplatesPageComponent {
   protected stateChipClass(state: TemplateLifecycleState | undefined): string {
     switch (state) {
       case TemplateLifecycleState._1:
-        return 'status-chip-success';
+        return 'status-chip--success';
       case TemplateLifecycleState._2:
-        return 'status-chip-muted';
+        return 'status-chip--muted';
       default:
-        return 'status-chip-warning';
+        return 'status-chip--warning';
     }
   }
 
@@ -279,11 +254,9 @@ export class TemplatesPageComponent {
           if (templateItem.id) {
             drafts[templateItem.id] = this.mapTemplateToDraft(templateItem);
           }
-
           return drafts;
         }, {})
       );
-
       this.feedback.set('Template listesi güncellendi.');
     });
   }
@@ -291,8 +264,7 @@ export class TemplatesPageComponent {
   private mapTemplateToDraft(templateItem: TemplateResult | undefined): TemplateDraft {
     return {
       name: templateItem?.name ?? '',
-      subject: templateItem?.subject ?? '',
-      body: templateItem?.body ?? '',
+      htmlContent: templateItem?.htmlContent ?? '',
       description: templateItem?.description ?? '',
       tags: (templateItem?.tags ?? []).join(', ')
     };
@@ -300,23 +272,21 @@ export class TemplatesPageComponent {
 
   private toUpsertInput(draft: TemplateDraft): UpsertTemplateInput | null {
     const name = draft.name.trim();
-    const subject = draft.subject.trim();
-    const body = draft.body.trim();
+    const htmlContent = draft.htmlContent.trim();
 
-    if (name.length === 0 || subject.length === 0 || body.length === 0) {
-      this.feedback.set('Template name, subject ve body alanları zorunludur.');
+    if (name.length === 0 || htmlContent.length === 0) {
+      this.feedback.set('Template name ve HTML content alanları zorunludur.');
       return null;
     }
 
     return {
       name,
-      subject,
-      body,
+      htmlContent,
       description: draft.description.trim(),
       tags: draft.tags
         .split(',')
-        .map((item) => item.trim())
-        .filter((item) => item.length > 0)
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0)
     };
   }
 
@@ -325,18 +295,21 @@ export class TemplatesPageComponent {
       this.templates().map((item) => (item.id === updatedTemplate.id ? updatedTemplate : item))
     );
 
-    if (updatedTemplate.id) {
-      this.editDrafts.set({
-        ...this.editDrafts(),
-        [updatedTemplate.id]: this.mapTemplateToDraft(updatedTemplate)
-      });
+    const updatedId = updatedTemplate.id;
+    if (typeof updatedId === 'string' && updatedId.length > 0) {
+      this.editDrafts.update((drafts) => ({
+        ...drafts,
+        [updatedId]: this.mapTemplateToDraft(updatedTemplate)
+      }));
     }
   }
 
   private async execute(action: () => Promise<void>): Promise<void> {
-    this.feedback.set(null);
-    this.isBusy.set(true);
+    if (this.isBusy()) {
+      return;
+    }
 
+    this.isBusy.set(true);
     try {
       await action();
     } catch (error) {

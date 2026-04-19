@@ -2,7 +2,6 @@ namespace QPhising.Api.Contracts.Template;
 
 public sealed record UpdateTemplateRequest(
     string Name,
-    string Subject,
-    string Body,
+    string HtmlContent,
     string? Description,
     IReadOnlyCollection<string>? Tags);

@@ -9,6 +9,7 @@ public sealed record CreateTrackingPageCommand(
     string? Description,
     string DestinationUrl,
     string? OwnerId,
+    Guid? TemplateId,
     int? RetentionDays,
     bool? MaskIpAddress,
     bool? EnableBotFiltering,

@@ -7,8 +7,7 @@ import {
 
 export interface UpsertTemplateInput {
   name: string;
-  subject: string;
-  body: string;
+  htmlContent: string;
   description: string;
   tags: string[];
 }
@@ -17,8 +16,7 @@ const toUpsertRequest = (
   input: UpsertTemplateInput
 ): CreateTemplateRequest & UpdateTemplateRequest => ({
   name: input.name,
-  subject: input.subject,
-  body: input.body,
+  htmlContent: input.htmlContent,
   description: input.description,
   tags: input.tags
 });

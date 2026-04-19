@@ -5,4 +5,7 @@ public sealed record TrackingLandingPageResult(
     string Slug,
     string Title,
     string? Description,
-    string DestinationUrl);
+    string DestinationUrl,
+    Guid? TemplateId,
+    string? TemplateName,
+    string? TemplateHtmlContent);

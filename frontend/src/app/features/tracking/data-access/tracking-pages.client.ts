@@ -12,6 +12,7 @@ export interface UpsertTrackingPageInput {
   description: string;
   destinationUrl: string;
   ownerId: string;
+  templateId: string;
   retentionDays: number;
   maskIpAddress: boolean;
   enableBotFiltering: boolean;
@@ -34,6 +35,7 @@ const toCreateRequest = (
   description: input.description,
   destinationUrl: input.destinationUrl,
   ownerId: input.ownerId,
+  templateId: input.templateId || undefined,
   retentionDays: input.retentionDays,
   maskIpAddress: input.maskIpAddress,
   enableBotFiltering: input.enableBotFiltering,
@@ -47,6 +49,7 @@ const toUpdateRequest = (
   title: input.title,
   description: input.description,
   destinationUrl: input.destinationUrl,
+  templateId: input.templateId || undefined,
   retentionDays: input.retentionDays,
   maskIpAddress: input.maskIpAddress,
   enableBotFiltering: input.enableBotFiltering,

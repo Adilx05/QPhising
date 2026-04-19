@@ -20,7 +20,7 @@ public sealed class CreateTemplateCommandHandler : IRequestHandler<CreateTemplat
         var aggregate = new TemplateAggregate(
             id: Guid.NewGuid(),
             name: new TemplateName(request.Name),
-            content: new TemplateContent(request.Subject, request.Body),
+            content: new TemplateContent(request.HtmlContent),
             metadata: new TemplateMetadata(request.Description, request.Tags));
 
         await _templateRepository.SaveAsync(aggregate, cancellationToken);

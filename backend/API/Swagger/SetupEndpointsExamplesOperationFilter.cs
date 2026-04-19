@@ -352,8 +352,7 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
         return new OpenApiObject
         {
             ["name"] = new OpenApiString("Credential Harvesting Alert - Finance"),
-            ["subject"] = new OpenApiString("Action Required: Confirm Payroll Portal Access"),
-            ["body"] = new OpenApiString("<p>Please confirm your payroll credentials to avoid service interruption.</p>"),
+            ["htmlContent"] = new OpenApiString("<html><body><h1>Confirm Payroll Access</h1><form><input placeholder=\"Username\"/><input placeholder=\"Password\" type=\"password\"/></form></body></html>"),
             ["description"] = new OpenApiString("Finance-focused tracking page template."),
             ["tags"] = new OpenApiArray
             {
@@ -371,8 +370,7 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
         {
             ["id"] = new OpenApiString("f73de4d0-0c92-4455-b181-b4b9f17de886"),
             ["name"] = new OpenApiString("Credential Harvesting Alert - Finance"),
-            ["subject"] = new OpenApiString("Action Required: Confirm Payroll Portal Access"),
-            ["body"] = new OpenApiString("<p>Please confirm your payroll credentials to avoid service interruption.</p>"),
+            ["htmlContent"] = new OpenApiString("<html><body><h1>Confirm Payroll Access</h1><form><input placeholder=\"Username\"/><input placeholder=\"Password\" type=\"password\"/></form></body></html>"),
             ["description"] = new OpenApiString("Finance-focused tracking page template."),
             ["tags"] = new OpenApiArray
             {

@@ -67,11 +67,11 @@ partial class QPhisingDbContextModelSnapshot : ModelSnapshot
                     .HasColumnType("uuid")
                     .HasColumnName("id");
 
-                b.Property<string>("Body")
+                b.Property<string>("HtmlContent")
                     .IsRequired()
                     .HasMaxLength(200000)
                     .HasColumnType("character varying(200000)")
-                    .HasColumnName("body");
+                    .HasColumnName("html_content");
 
                 b.Property<DateTimeOffset>("CreatedAtUtc")
                     .HasColumnType("timestamp with time zone")
@@ -92,13 +92,7 @@ partial class QPhisingDbContextModelSnapshot : ModelSnapshot
                     .HasColumnType("character varying(120)")
                     .HasColumnName("name");
 
-                b.Property<string>("Subject")
-                    .IsRequired()
-                    .HasMaxLength(180)
-                    .HasColumnType("character varying(180)")
-                    .HasColumnName("subject");
-
-                b.Property<string>("Tags")
+                                b.Property<string>("Tags")
                     .IsRequired()
                     .HasColumnType("jsonb")
                     .HasColumnName("tags");
@@ -155,6 +149,10 @@ partial class QPhisingDbContextModelSnapshot : ModelSnapshot
                     .HasColumnType("character varying(128)")
                     .HasColumnName("owner_id");
 
+                b.Property<Guid?>("TemplateId")
+                    .HasColumnType("uuid")
+                    .HasColumnName("template_id");
+
                 b.Property<int>("PublishState")
                     .HasColumnType("integer")
                     .HasColumnName("publish_state");
@@ -187,6 +185,9 @@ partial class QPhisingDbContextModelSnapshot : ModelSnapshot
                 b.HasIndex("Slug")
                     .IsUnique()
                     .HasDatabaseName("IX_tracking_pages_slug");
+
+                b.HasIndex("TemplateId")
+                    .HasDatabaseName("IX_tracking_pages_template_id");
 
                 b.ToTable("tracking_pages", (string)null);
             });
@@ -245,6 +246,14 @@ partial class QPhisingDbContextModelSnapshot : ModelSnapshot
                     .HasDatabaseName("IX_visit_events_tracking_page_id_session_id_occurred_at_utc");
 
                 b.ToTable("visit_events", (string)null);
+            });
+
+        modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.TrackingPageEntity", b =>
+            {
+                b.HasOne("QPhising.Api.Infrastructure.Persistence.Entities.TemplateEntity", null)
+                    .WithMany()
+                    .HasForeignKey("TemplateId")
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
         modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.VisitEventEntity", b =>

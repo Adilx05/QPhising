@@ -6,6 +6,7 @@ public sealed record CreateTrackingPageRequest(
     string? Description,
     string DestinationUrl,
     string? OwnerId,
+    Guid? TemplateId,
     int? RetentionDays,
     bool? MaskIpAddress,
     bool? EnableBotFiltering,
