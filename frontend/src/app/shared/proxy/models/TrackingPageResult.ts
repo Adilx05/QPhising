@@ -9,9 +9,11 @@ export type TrackingPageResult = {
   slug?: string | null;
   title?: string | null;
   description?: string | null;
-  destinationUrl?: string | null;
   ownerId?: string | null;
   templateId?: string | null;
+  customHtmlContent?: string | null;
+  validFromUtc?: string | null;
+  validUntilUtc?: string | null;
   publishState?: TrackingPagePublishState;
   settings?: TrackingPageSettingsResult;
   createdAtUtc?: string;

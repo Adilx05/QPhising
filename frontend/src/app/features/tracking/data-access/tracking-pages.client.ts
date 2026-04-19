@@ -10,7 +10,9 @@ export interface UpsertTrackingPageInput {
   slug: string;
   title: string;
   description: string;
-  destinationUrl: string;
+  customHtmlContent: string;
+  validFromUtc: string | null;
+  validUntilUtc: string | null;
   ownerId: string;
   templateId: string;
   retentionDays: number;
@@ -33,7 +35,9 @@ const toCreateRequest = (
   slug: input.slug,
   title: input.title,
   description: input.description,
-  destinationUrl: input.destinationUrl,
+  customHtmlContent: input.customHtmlContent,
+  validFromUtc: input.validFromUtc,
+  validUntilUtc: input.validUntilUtc,
   ownerId: input.ownerId,
   templateId: input.templateId || undefined,
   retentionDays: input.retentionDays,
@@ -48,7 +52,9 @@ const toUpdateRequest = (
   slug: input.slug,
   title: input.title,
   description: input.description,
-  destinationUrl: input.destinationUrl,
+  customHtmlContent: input.customHtmlContent,
+  validFromUtc: input.validFromUtc,
+  validUntilUtc: input.validUntilUtc,
   templateId: input.templateId || undefined,
   retentionDays: input.retentionDays,
   maskIpAddress: input.maskIpAddress,

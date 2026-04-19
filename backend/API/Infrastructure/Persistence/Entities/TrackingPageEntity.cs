@@ -10,11 +10,15 @@ public sealed class TrackingPageEntity
 
     public string? Description { get; set; }
 
-    public string DestinationUrl { get; set; } = string.Empty;
-
     public string OwnerId { get; set; } = string.Empty;
 
     public Guid? TemplateId { get; set; }
+
+    public string? CustomHtmlContent { get; set; }
+
+    public DateTimeOffset? ValidFromUtc { get; set; }
+
+    public DateTimeOffset? ValidUntilUtc { get; set; }
 
     public int PublishState { get; set; }
 

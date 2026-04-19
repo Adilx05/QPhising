@@ -10,24 +10,29 @@ public sealed class TrackingPageAggregate : Entity<Guid>
     public const int MaxTitleLength = 160;
     public const int MaxDescriptionLength = 1000;
     public const int MaxOwnerIdLength = 128;
+    public const int MaxCustomHtmlContentLength = 200000;
 
     public TrackingPageAggregate(
         Guid id,
         TrackingPageSlug slug,
         string title,
         string? description,
-        TrackingPageUrl destinationUrl,
         string ownerId,
         Guid? templateId,
+        string? customHtmlContent,
+        DateTimeOffset? validFromUtc,
+        DateTimeOffset? validUntilUtc,
         PageSettings? settings = null)
         : this(
             id,
             slug,
             title,
             description,
-            destinationUrl,
             ownerId,
             templateId,
+            customHtmlContent,
+            validFromUtc,
+            validUntilUtc,
             TrackingPagePublishState.Draft,
             settings,
             DateTimeOffset.UtcNow,
@@ -40,9 +45,11 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         TrackingPageSlug slug,
         string title,
         string? description,
-        TrackingPageUrl destinationUrl,
         string ownerId,
         Guid? templateId,
+        string? customHtmlContent,
+        DateTimeOffset? validFromUtc,
+        DateTimeOffset? validUntilUtc,
         TrackingPagePublishState publishState,
         PageSettings? settings,
         DateTimeOffset createdAtUtc,
@@ -50,14 +57,14 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         : base(id)
     {
         ArgumentNullException.ThrowIfNull(slug);
-        ArgumentNullException.ThrowIfNull(destinationUrl);
 
         Slug = slug;
         Title = NormalizeTitle(title);
         Description = NormalizeDescription(description);
-        DestinationUrl = destinationUrl;
         OwnerId = NormalizeOwnerId(ownerId);
         TemplateId = NormalizeTemplateId(templateId);
+        CustomHtmlContent = NormalizeCustomHtmlContent(customHtmlContent);
+        ApplyValidityWindow(validFromUtc, validUntilUtc);
         PublishState = publishState;
         Settings = settings;
         CreatedAtUtc = createdAtUtc;
@@ -70,11 +77,15 @@ public sealed class TrackingPageAggregate : Entity<Guid>
 
     public string? Description { get; private set; }
 
-    public TrackingPageUrl DestinationUrl { get; private set; }
-
     public string OwnerId { get; private set; }
 
     public Guid? TemplateId { get; private set; }
+
+    public string? CustomHtmlContent { get; private set; }
+
+    public DateTimeOffset? ValidFromUtc { get; private set; }
+
+    public DateTimeOffset? ValidUntilUtc { get; private set; }
 
     public TrackingPagePublishState PublishState { get; private set; }
 
@@ -84,18 +95,45 @@ public sealed class TrackingPageAggregate : Entity<Guid>
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
 
-    public void UpdateDetails(TrackingPageSlug slug, string title, string? description, TrackingPageUrl destinationUrl, Guid? templateId)
+    public void UpdateDetails(
+        TrackingPageSlug slug,
+        string title,
+        string? description,
+        Guid? templateId,
+        string? customHtmlContent,
+        DateTimeOffset? validFromUtc,
+        DateTimeOffset? validUntilUtc)
     {
         EnsureMutable();
         ArgumentNullException.ThrowIfNull(slug);
-        ArgumentNullException.ThrowIfNull(destinationUrl);
 
         Slug = slug;
         Title = NormalizeTitle(title);
         Description = NormalizeDescription(description);
-        DestinationUrl = destinationUrl;
         TemplateId = NormalizeTemplateId(templateId);
+        CustomHtmlContent = NormalizeCustomHtmlContent(customHtmlContent);
+        ApplyValidityWindow(validFromUtc, validUntilUtc);
         Touch();
+    }
+
+    public bool IsPubliclyAccessible(DateTimeOffset nowUtc)
+    {
+        if (PublishState != TrackingPagePublishState.Published)
+        {
+            return false;
+        }
+
+        if (ValidFromUtc.HasValue && nowUtc < ValidFromUtc.Value)
+        {
+            return false;
+        }
+
+        if (ValidUntilUtc.HasValue && nowUtc > ValidUntilUtc.Value)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public void AssignOwner(string ownerId)
@@ -134,15 +172,30 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         TrackingPageSlug slug,
         string title,
         string? description,
-        TrackingPageUrl destinationUrl,
         string ownerId,
         Guid? templateId,
+        string? customHtmlContent,
+        DateTimeOffset? validFromUtc,
+        DateTimeOffset? validUntilUtc,
         TrackingPagePublishState publishState,
         PageSettings? settings,
         DateTimeOffset createdAtUtc,
         DateTimeOffset updatedAtUtc)
     {
-        return new TrackingPageAggregate(id, slug, title, description, destinationUrl, ownerId, templateId, publishState, settings, createdAtUtc, updatedAtUtc);
+        return new TrackingPageAggregate(
+            id,
+            slug,
+            title,
+            description,
+            ownerId,
+            templateId,
+            customHtmlContent,
+            validFromUtc,
+            validUntilUtc,
+            publishState,
+            settings,
+            createdAtUtc,
+            updatedAtUtc);
     }
 
     private void EnsureMutable()
@@ -209,6 +262,33 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         }
 
         return templateId.Value == Guid.Empty ? null : templateId.Value;
+    }
+
+    private static string? NormalizeCustomHtmlContent(string? customHtmlContent)
+    {
+        if (string.IsNullOrWhiteSpace(customHtmlContent))
+        {
+            return null;
+        }
+
+        var normalized = customHtmlContent.Trim();
+        if (normalized.Length > MaxCustomHtmlContentLength)
+        {
+            throw new ArgumentException($"Tracking page custom HTML cannot exceed {MaxCustomHtmlContentLength} characters.", nameof(customHtmlContent));
+        }
+
+        return normalized;
+    }
+
+    private void ApplyValidityWindow(DateTimeOffset? validFromUtc, DateTimeOffset? validUntilUtc)
+    {
+        if (validFromUtc.HasValue && validUntilUtc.HasValue && validUntilUtc.Value < validFromUtc.Value)
+        {
+            throw new ArgumentException("Tracking page validity end date must be greater than or equal to start date.");
+        }
+
+        ValidFromUtc = validFromUtc;
+        ValidUntilUtc = validUntilUtc;
     }
 
     private void Touch() => UpdatedAtUtc = DateTimeOffset.UtcNow;

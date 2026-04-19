@@ -155,7 +155,6 @@ interface AnalyticsFilters {
           <input pInputText class="w-full" placeholder="Slug" [(ngModel)]="editorDraft.slug" />
           <input pInputText class="w-full" placeholder="Title" [(ngModel)]="editorDraft.title" />
           <input pInputText class="w-full" placeholder="Description" [(ngModel)]="editorDraft.description" />
-          <input pInputText class="w-full" placeholder="Destination URL" [(ngModel)]="editorDraft.destinationUrl" />
           <input pInputText class="w-full" placeholder="Owner Id" [(ngModel)]="editorDraft.ownerId" />
           <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="editorDraft.templateId">
             <option [ngValue]="''">No template</option>
@@ -323,7 +322,9 @@ export class TrackingDashboardPageComponent {
     slug: '',
     title: '',
     description: '',
-    destinationUrl: '',
+    customHtmlContent: '',
+    validFromUtc: '',
+    validUntilUtc: '',
     ownerId: '',
     templateId: '',
     retentionDays: 30,
@@ -547,7 +548,9 @@ export class TrackingDashboardPageComponent {
     this.editorDraft.slug = '';
     this.editorDraft.title = '';
     this.editorDraft.description = '';
-    this.editorDraft.destinationUrl = '';
+    this.editorDraft.customHtmlContent = '';
+    this.editorDraft.validFromUtc = '';
+    this.editorDraft.validUntilUtc = '';
     this.editorDraft.ownerId = '';
     this.editorDraft.templateId = '';
     this.editorDraft.retentionDays = 30;
@@ -643,7 +646,9 @@ export class TrackingDashboardPageComponent {
     this.editorDraft.slug = page.slug ?? '';
     this.editorDraft.title = page.title ?? '';
     this.editorDraft.description = page.description ?? '';
-    this.editorDraft.destinationUrl = page.destinationUrl ?? '';
+    this.editorDraft.customHtmlContent = page.customHtmlContent ?? '';
+    this.editorDraft.validFromUtc = page.validFromUtc ?? '';
+    this.editorDraft.validUntilUtc = page.validUntilUtc ?? '';
     this.editorDraft.ownerId = page.ownerId ?? '';
     this.editorDraft.templateId = page.templateId ?? '';
     this.editorDraft.retentionDays = page.settings?.retentionDays ?? 30;
@@ -655,10 +660,8 @@ export class TrackingDashboardPageComponent {
   private toValidatedInput(): UpsertTrackingPageInput | null {
     const slug = this.editorDraft.slug.trim();
     const title = this.editorDraft.title.trim();
-    const destinationUrl = this.editorDraft.destinationUrl.trim();
-
-    if (slug.length === 0 || title.length === 0 || destinationUrl.length === 0) {
-      this.feedback.set('Slug, title ve destination URL zorunludur.');
+    if (slug.length === 0 || title.length === 0) {
+      this.feedback.set('Slug ve title zorunludur.');
       return null;
     }
 
@@ -666,7 +669,9 @@ export class TrackingDashboardPageComponent {
       slug,
       title,
       description: this.editorDraft.description.trim(),
-      destinationUrl,
+      customHtmlContent: this.editorDraft.customHtmlContent.trim(),
+      validFromUtc: this.toUtcIso(this.editorDraft.validFromUtc),
+      validUntilUtc: this.toUtcIso(this.editorDraft.validUntilUtc),
       ownerId: this.editorDraft.ownerId.trim(),
       templateId: this.editorDraft.templateId.trim(),
       retentionDays: Number(this.editorDraft.retentionDays) || 30,
@@ -732,7 +737,10 @@ export class TrackingDashboardPageComponent {
     }
   }
 
-  private toUtcIso(localDateTime: string): string | null {
+  private toUtcIso(localDateTime: string | null): string | null {
+    if (!localDateTime) {
+      return null;
+    }
     if (localDateTime.trim().length === 0) {
       return null;
     }

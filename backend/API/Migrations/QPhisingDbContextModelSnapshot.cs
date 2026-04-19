@@ -141,11 +141,20 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("description");
 
-                    b.Property<string>("DestinationUrl")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)")
-                        .HasColumnName("destination_url");
+                    b.Property<string>("CustomHtmlContent")
+                        .HasMaxLength(200000)
+                        .HasColumnType("character varying(200000)")
+                        .HasColumnName("custom_html_content");
+
+                    b
+                        .Property<DateTimeOffset?>("ValidFromUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("valid_from_utc");
+
+                    b
+                        .Property<DateTimeOffset?>("ValidUntilUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("valid_until_utc");
 
                     b.Property<bool?>("EnableBotFiltering")
                         .HasColumnType("boolean")

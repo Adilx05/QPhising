@@ -60,9 +60,11 @@ public sealed class QPhisingDbContext : DbContext
         trackingPage.Property(x => x.Slug).HasColumnName("slug").HasMaxLength(80).IsRequired();
         trackingPage.Property(x => x.Title).HasColumnName("title").HasMaxLength(160).IsRequired();
         trackingPage.Property(x => x.Description).HasColumnName("description").HasMaxLength(1000);
-        trackingPage.Property(x => x.DestinationUrl).HasColumnName("destination_url").HasMaxLength(2048).IsRequired();
         trackingPage.Property(x => x.OwnerId).HasColumnName("owner_id").HasMaxLength(128).IsRequired();
         trackingPage.Property(x => x.TemplateId).HasColumnName("template_id");
+        trackingPage.Property(x => x.CustomHtmlContent).HasColumnName("custom_html_content").HasMaxLength(200000);
+        trackingPage.Property(x => x.ValidFromUtc).HasColumnName("valid_from_utc");
+        trackingPage.Property(x => x.ValidUntilUtc).HasColumnName("valid_until_utc");
         trackingPage.Property(x => x.PublishState).HasColumnName("publish_state").IsRequired();
         trackingPage.Property(x => x.RetentionDays).HasColumnName("retention_days");
         trackingPage.Property(x => x.MaskIpAddress).HasColumnName("mask_ip_address");

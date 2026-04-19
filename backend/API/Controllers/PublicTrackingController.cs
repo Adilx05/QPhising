@@ -23,6 +23,10 @@ public sealed class PublicTrackingController : ControllerBase
     [EnableRateLimiting(RateLimitPolicies.PublicTrackingLanding)]
     [ProducesResponseType(typeof(TrackingLandingPageResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task<TrackingLandingPageResult> ResolveLandingPage([FromRoute] string slug, CancellationToken cancellationToken) =>
-        _sender.Send(new GetTrackingLandingPageBySlugQuery(slug), cancellationToken);
+    public Task<TrackingLandingPageResult> ResolveLandingPage(
+        [FromRoute] string slug,
+        [FromQuery] Guid? id,
+        [FromQuery] string? campaign,
+        CancellationToken cancellationToken) =>
+        _sender.Send(new GetTrackingLandingPageBySlugQuery(slug, id, campaign), cancellationToken);
 }

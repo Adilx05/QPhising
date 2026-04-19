@@ -69,9 +69,11 @@ public sealed class EfCoreTrackingPageRepository : ITrackingPageRepository
         existing.Slug = aggregate.Slug.Value;
         existing.Title = aggregate.Title;
         existing.Description = aggregate.Description;
-        existing.DestinationUrl = aggregate.DestinationUrl.Value;
         existing.OwnerId = aggregate.OwnerId;
         existing.TemplateId = aggregate.TemplateId;
+        existing.CustomHtmlContent = aggregate.CustomHtmlContent;
+        existing.ValidFromUtc = aggregate.ValidFromUtc;
+        existing.ValidUntilUtc = aggregate.ValidUntilUtc;
         existing.PublishState = (int)aggregate.PublishState;
         existing.RetentionDays = aggregate.Settings?.RetentionDays;
         existing.MaskIpAddress = aggregate.Settings?.MaskIpAddress;

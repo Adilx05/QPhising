@@ -41,9 +41,11 @@ public sealed class CreateCampaignCommandHandler : IRequestHandler<CreateCampaig
             slug,
             request.TrackingPageTitle,
             request.TrackingPageDescription,
-            new TrackingPageUrl(request.DestinationUrl),
             ownerId!,
-            request.TemplateId);
+            request.TemplateId,
+            request.HtmlContent,
+            request.ValidFromUtc,
+            request.ValidUntilUtc);
 
         await _trackingPageRepository.SaveAsync(trackingPage, cancellationToken);
 
