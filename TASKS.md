@@ -46,12 +46,16 @@ Phase 2 evidence:
 - 2026-04-19: Added Tracking CQRS command/query flows with validation, DTO contracts, mapping profiles, EF Core repositories, and visit deduplication/analytics read models for tracking pages and visit events.
 
 ## Phase 3 - API
-- [ ] Implement public landing endpoint `GET /p/{slug}` for page resolution and visitor flow entry.
-- [ ] Implement visit capture endpoint for client/server visit logging (e.g., POST visit endpoint).
-- [ ] Implement authenticated admin CRUD endpoints for tracking pages.
-- [ ] Implement analytics endpoints for summary, trends, and recent events.
-- [ ] Enforce ProblemDetails-based error responses and request validation integration.
-- [ ] Ensure Swagger/OpenAPI documents all tracking and analytics contracts.
+- [x] Implement public landing endpoint `GET /p/{slug}` for page resolution and visitor flow entry.
+- [x] Implement visit capture endpoint for client/server visit logging (e.g., POST visit endpoint).
+- [x] Implement authenticated admin CRUD endpoints for tracking pages.
+- [x] Implement analytics endpoints for summary, trends, and recent events.
+- [x] Enforce ProblemDetails-based error responses and request validation integration.
+- [x] Ensure Swagger/OpenAPI documents all tracking and analytics contracts.
+
+
+Phase 3 evidence:
+- 2026-04-19: Added public tracking slug resolution endpoint (`GET /p/{slug}`), visit ingestion endpoint (`POST /api/tracking/pages/{trackingPageId}/visits`), authenticated tracking CRUD + analytics endpoints, and expanded ProblemDetails exception mapping for not found/conflict semantics used by tracking workflows.
 
 ## Phase 4 - Frontend
 - [ ] Build admin dashboard shell for tracking overview.
