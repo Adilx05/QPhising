@@ -6,8 +6,7 @@ namespace QPhising.Application.Contracts.Responses.Template;
 public sealed record TemplateResult(
     Guid Id,
     string Name,
-    string Subject,
-    string Body,
+    string HtmlContent,
     string? Description,
     IReadOnlyCollection<string> Tags,
     TemplateLifecycleState LifecycleState,
@@ -22,8 +21,7 @@ public sealed record TemplateResult(
         return new TemplateResult(
             Id: aggregate.Id,
             Name: aggregate.Name.Value,
-            Subject: aggregate.Content.Subject,
-            Body: aggregate.Content.Body,
+            HtmlContent: aggregate.Content.HtmlContent,
             Description: aggregate.Metadata.Description,
             Tags: aggregate.Metadata.Tags.ToArray(),
             LifecycleState: aggregate.LifecycleState,

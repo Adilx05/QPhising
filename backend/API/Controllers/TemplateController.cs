@@ -37,7 +37,7 @@ public sealed class TemplateController : ControllerBase
     [ProducesResponseType(typeof(TemplateResult), StatusCodes.Status200OK)]
     [Authorize(Policy = IdentityAuthorizationPolicies.OperatorOrAbove)]
     public Task<TemplateResult> Create([FromBody] CreateTemplateRequest request, CancellationToken cancellationToken) =>
-        _sender.Send(new CreateTemplateCommand(request.Name, request.Subject, request.Body, request.Description, request.Tags), cancellationToken);
+        _sender.Send(new CreateTemplateCommand(request.Name, request.HtmlContent, request.Description, request.Tags), cancellationToken);
 
     [HttpPut("{templateId:guid}", Name = "Template_Update")]
     [Consumes("application/json")]
@@ -47,7 +47,7 @@ public sealed class TemplateController : ControllerBase
         [FromRoute] Guid templateId,
         [FromBody] UpdateTemplateRequest request,
         CancellationToken cancellationToken) =>
-        _sender.Send(new UpdateTemplateCommand(templateId, request.Name, request.Subject, request.Body, request.Description, request.Tags), cancellationToken);
+        _sender.Send(new UpdateTemplateCommand(templateId, request.Name, request.HtmlContent, request.Description, request.Tags), cancellationToken);
 
     [HttpPost("{templateId:guid}/publish", Name = "Template_Publish")]
     [ProducesResponseType(typeof(TemplateResult), StatusCodes.Status200OK)]

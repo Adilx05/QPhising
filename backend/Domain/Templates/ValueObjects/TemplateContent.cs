@@ -7,45 +7,29 @@ namespace QPhising.Domain.Templates.ValueObjects;
 
 public sealed class TemplateContent : ValueObject
 {
-    public const int MaxSubjectLength = 180;
-    public const int MaxBodyLength = 200_000;
+    public const int MaxHtmlLength = 200_000;
 
-    public TemplateContent(string subject, string body)
+    public TemplateContent(string htmlContent)
     {
-        if (string.IsNullOrWhiteSpace(subject))
+        if (string.IsNullOrWhiteSpace(htmlContent))
         {
-            throw new ArgumentException("Template subject is required.", nameof(subject));
+            throw new ArgumentException("Template HTML content is required.", nameof(htmlContent));
         }
 
-        if (string.IsNullOrWhiteSpace(body))
+        var normalizedHtml = htmlContent.Trim();
+
+        if (normalizedHtml.Length > MaxHtmlLength)
         {
-            throw new ArgumentException("Template body is required.", nameof(body));
+            throw new ArgumentException($"Template HTML content must be at most {MaxHtmlLength} characters.", nameof(htmlContent));
         }
 
-        var normalizedSubject = subject.Trim();
-        var normalizedBody = body.Trim();
-
-        if (normalizedSubject.Length > MaxSubjectLength)
-        {
-            throw new ArgumentException($"Template subject must be at most {MaxSubjectLength} characters.", nameof(subject));
-        }
-
-        if (normalizedBody.Length > MaxBodyLength)
-        {
-            throw new ArgumentException($"Template body must be at most {MaxBodyLength} characters.", nameof(body));
-        }
-
-        Subject = normalizedSubject;
-        Body = normalizedBody;
+        HtmlContent = normalizedHtml;
     }
 
-    public string Subject { get; }
-
-    public string Body { get; }
+    public string HtmlContent { get; }
 
     protected override IEnumerable<object?> GetEqualityComponents()
     {
-        yield return Subject;
-        yield return Body;
+        yield return HtmlContent;
     }
 }

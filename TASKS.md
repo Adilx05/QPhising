@@ -122,6 +122,7 @@ Phase 8 evidence:
 - [ ] Confirm Definition of Done criteria are fully met before release.
 
 Phase 9 evidence:
+- 2026-04-19: Reworked template management into HTML page-template flow (backend + frontend), added live preview support in templates UI, and introduced optional tracking page -> template linkage for page creation/update and public landing resolution contracts.
 - 2026-04-19: Reduced analytics query latency by parallelizing page-analytics read tasks and moving top-pages aggregation work to database grouping in `EfCoreVisitEventRepository`; refreshed tracking dashboard UX copy/layout controls for responsive readability; and added final architecture/API/runbook/readiness docs under `docs/architecture` and `docs/operations`.
 - 2026-04-19: Verified frontend build + tracking UI smoke checks locally; backend/gateway build verification remains blocked in this execution environment because `dotnet` CLI is unavailable.
 

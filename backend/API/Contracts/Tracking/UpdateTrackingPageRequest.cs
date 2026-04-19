@@ -5,6 +5,7 @@ public sealed record UpdateTrackingPageRequest(
     string Title,
     string? Description,
     string DestinationUrl,
+    Guid? TemplateId,
     int? RetentionDays,
     bool? MaskIpAddress,
     bool? EnableBotFiltering,

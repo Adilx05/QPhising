@@ -11,9 +11,9 @@ export type TrackingPageResult = {
   description?: string | null;
   destinationUrl?: string | null;
   ownerId?: string | null;
+  templateId?: string | null;
   publishState?: TrackingPagePublishState;
   settings?: TrackingPageSettingsResult;
   createdAtUtc?: string;
   updatedAtUtc?: string;
 };
-

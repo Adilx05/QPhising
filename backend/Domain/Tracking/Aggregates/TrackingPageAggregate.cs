@@ -18,6 +18,7 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         string? description,
         TrackingPageUrl destinationUrl,
         string ownerId,
+        Guid? templateId,
         PageSettings? settings = null)
         : this(
             id,
@@ -26,6 +27,7 @@ public sealed class TrackingPageAggregate : Entity<Guid>
             description,
             destinationUrl,
             ownerId,
+            templateId,
             TrackingPagePublishState.Draft,
             settings,
             DateTimeOffset.UtcNow,
@@ -40,6 +42,7 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         string? description,
         TrackingPageUrl destinationUrl,
         string ownerId,
+        Guid? templateId,
         TrackingPagePublishState publishState,
         PageSettings? settings,
         DateTimeOffset createdAtUtc,
@@ -54,6 +57,7 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         Description = NormalizeDescription(description);
         DestinationUrl = destinationUrl;
         OwnerId = NormalizeOwnerId(ownerId);
+        TemplateId = NormalizeTemplateId(templateId);
         PublishState = publishState;
         Settings = settings;
         CreatedAtUtc = createdAtUtc;
@@ -70,6 +74,8 @@ public sealed class TrackingPageAggregate : Entity<Guid>
 
     public string OwnerId { get; private set; }
 
+    public Guid? TemplateId { get; private set; }
+
     public TrackingPagePublishState PublishState { get; private set; }
 
     public PageSettings? Settings { get; private set; }
@@ -78,7 +84,7 @@ public sealed class TrackingPageAggregate : Entity<Guid>
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
 
-    public void UpdateDetails(TrackingPageSlug slug, string title, string? description, TrackingPageUrl destinationUrl)
+    public void UpdateDetails(TrackingPageSlug slug, string title, string? description, TrackingPageUrl destinationUrl, Guid? templateId)
     {
         EnsureMutable();
         ArgumentNullException.ThrowIfNull(slug);
@@ -88,6 +94,7 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         Title = NormalizeTitle(title);
         Description = NormalizeDescription(description);
         DestinationUrl = destinationUrl;
+        TemplateId = NormalizeTemplateId(templateId);
         Touch();
     }
 
@@ -129,12 +136,13 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         string? description,
         TrackingPageUrl destinationUrl,
         string ownerId,
+        Guid? templateId,
         TrackingPagePublishState publishState,
         PageSettings? settings,
         DateTimeOffset createdAtUtc,
         DateTimeOffset updatedAtUtc)
     {
-        return new TrackingPageAggregate(id, slug, title, description, destinationUrl, ownerId, publishState, settings, createdAtUtc, updatedAtUtc);
+        return new TrackingPageAggregate(id, slug, title, description, destinationUrl, ownerId, templateId, publishState, settings, createdAtUtc, updatedAtUtc);
     }
 
     private void EnsureMutable()
@@ -191,6 +199,16 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         }
 
         return normalized;
+    }
+
+    private static Guid? NormalizeTemplateId(Guid? templateId)
+    {
+        if (!templateId.HasValue)
+        {
+            return null;
+        }
+
+        return templateId.Value == Guid.Empty ? null : templateId.Value;
     }
 
     private void Touch() => UpdatedAtUtc = DateTimeOffset.UtcNow;

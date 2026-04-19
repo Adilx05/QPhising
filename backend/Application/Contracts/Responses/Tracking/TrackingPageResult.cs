@@ -9,6 +9,7 @@ public sealed record TrackingPageResult(
     string? Description,
     string DestinationUrl,
     string OwnerId,
+    Guid? TemplateId,
     TrackingPagePublishState PublishState,
     TrackingPageSettingsResult? Settings,
     DateTimeOffset CreatedAtUtc,

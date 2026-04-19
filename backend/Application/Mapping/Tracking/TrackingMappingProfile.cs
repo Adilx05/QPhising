@@ -18,6 +18,7 @@ public static class TrackingMappingProfile
             Description: aggregate.Description,
             DestinationUrl: aggregate.DestinationUrl.Value,
             OwnerId: aggregate.OwnerId,
+            TemplateId: aggregate.TemplateId,
             PublishState: aggregate.PublishState,
             Settings: aggregate.Settings is null
                 ? null

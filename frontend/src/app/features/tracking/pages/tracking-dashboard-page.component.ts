@@ -10,7 +10,8 @@ import {
   type TrackingPageAnalyticsResult,
   type TrackingPageResult,
   type TrackingRecentVisitResult,
-  type TrackingVisitTrendPointResult
+  type TrackingVisitTrendPointResult,
+  type TemplateResult
 } from '../../../shared/proxy';
 import {
   archiveTrackingPage,
@@ -22,6 +23,7 @@ import {
   updateTrackingPage,
   type UpsertTrackingPageInput
 } from '../data-access';
+import { listTemplates } from '../../templates/data-access';
 
 interface TrackingPageDraft extends UpsertTrackingPageInput {}
 
@@ -155,6 +157,10 @@ interface AnalyticsFilters {
           <input pInputText class="w-full" placeholder="Description" [(ngModel)]="editorDraft.description" />
           <input pInputText class="w-full" placeholder="Destination URL" [(ngModel)]="editorDraft.destinationUrl" />
           <input pInputText class="w-full" placeholder="Owner Id" [(ngModel)]="editorDraft.ownerId" />
+          <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="editorDraft.templateId">
+            <option [ngValue]="''">No template</option>
+            <option *ngFor="let templateItem of templates()" [ngValue]="templateItem.id">{{ templateItem.name || templateItem.id }}</option>
+          </select>
           <input pInputText class="w-full" type="number" min="1" placeholder="Retention Days" [(ngModel)]="editorDraft.retentionDays" />
         </div>
 
@@ -299,6 +305,7 @@ export class TrackingDashboardPageComponent {
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
   protected readonly trackingPages = signal<TrackingPageResult[]>([]);
+  protected readonly templates = signal<TemplateResult[]>([]);
   protected readonly selectedPageId = signal<string | null>(null);
   protected readonly analytics = signal<TrackingPageAnalyticsResult | null>(null);
   protected readonly canOperate = computed(() => this.authSessionService.hasRequiredRole('Operator'));
@@ -318,6 +325,7 @@ export class TrackingDashboardPageComponent {
     description: '',
     destinationUrl: '',
     ownerId: '',
+    templateId: '',
     retentionDays: 30,
     maskIpAddress: true,
     enableBotFiltering: true,
@@ -541,6 +549,7 @@ export class TrackingDashboardPageComponent {
     this.editorDraft.description = '';
     this.editorDraft.destinationUrl = '';
     this.editorDraft.ownerId = '';
+    this.editorDraft.templateId = '';
     this.editorDraft.retentionDays = 30;
     this.editorDraft.maskIpAddress = true;
     this.editorDraft.enableBotFiltering = true;
@@ -636,6 +645,7 @@ export class TrackingDashboardPageComponent {
     this.editorDraft.description = page.description ?? '';
     this.editorDraft.destinationUrl = page.destinationUrl ?? '';
     this.editorDraft.ownerId = page.ownerId ?? '';
+    this.editorDraft.templateId = page.templateId ?? '';
     this.editorDraft.retentionDays = page.settings?.retentionDays ?? 30;
     this.editorDraft.maskIpAddress = page.settings?.maskIpAddress ?? true;
     this.editorDraft.enableBotFiltering = page.settings?.enableBotFiltering ?? true;
@@ -658,6 +668,7 @@ export class TrackingDashboardPageComponent {
       description: this.editorDraft.description.trim(),
       destinationUrl,
       ownerId: this.editorDraft.ownerId.trim(),
+      templateId: this.editorDraft.templateId.trim(),
       retentionDays: Number(this.editorDraft.retentionDays) || 30,
       maskIpAddress: this.editorDraft.maskIpAddress,
       enableBotFiltering: this.editorDraft.enableBotFiltering,

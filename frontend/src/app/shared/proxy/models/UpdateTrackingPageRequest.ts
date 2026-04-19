@@ -7,9 +7,9 @@ export type UpdateTrackingPageRequest = {
   title?: string | null;
   description?: string | null;
   destinationUrl?: string | null;
+  templateId?: string | null;
   retentionDays?: number | null;
   maskIpAddress?: boolean | null;
   enableBotFiltering?: boolean | null;
   captureUtmParameters?: boolean | null;
 };
-

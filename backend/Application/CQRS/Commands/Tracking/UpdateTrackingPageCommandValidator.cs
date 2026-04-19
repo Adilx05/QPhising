@@ -29,6 +29,11 @@ public sealed class UpdateTrackingPageCommandValidator : AbstractValidator<Updat
             .NotEmpty()
             .MaximumLength(TrackingPageUrl.MaxLength);
 
+
+        RuleFor(command => command.TemplateId)
+            .Must(templateId => !templateId.HasValue || templateId.Value != Guid.Empty)
+            .WithMessage("Template ID must be a non-empty GUID when provided.");
+
         RuleFor(command => command.RetentionDays)
             .InclusiveBetween(PageSettings.MinRetentionDays, PageSettings.MaxRetentionDays)
             .When(command => command.RetentionDays.HasValue);

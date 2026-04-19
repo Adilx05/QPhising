@@ -13,17 +13,11 @@ public sealed class CreateTemplateCommandValidator : AbstractValidator<CreateTem
             .MaximumLength(TemplateName.MaxLength)
             .WithMessage($"Template name must be at most {TemplateName.MaxLength} characters.");
 
-        RuleFor(command => command.Subject)
+        RuleFor(command => command.HtmlContent)
             .NotEmpty()
-            .WithMessage("Template subject is required.")
-            .MaximumLength(TemplateContent.MaxSubjectLength)
-            .WithMessage($"Template subject must be at most {TemplateContent.MaxSubjectLength} characters.");
-
-        RuleFor(command => command.Body)
-            .NotEmpty()
-            .WithMessage("Template body is required.")
-            .MaximumLength(TemplateContent.MaxBodyLength)
-            .WithMessage($"Template body must be at most {TemplateContent.MaxBodyLength} characters.");
+            .WithMessage("Template HTML content is required.")
+            .MaximumLength(TemplateContent.MaxHtmlLength)
+            .WithMessage($"Template HTML content must be at most {TemplateContent.MaxHtmlLength} characters.");
 
         RuleFor(command => command.Description)
             .MaximumLength(TemplateMetadata.MaxDescriptionLength)

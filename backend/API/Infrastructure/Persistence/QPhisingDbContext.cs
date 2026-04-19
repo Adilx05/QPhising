@@ -39,8 +39,7 @@ public sealed class QPhisingDbContext : DbContext
         template.HasKey(x => x.Id);
         template.Property(x => x.Id).HasColumnName("id");
         template.Property(x => x.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
-        template.Property(x => x.Subject).HasColumnName("subject").HasMaxLength(180).IsRequired();
-        template.Property(x => x.Body).HasColumnName("body").HasMaxLength(200000).IsRequired();
+        template.Property(x => x.HtmlContent).HasColumnName("html_content").HasMaxLength(200000).IsRequired();
         template.Property(x => x.Description).HasColumnName("description").HasMaxLength(500);
         template.Property(x => x.Tags).HasColumnName("tags").HasColumnType("jsonb").IsRequired();
         template.Property(x => x.LifecycleState).HasColumnName("lifecycle_state").IsRequired();
@@ -57,6 +56,7 @@ public sealed class QPhisingDbContext : DbContext
         trackingPage.Property(x => x.Description).HasColumnName("description").HasMaxLength(1000);
         trackingPage.Property(x => x.DestinationUrl).HasColumnName("destination_url").HasMaxLength(2048).IsRequired();
         trackingPage.Property(x => x.OwnerId).HasColumnName("owner_id").HasMaxLength(128).IsRequired();
+        trackingPage.Property(x => x.TemplateId).HasColumnName("template_id");
         trackingPage.Property(x => x.PublishState).HasColumnName("publish_state").IsRequired();
         trackingPage.Property(x => x.RetentionDays).HasColumnName("retention_days");
         trackingPage.Property(x => x.MaskIpAddress).HasColumnName("mask_ip_address");
@@ -66,6 +66,11 @@ public sealed class QPhisingDbContext : DbContext
         trackingPage.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc").IsRequired();
         trackingPage.HasIndex(x => x.Slug).IsUnique();
         trackingPage.HasIndex(x => x.OwnerId);
+        trackingPage.HasIndex(x => x.TemplateId);
+        trackingPage.HasOne<TemplateEntity>()
+            .WithMany()
+            .HasForeignKey(x => x.TemplateId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         var visitEvent = modelBuilder.Entity<VisitEventEntity>();
         visitEvent.ToTable("visit_events");

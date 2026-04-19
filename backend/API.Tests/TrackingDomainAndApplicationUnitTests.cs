@@ -33,6 +33,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             "description",
             new TrackingPageUrl("https://example.com/page"),
             "owner-1",
+            templateId: null,
             new PageSettings(30, maskIpAddress: true, enableBotFiltering: true, captureUtmParameters: true));
 
         aggregate.Archive();
@@ -41,7 +42,8 @@ public sealed class TrackingDomainAndApplicationUnitTests
             new TrackingPageSlug("new-slug"),
             "Updated",
             "updated",
-            new TrackingPageUrl("https://example.com/new")));
+            new TrackingPageUrl("https://example.com/new"),
+            templateId: null));
     }
 
     [Fact]
@@ -68,7 +70,8 @@ public sealed class TrackingDomainAndApplicationUnitTests
             "Dedupe Page",
             null,
             new TrackingPageUrl("https://example.com/dedupe"),
-            "owner-1");
+            "owner-1",
+            templateId: null);
 
         var trackingRepo = new FakeTrackingPageRepository(trackingPage);
         var visitRepo = new FakeVisitEventRepository
@@ -105,6 +108,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             Description: null,
             DestinationUrl: "https://example.com",
             OwnerId: "owner-1",
+            TemplateId: null,
             RetentionDays: 10000,
             MaskIpAddress: true,
             EnableBotFiltering: true,
@@ -176,6 +180,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             "Description",
             new TrackingPageUrl("https://example.com/profile"),
             "owner-2",
+            templateId: null,
             new PageSettings(90, maskIpAddress: true, enableBotFiltering: false, captureUtmParameters: true));
 
         var result = aggregate.ToResult();

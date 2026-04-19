@@ -4,9 +4,7 @@
 /* eslint-disable */
 export type CreateTemplateRequest = {
   name?: string | null;
-  subject?: string | null;
-  body?: string | null;
+  htmlContent?: string | null;
   description?: string | null;
   tags?: Array<string> | null;
 };
-

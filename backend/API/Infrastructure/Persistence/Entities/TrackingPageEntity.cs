@@ -14,6 +14,8 @@ public sealed class TrackingPageEntity
 
     public string OwnerId { get; set; } = string.Empty;
 
+    public Guid? TemplateId { get; set; }
+
     public int PublishState { get; set; }
 
     public int? RetentionDays { get; set; }

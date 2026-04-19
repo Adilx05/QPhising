@@ -8,9 +8,9 @@ export type CreateTrackingPageRequest = {
   description?: string | null;
   destinationUrl?: string | null;
   ownerId?: string | null;
+  templateId?: string | null;
   retentionDays?: number | null;
   maskIpAddress?: boolean | null;
   enableBotFiltering?: boolean | null;
   captureUtmParameters?: boolean | null;
 };
-
