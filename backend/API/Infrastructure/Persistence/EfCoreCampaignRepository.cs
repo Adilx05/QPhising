@@ -56,6 +56,9 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
         existing.ScheduleEndsAtUtc = aggregate.ScheduleWindow?.EndsAtUtc;
         existing.CreatedAtUtc = aggregate.CreatedAtUtc;
         existing.UpdatedAtUtc = aggregate.UpdatedAtUtc;
+        existing.IsDeleted = aggregate.IsDeleted;
+        existing.DeletedAtUtc = aggregate.DeletedAtUtc;
+        existing.DeletedBy = aggregate.DeletedBy;
     }
 
     public async Task DeleteAsync(CampaignAggregate aggregate, CancellationToken cancellationToken)
@@ -70,7 +73,10 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
             return;
         }
 
-        _dbContext.Campaigns.Remove(existing);
+        existing.IsDeleted = aggregate.IsDeleted;
+        existing.UpdatedAtUtc = aggregate.UpdatedAtUtc;
+        existing.DeletedAtUtc = aggregate.DeletedAtUtc;
+        existing.DeletedBy = aggregate.DeletedBy;
     }
 
     private static CampaignAggregate ToDomainAggregate(CampaignEntity entity)
@@ -87,7 +93,10 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
             (CampaignLifecycleState)entity.LifecycleState,
             scheduleWindow,
             entity.CreatedAtUtc,
-            entity.UpdatedAtUtc);
+            entity.UpdatedAtUtc,
+            entity.IsDeleted,
+            entity.DeletedAtUtc,
+            entity.DeletedBy);
     }
 
     private static CampaignEntity ToEntity(CampaignAggregate aggregate)
@@ -102,7 +111,10 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
             ScheduleStartsAtUtc = aggregate.ScheduleWindow?.StartsAtUtc,
             ScheduleEndsAtUtc = aggregate.ScheduleWindow?.EndsAtUtc,
             CreatedAtUtc = aggregate.CreatedAtUtc,
-            UpdatedAtUtc = aggregate.UpdatedAtUtc
+            UpdatedAtUtc = aggregate.UpdatedAtUtc,
+            IsDeleted = aggregate.IsDeleted,
+            DeletedAtUtc = aggregate.DeletedAtUtc,
+            DeletedBy = aggregate.DeletedBy
         };
     }
 }

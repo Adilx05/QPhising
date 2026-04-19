@@ -1,9 +1,7 @@
 namespace QPhising.Api.Infrastructure.Persistence.Entities;
 
-public sealed class CampaignEntity
+public sealed class CampaignEntity : BaseEntity
 {
-    public Guid Id { get; set; }
-
     public string Name { get; set; } = string.Empty;
 
     public Guid TrackingPageId { get; set; }
@@ -16,7 +14,4 @@ public sealed class CampaignEntity
 
     public DateTimeOffset? ScheduleEndsAtUtc { get; set; }
 
-    public DateTimeOffset CreatedAtUtc { get; set; }
-
-    public DateTimeOffset UpdatedAtUtc { get; set; }
 }

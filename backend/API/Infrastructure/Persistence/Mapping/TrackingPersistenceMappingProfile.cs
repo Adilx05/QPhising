@@ -34,7 +34,10 @@ public static class TrackingPersistenceMappingProfile
             (TrackingPagePublishState)entity.PublishState,
             settings,
             entity.CreatedAtUtc,
-            entity.UpdatedAtUtc);
+            entity.UpdatedAtUtc,
+            entity.IsDeleted,
+            entity.DeletedAtUtc,
+            entity.DeletedBy);
     }
 
     public static TrackingPageEntity ToEntity(this TrackingPageAggregate aggregate)
@@ -59,7 +62,10 @@ public static class TrackingPersistenceMappingProfile
             EnableBotFiltering = aggregate.Settings?.EnableBotFiltering,
             CaptureUtmParameters = aggregate.Settings?.CaptureUtmParameters,
             CreatedAtUtc = aggregate.CreatedAtUtc,
-            UpdatedAtUtc = aggregate.UpdatedAtUtc
+            UpdatedAtUtc = aggregate.UpdatedAtUtc,
+            IsDeleted = aggregate.IsDeleted,
+            DeletedAtUtc = aggregate.DeletedAtUtc,
+            DeletedBy = aggregate.DeletedBy
         };
     }
 

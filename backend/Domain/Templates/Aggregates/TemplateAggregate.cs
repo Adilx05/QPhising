@@ -6,7 +6,7 @@ using QPhising.Domain.Templates.ValueObjects;
 
 namespace QPhising.Domain.Templates.Aggregates;
 
-public sealed class TemplateAggregate : Entity<Guid>
+public sealed class TemplateAggregate : AuditableSoftDeletableEntity<Guid>
 {
     public const int InitialVersion = 1;
     public const int MaxVersion = 10_000;
@@ -20,7 +20,10 @@ public sealed class TemplateAggregate : Entity<Guid>
             TemplateLifecycleState.Draft,
             InitialVersion,
             createdAtUtc: DateTimeOffset.UtcNow,
-            updatedAtUtc: null)
+            updatedAtUtc: null,
+            isDeleted: false,
+            deletedAtUtc: null,
+            deletedBy: null)
     {
     }
 
@@ -32,8 +35,11 @@ public sealed class TemplateAggregate : Entity<Guid>
         TemplateLifecycleState lifecycleState,
         int version,
         DateTimeOffset createdAtUtc,
-        DateTimeOffset? updatedAtUtc)
-        : base(id)
+        DateTimeOffset? updatedAtUtc,
+        bool isDeleted,
+        DateTimeOffset? deletedAtUtc,
+        string? deletedBy)
+        : base(id, createdAtUtc, updatedAtUtc, isDeleted, deletedAtUtc, deletedBy)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(content);
@@ -46,8 +52,6 @@ public sealed class TemplateAggregate : Entity<Guid>
         Metadata = metadata;
         LifecycleState = lifecycleState;
         Version = version;
-        CreatedAtUtc = createdAtUtc;
-        UpdatedAtUtc = updatedAtUtc ?? createdAtUtc;
     }
 
     public TemplateName Name { get; private set; }
@@ -59,10 +63,6 @@ public sealed class TemplateAggregate : Entity<Guid>
     public TemplateLifecycleState LifecycleState { get; private set; }
 
     public int Version { get; private set; }
-
-    public DateTimeOffset CreatedAtUtc { get; }
-
-    public DateTimeOffset UpdatedAtUtc { get; private set; }
 
     public void Update(TemplateName name, TemplateContent content, TemplateMetadata metadata)
     {
@@ -110,7 +110,10 @@ public sealed class TemplateAggregate : Entity<Guid>
         TemplateLifecycleState lifecycleState,
         int version,
         DateTimeOffset createdAtUtc,
-        DateTimeOffset updatedAtUtc)
+        DateTimeOffset updatedAtUtc,
+        bool isDeleted = false,
+        DateTimeOffset? deletedAtUtc = null,
+        string? deletedBy = null)
     {
         return new TemplateAggregate(
             id,
@@ -120,11 +123,19 @@ public sealed class TemplateAggregate : Entity<Guid>
             lifecycleState,
             version,
             createdAtUtc,
-            updatedAtUtc);
+            updatedAtUtc,
+            isDeleted,
+            deletedAtUtc,
+            deletedBy);
     }
 
     private void EnsureMutable()
     {
+        if (IsDeleted)
+        {
+            throw new InvalidOperationException("Deleted templates cannot be modified.");
+        }
+
         if (LifecycleState == TemplateLifecycleState.Archived)
         {
             throw new InvalidOperationException("Archived templates cannot be modified.");
@@ -154,5 +165,4 @@ public sealed class TemplateAggregate : Entity<Guid>
         }
     }
 
-    private void Touch() => UpdatedAtUtc = DateTimeOffset.UtcNow;
 }

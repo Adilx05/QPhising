@@ -59,6 +59,9 @@ public sealed class EfCoreTemplateRepository : ITemplateRepository
         existing.Version = aggregate.Version;
         existing.CreatedAtUtc = aggregate.CreatedAtUtc;
         existing.UpdatedAtUtc = aggregate.UpdatedAtUtc;
+        existing.IsDeleted = aggregate.IsDeleted;
+        existing.DeletedAtUtc = aggregate.DeletedAtUtc;
+        existing.DeletedBy = aggregate.DeletedBy;
     }
 
     public async Task DeleteAsync(TemplateAggregate aggregate, CancellationToken cancellationToken)
@@ -73,7 +76,10 @@ public sealed class EfCoreTemplateRepository : ITemplateRepository
             return;
         }
 
-        _dbContext.Templates.Remove(existing);
+        existing.IsDeleted = aggregate.IsDeleted;
+        existing.UpdatedAtUtc = aggregate.UpdatedAtUtc;
+        existing.DeletedAtUtc = aggregate.DeletedAtUtc;
+        existing.DeletedBy = aggregate.DeletedBy;
     }
 
     private static TemplateAggregate ToDomainAggregate(TemplateEntity entity)
@@ -86,7 +92,10 @@ public sealed class EfCoreTemplateRepository : ITemplateRepository
             (TemplateLifecycleState)entity.LifecycleState,
             entity.Version,
             entity.CreatedAtUtc,
-            entity.UpdatedAtUtc);
+            entity.UpdatedAtUtc,
+            entity.IsDeleted,
+            entity.DeletedAtUtc,
+            entity.DeletedBy);
     }
 
     private static TemplateEntity ToEntity(TemplateAggregate aggregate)
@@ -101,7 +110,10 @@ public sealed class EfCoreTemplateRepository : ITemplateRepository
             LifecycleState = (int)aggregate.LifecycleState,
             Version = aggregate.Version,
             CreatedAtUtc = aggregate.CreatedAtUtc,
-            UpdatedAtUtc = aggregate.UpdatedAtUtc
+            UpdatedAtUtc = aggregate.UpdatedAtUtc,
+            IsDeleted = aggregate.IsDeleted,
+            DeletedAtUtc = aggregate.DeletedAtUtc,
+            DeletedBy = aggregate.DeletedBy
         };
     }
 

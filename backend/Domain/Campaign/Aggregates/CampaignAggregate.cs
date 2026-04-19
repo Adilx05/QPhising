@@ -8,7 +8,7 @@ using QPhising.Domain.Common;
 
 namespace QPhising.Domain.Campaign.Aggregates;
 
-public sealed class CampaignAggregate : Entity<Guid>
+public sealed class CampaignAggregate : AuditableSoftDeletableEntity<Guid>
 {
     public CampaignAggregate(Guid id, CampaignName name, Guid trackingPageId, Guid? templateId)
         : this(
@@ -19,7 +19,10 @@ public sealed class CampaignAggregate : Entity<Guid>
             CampaignLifecycleState.Draft,
             scheduleWindow: null,
             createdAtUtc: DateTimeOffset.UtcNow,
-            updatedAtUtc: null)
+            updatedAtUtc: null,
+            isDeleted: false,
+            deletedAtUtc: null,
+            deletedBy: null)
     {
     }
 
@@ -31,8 +34,11 @@ public sealed class CampaignAggregate : Entity<Guid>
         CampaignLifecycleState lifecycleState,
         CampaignScheduleWindow? scheduleWindow,
         DateTimeOffset createdAtUtc,
-        DateTimeOffset? updatedAtUtc)
-        : base(id)
+        DateTimeOffset? updatedAtUtc,
+        bool isDeleted,
+        DateTimeOffset? deletedAtUtc,
+        string? deletedBy)
+        : base(id, createdAtUtc, updatedAtUtc, isDeleted, deletedAtUtc, deletedBy)
     {
         ArgumentNullException.ThrowIfNull(name);
 
@@ -46,8 +52,6 @@ public sealed class CampaignAggregate : Entity<Guid>
         TemplateId = NormalizeTemplateId(templateId);
         LifecycleState = lifecycleState;
         ScheduleWindow = scheduleWindow;
-        CreatedAtUtc = createdAtUtc;
-        UpdatedAtUtc = updatedAtUtc ?? createdAtUtc;
     }
 
     public CampaignName Name { get; private set; }
@@ -59,10 +63,6 @@ public sealed class CampaignAggregate : Entity<Guid>
     public CampaignLifecycleState LifecycleState { get; private set; }
 
     public CampaignScheduleWindow? ScheduleWindow { get; private set; }
-
-    public DateTimeOffset CreatedAtUtc { get; }
-
-    public DateTimeOffset UpdatedAtUtc { get; private set; }
 
     public void Rename(CampaignName name)
     {
@@ -110,7 +110,10 @@ public sealed class CampaignAggregate : Entity<Guid>
         CampaignLifecycleState lifecycleState,
         CampaignScheduleWindow? scheduleWindow,
         DateTimeOffset createdAtUtc,
-        DateTimeOffset updatedAtUtc)
+        DateTimeOffset updatedAtUtc,
+        bool isDeleted = false,
+        DateTimeOffset? deletedAtUtc = null,
+        string? deletedBy = null)
     {
         return new CampaignAggregate(
             id,
@@ -120,7 +123,10 @@ public sealed class CampaignAggregate : Entity<Guid>
             lifecycleState,
             scheduleWindow,
             createdAtUtc,
-            updatedAtUtc);
+            updatedAtUtc,
+            isDeleted,
+            deletedAtUtc,
+            deletedBy);
     }
 
     private void TransitionTo(CampaignLifecycleState nextState)
@@ -132,13 +138,16 @@ public sealed class CampaignAggregate : Entity<Guid>
 
     private void EnsureMutable()
     {
+        if (IsDeleted)
+        {
+            throw new InvalidOperationException("Deleted campaigns cannot be modified.");
+        }
+
         if (LifecycleState is CampaignLifecycleState.Completed or CampaignLifecycleState.Cancelled)
         {
             throw new InvalidOperationException("Completed or cancelled campaigns cannot be modified.");
         }
     }
-
-    private void Touch() => UpdatedAtUtc = DateTimeOffset.UtcNow;
 
     private static Guid? NormalizeTemplateId(Guid? templateId)
     {

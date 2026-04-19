@@ -5,7 +5,7 @@ using QPhising.Domain.Tracking.ValueObjects;
 
 namespace QPhising.Domain.Tracking.Aggregates;
 
-public sealed class TrackingPageAggregate : Entity<Guid>
+public sealed class TrackingPageAggregate : AuditableSoftDeletableEntity<Guid>
 {
     public const int MaxTitleLength = 160;
     public const int MaxDescriptionLength = 1000;
@@ -36,7 +36,10 @@ public sealed class TrackingPageAggregate : Entity<Guid>
             TrackingPagePublishState.Draft,
             settings,
             DateTimeOffset.UtcNow,
-            null)
+            null,
+            isDeleted: false,
+            deletedAtUtc: null,
+            deletedBy: null)
     {
     }
 
@@ -53,8 +56,11 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         TrackingPagePublishState publishState,
         PageSettings? settings,
         DateTimeOffset createdAtUtc,
-        DateTimeOffset? updatedAtUtc)
-        : base(id)
+        DateTimeOffset? updatedAtUtc,
+        bool isDeleted,
+        DateTimeOffset? deletedAtUtc,
+        string? deletedBy)
+        : base(id, createdAtUtc, updatedAtUtc, isDeleted, deletedAtUtc, deletedBy)
     {
         ArgumentNullException.ThrowIfNull(slug);
 
@@ -67,8 +73,6 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         ApplyValidityWindow(validFromUtc, validUntilUtc);
         PublishState = publishState;
         Settings = settings;
-        CreatedAtUtc = createdAtUtc;
-        UpdatedAtUtc = updatedAtUtc ?? createdAtUtc;
     }
 
     public TrackingPageSlug Slug { get; private set; }
@@ -90,10 +94,6 @@ public sealed class TrackingPageAggregate : Entity<Guid>
     public TrackingPagePublishState PublishState { get; private set; }
 
     public PageSettings? Settings { get; private set; }
-
-    public DateTimeOffset CreatedAtUtc { get; }
-
-    public DateTimeOffset UpdatedAtUtc { get; private set; }
 
     public void UpdateDetails(
         TrackingPageSlug slug,
@@ -180,7 +180,10 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         TrackingPagePublishState publishState,
         PageSettings? settings,
         DateTimeOffset createdAtUtc,
-        DateTimeOffset updatedAtUtc)
+        DateTimeOffset updatedAtUtc,
+        bool isDeleted = false,
+        DateTimeOffset? deletedAtUtc = null,
+        string? deletedBy = null)
     {
         return new TrackingPageAggregate(
             id,
@@ -195,11 +198,19 @@ public sealed class TrackingPageAggregate : Entity<Guid>
             publishState,
             settings,
             createdAtUtc,
-            updatedAtUtc);
+            updatedAtUtc,
+            isDeleted,
+            deletedAtUtc,
+            deletedBy);
     }
 
     private void EnsureMutable()
     {
+        if (IsDeleted)
+        {
+            throw new InvalidOperationException("Deleted tracking pages cannot be modified.");
+        }
+
         if (PublishState == TrackingPagePublishState.Archived)
         {
             throw new InvalidOperationException("Archived tracking pages cannot be modified.");
@@ -291,5 +302,4 @@ public sealed class TrackingPageAggregate : Entity<Guid>
         ValidUntilUtc = validUntilUtc;
     }
 
-    private void Touch() => UpdatedAtUtc = DateTimeOffset.UtcNow;
 }
