@@ -119,38 +119,6 @@ partial class QPhisingDbContextModelSnapshot : ModelSnapshot
                 b.ToTable("templates", (string)null);
             });
 
-        modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignTargetEntity", b =>
-            {
-                b.Property<Guid>("Id")
-                    .HasColumnType("uuid")
-                    .HasColumnName("id");
-
-                b.Property<Guid>("CampaignId")
-                    .HasColumnType("uuid")
-                    .HasColumnName("campaign_id");
-
-                b.Property<string>("EmailAddress")
-                    .IsRequired()
-                    .HasMaxLength(320)
-                    .HasColumnType("character varying(320)")
-                    .HasColumnName("email_address");
-
-                b.HasKey("Id");
-
-                b.HasIndex("CampaignId", "EmailAddress")
-                    .IsUnique();
-
-                b.ToTable("campaign_targets", (string)null);
-            });
-
-        modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignTargetEntity", b =>
-            {
-                b.HasOne("QPhising.Api.Infrastructure.Persistence.Entities.CampaignEntity", null)
-                    .WithMany("Targets")
-                    .HasForeignKey("CampaignId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-            });
 #pragma warning restore 612, 618
     }
 }

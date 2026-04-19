@@ -17,6 +17,4 @@ public sealed class CampaignEntity
     public DateTimeOffset CreatedAtUtc { get; set; }
 
     public DateTimeOffset UpdatedAtUtc { get; set; }
-
-    public List<CampaignTargetEntity> Targets { get; set; } = [];
 }

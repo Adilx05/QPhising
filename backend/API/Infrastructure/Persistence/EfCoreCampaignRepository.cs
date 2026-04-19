@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using QPhising.Api.Infrastructure.Persistence.Entities;
 using QPhising.Application.Contracts.Abstractions.Campaign;
 using QPhising.Domain.Campaign.Aggregates;
-using QPhising.Domain.Campaign.Entities;
 using QPhising.Domain.Campaign.Enums;
 using QPhising.Domain.Campaign.ValueObjects;
 
@@ -21,7 +20,6 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
     {
         var entity = await _dbContext.Campaigns
             .AsNoTracking()
-            .Include(x => x.Targets)
             .SingleOrDefaultAsync(x => x.Id == campaignId, cancellationToken);
 
         return entity is null ? null : ToDomainAggregate(entity);
@@ -31,7 +29,6 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
     {
         var entities = await _dbContext.Campaigns
             .AsNoTracking()
-            .Include(x => x.Targets)
             .OrderByDescending(x => x.CreatedAtUtc)
             .ToListAsync(cancellationToken);
 
@@ -43,7 +40,6 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
         ArgumentNullException.ThrowIfNull(aggregate);
 
         var existing = await _dbContext.Campaigns
-            .Include(x => x.Targets)
             .SingleOrDefaultAsync(x => x.Id == aggregate.Id, cancellationToken);
 
         if (existing is null)
@@ -59,17 +55,6 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
         existing.ScheduleEndsAtUtc = aggregate.ScheduleWindow?.EndsAtUtc;
         existing.CreatedAtUtc = aggregate.CreatedAtUtc;
         existing.UpdatedAtUtc = aggregate.UpdatedAtUtc;
-
-        existing.Targets.Clear();
-        foreach (var target in aggregate.Targets)
-        {
-            existing.Targets.Add(new CampaignTargetEntity
-            {
-                Id = target.Id,
-                CampaignId = aggregate.Id,
-                EmailAddress = target.EmailAddress
-            });
-        }
     }
 
     public async Task DeleteAsync(CampaignAggregate aggregate, CancellationToken cancellationToken)
@@ -93,10 +78,6 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
             ? new CampaignScheduleWindow(entity.ScheduleStartsAtUtc.Value, entity.ScheduleEndsAtUtc)
             : null;
 
-        var targets = entity.Targets
-            .Select(target => new CampaignTarget(target.Id, target.EmailAddress))
-            .ToArray();
-
         return CampaignAggregate.Rehydrate(
             entity.Id,
             new CampaignName(entity.Name),
@@ -104,8 +85,7 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
             (CampaignLifecycleState)entity.LifecycleState,
             scheduleWindow,
             entity.CreatedAtUtc,
-            entity.UpdatedAtUtc,
-            targets);
+            entity.UpdatedAtUtc);
     }
 
     private static CampaignEntity ToEntity(CampaignAggregate aggregate)
@@ -119,13 +99,7 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
             ScheduleStartsAtUtc = aggregate.ScheduleWindow?.StartsAtUtc,
             ScheduleEndsAtUtc = aggregate.ScheduleWindow?.EndsAtUtc,
             CreatedAtUtc = aggregate.CreatedAtUtc,
-            UpdatedAtUtc = aggregate.UpdatedAtUtc,
-            Targets = aggregate.Targets.Select(target => new CampaignTargetEntity
-            {
-                Id = target.Id,
-                CampaignId = aggregate.Id,
-                EmailAddress = target.EmailAddress
-            }).ToList()
+            UpdatedAtUtc = aggregate.UpdatedAtUtc
         };
     }
 }

@@ -12,8 +12,6 @@ public sealed class QPhisingDbContext : DbContext
 
     public DbSet<CampaignEntity> Campaigns => Set<CampaignEntity>();
 
-    public DbSet<CampaignTargetEntity> CampaignTargets => Set<CampaignTargetEntity>();
-
     public DbSet<TemplateEntity> Templates => Set<TemplateEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,22 +29,6 @@ public sealed class QPhisingDbContext : DbContext
         campaign.Property(x => x.ScheduleEndsAtUtc).HasColumnName("schedule_ends_at_utc");
         campaign.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc").IsRequired();
         campaign.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc").IsRequired();
-
-        campaign.HasMany(x => x.Targets)
-            .WithOne()
-            .HasForeignKey(x => x.CampaignId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        var campaignTarget = modelBuilder.Entity<CampaignTargetEntity>();
-        campaignTarget.ToTable("campaign_targets");
-        campaignTarget.HasKey(x => x.Id);
-        campaignTarget.Property(x => x.Id).HasColumnName("id");
-        campaignTarget.Property(x => x.CampaignId).HasColumnName("campaign_id").IsRequired();
-        campaignTarget.Property(x => x.EmailAddress).HasColumnName("email_address").HasMaxLength(320).IsRequired();
-
-        campaignTarget.HasIndex(x => new { x.CampaignId, x.EmailAddress })
-            .IsUnique();
-
 
         var template = modelBuilder.Entity<TemplateEntity>();
         template.ToTable("templates");

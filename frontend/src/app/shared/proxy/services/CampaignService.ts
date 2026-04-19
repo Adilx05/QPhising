@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AddCampaignTargetRequest } from '../models/AddCampaignTargetRequest';
 import type { CampaignResult } from '../models/CampaignResult';
 import type { CreateCampaignRequest } from '../models/CreateCampaignRequest';
 import type { ScheduleCampaignRequest } from '../models/ScheduleCampaignRequest';
@@ -117,61 +116,6 @@ export class CampaignService {
       url: '/api/campaigns/{campaignId}',
       path: {
         'campaignId': campaignId,
-      },
-      errors: {
-        400: `Bad Request`,
-        401: `Unauthorized`,
-        403: `Forbidden`,
-        500: `Internal Server Error`,
-      },
-    });
-  }
-  /**
-   * Add an email target to a campaign.
-   * @returns CampaignResult OK
-   * @throws ApiError
-   */
-  public static campaignAddTarget({
-    campaignId,
-    requestBody,
-  }: {
-    campaignId: string,
-    requestBody?: AddCampaignTargetRequest,
-  }): CancelablePromise<CampaignResult> {
-    return __request(OpenAPI, {
-      method: 'POST',
-      url: '/api/campaigns/{campaignId}/targets',
-      path: {
-        'campaignId': campaignId,
-      },
-      body: requestBody,
-      mediaType: 'application/json',
-      errors: {
-        400: `Bad Request`,
-        401: `Unauthorized`,
-        403: `Forbidden`,
-        500: `Internal Server Error`,
-      },
-    });
-  }
-  /**
-   * Remove a target from a campaign.
-   * @returns CampaignResult OK
-   * @throws ApiError
-   */
-  public static campaignRemoveTarget({
-    campaignId,
-    targetId,
-  }: {
-    campaignId: string,
-    targetId: string,
-  }): CancelablePromise<CampaignResult> {
-    return __request(OpenAPI, {
-      method: 'DELETE',
-      url: '/api/campaigns/{campaignId}/targets/{targetId}',
-      path: {
-        'campaignId': campaignId,
-        'targetId': targetId,
       },
       errors: {
         400: `Bad Request`,

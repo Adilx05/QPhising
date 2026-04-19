@@ -38,7 +38,7 @@ interface TemplateDraft {
       <h2 class="text-base font-semibold text-slate-900">Create Template</h2>
       <div class="mt-3 grid gap-3 md:grid-cols-2">
         <input pInputText [(ngModel)]="createForm.name" class="w-full" placeholder="Template name" />
-        <input pInputText [(ngModel)]="createForm.subject" class="w-full" placeholder="Email subject" />
+        <input pInputText [(ngModel)]="createForm.subject" class="w-full" placeholder="Page headline" />
         <input pInputText [(ngModel)]="createForm.description" class="w-full md:col-span-2" placeholder="Description" />
         <input pInputText [(ngModel)]="createForm.body" class="w-full md:col-span-2" placeholder="Body" />
         <input pInputText [(ngModel)]="createForm.tags" class="w-full md:col-span-2" placeholder="Tags (comma-separated)" />

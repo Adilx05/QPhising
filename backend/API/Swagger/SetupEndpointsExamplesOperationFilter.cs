@@ -151,23 +151,6 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             return;
         }
 
-        if (method == "POST" && path == "/api/campaigns/{campaignid}/targets")
-        {
-            operation.Summary ??= "Add an email target to a campaign.";
-            SetRequestExample(operation, new OpenApiObject
-            {
-                ["emailAddress"] = new OpenApiString("analyst@example.com")
-            });
-            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample());
-            return;
-        }
-
-        if (method == "DELETE" && path == "/api/campaigns/{campaignid}/targets/{targetid}")
-        {
-            operation.Summary ??= "Remove a target from a campaign.";
-            SetResponseExample(operation, StatusCodes.Status200OK.ToString(), CreateCampaignResponseExample());
-            return;
-        }
 
         if (method == "POST" && path == "/api/campaigns/{campaignid}/schedule")
         {
@@ -360,15 +343,7 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             ["startsAtUtc"] = startsAtUtc is null ? new OpenApiNull() : new OpenApiString(startsAtUtc),
             ["endsAtUtc"] = endsAtUtc is null ? new OpenApiNull() : new OpenApiString(endsAtUtc),
             ["createdAtUtc"] = new OpenApiString("2026-04-18T13:31:00Z"),
-            ["updatedAtUtc"] = new OpenApiString("2026-04-18T13:40:00Z"),
-            ["targets"] = new OpenApiArray
-            {
-                new OpenApiObject
-                {
-                    ["id"] = new OpenApiString("0528d1ef-3fa0-4f0d-b984-02584f27c079"),
-                    ["emailAddress"] = new OpenApiString("analyst@example.com")
-                }
-            }
+            ["updatedAtUtc"] = new OpenApiString("2026-04-18T13:40:00Z")
         };
     }
 
@@ -379,7 +354,7 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             ["name"] = new OpenApiString("Credential Harvesting Alert - Finance"),
             ["subject"] = new OpenApiString("Action Required: Confirm Payroll Portal Access"),
             ["body"] = new OpenApiString("<p>Please confirm your payroll credentials to avoid service interruption.</p>"),
-            ["description"] = new OpenApiString("Finance-focused phishing simulation template."),
+            ["description"] = new OpenApiString("Finance-focused tracking page template."),
             ["tags"] = new OpenApiArray
             {
                 new OpenApiString("finance"),
@@ -398,7 +373,7 @@ public sealed class SetupEndpointsExamplesOperationFilter : IOperationFilter
             ["name"] = new OpenApiString("Credential Harvesting Alert - Finance"),
             ["subject"] = new OpenApiString("Action Required: Confirm Payroll Portal Access"),
             ["body"] = new OpenApiString("<p>Please confirm your payroll credentials to avoid service interruption.</p>"),
-            ["description"] = new OpenApiString("Finance-focused phishing simulation template."),
+            ["description"] = new OpenApiString("Finance-focused tracking page template."),
             ["tags"] = new OpenApiArray
             {
                 new OpenApiString("finance"),

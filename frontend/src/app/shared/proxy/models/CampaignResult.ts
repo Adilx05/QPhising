@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CampaignLifecycleState } from './CampaignLifecycleState';
-import type { CampaignTargetResult } from './CampaignTargetResult';
 export type CampaignResult = {
   id?: string;
   name?: string | null;
@@ -13,6 +12,5 @@ export type CampaignResult = {
   endsAtUtc?: string | null;
   createdAtUtc?: string;
   updatedAtUtc?: string;
-  targets?: Array<CampaignTargetResult> | null;
 };
 
