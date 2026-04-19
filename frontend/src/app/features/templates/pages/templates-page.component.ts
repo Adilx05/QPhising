@@ -104,8 +104,6 @@ interface TemplateDraft {
 
           <div class="mt-3 flex flex-wrap gap-2">
             <button pButton type="button" size="small" label="Save" [disabled]="!canOperate() || isBusy()" (click)="save(templateItem.id)"></button>
-            <button pButton type="button" size="small" severity="success" label="Publish" [disabled]="!canOperate() || isBusy()" (click)="publish(templateItem.id)"></button>
-            <button pButton type="button" size="small" severity="secondary" label="Archive" [disabled]="!canOperate() || isBusy()" (click)="archive(templateItem.id)"></button>
             <button pButton type="button" size="small" severity="danger" label="Delete" [disabled]="!canOperate() || isBusy()" (click)="remove(templateItem.id)"></button>
           </div>
         </div>
