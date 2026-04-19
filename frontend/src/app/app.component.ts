@@ -18,7 +18,9 @@ import { SetupReadinessState, SetupService } from './shared/proxy';
     <div class="app-shell min-h-screen">
       <aside class="hidden border-r border-slate-200/80 bg-white/95 lg:flex lg:w-72 lg:flex-col">
         <div class="border-b border-slate-200 px-6 py-6">
-          <a class="text-2xl font-semibold tracking-tight text-slate-900" routerLink="/dashboard">QPhising</a>
+          <a class="text-2xl font-semibold tracking-tight text-slate-900" routerLink="/dashboard">
+            <img src="logo.png" alt="QPhising" class="h-20 w-auto mr-2">
+          </a>
           <p class="mt-2 text-sm text-slate-500">{{ t('shellSubtitle') }}</p>
         </div>
 
