@@ -145,6 +145,24 @@ public sealed class TrackingController : ControllerBase
             cancellationToken);
     }
 
+    [HttpPost("{slug}/visits", Name = "TrackingPage_CaptureVisitBySlug")]
+    [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.PublicVisitIngestion)]
+    [RequestSizeLimit(16 * 1024)]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(VisitIngestionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<VisitIngestionResult> CaptureVisitBySlug(
+        [FromRoute] string slug,
+        [FromQuery] Guid? id,
+        [FromQuery] string? campaign,
+        [FromBody] CaptureVisitRequest request,
+        CancellationToken cancellationToken)
+    {
+        var landingPage = await _sender.Send(new GetTrackingLandingPageBySlugQuery(slug, id, campaign), cancellationToken);
+        return await CaptureVisit(landingPage.TrackingPageId, request, cancellationToken);
+    }
+
     [HttpGet("{trackingPageId:guid}/analytics", Name = "TrackingPage_GetAnalytics")]
     [Authorize(Policy = IdentityAuthorizationPolicies.ViewerOrAbove)]
     [ProducesResponseType(typeof(TrackingPageAnalyticsResult), StatusCodes.Status200OK)]
