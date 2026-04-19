@@ -42,15 +42,15 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("deleted_by");
 
-                    b.Property<int>("LifecycleState")
-                        .HasColumnType("integer")
-                        .HasColumnName("lifecycle_state");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasColumnName("is_deleted")
-                        .HasDefaultValue(false);
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<int>("LifecycleState")
+                        .HasColumnType("integer")
+                        .HasColumnName("lifecycle_state");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -118,15 +118,15 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("character varying(200000)")
                         .HasColumnName("html_content");
 
-                    b.Property<int>("LifecycleState")
-                        .HasColumnType("integer")
-                        .HasColumnName("lifecycle_state");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasColumnName("is_deleted")
-                        .HasDefaultValue(false);
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<int>("LifecycleState")
+                        .HasColumnType("integer")
+                        .HasColumnName("lifecycle_state");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -171,6 +171,11 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
+                    b.Property<string>("CustomHtmlContent")
+                        .HasMaxLength(200000)
+                        .HasColumnType("character varying(200000)")
+                        .HasColumnName("custom_html_content");
+
                     b.Property<DateTimeOffset?>("DeletedAtUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at_utc");
@@ -179,11 +184,6 @@ namespace QPhising.Api.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
                         .HasColumnName("deleted_by");
-
-                    b.Property<string>("CustomHtmlContent")
-                        .HasMaxLength(200000)
-                        .HasColumnType("character varying(200000)")
-                        .HasColumnName("custom_html_content");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
@@ -201,8 +201,8 @@ namespace QPhising.Api.Migrations
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasColumnName("is_deleted")
-                        .HasDefaultValue(false);
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("OwnerId")
                         .IsRequired()

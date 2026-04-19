@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QPhising.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class firstinc : Migration
+    public partial class firstint : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,7 +23,10 @@ namespace QPhising.Api.Migrations
                     lifecycle_state = table.Column<int>(type: "integer", nullable: false),
                     version = table.Column<int>(type: "integer", nullable: false),
                     created_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    updated_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    updated_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    deleted_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    deleted_by = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -45,11 +48,15 @@ namespace QPhising.Api.Migrations
                     valid_until_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     publish_state = table.Column<int>(type: "integer", nullable: false),
                     retention_days = table.Column<int>(type: "integer", nullable: true),
-                    mask_ip_address = table.Column<bool>(type: "boolean", nullable: true),
+                    capture_ip_address = table.Column<bool>(type: "boolean", nullable: true),
+                    ip_address_hash_policy = table.Column<int>(type: "integer", nullable: true),
                     enable_bot_filtering = table.Column<bool>(type: "boolean", nullable: true),
                     capture_utm_parameters = table.Column<bool>(type: "boolean", nullable: true),
                     created_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    updated_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    updated_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    deleted_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    deleted_by = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -74,7 +81,10 @@ namespace QPhising.Api.Migrations
                     schedule_starts_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     schedule_ends_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     created_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    updated_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    updated_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    deleted_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    deleted_by = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -116,7 +126,8 @@ namespace QPhising.Api.Migrations
                 name: "IX_campaigns_tracking_page_id",
                 table: "campaigns",
                 column: "tracking_page_id",
-                unique: true);
+                unique: true,
+                filter: "\"is_deleted\" = FALSE");
 
             migrationBuilder.CreateIndex(
                 name: "IX_tracking_pages_owner_id",
@@ -127,7 +138,8 @@ namespace QPhising.Api.Migrations
                 name: "IX_tracking_pages_slug",
                 table: "tracking_pages",
                 column: "slug",
-                unique: true);
+                unique: true,
+                filter: "\"is_deleted\" = FALSE");
 
             migrationBuilder.CreateIndex(
                 name: "IX_tracking_pages_template_id",
