@@ -7,7 +7,6 @@ import {
 
 export interface RuntimeConfigurationInput {
   databaseConnectionString: string;
-  redisConnectionString: string;
   keycloakAuthority: string;
   keycloakRealm: string;
   keycloakClientId: string;
@@ -22,7 +21,6 @@ export const saveRuntimeConfiguration = async (
 ): Promise<RuntimeConfigurationResult> => {
   const request: SaveRuntimeConfigurationRequest = {
     databaseConnectionString: input.databaseConnectionString,
-    redisConnectionString: input.redisConnectionString,
     keycloakAuthority: input.keycloakAuthority,
     keycloakRealm: input.keycloakRealm,
     keycloakClientId: input.keycloakClientId,
@@ -37,7 +35,6 @@ export const updateRuntimeConfiguration = async (
 ): Promise<RuntimeConfigurationResult> => {
   const request: UpdateRuntimeConfigurationRequest = {
     databaseConnectionString: normalizeOptionalValue(input.databaseConnectionString),
-    redisConnectionString: normalizeOptionalValue(input.redisConnectionString),
     keycloakAuthority: normalizeOptionalValue(input.keycloakAuthority),
     keycloakRealm: normalizeOptionalValue(input.keycloakRealm),
     keycloakClientId: normalizeOptionalValue(input.keycloakClientId),

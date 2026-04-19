@@ -96,7 +96,6 @@ public sealed class JsonFileSetupConfigurationRepository : ISetupConfigurationRe
     private static SetupConfigurationSnapshot ToSnapshot(SetupAggregate aggregate)
     {
         if (aggregate.DatabaseConnectionCipherText is null ||
-            aggregate.RedisConnectionCipherText is null ||
             aggregate.KeycloakClientSecretCipherText is null ||
             string.IsNullOrWhiteSpace(aggregate.KeycloakAuthority) ||
             string.IsNullOrWhiteSpace(aggregate.KeycloakRealm) ||
@@ -107,7 +106,7 @@ public sealed class JsonFileSetupConfigurationRepository : ISetupConfigurationRe
 
         return new SetupConfigurationSnapshot(
             aggregate.DatabaseConnectionCipherText.CipherText,
-            aggregate.RedisConnectionCipherText.CipherText,
+            aggregate.RedisConnectionCipherText?.CipherText,
             aggregate.KeycloakAuthority,
             aggregate.KeycloakRealm,
             aggregate.KeycloakClientId,
@@ -119,7 +118,10 @@ public sealed class JsonFileSetupConfigurationRepository : ISetupConfigurationRe
         var aggregate = new SetupAggregate();
 
         aggregate.ConfigureDatabase(new SecureConfigValue(snapshot.DatabaseConnectionCipherText));
-        aggregate.ConfigureRedis(new SecureConfigValue(snapshot.RedisConnectionCipherText));
+        if (!string.IsNullOrWhiteSpace(snapshot.RedisConnectionCipherText))
+        {
+            aggregate.ConfigureRedis(new SecureConfigValue(snapshot.RedisConnectionCipherText));
+        }
         aggregate.ConfigureKeycloak(
             new Uri(snapshot.KeycloakAuthority, UriKind.Absolute),
             snapshot.KeycloakRealm,
@@ -133,7 +135,7 @@ public sealed class JsonFileSetupConfigurationRepository : ISetupConfigurationRe
 
     private sealed record SetupConfigurationSnapshot(
         string DatabaseConnectionCipherText,
-        string RedisConnectionCipherText,
+        string? RedisConnectionCipherText,
         string KeycloakAuthority,
         string KeycloakRealm,
         string KeycloakClientId,

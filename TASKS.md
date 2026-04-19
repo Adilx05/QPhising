@@ -144,8 +144,10 @@ Phase 9 evidence:
 - [x] Fix tracking analytics detail unique-visitor query runtime failure and ensure campaign detail shows persisted start/end schedule windows.
 - [x] Introduce auditable BaseEntity + soft-delete semantics (`IsDeleted`) for core write-side entities and enforce global EF filtering with no hard deletes.
 - [x] Add campaign delete action in campaigns list and cascade soft-delete linked tracking pages when campaign is deleted.
+- [x] Remove Redis-only setup/runtime form requirements, add appsettings bootstrap guard fallback, and expose authenticated user card with sidebar logout action.
 
 Incremental evidence:
+- 2026-04-19: Removed Redis input/test requirements from setup + runtime configuration flows (Redis now optional in setup/runtime aggregates), setup guard now allows main app when base appsettings bootstrap config is already present, and app shell now renders authenticated user card (name/role) with sidebar logout action.
 - 2026-04-19: Campaign create flow now provisions public landing validity window + optional custom HTML, removes destination URL dependency, returns/create-UI displays slug/id public links, and public `/p/{slug}` resolution now accepts optional `id`/`campaign` query with strict 404 for unpublished or out-of-window pages.
 - 2026-04-19: Campaign create contract now accepts tracking page fields and optional template; handler provisions tracking page + campaign atomically via CQRS, campaign aggregate now persists `TrackingPageId`, and migration `20260419140000_CampaignTrackingPageLink` introduces campaign→tracking_page FK/index.
 - 2026-04-19: Campaign UI now uses template dropdown (no GUID input), captures page slug/title/destination for create flow, lists campaigns with detail navigation, and adds dedicated `/campaigns/:campaignId` detail page.

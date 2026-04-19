@@ -14,7 +14,7 @@ public static class SetupCompletionPolicy
             return SetupAccessState.MainApplicationAccessible;
         }
 
-        if (aggregate.IsDatabaseConfigured || aggregate.IsKeycloakConfigured || aggregate.IsRedisConfigured)
+        if (aggregate.IsDatabaseConfigured || aggregate.IsKeycloakConfigured)
         {
             return SetupAccessState.SetupInProgress;
         }

@@ -4,13 +4,11 @@ import {
   type SetupStatusResult,
   type TestDatabaseConnectionRequest,
   type TestKeycloakConnectionRequest,
-  type TestRedisConnectionRequest,
   type SetupDependencyTestResult
 } from '../../../shared/proxy';
 
 export interface SetupConfigurationInput {
   databaseConnectionString: string;
-  redisConnectionString: string;
   keycloakAuthority: string;
   keycloakRealm: string;
   keycloakClientId: string;
@@ -28,16 +26,6 @@ export const testDatabaseConnection = async (
   };
 
   return SetupService.testDatabaseConnectionSetup({ requestBody: request });
-};
-
-export const testRedisConnection = async (
-  connectionString: string
-): Promise<SetupDependencyTestResult> => {
-  const request: TestRedisConnectionRequest = {
-    connectionString
-  };
-
-  return SetupService.testRedisConnectionSetup({ requestBody: request });
 };
 
 export const testKeycloakConnection = async (
@@ -61,7 +49,6 @@ export const saveSetupConfiguration = async (
 ): Promise<SetupStatusResult> => {
   const request: SaveSetupConfigurationRequest = {
     databaseConnectionString: input.databaseConnectionString,
-    redisConnectionString: input.redisConnectionString,
     keycloakAuthority: input.keycloakAuthority,
     keycloakRealm: input.keycloakRealm,
     keycloakClientId: input.keycloakClientId,

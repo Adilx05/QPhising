@@ -24,7 +24,7 @@ public sealed class RuntimeConfigurationAggregate
 
     public static RuntimeConfigurationAggregate Rehydrate(
         string databaseConnectionCipherText,
-        string redisConnectionCipherText,
+        string? redisConnectionCipherText,
         string keycloakAuthority,
         string keycloakRealm,
         string keycloakClientId,
@@ -39,7 +39,9 @@ public sealed class RuntimeConfigurationAggregate
         var aggregate = new RuntimeConfigurationAggregate
         {
             DatabaseConnectionCipherText = RuntimeConfigurationSecretPolicy.RequireSecret(databaseConnectionCipherText, nameof(databaseConnectionCipherText)),
-            RedisConnectionCipherText = RuntimeConfigurationSecretPolicy.RequireSecret(redisConnectionCipherText, nameof(redisConnectionCipherText)),
+            RedisConnectionCipherText = string.IsNullOrWhiteSpace(redisConnectionCipherText)
+                ? null
+                : RuntimeConfigurationSecretPolicy.RequireSecret(redisConnectionCipherText, nameof(redisConnectionCipherText)),
             KeycloakClientSecretCipherText = RuntimeConfigurationSecretPolicy.RequireSecret(keycloakClientSecretCipherText, nameof(keycloakClientSecretCipherText)),
             KeycloakAuthority = authorityUri.AbsoluteUri.TrimEnd('/'),
             KeycloakRealm = string.IsNullOrWhiteSpace(keycloakRealm)
@@ -101,7 +103,6 @@ public sealed class RuntimeConfigurationAggregate
 
     public bool IsReadyForProtectedRuntime() =>
         DatabaseConnectionCipherText is not null &&
-        RedisConnectionCipherText is not null &&
         KeycloakClientSecretCipherText is not null &&
         !string.IsNullOrWhiteSpace(KeycloakAuthority) &&
         !string.IsNullOrWhiteSpace(KeycloakRealm) &&

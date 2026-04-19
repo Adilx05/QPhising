@@ -5,7 +5,7 @@ namespace QPhising.Application.CQRS.Commands.Setup;
 
 public sealed record SaveSetupConfigurationCommand(
     string DatabaseConnectionString,
-    string RedisConnectionString,
+    string? RedisConnectionString,
     string KeycloakAuthority,
     string KeycloakRealm,
     string KeycloakClientId,

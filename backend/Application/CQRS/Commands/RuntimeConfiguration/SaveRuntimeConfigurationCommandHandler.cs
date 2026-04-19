@@ -23,11 +23,14 @@ public sealed class SaveRuntimeConfigurationCommandHandler : IRequestHandler<Sav
         var aggregate = new RuntimeConfigurationAggregate();
 
         var databaseCipherText = await _runtimeConfigurationSecretCipher.EncryptAsync(request.DatabaseConnectionString, cancellationToken);
-        var redisCipherText = await _runtimeConfigurationSecretCipher.EncryptAsync(request.RedisConnectionString, cancellationToken);
         var keycloakClientSecretCipherText = await _runtimeConfigurationSecretCipher.EncryptAsync(request.KeycloakClientSecret, cancellationToken);
 
         aggregate.SetDatabaseConnection(databaseCipherText);
-        aggregate.SetRedisConnection(redisCipherText);
+        if (!string.IsNullOrWhiteSpace(request.RedisConnectionString))
+        {
+            var redisCipherText = await _runtimeConfigurationSecretCipher.EncryptAsync(request.RedisConnectionString, cancellationToken);
+            aggregate.SetRedisConnection(redisCipherText);
+        }
         aggregate.SetKeycloakConfiguration(
             new Uri(request.KeycloakAuthority),
             request.KeycloakRealm,

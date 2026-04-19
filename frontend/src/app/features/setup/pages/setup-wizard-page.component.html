@@ -8,7 +8,7 @@
     <div class="mb-5 flex items-start justify-between gap-3 border-b border-slate-200 pb-4">
       <div>
         <h2 class="text-lg font-semibold text-slate-900">Dependency Configuration</h2>
-        <p class="mt-1 text-sm text-slate-500">Database, Redis ve Keycloak bilgilerini backend test endpointleriyle doğrulayın.</p>
+        <p class="mt-1 text-sm text-slate-500">Database ve Keycloak bilgilerini backend test endpointleriyle doğrulayın.</p>
       </div>
       <span class="status-chip" [ngClass]="setupCompleted() ? 'status-chip-success' : 'status-chip-warning'">
         {{ setupCompleted() ? 'Setup Completed' : 'Setup Pending' }}
@@ -19,11 +19,6 @@
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700" for="databaseConnectionString">Database Connection String</label>
         <input id="databaseConnectionString" pInputText class="w-full" formControlName="databaseConnectionString" />
-      </div>
-
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-slate-700" for="redisConnectionString">Redis Connection String</label>
-        <input id="redisConnectionString" pInputText class="w-full" formControlName="redisConnectionString" />
       </div>
 
       <div class="grid gap-4 md:grid-cols-2">
@@ -52,7 +47,6 @@
 
       <div class="flex flex-wrap gap-3 pt-3">
         <button pButton type="button" severity="secondary" icon="pi pi-database" label="DB Test" [disabled]="isBusy()" (click)="testDatabase()"></button>
-        <button pButton type="button" severity="secondary" icon="pi pi-bolt" label="Redis Test" [disabled]="isBusy()" (click)="testRedis()"></button>
         <button pButton type="button" severity="secondary" icon="pi pi-shield" label="Keycloak Test" [disabled]="isBusy()" (click)="testKeycloak()"></button>
         <button pButton type="button" icon="pi pi-save" [label]="isBusy() ? 'Kaydediliyor...' : 'Kaydet'" [loading]="isBusy()" [disabled]="isBusy()" (click)="save()"></button>
       </div>
@@ -83,12 +77,6 @@
           <span>Database</span>
           <span class="status-chip" [ngClass]="dbTestResult()?.succeeded ? 'status-chip-success' : 'status-chip-muted'">
             {{ dbTestResult()?.succeeded ? 'OK' : 'Not tested' }}
-          </span>
-        </li>
-        <li class="flex items-center justify-between gap-2">
-          <span>Redis</span>
-          <span class="status-chip" [ngClass]="redisTestResult()?.succeeded ? 'status-chip-success' : 'status-chip-muted'">
-            {{ redisTestResult()?.succeeded ? 'OK' : 'Not tested' }}
           </span>
         </li>
         <li class="flex items-center justify-between gap-2">
