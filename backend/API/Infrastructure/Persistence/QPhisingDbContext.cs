@@ -27,12 +27,18 @@ public sealed class QPhisingDbContext : DbContext
         campaign.HasKey(x => x.Id);
         campaign.Property(x => x.Id).HasColumnName("id");
         campaign.Property(x => x.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
-        campaign.Property(x => x.TemplateId).HasColumnName("template_id").IsRequired();
+        campaign.Property(x => x.TrackingPageId).HasColumnName("tracking_page_id").IsRequired();
+        campaign.Property(x => x.TemplateId).HasColumnName("template_id");
         campaign.Property(x => x.LifecycleState).HasColumnName("lifecycle_state").IsRequired();
         campaign.Property(x => x.ScheduleStartsAtUtc).HasColumnName("schedule_starts_at_utc");
         campaign.Property(x => x.ScheduleEndsAtUtc).HasColumnName("schedule_ends_at_utc");
         campaign.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc").IsRequired();
         campaign.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc").IsRequired();
+        campaign.HasIndex(x => x.TrackingPageId).IsUnique();
+        campaign.HasOne<TrackingPageEntity>()
+            .WithMany()
+            .HasForeignKey(x => x.TrackingPageId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         var template = modelBuilder.Entity<TemplateEntity>();
         template.ToTable("templates");

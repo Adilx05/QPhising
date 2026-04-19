@@ -2,4 +2,8 @@ namespace QPhising.Api.Contracts.Campaign;
 
 public sealed record CreateCampaignRequest(
     string Name,
-    Guid TemplateId);
+    string TrackingPageSlug,
+    string TrackingPageTitle,
+    string DestinationUrl,
+    string? TrackingPageDescription,
+    Guid? TemplateId);

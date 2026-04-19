@@ -10,10 +10,11 @@ namespace QPhising.Domain.Campaign.Aggregates;
 
 public sealed class CampaignAggregate : Entity<Guid>
 {
-    public CampaignAggregate(Guid id, CampaignName name, Guid templateId)
+    public CampaignAggregate(Guid id, CampaignName name, Guid trackingPageId, Guid? templateId)
         : this(
             id,
             name,
+            trackingPageId,
             templateId,
             CampaignLifecycleState.Draft,
             scheduleWindow: null,
@@ -25,7 +26,8 @@ public sealed class CampaignAggregate : Entity<Guid>
     private CampaignAggregate(
         Guid id,
         CampaignName name,
-        Guid templateId,
+        Guid trackingPageId,
+        Guid? templateId,
         CampaignLifecycleState lifecycleState,
         CampaignScheduleWindow? scheduleWindow,
         DateTimeOffset createdAtUtc,
@@ -34,13 +36,14 @@ public sealed class CampaignAggregate : Entity<Guid>
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (templateId == Guid.Empty)
+        if (trackingPageId == Guid.Empty)
         {
-            throw new ArgumentException("Template ID is required.", nameof(templateId));
+            throw new ArgumentException("Tracking page ID is required.", nameof(trackingPageId));
         }
 
         Name = name;
-        TemplateId = templateId;
+        TrackingPageId = trackingPageId;
+        TemplateId = NormalizeTemplateId(templateId);
         LifecycleState = lifecycleState;
         ScheduleWindow = scheduleWindow;
         CreatedAtUtc = createdAtUtc;
@@ -49,7 +52,9 @@ public sealed class CampaignAggregate : Entity<Guid>
 
     public CampaignName Name { get; private set; }
 
-    public Guid TemplateId { get; private set; }
+    public Guid TrackingPageId { get; private set; }
+
+    public Guid? TemplateId { get; private set; }
 
     public CampaignLifecycleState LifecycleState { get; private set; }
 
@@ -100,7 +105,8 @@ public sealed class CampaignAggregate : Entity<Guid>
     public static CampaignAggregate Rehydrate(
         Guid id,
         CampaignName name,
-        Guid templateId,
+        Guid trackingPageId,
+        Guid? templateId,
         CampaignLifecycleState lifecycleState,
         CampaignScheduleWindow? scheduleWindow,
         DateTimeOffset createdAtUtc,
@@ -109,6 +115,7 @@ public sealed class CampaignAggregate : Entity<Guid>
         return new CampaignAggregate(
             id,
             name,
+            trackingPageId,
             templateId,
             lifecycleState,
             scheduleWindow,
@@ -132,4 +139,14 @@ public sealed class CampaignAggregate : Entity<Guid>
     }
 
     private void Touch() => UpdatedAtUtc = DateTimeOffset.UtcNow;
+
+    private static Guid? NormalizeTemplateId(Guid? templateId)
+    {
+        if (!templateId.HasValue || templateId.Value == Guid.Empty)
+        {
+            return null;
+        }
+
+        return templateId.Value;
+    }
 }

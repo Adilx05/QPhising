@@ -6,7 +6,8 @@ namespace QPhising.Application.Contracts.Responses.Campaign;
 public sealed record CampaignResult(
     Guid Id,
     string Name,
-    Guid TemplateId,
+    Guid TrackingPageId,
+    Guid? TemplateId,
     CampaignLifecycleState LifecycleState,
     DateTimeOffset? StartsAtUtc,
     DateTimeOffset? EndsAtUtc,
@@ -20,6 +21,7 @@ public sealed record CampaignResult(
         return new CampaignResult(
             Id: aggregate.Id,
             Name: aggregate.Name.Value,
+            TrackingPageId: aggregate.TrackingPageId,
             TemplateId: aggregate.TemplateId,
             LifecycleState: aggregate.LifecycleState,
             StartsAtUtc: aggregate.ScheduleWindow?.StartsAtUtc,

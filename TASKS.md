@@ -134,3 +134,12 @@ Phase 9 evidence:
 - [ ] No placeholder/fake data or deprecated phishing/email flows remain.
 - [ ] Security, role authorization, and rate-limiting behavior are verified.
 - [ ] TASKS.md statuses are accurate and evidence is documented.
+
+## Incremental Feature Requests
+- [x] Rework campaign creation flow to create a real tracking page (template-based or blank) without manual GUID entry in UI.
+- [x] Add campaign detail route and screen reachable from campaign listing cards.
+- [x] Persist campaign-to-tracking-page relationship in Domain + EF Core schema.
+
+Incremental evidence:
+- 2026-04-19: Campaign create contract now accepts tracking page fields and optional template; handler provisions tracking page + campaign atomically via CQRS, campaign aggregate now persists `TrackingPageId`, and migration `20260419140000_CampaignTrackingPageLink` introduces campaign→tracking_page FK/index.
+- 2026-04-19: Campaign UI now uses template dropdown (no GUID input), captures page slug/title/destination for create flow, lists campaigns with detail navigation, and adds dedicated `/campaigns/:campaignId` detail page.

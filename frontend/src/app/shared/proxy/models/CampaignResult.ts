@@ -6,11 +6,11 @@ import type { CampaignLifecycleState } from './CampaignLifecycleState';
 export type CampaignResult = {
   id?: string;
   name?: string | null;
-  templateId?: string;
+  trackingPageId?: string;
+  templateId?: string | null;
   lifecycleState?: CampaignLifecycleState;
   startsAtUtc?: string | null;
   endsAtUtc?: string | null;
   createdAtUtc?: string;
   updatedAtUtc?: string;
 };
-

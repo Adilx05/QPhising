@@ -8,6 +8,7 @@ import {
 import { AuthCallbackPageComponent } from './features/auth/pages/auth-callback-page.component';
 import { AuthUnauthorizedPageComponent } from './features/auth/pages/auth-unauthorized-page.component';
 import { CampaignsPageComponent } from './features/campaigns/pages/campaigns-page.component';
+import { CampaignDetailPageComponent } from './features/campaigns/pages/campaign-detail-page.component';
 import { DashboardPageComponent } from './features/dashboard/pages/dashboard-page.component';
 import { RuntimeConfigurationPageComponent } from './features/setup/pages/runtime-configuration-page.component';
 import { TrackingDashboardPageComponent } from './features/tracking/pages/tracking-dashboard-page.component';
@@ -40,6 +41,15 @@ export const appRoutes: Routes = [
   {
     path: 'campaigns',
     component: CampaignsPageComponent,
+    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    data: {
+      requiredRole: 'Viewer'
+    }
+  },
+  {
+    path: 'campaigns/:campaignId',
+    component: CampaignDetailPageComponent,
     canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
     canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
     data: {

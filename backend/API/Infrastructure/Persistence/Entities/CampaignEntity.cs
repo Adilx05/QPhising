@@ -6,7 +6,9 @@ public sealed class CampaignEntity
 
     public string Name { get; set; } = string.Empty;
 
-    public Guid TemplateId { get; set; }
+    public Guid TrackingPageId { get; set; }
+
+    public Guid? TemplateId { get; set; }
 
     public int LifecycleState { get; set; }
 

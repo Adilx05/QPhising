@@ -1,13 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { resolveApiError } from '../../../core/http/api-error-handler';
 import { AuthSessionService } from '../../../core/auth/auth-session';
 import {
-  CampaignLifecycleState ,
-  type CampaignResult
+  CampaignLifecycleState,
+  type CampaignResult,
+  TemplateService,
+  type TemplateResult
 } from '../../../shared/proxy';
 import {
   cancelCampaign,
@@ -15,32 +19,57 @@ import {
   createCampaign,
   listCampaigns,
   pauseCampaign,
-  scheduleCampaign,
   startCampaign
 } from '../data-access';
 
 @Component({
   selector: 'app-campaigns-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, InputTextModule],
+  imports: [CommonModule, FormsModule, RouterLink, ButtonModule, DropdownModule, InputTextModule],
   template: `
     <section class="mb-6">
-      <h1 class="page-title">Campaign Management</h1>
-      <p class="page-subtitle">Campaign verileri doğrudan generated CampaignService proxy çağrılarıyla yönetilir.</p>
+      <h1 class="page-title">Campaigns</h1>
+      <p class="page-subtitle">Template seçerek ya da sıfırdan tracking sayfası oluşturarak yeni campaign başlatabilirsin.</p>
     </section>
 
     <section class="surface-card p-5">
-      <div class="flex flex-wrap items-end gap-3">
-        <div class="min-w-56 flex-1">
+      <div class="grid gap-3 md:grid-cols-2">
+        <div>
           <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Campaign Name</label>
-          <input pInputText [(ngModel)]="createForm.name" class="w-full" placeholder="Quarterly Simulation" />
+          <input pInputText [(ngModel)]="createForm.name" class="w-full" placeholder="Q2 Signup Simulation" />
         </div>
 
-        <div class="min-w-56 flex-1">
-          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Template Id</label>
-          <input pInputText [(ngModel)]="createForm.templateId" class="w-full" placeholder="00000000-0000-0000-0000-000000000000" />
+        <div>
+          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Template (Optional)</label>
+          <p-dropdown
+            [options]="templateOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            [ngModel]="createForm.templateId"
+            (ngModelChange)="createForm.templateId = $event"
+            placeholder="Blank campaign page"
+            styleClass="w-full"
+          ></p-dropdown>
         </div>
 
+        <div>
+          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Page Slug</label>
+          <input pInputText [(ngModel)]="createForm.slug" class="w-full" placeholder="q2-signup" />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Page Title</label>
+          <input pInputText [(ngModel)]="createForm.pageTitle" class="w-full" placeholder="Q2 Signup Landing" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Destination URL</label>
+          <input pInputText [(ngModel)]="createForm.destinationUrl" class="w-full" placeholder="https://example.com/welcome" />
+        </div>
+      </div>
+
+      <div class="mt-4">
         <button
           pButton
           type="button"
@@ -62,7 +91,7 @@ import {
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 class="text-lg font-semibold text-slate-900">{{ campaign.name || 'Unnamed Campaign' }}</h2>
-            <p class="text-sm text-slate-500">ID: {{ campaign.id }}</p>
+            <p class="text-sm text-slate-500">Tracking Page: {{ campaign.trackingPageId }}</p>
           </div>
 
           <span class="status-chip" [ngClass]="stateChipClass(campaign.lifecycleState)">
@@ -71,7 +100,7 @@ import {
         </div>
 
         <div class="mt-4 grid gap-3 lg:grid-cols-3">
-                    <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+          <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
             <p class="text-xs font-semibold uppercase text-slate-500">Starts At (UTC)</p>
             <p class="mt-1 text-sm text-slate-700">{{ campaign.startsAtUtc || 'Not scheduled' }}</p>
           </div>
@@ -82,38 +111,8 @@ import {
           </div>
         </div>
 
-        <div class="mt-4 grid gap-3 xl:grid-cols-2">
-          <div class="rounded-xl border border-slate-200 p-4">
-            <p class="text-xs font-semibold uppercase text-slate-500">Schedule</p>
-            <div class="mt-2 grid gap-2 sm:grid-cols-2">
-              <input
-                pInputText
-                class="w-full"
-                placeholder="2026-06-01T09:00:00Z"
-                [ngModel]="scheduleDrafts()[campaign.id || ''].startsAtUtc || ''"
-                (ngModelChange)="setScheduleDraft(campaign.id, 'startsAtUtc', $event)"
-              />
-              <input
-                pInputText
-                class="w-full"
-                placeholder="2026-06-01T17:00:00Z"
-                [ngModel]="scheduleDrafts()[campaign.id || ''].endsAtUtc || ''"
-                (ngModelChange)="setScheduleDraft(campaign.id, 'endsAtUtc', $event)"
-              />
-            </div>
-            <button
-              class="mt-2"
-              pButton
-              type="button"
-              icon="pi pi-calendar-plus"
-              label="Apply Schedule"
-              [disabled]="!canOperate() || isBusy()"
-              (click)="schedule(campaign.id)"
-            ></button>
-          </div>
-        </div>
-
         <div class="mt-4 flex flex-wrap gap-2">
+          <a pButton type="button" size="small" severity="info" [routerLink]="['/campaigns', campaign.id]" label="Details"></a>
           <button pButton type="button" size="small" label="Start" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'start')"></button>
           <button pButton type="button" size="small" severity="secondary" label="Pause" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'pause')"></button>
           <button pButton type="button" size="small" severity="success" label="Complete" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'complete')"></button>
@@ -131,13 +130,24 @@ export class CampaignsPageComponent {
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
   protected readonly campaigns = signal<CampaignResult[]>([]);
-  protected readonly scheduleDrafts = signal<Record<string, { startsAtUtc: string; endsAtUtc: string }>>({});
+  protected readonly templates = signal<TemplateResult[]>([]);
   protected readonly canOperate = computed(() => this.authSessionService.hasRequiredRole('Operator'));
 
   protected readonly createForm = {
     name: '',
-    templateId: ''
+    slug: '',
+    pageTitle: '',
+    destinationUrl: '',
+    templateId: null as string | null
   };
+
+  protected readonly templateOptions = computed(() =>
+    this.templates()
+      .filter((template) => !!template.id)
+      .map((template) => ({
+        value: template.id!,
+        label: template.name || template.id!
+      })));
 
   public constructor(private readonly authSessionService: AuthSessionService) {
     void this.refresh();
@@ -145,50 +155,41 @@ export class CampaignsPageComponent {
 
   protected async refresh(): Promise<void> {
     await this.execute(async () => {
-      this.campaigns.set(await listCampaigns());
+      const [campaigns, templates] = await Promise.all([listCampaigns(), TemplateService.templateList()]);
+      this.campaigns.set(campaigns);
+      this.templates.set(templates);
       this.feedback.set('Campaign listesi güncellendi.');
     });
   }
 
   protected async create(): Promise<void> {
     const name = this.createForm.name.trim();
-    const templateId = this.createForm.templateId.trim();
+    const trackingPageSlug = this.createForm.slug.trim();
+    const trackingPageTitle = this.createForm.pageTitle.trim();
+    const destinationUrl = this.createForm.destinationUrl.trim();
 
-    if (name.length === 0 || templateId.length === 0) {
-      this.feedback.set('Campaign name ve template id zorunludur.');
+    if (!name || !trackingPageSlug || !trackingPageTitle || !destinationUrl) {
+      this.feedback.set('Campaign name, page slug, page title ve destination URL zorunludur.');
       return;
     }
 
     await this.execute(async () => {
-      await createCampaign({ name, templateId });
+      await createCampaign({
+        name,
+        trackingPageSlug,
+        trackingPageTitle,
+        destinationUrl,
+        trackingPageDescription: null,
+        templateId: this.createForm.templateId
+      });
+
       this.createForm.name = '';
-      this.createForm.templateId = '';
+      this.createForm.slug = '';
+      this.createForm.pageTitle = '';
+      this.createForm.destinationUrl = '';
+      this.createForm.templateId = null;
       this.feedback.set('Campaign oluşturuldu.');
       this.campaigns.set(await listCampaigns());
-    });
-  }
-
-  protected async schedule(campaignId: string | undefined): Promise<void> {
-    if (!campaignId) {
-      return;
-    }
-
-    const draft = this.scheduleDrafts()[campaignId];
-    const startsAtUtc = draft?.startsAtUtc?.trim() ?? '';
-
-    if (startsAtUtc.length === 0) {
-      this.feedback.set('Schedule için startsAtUtc zorunludur.');
-      return;
-    }
-
-    await this.execute(async () => {
-      const updatedCampaign = await scheduleCampaign({
-        campaignId,
-        startsAtUtc,
-        endsAtUtc: draft?.endsAtUtc?.trim() || null
-      });
-      this.applyUpdatedCampaign(updatedCampaign);
-      this.feedback.set('Campaign schedule güncellendi.');
     });
   }
 
@@ -204,26 +205,6 @@ export class CampaignsPageComponent {
       const updatedCampaign = await this.transitionCampaign(campaignId, action);
       this.applyUpdatedCampaign(updatedCampaign);
       this.feedback.set(`Campaign ${action} işlemi başarılı.`);
-    });
-  }
-
-  protected setScheduleDraft(
-    campaignId: string | undefined,
-    field: 'startsAtUtc' | 'endsAtUtc',
-    value: string
-  ): void {
-    if (!campaignId) {
-      return;
-    }
-
-    const current = this.scheduleDrafts()[campaignId] ?? { startsAtUtc: '', endsAtUtc: '' };
-
-    this.scheduleDrafts.set({
-      ...this.scheduleDrafts(),
-      [campaignId]: {
-        ...current,
-        [field]: value
-      }
     });
   }
 

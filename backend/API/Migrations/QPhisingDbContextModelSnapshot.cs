@@ -51,15 +51,22 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("schedule_starts_at_utc");
 
-                    b.Property<Guid>("TemplateId")
+                    b.Property<Guid?>("TemplateId")
                         .HasColumnType("uuid")
                         .HasColumnName("template_id");
+
+                    b.Property<Guid>("TrackingPageId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tracking_page_id");
 
                     b.Property<DateTimeOffset>("UpdatedAtUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at_utc");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TrackingPageId")
+                        .IsUnique();
 
                     b.ToTable("campaigns", (string)null);
                 });
@@ -255,6 +262,15 @@ namespace QPhising.Api.Migrations
                         .WithMany()
                         .HasForeignKey("TemplateId")
                         .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignEntity", b =>
+                {
+                    b.HasOne("QPhising.Api.Infrastructure.Persistence.Entities.TrackingPageEntity", null)
+                        .WithMany()
+                        .HasForeignKey("TrackingPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.VisitEventEntity", b =>

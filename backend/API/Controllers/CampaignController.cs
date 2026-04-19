@@ -37,7 +37,15 @@ public sealed class CampaignController : ControllerBase
     [ProducesResponseType(typeof(CampaignResult), StatusCodes.Status200OK)]
     [Authorize(Policy = IdentityAuthorizationPolicies.OperatorOrAbove)]
     public Task<CampaignResult> Create([FromBody] CreateCampaignRequest request, CancellationToken cancellationToken) =>
-        _sender.Send(new CreateCampaignCommand(request.Name, request.TemplateId), cancellationToken);
+        _sender.Send(
+            new CreateCampaignCommand(
+                request.Name,
+                request.TrackingPageSlug,
+                request.TrackingPageTitle,
+                request.DestinationUrl,
+                request.TrackingPageDescription,
+                request.TemplateId),
+            cancellationToken);
 
     [HttpPut("{campaignId:guid}", Name = "Campaign_Update")]
     [Consumes("application/json")]
