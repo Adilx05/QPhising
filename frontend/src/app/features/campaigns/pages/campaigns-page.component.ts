@@ -47,10 +47,6 @@ export class CampaignsPageComponent {
     validUntilUtc: ''
   };
 
-  protected readonly previewHtml = computed(
-    () => this.createForm.htmlContent?.trim() || '<p style="padding:8px">Preview boş.</p>'
-  );
-
   protected readonly templateOptions = computed(() =>
     this.templates()
       .filter((template) => !!template.id)
@@ -156,6 +152,22 @@ export class CampaignsPageComponent {
       default:
         return 'status-chip-default';
     }
+  }
+
+  protected previewHtml(): string {
+    const customHtml = this.createForm.htmlContent.trim();
+    if (customHtml.length > 0) {
+      return customHtml;
+    }
+
+    const selectedTemplateHtml = this.templates()
+      .find((template) => template.id === this.createForm.templateId)
+      ?.htmlContent
+      ?.trim();
+
+    return selectedTemplateHtml && selectedTemplateHtml.length > 0
+      ? selectedTemplateHtml
+      : '<p style="padding:8px">Preview boş.</p>';
   }
 
   private toUtcIso(value: string): string | null {

@@ -9,7 +9,7 @@ public static class CampaignLifecyclePolicy
     public static bool CanTransition(CampaignLifecycleState currentState, CampaignLifecycleState nextState) =>
         currentState switch
         {
-            CampaignLifecycleState.Draft => nextState is CampaignLifecycleState.Scheduled or CampaignLifecycleState.Cancelled,
+            CampaignLifecycleState.Draft => nextState is CampaignLifecycleState.Scheduled or CampaignLifecycleState.Active or CampaignLifecycleState.Cancelled,
             CampaignLifecycleState.Scheduled => nextState is CampaignLifecycleState.Active or CampaignLifecycleState.Cancelled,
             CampaignLifecycleState.Active => nextState is CampaignLifecycleState.Paused or CampaignLifecycleState.Completed or CampaignLifecycleState.Cancelled,
             CampaignLifecycleState.Paused => nextState is CampaignLifecycleState.Active or CampaignLifecycleState.Cancelled,
