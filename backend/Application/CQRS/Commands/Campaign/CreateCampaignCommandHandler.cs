@@ -54,7 +54,6 @@ public sealed class CreateCampaignCommandHandler : IRequestHandler<CreateCampaig
             ipAddressHashPolicy: IpAddressHashPolicy.Sha256,
             enableBotFiltering: true,
             captureUtmParameters: true));
-        trackingPage.Publish();
 
         await _trackingPageRepository.SaveAsync(trackingPage, cancellationToken);
 
