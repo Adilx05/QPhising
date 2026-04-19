@@ -1,0 +1,71 @@
+name: qphising
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-qphising}
+      POSTGRES_USER: ${POSTGRES_USER:-qphising}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qphising-dev-password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - qphising-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qphising} -d ${POSTGRES_DB:-qphising}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    profiles: ["redis"]
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/API/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-qphising};Password=${POSTGRES_PASSWORD:-qphising-dev-password}
+      Authentication__Jwt__Authority: ${JWT_AUTHORITY:-http://host.docker.internal:6060/realms/QPhising}
+      Authentication__Jwt__Audience: ${JWT_AUDIENCE:-account}
+      Authentication__Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
+      Redis__Configuration: redis:6379
+      Redis__InstanceName: ${REDIS_INSTANCE_NAME:-QPhising}
+      FeatureFlags__SwaggerEnabled: ${API_SWAGGER_ENABLED:-true}
+      Database__ApplyMigrationsOnStartup: ${API_APPLY_MIGRATIONS_ON_STARTUP:-true}
+      Tracking__VisitorPrivacy__HashPepper: ${TRACKING_HASH_PEPPER:-}
+      Setup__AllowRuntimeOverrides: ${SETUP_ALLOW_RUNTIME_OVERRIDES:-false}
+    ports:
+      - "${API_PORT:-5050}:5050"
+
+  gateway:
+    build:
+      context: .
+      dockerfile: backend/Gateway/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      Authentication__Jwt__Authority: ${JWT_AUTHORITY:-http://host.docker.internal:6060/realms/QPhising}
+      Authentication__Jwt__Audience: ${JWT_AUDIENCE:-account}
+      Authentication__Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
+      Gateway__RoutePolicies__ForwardAccessToken: ${GATEWAY_FORWARD_ACCESS_TOKEN:-true}
+      Setup__AllowRuntimeOverrides: ${SETUP_ALLOW_RUNTIME_OVERRIDES:-false}
+    ports:
+      - "${GATEWAY_PORT:-8080}:8080"
+
+volumes:
+  qphising-postgres-data:

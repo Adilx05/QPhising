@@ -1,0 +1,76 @@
+name: Release Baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: "Release environment"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      release_version:
+        description: "Release version tag (for example v1.2.3)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.inputs.target_environment }}
+  cancel-in-progress: false
+
+jobs:
+  release-readiness:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.target_environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate semantic release version format
+        run: |
+          if [[ ! "${{ github.event.inputs.release_version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "release_version must follow vMAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore + build
+        run: |
+          dotnet restore QPhising.slnx
+          dotnet build QPhising.slnx --configuration Release --no-restore
+
+      - name: Run backend tests
+        run: dotnet test backend/API.Tests/QPhising.Api.Tests.csproj --configuration Release --no-build
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Create deployment artifact bundle
+        run: |
+          mkdir -p artifacts
+          tar -czf artifacts/qphising-${{ github.event.inputs.release_version }}.tgz backend frontend docker-compose.yml deploy/env
+
+      - name: Upload release baseline artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qphising-${{ github.event.inputs.release_version }}
+          path: artifacts/qphising-${{ github.event.inputs.release_version }}.tgz

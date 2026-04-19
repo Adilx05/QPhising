@@ -1,6 +1,18 @@
 {
   "Routes": [
     {
+      "UpstreamPathTemplate": "/p/{slug}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/p/{slug}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5050
+        }
+      ]
+    },
+    {
       "UpstreamPathTemplate": "/api/setup/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
       "DownstreamPathTemplate": "/api/setup/{everything}",

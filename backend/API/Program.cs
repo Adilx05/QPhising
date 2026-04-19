@@ -34,6 +34,8 @@ using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.runtime.json", optional: true, reloadOnChange: true);
+builder.Logging.ClearProviders();
+builder.Logging.AddJsonConsole();
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 
@@ -272,6 +274,7 @@ builder.Services.AddSingleton<IRuntimeConfigurationRepository, JsonFileRuntimeCo
 
 var app = builder.Build();
 
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ProblemDetailsExceptionMiddleware>();
 
 var shouldRunMigrations = app.Environment.IsDevelopment() ||

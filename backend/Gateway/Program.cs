@@ -10,6 +10,8 @@ builder.Configuration
     .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.runtime.json", optional: true, reloadOnChange: true);
+builder.Logging.ClearProviders();
+builder.Logging.AddJsonConsole();
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 var gatewayRoutePolicySettingsProvider = new ConfigurationGatewayRoutePolicySettingsProvider(builder.Configuration);
@@ -55,6 +57,7 @@ var app = builder.Build();
 
 app.UseRouting();
 app.UseCors("GatewayCors");
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseAuthentication();
 app.UseMiddleware<ClaimsToHeadersForwardingMiddleware>();
 app.UseAuthorization();
