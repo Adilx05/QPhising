@@ -20,6 +20,7 @@ import {
   cancelCampaign,
   completeCampaign,
   createCampaign,
+  deleteCampaign,
   listCampaigns,
   pauseCampaign,
   startCampaign
@@ -39,6 +40,7 @@ export class CampaignsPageComponent {
   protected readonly campaigns = signal<CampaignResult[]>([]);
   protected readonly templates = signal<TemplateResult[]>([]);
   protected readonly canOperate = computed(() => this.authSessionService.hasRequiredRole('Operator'));
+  protected readonly canDelete = computed(() => this.authSessionService.hasRequiredRole('Admin'));
 
   protected readonly createForm = {
     name: '',
@@ -154,6 +156,22 @@ export class CampaignsPageComponent {
       const updatedCampaign = await this.transitionCampaign(campaignId, action);
       this.applyUpdatedCampaign(updatedCampaign);
       this.feedback.set(`Campaign ${action} işlemi başarılı.`);
+    });
+  }
+
+  protected async removeCampaign(campaignId: string | undefined): Promise<void> {
+    if (!campaignId) {
+      return;
+    }
+
+    if (!window.confirm('Campaign silinsin mi? Bağlı tracking page de soft-delete ile kaldırılacak.')) {
+      return;
+    }
+
+    await this.execute(async () => {
+      await deleteCampaign(campaignId);
+      this.campaigns.set(this.campaigns().filter((campaign) => campaign.id !== campaignId));
+      this.feedback.set('Campaign ve bağlı tracking page soft-delete ile silindi.');
     });
   }
 

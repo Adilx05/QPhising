@@ -135,6 +135,7 @@
       <button pButton type="button" size="small" severity="secondary" label="Pause" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'pause')"></button>
       <button pButton type="button" size="small" severity="success" label="Complete" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'complete')"></button>
       <button pButton type="button" size="small" severity="danger" label="Cancel" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'cancel')"></button>
+      <button pButton type="button" size="small" severity="danger" outlined="true" label="Delete" [disabled]="!canDelete() || isBusy()" (click)="removeCampaign(campaign.id)"></button>
     </div>
   </article>
 
