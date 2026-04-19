@@ -54,11 +54,11 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
     public Task<int> CountUniqueVisitorsAsync(Guid trackingPageId, DateTimeOffset? fromUtc, DateTimeOffset? toUtc, CancellationToken cancellationToken)
     {
         return ApplyRangeFilter(_dbContext.VisitEvents.AsNoTracking(), trackingPageId, fromUtc, toUtc)
-            .Select(visit => string.IsNullOrWhiteSpace(visit.SessionId)
-                ? (string.IsNullOrWhiteSpace(visit.VisitorFingerprint)
-                    ? (string.IsNullOrWhiteSpace(visit.IpHash) ? $"ua:{visit.UserAgent}" : $"ip:{visit.IpHash}")
-                    : $"fp:{visit.VisitorFingerprint}")
-                : $"sid:{visit.SessionId}")
+            .Select(visit => visit.SessionId != null && visit.SessionId != string.Empty
+                ? $"sid:{visit.SessionId}"
+                : (visit.VisitorFingerprint != null && visit.VisitorFingerprint != string.Empty
+                    ? $"fp:{visit.VisitorFingerprint}"
+                    : (visit.IpHash != null && visit.IpHash != string.Empty ? $"ip:{visit.IpHash}" : $"ua:{visit.UserAgent}")))
             .Distinct()
             .CountAsync(cancellationToken);
     }
@@ -137,11 +137,11 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         CancellationToken cancellationToken)
     {
         return ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
-            .Select(visit => string.IsNullOrWhiteSpace(visit.SessionId)
-                ? (string.IsNullOrWhiteSpace(visit.VisitorFingerprint)
-                    ? (string.IsNullOrWhiteSpace(visit.IpHash) ? $"ua:{visit.UserAgent}" : $"ip:{visit.IpHash}")
-                    : $"fp:{visit.VisitorFingerprint}")
-                : $"sid:{visit.SessionId}")
+            .Select(visit => visit.SessionId != null && visit.SessionId != string.Empty
+                ? $"sid:{visit.SessionId}"
+                : (visit.VisitorFingerprint != null && visit.VisitorFingerprint != string.Empty
+                    ? $"fp:{visit.VisitorFingerprint}"
+                    : (visit.IpHash != null && visit.IpHash != string.Empty ? $"ip:{visit.IpHash}" : $"ua:{visit.UserAgent}")))
             .Distinct()
             .CountAsync(cancellationToken);
     }
@@ -170,11 +170,11 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
             .Select(visit => new
             {
                 visit.TrackingPageId,
-                UniqueKey = string.IsNullOrWhiteSpace(visit.SessionId)
-                    ? (string.IsNullOrWhiteSpace(visit.VisitorFingerprint)
-                        ? (string.IsNullOrWhiteSpace(visit.IpHash) ? $"ua:{visit.UserAgent}" : $"ip:{visit.IpHash}")
-                        : $"fp:{visit.VisitorFingerprint}")
-                    : $"sid:{visit.SessionId}"
+                UniqueKey = visit.SessionId != null && visit.SessionId != string.Empty
+                    ? $"sid:{visit.SessionId}"
+                    : (visit.VisitorFingerprint != null && visit.VisitorFingerprint != string.Empty
+                        ? $"fp:{visit.VisitorFingerprint}"
+                        : (visit.IpHash != null && visit.IpHash != string.Empty ? $"ip:{visit.IpHash}" : $"ua:{visit.UserAgent}"))
             })
             .Distinct()
             .GroupBy(visit => visit.TrackingPageId)
