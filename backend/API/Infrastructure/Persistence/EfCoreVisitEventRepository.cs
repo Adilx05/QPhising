@@ -330,7 +330,14 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
 
         if (excludeBots)
         {
-            query = query.Where(visit => visit.TrackingPage.EnableBotFiltering != true || !IsBotUserAgent(visit.UserAgent));
+            query = query.Where(visit =>
+                visit.TrackingPage.EnableBotFiltering != true
+                || visit.UserAgent == null
+                || (!EF.Functions.ILike(visit.UserAgent, "%bot%")
+                    && !EF.Functions.ILike(visit.UserAgent, "%spider%")
+                    && !EF.Functions.ILike(visit.UserAgent, "%crawler%")
+                    && !EF.Functions.ILike(visit.UserAgent, "%slurp%")
+                    && !EF.Functions.ILike(visit.UserAgent, "%headless%")));
         }
 
         return query;
@@ -370,18 +377,4 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         return startOfDay.AddDays(-daysSinceMonday);
     }
 
-    private static bool IsBotUserAgent(string? userAgent)
-    {
-        if (string.IsNullOrWhiteSpace(userAgent))
-        {
-            return false;
-        }
-
-        var normalized = userAgent.Trim();
-        return normalized.Contains("bot", StringComparison.OrdinalIgnoreCase)
-               || normalized.Contains("spider", StringComparison.OrdinalIgnoreCase)
-               || normalized.Contains("crawler", StringComparison.OrdinalIgnoreCase)
-               || normalized.Contains("slurp", StringComparison.OrdinalIgnoreCase)
-               || normalized.Contains("headless", StringComparison.OrdinalIgnoreCase);
-    }
 }
