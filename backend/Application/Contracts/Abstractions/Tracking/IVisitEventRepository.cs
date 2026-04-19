@@ -33,4 +33,38 @@ public interface IVisitEventRepository
         DateTimeOffset? toUtc,
         int limit,
         CancellationToken cancellationToken);
+
+    Task<int> CountTotalAcrossPagesAsync(
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        CancellationToken cancellationToken);
+
+    Task<int> CountUniqueVisitorsAcrossPagesAsync(
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<TrackingTopPageMetric>> ListTopPagesAsync(
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        int limit,
+        CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<TrackingRecentVisitMetric>> ListRecentAcrossPagesAsync(
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        int limit,
+        CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<TrackingVisitTrendBucket>> GetTrendBucketsAcrossPagesAsync(
+        DateTimeOffset fromUtc,
+        DateTimeOffset toUtc,
+        TrackingVisitTrendBucketWindow window,
+        int timezoneOffsetMinutes,
+        bool excludeBots,
+        CancellationToken cancellationToken);
 }

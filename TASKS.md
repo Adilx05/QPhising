@@ -70,12 +70,16 @@ Phase 4 evidence:
 - 2026-04-19: Added authenticated `/tracking` frontend module with generated TrackingService-based data-access, admin KPI shell, searchable/sortable/paginated tracking page grid, editor + lifecycle controls, analytics detail with date/source/device filters, and trend/distribution chart visualizations.
 
 ## Phase 5 - Analytics
-- [ ] Implement total visits metric pipeline.
-- [ ] Implement unique visits metric strategy (session/fingerprint policy).
-- [ ] Implement top pages ranking logic.
-- [ ] Implement recent visits stream/query.
-- [ ] Implement trend aggregation (hour/day/week windows).
-- [ ] Define metric definitions and edge-case behavior (bot traffic, duplicate hits, timezone boundaries).
+- [x] Implement total visits metric pipeline.
+- [x] Implement unique visits metric strategy (session/fingerprint policy).
+- [x] Implement top pages ranking logic.
+- [x] Implement recent visits stream/query.
+- [x] Implement trend aggregation (hour/day/week windows).
+- [x] Define metric definitions and edge-case behavior (bot traffic, duplicate hits, timezone boundaries).
+
+
+Phase 5 evidence:
+- 2026-04-19: Added analytics overview CQRS + API endpoint (`GET /api/tracking/analytics/overview`) with total/unique visit pipelines, top-pages ranking, cross-page recent-visit stream, hour/day/week trend aggregation with timezone offsets, bot-exclusion support, and explicit metric definition semantics for duplicate/bot/time-boundary edge cases.
 
 ## Phase 6 - Security
 - [ ] Enforce authentication for all admin and analytics management endpoints.
