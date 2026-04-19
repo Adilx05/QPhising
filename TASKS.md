@@ -146,6 +146,8 @@ Phase 9 evidence:
 - [x] Add campaign delete action in campaigns list and cascade soft-delete linked tracking pages when campaign is deleted.
 - [x] Remove Redis-only setup/runtime form requirements, add appsettings bootstrap guard fallback, and expose authenticated user card with sidebar logout action.
 - [x] Hide Setup Wizard navigation once setup is completed and move Runtime Configuration into a low-prominence bottom sidebar section while placing the user card at the top.
+- [x] Replace setup-state home dashboard with application analytics dashboard (campaign totals, tracking summary, trends, and recent visits) using PrimeNG data components and live backend metrics.
+- [x] Simplify sidebar user card content to show only full name and role, and normalize dashboard copy/date formatting for proper Turkish character rendering.
 
 Incremental evidence:
 - 2026-04-19: Removed Redis input/test requirements from setup + runtime configuration flows (Redis now optional in setup/runtime aggregates), setup guard now allows main app when base appsettings bootstrap config is already present, and app shell now renders authenticated user card (name/role) with sidebar logout action.
@@ -166,3 +168,4 @@ Incremental evidence:
 - 2026-04-19: Extended soft-delete metadata with optional `deleted_at_utc` and `deleted_by` fields across domain + persistence base entities, propagated metadata through aggregate rehydration/mapping/repositories, and added migration `20260419193000_AddSoftDeleteMetadataColumns`.
 - 2026-04-19: Added campaign list delete action (Admin-only UI control), wired campaign data-access `campaignDelete` proxy usage, and updated `DeleteCampaignCommandHandler` to soft-delete linked tracking pages automatically; validated with integration coverage for campaign+tracking page post-delete 404 behavior.
 - 2026-04-19: Updated app shell navigation to auto-hide Setup Wizard after setup readiness is `Ready`, moved the authenticated user card to the top of the sidebar, and repositioned Runtime Configuration into a bottom, lower-prominence system section.
+- 2026-04-19: Replaced `/dashboard` setup health view with a production-focused analytics dashboard powered by campaign list, tracking page list, and tracking overview endpoints; added PrimeNG table/tag/progress widgets for KPI, top-page, trend, and recent-visit summaries; simplified sidebar user card copy to name+role only; and standardized dashboard Turkish text/date formatting (`tr-TR`).
