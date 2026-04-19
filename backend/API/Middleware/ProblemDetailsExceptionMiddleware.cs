@@ -78,7 +78,7 @@ public sealed class ProblemDetailsExceptionMiddleware
         {
             ValidationException => (
                 StatusCodes.Status400BadRequest,
-                "Validation failure",
+                "One or more validation errors occurred.",
                 "https://tools.ietf.org/html/rfc9110#section-15.5.1"),
             ApplicationAuthorizationException authorizationException when authorizationException.Message.Contains("not authenticated", StringComparison.OrdinalIgnoreCase) => (
                 StatusCodes.Status401Unauthorized,
