@@ -80,6 +80,7 @@ Phase 4 evidence:
 
 Phase 5 evidence:
 - 2026-04-19: Added analytics overview CQRS + API endpoint (`GET /api/tracking/analytics/overview`) with total/unique visit pipelines, top-pages ranking, cross-page recent-visit stream, hour/day/week trend aggregation with timezone offsets, bot-exclusion support, and explicit metric definition semantics for duplicate/bot/time-boundary edge cases.
+- 2026-04-19: Fixed analytics compile-time regressions by normalizing unique-visitor selector translation in EF Core repository and removing index-based access on IReadOnlyCollection in overview query handler.
 
 ## Phase 6 - Security
 - [ ] Enforce authentication for all admin and analytics management endpoints.

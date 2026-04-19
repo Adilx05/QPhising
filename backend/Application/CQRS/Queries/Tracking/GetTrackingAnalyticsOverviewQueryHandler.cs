@@ -52,10 +52,12 @@ public sealed class GetTrackingAnalyticsOverviewQueryHandler : IRequestHandler<G
         await Task.WhenAll(totalVisitsTask, uniqueVisitorsTask, topPagesTask, recentVisitsTask, trendsTask);
 
         var recentVisits = recentVisitsTask.Result;
+        var lastVisit = recentVisits.FirstOrDefault();
+
         var summary = new TrackingAnalyticsSummaryResult(
             TotalVisits: totalVisitsTask.Result,
             UniqueVisitors: uniqueVisitorsTask.Result,
-            LastVisitAtUtc: recentVisits.Count > 0 ? recentVisits[0].OccurredAtUtc : null);
+            LastVisitAtUtc: lastVisit?.OccurredAtUtc);
 
         return new TrackingAnalyticsOverviewResult(
             Summary: summary,

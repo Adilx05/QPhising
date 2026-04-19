@@ -126,7 +126,7 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         CancellationToken cancellationToken)
     {
         return ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
-            .Select(UniqueVisitorKeySelector)
+            .Select(visit => string.IsNullOrWhiteSpace(visit.SessionId) ? visit.VisitorFingerprint : visit.SessionId)
             .Distinct()
             .CountAsync(cancellationToken);
     }
@@ -273,13 +273,6 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         }
 
         return query;
-    }
-
-    private static string UniqueVisitorKeySelector(PersistenceVisitEventEntity visit)
-    {
-        return string.IsNullOrWhiteSpace(visit.SessionId)
-            ? visit.VisitorFingerprint
-            : visit.SessionId;
     }
 
     private static DateTimeOffset FloorBucket(DateTimeOffset value, int bucketSizeMinutes)
