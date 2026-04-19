@@ -14,3 +14,4 @@ export type CreateTrackingPageRequest = {
   enableBotFiltering?: boolean | null;
   captureUtmParameters?: boolean | null;
 };
+

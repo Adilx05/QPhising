@@ -8,3 +8,4 @@ export type UpdateTemplateRequest = {
   description?: string | null;
   tags?: Array<string> | null;
 };
+

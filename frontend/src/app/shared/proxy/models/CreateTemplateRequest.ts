@@ -8,3 +8,4 @@ export type CreateTemplateRequest = {
   description?: string | null;
   tags?: Array<string> | null;
 };
+

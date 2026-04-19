@@ -12,3 +12,4 @@ export type TrackingLandingPageResult = {
   templateName?: string | null;
   templateHtmlContent?: string | null;
 };
+

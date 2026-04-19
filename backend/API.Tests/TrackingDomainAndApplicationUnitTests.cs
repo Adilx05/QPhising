@@ -156,10 +156,10 @@ public sealed class TrackingDomainAndApplicationUnitTests
                 now.AddDays(-1),
                 now,
                 TrackingVisitTrendBucketWindow.Day,
-                timezoneOffsetMinutes: 0,
-                excludeBots: true,
-                topPagesLimit: 5,
-                recentVisitLimit: 10),
+                TimezoneOffsetMinutes: 0,
+                ExcludeBots: true,
+                TopPagesLimit: 5,
+                RecentVisitLimit: 10),
             CancellationToken.None);
 
         Assert.Equal(42, response.Summary.TotalVisits);
