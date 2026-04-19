@@ -10,5 +10,9 @@ public sealed class GetTrackingLandingPageBySlugQueryValidator : AbstractValidat
         RuleFor(query => query.Slug)
             .NotEmpty()
             .MaximumLength(TrackingPageSlug.MaxLength);
+
+        RuleFor(query => query.Campaign)
+            .MaximumLength(120)
+            .When(query => !string.IsNullOrWhiteSpace(query.Campaign));
     }
 }

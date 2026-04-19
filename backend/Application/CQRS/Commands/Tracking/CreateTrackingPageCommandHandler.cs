@@ -42,9 +42,11 @@ public sealed class CreateTrackingPageCommandHandler : IRequestHandler<CreateTra
             new TrackingPageSlug(request.Slug),
             request.Title,
             request.Description,
-            new TrackingPageUrl(request.DestinationUrl),
             ownerId,
             templateId,
+            request.CustomHtmlContent,
+            request.ValidFromUtc,
+            request.ValidUntilUtc,
             settings);
 
         await _trackingPageRepository.SaveAsync(aggregate, cancellationToken);

@@ -21,18 +21,21 @@ public sealed class CreateTrackingPageCommandValidator : AbstractValidator<Creat
             .MaximumLength(TrackingPageAggregate.MaxDescriptionLength)
             .When(command => !string.IsNullOrWhiteSpace(command.Description));
 
-        RuleFor(command => command.DestinationUrl)
-            .NotEmpty()
-            .MaximumLength(TrackingPageUrl.MaxLength);
-
         RuleFor(command => command.OwnerId)
             .MaximumLength(TrackingPageAggregate.MaxOwnerIdLength)
             .When(command => !string.IsNullOrWhiteSpace(command.OwnerId));
 
-
         RuleFor(command => command.TemplateId)
             .Must(templateId => !templateId.HasValue || templateId.Value != Guid.Empty)
             .WithMessage("Template ID must be a non-empty GUID when provided.");
+
+        RuleFor(command => command.CustomHtmlContent)
+            .MaximumLength(TrackingPageAggregate.MaxCustomHtmlContentLength)
+            .When(command => !string.IsNullOrWhiteSpace(command.CustomHtmlContent));
+
+        RuleFor(command => command)
+            .Must(command => !command.ValidFromUtc.HasValue || !command.ValidUntilUtc.HasValue || command.ValidUntilUtc.Value >= command.ValidFromUtc.Value)
+            .WithMessage("Validity end date must be greater than or equal to start date.");
 
         RuleFor(command => command.RetentionDays)
             .InclusiveBetween(PageSettings.MinRetentionDays, PageSettings.MaxRetentionDays)

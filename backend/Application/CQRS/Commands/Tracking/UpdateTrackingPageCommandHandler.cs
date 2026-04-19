@@ -35,8 +35,10 @@ public sealed class UpdateTrackingPageCommandHandler : IRequestHandler<UpdateTra
             new TrackingPageSlug(request.Slug),
             request.Title,
             request.Description,
-            new TrackingPageUrl(request.DestinationUrl),
-            templateId);
+            templateId,
+            request.CustomHtmlContent,
+            request.ValidFromUtc,
+            request.ValidUntilUtc);
 
         aggregate.ConfigureSettings(BuildSettings(request.RetentionDays, request.MaskIpAddress, request.EnableBotFiltering, request.CaptureUtmParameters));
 

@@ -42,9 +42,11 @@ public sealed class CampaignController : ControllerBase
                 request.Name,
                 request.TrackingPageSlug,
                 request.TrackingPageTitle,
-                request.DestinationUrl,
                 request.TrackingPageDescription,
-                request.TemplateId),
+                request.TemplateId,
+                request.HtmlContent,
+                request.ValidFromUtc,
+                request.ValidUntilUtc),
             cancellationToken);
 
     [HttpPut("{campaignId:guid}", Name = "Campaign_Update")]

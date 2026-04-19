@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputTextarea } from 'primeng/inputtextarea';
 import { resolveApiError } from '../../../core/http/api-error-handler';
 import { AuthSessionService } from '../../../core/auth/auth-session';
 import {
@@ -25,110 +26,13 @@ import {
 @Component({
   selector: 'app-campaigns-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ButtonModule, DropdownModule, InputTextModule],
-  template: `
-    <section class="mb-6">
-      <h1 class="page-title">Campaigns</h1>
-      <p class="page-subtitle">Template seçerek ya da sıfırdan tracking sayfası oluşturarak yeni campaign başlatabilirsin.</p>
-    </section>
-
-    <section class="surface-card p-5">
-      <div class="grid gap-3 md:grid-cols-2">
-        <div>
-          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Campaign Name</label>
-          <input pInputText [(ngModel)]="createForm.name" class="w-full" placeholder="Q2 Signup Simulation" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Template (Optional)</label>
-          <p-dropdown
-            [options]="templateOptions()"
-            optionLabel="label"
-            optionValue="value"
-            [showClear]="true"
-            [ngModel]="createForm.templateId"
-            (ngModelChange)="createForm.templateId = $event"
-            placeholder="Blank campaign page"
-            styleClass="w-full"
-          ></p-dropdown>
-        </div>
-
-        <div>
-          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Page Slug</label>
-          <input pInputText [(ngModel)]="createForm.slug" class="w-full" placeholder="q2-signup" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Page Title</label>
-          <input pInputText [(ngModel)]="createForm.pageTitle" class="w-full" placeholder="Q2 Signup Landing" />
-        </div>
-
-        <div class="md:col-span-2">
-          <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Destination URL</label>
-          <input pInputText [(ngModel)]="createForm.destinationUrl" class="w-full" placeholder="https://example.com/welcome" />
-        </div>
-      </div>
-
-      <div class="mt-4">
-        <button
-          pButton
-          type="button"
-          icon="pi pi-plus"
-          label="Create Campaign"
-          [disabled]="!canOperate() || isBusy()"
-          [loading]="isBusy()"
-          (click)="create()"
-        ></button>
-      </div>
-
-      <p *ngIf="feedback()" class="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-800">
-        {{ feedback() }}
-      </p>
-    </section>
-
-    <section class="mt-6 grid gap-4">
-      <article *ngFor="let campaign of campaigns()" class="surface-card p-5">
-        <div class="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 class="text-lg font-semibold text-slate-900">{{ campaign.name || 'Unnamed Campaign' }}</h2>
-            <p class="text-sm text-slate-500">Tracking Page: {{ campaign.trackingPageId }}</p>
-          </div>
-
-          <span class="status-chip" [ngClass]="stateChipClass(campaign.lifecycleState)">
-            {{ stateLabel(campaign.lifecycleState) }}
-          </span>
-        </div>
-
-        <div class="mt-4 grid gap-3 lg:grid-cols-3">
-          <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Starts At (UTC)</p>
-            <p class="mt-1 text-sm text-slate-700">{{ campaign.startsAtUtc || 'Not scheduled' }}</p>
-          </div>
-
-          <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Ends At (UTC)</p>
-            <p class="mt-1 text-sm text-slate-700">{{ campaign.endsAtUtc || 'Not scheduled' }}</p>
-          </div>
-        </div>
-
-        <div class="mt-4 flex flex-wrap gap-2">
-          <a pButton type="button" size="small" severity="info" [routerLink]="['/campaigns', campaign.id]" label="Details"></a>
-          <button pButton type="button" size="small" label="Start" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'start')"></button>
-          <button pButton type="button" size="small" severity="secondary" label="Pause" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'pause')"></button>
-          <button pButton type="button" size="small" severity="success" label="Complete" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'complete')"></button>
-          <button pButton type="button" size="small" severity="danger" label="Cancel" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'cancel')"></button>
-        </div>
-      </article>
-
-      <article *ngIf="campaigns().length === 0" class="surface-card p-5 text-sm text-slate-500">
-        Henüz campaign kaydı bulunmuyor.
-      </article>
-    </section>
-  `
+  imports: [CommonModule, FormsModule, RouterLink, ButtonModule, DropdownModule, InputTextModule, InputTextarea],
+  templateUrl: './campaigns-page.component.html'
 })
 export class CampaignsPageComponent {
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
+  protected readonly publicLinks = signal<{ slugUrl: string; idUrl: string } | null>(null);
   protected readonly campaigns = signal<CampaignResult[]>([]);
   protected readonly templates = signal<TemplateResult[]>([]);
   protected readonly canOperate = computed(() => this.authSessionService.hasRequiredRole('Operator'));
@@ -137,9 +41,15 @@ export class CampaignsPageComponent {
     name: '',
     slug: '',
     pageTitle: '',
-    destinationUrl: '',
-    templateId: null as string | null
+    templateId: null as string | null,
+    htmlContent: '',
+    validFromUtc: '',
+    validUntilUtc: ''
   };
+
+  protected readonly previewHtml = computed(
+    () => this.createForm.htmlContent?.trim() || '<p style="padding:8px">Preview boş.</p>'
+  );
 
   protected readonly templateOptions = computed(() =>
     this.templates()
@@ -166,29 +76,37 @@ export class CampaignsPageComponent {
     const name = this.createForm.name.trim();
     const trackingPageSlug = this.createForm.slug.trim();
     const trackingPageTitle = this.createForm.pageTitle.trim();
-    const destinationUrl = this.createForm.destinationUrl.trim();
 
-    if (!name || !trackingPageSlug || !trackingPageTitle || !destinationUrl) {
-      this.feedback.set('Campaign name, page slug, page title ve destination URL zorunludur.');
+    if (!name || !trackingPageSlug || !trackingPageTitle) {
+      this.feedback.set('Campaign name, page slug ve page title zorunludur.');
       return;
     }
 
     await this.execute(async () => {
-      await createCampaign({
+      const created = await createCampaign({
         name,
         trackingPageSlug,
         trackingPageTitle,
-        destinationUrl,
         trackingPageDescription: null,
-        templateId: this.createForm.templateId
+        templateId: this.createForm.templateId,
+        htmlContent: this.createForm.htmlContent.trim() || null,
+        validFromUtc: this.toUtcIso(this.createForm.validFromUtc),
+        validUntilUtc: this.toUtcIso(this.createForm.validUntilUtc)
+      });
+
+      this.publicLinks.set({
+        slugUrl: `/p/${trackingPageSlug}?campaign=${encodeURIComponent(name)}`,
+        idUrl: `/p/${trackingPageSlug}?id=${created.trackingPageId}`
       });
 
       this.createForm.name = '';
       this.createForm.slug = '';
       this.createForm.pageTitle = '';
-      this.createForm.destinationUrl = '';
       this.createForm.templateId = null;
-      this.feedback.set('Campaign oluşturuldu.');
+      this.createForm.htmlContent = '';
+      this.createForm.validFromUtc = '';
+      this.createForm.validUntilUtc = '';
+      this.feedback.set('Campaign oluşturuldu. Public linkler hazırlandı.');
       this.campaigns.set(await listCampaigns());
     });
   }
@@ -238,6 +156,10 @@ export class CampaignsPageComponent {
       default:
         return 'status-chip-default';
     }
+  }
+
+  private toUtcIso(value: string): string | null {
+    return value ? new Date(value).toISOString() : null;
   }
 
   private async transitionCampaign(

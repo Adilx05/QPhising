@@ -6,9 +6,11 @@ export type CreateTrackingPageRequest = {
   slug?: string | null;
   title?: string | null;
   description?: string | null;
-  destinationUrl?: string | null;
   ownerId?: string | null;
   templateId?: string | null;
+  customHtmlContent?: string | null;
+  validFromUtc?: string | null;
+  validUntilUtc?: string | null;
   retentionDays?: number | null;
   maskIpAddress?: boolean | null;
   enableBotFiltering?: boolean | null;

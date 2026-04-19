@@ -9,9 +9,11 @@ export interface CreateCampaignInput {
   name: string;
   trackingPageSlug: string;
   trackingPageTitle: string;
-  destinationUrl: string;
   trackingPageDescription: string | null;
   templateId: string | null;
+  htmlContent: string | null;
+  validFromUtc: string | null;
+  validUntilUtc: string | null;
 }
 
 export interface ScheduleCampaignInput {
@@ -30,9 +32,11 @@ export const createCampaign = async (
     name: input.name,
     trackingPageSlug: input.trackingPageSlug,
     trackingPageTitle: input.trackingPageTitle,
-    destinationUrl: input.destinationUrl,
     trackingPageDescription: input.trackingPageDescription,
-    templateId: input.templateId
+    templateId: input.templateId,
+    htmlContent: input.htmlContent,
+    validFromUtc: input.validFromUtc,
+    validUntilUtc: input.validUntilUtc
   };
 
   return CampaignService.campaignCreate({ requestBody: request });

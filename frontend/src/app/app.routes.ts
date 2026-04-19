@@ -12,10 +12,15 @@ import { CampaignDetailPageComponent } from './features/campaigns/pages/campaign
 import { DashboardPageComponent } from './features/dashboard/pages/dashboard-page.component';
 import { RuntimeConfigurationPageComponent } from './features/setup/pages/runtime-configuration-page.component';
 import { TrackingDashboardPageComponent } from './features/tracking/pages/tracking-dashboard-page.component';
+import { PublicTrackingLandingPageComponent } from './features/tracking/pages/public-tracking-landing-page.component';
 import { SetupWizardPageComponent } from './features/setup/pages/setup-wizard-page.component';
 import { TemplatesPageComponent } from './features/templates/pages/templates-page.component';
 
 export const appRoutes: Routes = [
+  {
+    path: 'p/:slug',
+    component: PublicTrackingLandingPageComponent
+  },
   {
     path: 'auth/callback',
     component: AuthCallbackPageComponent
@@ -92,6 +97,6 @@ export const appRoutes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'dashboard'
+    component: PublicTrackingLandingPageComponent
   }
 ];

@@ -16,9 +16,11 @@ public static class TrackingMappingProfile
             Slug: aggregate.Slug.Value,
             Title: aggregate.Title,
             Description: aggregate.Description,
-            DestinationUrl: aggregate.DestinationUrl.Value,
             OwnerId: aggregate.OwnerId,
             TemplateId: aggregate.TemplateId,
+            CustomHtmlContent: aggregate.CustomHtmlContent,
+            ValidFromUtc: aggregate.ValidFromUtc,
+            ValidUntilUtc: aggregate.ValidUntilUtc,
             PublishState: aggregate.PublishState,
             Settings: aggregate.Settings is null
                 ? null

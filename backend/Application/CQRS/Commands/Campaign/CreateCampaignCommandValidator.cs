@@ -27,8 +27,12 @@ public sealed class CreateCampaignCommandValidator : AbstractValidator<CreateCam
             .MaximumLength(TrackingPageAggregate.MaxTitleLength)
             .WithMessage($"Tracking page title must be at most {TrackingPageAggregate.MaxTitleLength} characters.");
 
-        RuleFor(command => command.DestinationUrl)
-            .NotEmpty()
-            .WithMessage("Destination URL is required.");
+        RuleFor(command => command.HtmlContent)
+            .MaximumLength(TrackingPageAggregate.MaxCustomHtmlContentLength)
+            .When(command => !string.IsNullOrWhiteSpace(command.HtmlContent));
+
+        RuleFor(command => command)
+            .Must(command => !command.ValidFromUtc.HasValue || !command.ValidUntilUtc.HasValue || command.ValidUntilUtc.Value >= command.ValidFromUtc.Value)
+            .WithMessage("Validity end date must be greater than or equal to start date.");
     }
 }

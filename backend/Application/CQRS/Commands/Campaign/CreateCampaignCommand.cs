@@ -7,6 +7,8 @@ public sealed record CreateCampaignCommand(
     string Name,
     string TrackingPageSlug,
     string TrackingPageTitle,
-    string DestinationUrl,
     string? TrackingPageDescription,
-    Guid? TemplateId) : ITransactionalRequest<CampaignResult>;
+    Guid? TemplateId,
+    string? HtmlContent,
+    DateTimeOffset? ValidFromUtc,
+    DateTimeOffset? ValidUntilUtc) : ITransactionalRequest<CampaignResult>;
