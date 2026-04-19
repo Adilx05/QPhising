@@ -7,6 +7,7 @@ import { PasswordModule } from 'primeng/password';
 import type { RuntimeConfigurationResult } from '../../../shared/proxy';
 import { AuthSessionService } from '../../../core/auth/auth-session';
 import { resolveApiError } from '../../../core/http/api-error-handler';
+import { UserPreferencesService } from '../../../core/ui/user-preferences.service';
 import {
   getRuntimeConfigurationStatus,
   saveRuntimeConfiguration,
@@ -35,11 +36,16 @@ export class RuntimeConfigurationPageComponent {
 
   public constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly authSessionService: AuthSessionService
+    private readonly authSessionService: AuthSessionService,
+    private readonly userPreferencesService: UserPreferencesService
   ) {
     void this.refreshStatus();
   }
 
+
+  protected tx(tr: string, en: string): string {
+    return this.userPreferencesService.language() === 'tr' ? tr : en;
+  }
 
   protected canUpdateRuntimeConfiguration(): boolean {
     return this.authSessionService.hasRequiredRole('Operator');
@@ -58,7 +64,7 @@ export class RuntimeConfigurationPageComponent {
     await this.executeAsync(async () => {
       const payload: RuntimeConfigurationInput = this.form.getRawValue();
       this.status.set(await saveRuntimeConfiguration(payload));
-      this.feedback.set('Runtime konfigürasyonu güvenli şekilde kaydedildi.');
+      this.feedback.set(this.tx('Runtime yapılandırması güvenli şekilde kaydedildi.', 'Runtime configuration saved securely.'));
       this.form.markAsPristine();
     });
   }
@@ -67,13 +73,13 @@ export class RuntimeConfigurationPageComponent {
     const patchPayload = this.collectDirtyValues();
 
     if (Object.keys(patchPayload).length === 0) {
-      this.feedback.set('Güncellenecek alan bulunamadı.');
+      this.feedback.set(this.tx('Güncellenecek alan bulunamadı.', 'No fields to update.'));
       return;
     }
 
     await this.executeAsync(async () => {
       this.status.set(await updateRuntimeConfiguration(patchPayload));
-      this.feedback.set('Değişen alanlar güvenli şekilde güncellendi.');
+      this.feedback.set(this.tx('Değişen alanlar güvenli şekilde güncellendi.', 'Changed fields updated securely.'));
       this.form.markAsPristine();
     });
   }
@@ -81,7 +87,7 @@ export class RuntimeConfigurationPageComponent {
   protected async refreshStatus(): Promise<void> {
     await this.executeAsync(async () => {
       this.status.set(await getRuntimeConfigurationStatus());
-      this.feedback.set('Runtime konfigürasyon durumu güncellendi.');
+      this.feedback.set(this.tx('Runtime yapılandırma durumu güncellendi.', 'Runtime configuration status refreshed.'));
     });
   }
 

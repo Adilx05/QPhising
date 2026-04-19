@@ -12,14 +12,14 @@ import { PublicTrackingService, TrackingService, type TrackingLandingPageResult 
     <ng-container *ngIf="landing() as data; else missing">
       <iframe
         class="h-screen w-screen border-0"
-        [src]="previewUrl(data.customHtmlContent || data.templateHtmlContent || '<p style=&quot;padding:12px&quot;>Landing content not configured.</p>')"
+        [src]="previewUrl(data.customHtmlContent || data.templateHtmlContent || tx('<p style=&quot;padding:12px&quot;>Açılış içeriği yapılandırılmadı.</p>', '<p style=&quot;padding:12px&quot;>Landing content not configured.</p>'))"
       ></iframe>
     </ng-container>
     <ng-template #missing>
       <main class="flex min-h-screen items-center justify-center bg-white p-6 text-center">
         <div>
           <h1 class="text-2xl font-semibold text-slate-900">404</h1>
-          <p class="mt-2 text-sm text-slate-600">Page not found.</p>
+          <p class="mt-2 text-sm text-slate-600">{{ tx('Sayfa bulunamadı.', 'Page not found.') }}</p>
         </div>
       </main>
     </ng-template>
@@ -46,6 +46,11 @@ export class PublicTrackingLandingPageComponent implements OnDestroy {
     this.previewUrlCache.clear();
   }
 
+
+  protected tx(tr: string, en: string): string {
+    const language = navigator.language?.toLowerCase() ?? 'en';
+    return language.startsWith('tr') ? tr : en;
+  }
   protected previewUrl(htmlContent: string): SafeResourceUrl {
     const html = htmlContent.trim();
     if (html.length === 0) {

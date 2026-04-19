@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { resolveApiError } from '../../../core/http/api-error-handler';
 import { AuthSessionService } from '../../../core/auth/auth-session';
+import { UserPreferencesService } from '../../../core/ui/user-preferences.service';
 import { TemplateLifecycleState, type TemplateResult } from '../../../shared/proxy';
 import {
   archiveTemplate,
@@ -30,21 +31,21 @@ interface TemplateDraft {
   imports: [CommonModule, FormsModule, ButtonModule, InputTextModule],
   template: `
     <section class="mb-6">
-      <h1 class="page-title">HTML Template Management</h1>
-      <p class="page-subtitle">Template sayfası artık e-posta için değil, direkt HTML sayfa şablonları üretmek için kullanılır.</p>
+      <h1 class="page-title">{{ tx('HTML Şablon Yönetimi', 'HTML Template Management') }}</h1>
+      <p class="page-subtitle">{{ tx('Bu ekran e-posta yerine doğrudan HTML sayfa şablonları üretmek için kullanılır.', 'This page is used to manage direct HTML page templates (not email templates).') }}</p>
     </section>
 
     <section class="surface-card p-5">
-      <h2 class="text-base font-semibold text-slate-900">Create HTML Template</h2>
+      <h2 class="text-base font-semibold text-slate-900">{{ tx('HTML Şablon Oluştur', 'Create HTML Template') }}</h2>
       <div class="mt-3 grid gap-3 md:grid-cols-2">
-        <input pInputText [(ngModel)]="createForm.name" class="w-full" placeholder="Template name" />
-        <input pInputText [(ngModel)]="createForm.description" class="w-full" placeholder="Description" />
-        <input pInputText [(ngModel)]="createForm.tags" class="w-full md:col-span-2" placeholder="Tags (comma-separated)" />
+        <input pInputText [(ngModel)]="createForm.name" class="w-full" [placeholder]="tx('Şablon adı', 'Template name')" />
+        <input pInputText [(ngModel)]="createForm.description" class="w-full" [placeholder]="tx('Açıklama', 'Description')" />
+        <input pInputText [(ngModel)]="createForm.tags" class="w-full md:col-span-2" [placeholder]="tx('Etiketler (virgülle)', 'Tags (comma-separated)')" />
         <textarea [(ngModel)]="createForm.htmlContent" class="min-h-48 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm md:col-span-2" placeholder="<html>...</html>"></textarea>
       </div>
 
       <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 md:col-span-2">
-        <p class="text-xs font-semibold uppercase text-slate-500">Live Preview</p>
+        <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Canlı Önizleme', 'Live Preview') }}</p>
         <iframe class="mt-2 h-64 w-full rounded-lg border border-slate-200 bg-white" [src]="previewUrl(createForm.htmlContent)"></iframe>
       </div>
 
@@ -53,7 +54,7 @@ interface TemplateDraft {
         pButton
         type="button"
         icon="pi pi-plus"
-        label="Create"
+        [label]="tx('Oluştur', 'Create')"
         [disabled]="!canOperate() || isBusy()"
         [loading]="isBusy()"
         (click)="create()"
@@ -68,8 +69,8 @@ interface TemplateDraft {
       <article *ngFor="let templateItem of templates()" class="surface-card p-5">
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 class="text-lg font-semibold text-slate-900">{{ templateItem.name || 'Unnamed Template' }}</h3>
-            <p class="text-sm text-slate-500">ID: {{ templateItem.id }}</p>
+            <h3 class="text-lg font-semibold text-slate-900">{{ templateItem.name || tx('Adsız Şablon', 'Unnamed Template') }}</h3>
+            <p class="text-sm text-slate-500">{{ tx('Kimlik', 'ID') }}: {{ templateItem.id }}</p>
           </div>
 
           <span class="status-chip" [ngClass]="stateChipClass(templateItem.lifecycleState)">
@@ -79,38 +80,38 @@ interface TemplateDraft {
 
         <div class="mt-3 grid gap-3 lg:grid-cols-2">
           <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Tags</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Etiketler', 'Tags') }}</p>
             <p class="mt-1 text-sm text-slate-700">{{ (templateItem.tags || []).join(', ') || '-' }}</p>
           </div>
           <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Description</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Açıklama', 'Description') }}</p>
             <p class="mt-1 text-sm text-slate-700">{{ templateItem.description || '-' }}</p>
           </div>
         </div>
 
         <div class="mt-4 rounded-xl border border-slate-200 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">Update Template</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Şablonu Güncelle', 'Update Template') }}</p>
           <div class="mt-2 grid gap-2 md:grid-cols-2">
-            <input pInputText class="w-full" placeholder="Template name" [ngModel]="editDrafts()[templateItem.id || ''].name || ''" (ngModelChange)="setDraftField(templateItem.id, 'name', $event)" />
-            <input pInputText class="w-full" placeholder="Description" [ngModel]="editDrafts()[templateItem.id || ''].description || ''" (ngModelChange)="setDraftField(templateItem.id, 'description', $event)" />
-            <input pInputText class="w-full md:col-span-2" placeholder="Tags (comma-separated)" [ngModel]="editDrafts()[templateItem.id || ''].tags || ''" (ngModelChange)="setDraftField(templateItem.id, 'tags', $event)" />
+            <input pInputText class="w-full" [placeholder]="tx('Şablon adı', 'Template name')" [ngModel]="editDrafts()[templateItem.id || ''].name || ''" (ngModelChange)="setDraftField(templateItem.id, 'name', $event)" />
+            <input pInputText class="w-full" [placeholder]="tx('Açıklama', 'Description')" [ngModel]="editDrafts()[templateItem.id || ''].description || ''" (ngModelChange)="setDraftField(templateItem.id, 'description', $event)" />
+            <input pInputText class="w-full md:col-span-2" [placeholder]="tx('Etiketler (virgülle)', 'Tags (comma-separated)')" [ngModel]="editDrafts()[templateItem.id || ''].tags || ''" (ngModelChange)="setDraftField(templateItem.id, 'tags', $event)" />
             <textarea class="min-h-48 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm md:col-span-2" placeholder="<html>...</html>" [ngModel]="editDrafts()[templateItem.id || ''].htmlContent || ''" (ngModelChange)="setDraftField(templateItem.id, 'htmlContent', $event)"></textarea>
           </div>
 
           <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Preview</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Önizleme', 'Preview') }}</p>
             <iframe class="mt-2 h-64 w-full rounded-lg border border-slate-200 bg-white" [src]="previewUrl(editDrafts()[templateItem.id || ''].htmlContent || '')"></iframe>
           </div>
 
           <div class="mt-3 flex flex-wrap gap-2">
-            <button pButton type="button" size="small" label="Save" [disabled]="!canOperate() || isBusy()" (click)="save(templateItem.id)"></button>
-            <button pButton type="button" size="small" severity="danger" label="Delete" [disabled]="!canOperate() || isBusy()" (click)="remove(templateItem.id)"></button>
+            <button pButton type="button" size="small" [label]="tx('Kaydet', 'Save')" [disabled]="!canOperate() || isBusy()" (click)="save(templateItem.id)"></button>
+            <button pButton type="button" size="small" severity="danger" [label]="tx('Sil', 'Delete')" [disabled]="!canOperate() || isBusy()" (click)="remove(templateItem.id)"></button>
           </div>
         </div>
       </article>
 
       <article *ngIf="templates().length === 0" class="surface-card p-5 text-sm text-slate-500">
-        Henüz template kaydı bulunmuyor.
+        {{ tx('Henüz şablon kaydı bulunmuyor.', 'No templates found yet.') }}
       </article>
     </section>
   `
@@ -133,9 +134,14 @@ export class TemplatesPageComponent implements OnDestroy {
 
   public constructor(
     private readonly authSessionService: AuthSessionService,
-    private readonly sanitizer: DomSanitizer
+    private readonly sanitizer: DomSanitizer,
+    private readonly userPreferencesService: UserPreferencesService
   ) {
     void this.refresh();
+  }
+
+  protected tx(tr: string, en: string): string {
+    return this.userPreferencesService.language() === 'tr' ? tr : en;
   }
 
   public ngOnDestroy(): void {
@@ -154,7 +160,7 @@ export class TemplatesPageComponent implements OnDestroy {
       this.createForm.htmlContent = '';
       this.createForm.description = '';
       this.createForm.tags = '';
-      this.feedback.set('HTML template oluşturuldu.');
+      this.feedback.set(this.tx('HTML şablonu oluşturuldu.', 'HTML template created.'));
       await this.refresh();
     });
   }
@@ -173,7 +179,7 @@ export class TemplatesPageComponent implements OnDestroy {
     await this.execute(async () => {
       const updated = await updateTemplate(templateId, input);
       this.applyUpdatedTemplate(updated);
-      this.feedback.set('Template güncellendi.');
+      this.feedback.set(this.tx('Şablon güncellendi.', 'Template updated.'));
     });
   }
 
@@ -184,7 +190,7 @@ export class TemplatesPageComponent implements OnDestroy {
 
     await this.execute(async () => {
       this.applyUpdatedTemplate(await publishTemplate(templateId));
-      this.feedback.set('Template publish edildi.');
+      this.feedback.set(this.tx('Şablon yayımlandı.', 'Template published.'));
     });
   }
 
@@ -195,7 +201,7 @@ export class TemplatesPageComponent implements OnDestroy {
 
     await this.execute(async () => {
       this.applyUpdatedTemplate(await archiveTemplate(templateId));
-      this.feedback.set('Template archive edildi.');
+      this.feedback.set(this.tx('Şablon arşivlendi.', 'Template archived.'));
     });
   }
 
@@ -212,7 +218,7 @@ export class TemplatesPageComponent implements OnDestroy {
         delete nextDrafts[templateId];
         return nextDrafts;
       });
-      this.feedback.set('Template silindi.');
+      this.feedback.set(this.tx('Şablon silindi.', 'Template deleted.'));
     });
   }
 
@@ -234,11 +240,11 @@ export class TemplatesPageComponent implements OnDestroy {
   protected stateLabel(state: TemplateLifecycleState | undefined): string {
     switch (state) {
       case TemplateLifecycleState._1:
-        return 'Published';
+        return this.tx('Yayımlandı', 'Published');
       case TemplateLifecycleState._2:
-        return 'Archived';
+        return this.tx('Arşivlendi', 'Archived');
       default:
-        return 'Draft';
+        return this.tx('Taslak', 'Draft');
     }
   }
 
@@ -285,7 +291,7 @@ export class TemplatesPageComponent implements OnDestroy {
           return drafts;
         }, {})
       );
-      this.feedback.set('Template listesi güncellendi.');
+      this.feedback.set(this.tx('Şablon listesi güncellendi.', 'Template list refreshed.'));
     });
   }
 
@@ -303,7 +309,7 @@ export class TemplatesPageComponent implements OnDestroy {
     const htmlContent = draft.htmlContent.trim();
 
     if (name.length === 0 || htmlContent.length === 0) {
-      this.feedback.set('Template name ve HTML content alanları zorunludur.');
+      this.feedback.set(this.tx('Şablon adı ve HTML içeriği zorunludur.', 'Template name and HTML content are required.'));
       return null;
     }
 

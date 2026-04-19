@@ -4,6 +4,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { resolveApiError } from '../../../core/http/api-error-handler';
+import { AppLanguage, UserPreferencesService } from '../../../core/ui/user-preferences.service';
 import {
   PublicTrackingService,
   TrackingService,
@@ -21,32 +22,32 @@ import { getCampaignById } from '../data-access';
   template: `
     <section class="mb-6 flex items-center justify-between gap-3">
       <div>
-        <h1 class="page-title">Campaign Detail</h1>
-        <p class="page-subtitle">Campaign, bağlı tracking page, public linkler ve içerik önizlemesini görüntüleyebilirsin.</p>
+        <h1 class="page-title">{{ activeLanguage() === 'tr' ? 'Senaryo Detayı' : 'Campaign Detail' }}</h1>
+        <p class="page-subtitle">{{ activeLanguage() === 'tr' ? 'Senaryo, bağlı takip sayfası, genel bağlantılar ve içerik önizlemesini görüntüleyebilirsiniz.' : 'View campaign, linked tracking page, public links, and content preview.' }}</p>
       </div>
-      <a pButton type="button" severity="secondary" [routerLink]="['/campaigns']" label="Back"></a>
+      <a pButton type="button" severity="secondary" [routerLink]="['/campaigns']" [label]="activeLanguage() === 'tr' ? 'Geri' : 'Back'"></a>
     </section>
 
     <section *ngIf="campaign(); else loadingState" class="surface-card p-5">
       <h2 class="text-xl font-semibold text-slate-900">{{ campaign()?.name }}</h2>
       <div class="mt-4 grid gap-3 md:grid-cols-2">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">Campaign Id</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Senaryo Kimliği' : 'Campaign Id' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ campaign()?.id }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">Tracking Page Id</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Takip Sayfası Kimliği' : 'Tracking Page Id' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ campaign()?.trackingPageId }}</p>
         </div>
       </div>
 
       <div class="mt-4 grid gap-3 md:grid-cols-2">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">Starts At (UTC)</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Başlangıç (UTC)' : 'Starts At (UTC)' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ resolveStartsAtUtc() }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">Ends At (UTC)</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Bitiş (UTC)' : 'Ends At (UTC)' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ resolveEndsAtUtc() }}</p>
         </div>
       </div>
@@ -57,35 +58,35 @@ import { getCampaignById } from '../data-access';
           <p class="mt-1 text-sm text-slate-700">{{ page.slug }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">Publish State</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Yayın Durumu' : 'Publish State' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ publishStateLabel(page.publishState) }}</p>
         </div>
       </div>
 
       <div *ngIf="analytics() as analytics" class="mt-4 grid gap-3 md:grid-cols-2">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">Total Clicks</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Toplam Tıklama' : 'Total Clicks' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ analytics.summary?.totalVisits ?? 0 }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">Unique Clicks</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Tekil Tıklama' : 'Unique Clicks' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ analytics.summary?.uniqueVisitors ?? 0 }}</p>
         </div>
       </div>
 
       <div *ngIf="publicLinks() as links" class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-xs text-emerald-900">
         <p class="break-all">
-          <strong>Slug URL:</strong>
+          <strong>{{ activeLanguage() === 'tr' ? 'Kısa ad URL:' : 'Slug URL:' }}</strong>
           <a class="font-medium underline underline-offset-2" [href]="links.slugUrl" target="_blank" rel="noopener noreferrer">{{ links.slugUrl }}</a>
         </p>
         <p class="mt-1 break-all">
-          <strong>ID URL:</strong>
+          <strong>{{ activeLanguage() === 'tr' ? 'Kimlik URL:' : 'ID URL:' }}</strong>
           <a class="font-medium underline underline-offset-2" [href]="links.idUrl" target="_blank" rel="noopener noreferrer">{{ links.idUrl }}</a>
         </p>
       </div>
 
       <div class="mt-4">
-        <p class="mb-2 text-xs font-semibold uppercase text-slate-500">HTML Preview</p>
+        <p class="mb-2 text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'HTML Önizleme' : 'HTML Preview' }}</p>
         <div class="rounded-xl border border-slate-200 bg-white p-3">
           <iframe class="h-80 w-full rounded-lg" [src]="previewUrl(previewHtml())"></iframe>
         </div>
@@ -95,7 +96,7 @@ import { getCampaignById } from '../data-access';
     <p *ngIf="feedback()" class="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-800">{{ feedback() }}</p>
 
     <ng-template #loadingState>
-      <section class="surface-card p-5 text-sm text-slate-500">Campaign detayı yükleniyor...</section>
+      <section class="surface-card p-5 text-sm text-slate-500">{{ activeLanguage() === 'tr' ? 'Senaryo detayı yükleniyor...' : 'Campaign detail is loading...' }}</section>
     </ng-template>
   `
 })
@@ -112,7 +113,8 @@ export class CampaignDetailPageComponent implements OnDestroy {
 
   public constructor(
     private readonly route: ActivatedRoute,
-    private readonly sanitizer: DomSanitizer
+    private readonly sanitizer: DomSanitizer,
+    private readonly userPreferencesService: UserPreferencesService
   ) {
     void this.load();
   }
@@ -123,10 +125,14 @@ export class CampaignDetailPageComponent implements OnDestroy {
     this.previewUrlCache.clear();
   }
 
+
+  protected activeLanguage(): AppLanguage {
+    return this.userPreferencesService.language();
+  }
   private async load(): Promise<void> {
     const campaignId = this.route.snapshot.paramMap.get('campaignId');
     if (!campaignId) {
-      this.feedback.set('Campaign kimliği bulunamadı.');
+      this.feedback.set(this.activeLanguage() === 'tr' ? 'Senaryo kimliği bulunamadı.' : 'Campaign identifier was not found.');
       return;
     }
 
@@ -148,7 +154,9 @@ export class CampaignDetailPageComponent implements OnDestroy {
     const templateHtml = this.landingPage()?.templateHtmlContent?.trim();
     return templateHtml && templateHtml.length > 0
       ? templateHtml
-      : '<p style="padding:8px">Bu campaign için HTML içerik bulunamadı.</p>';
+      : this.activeLanguage() === 'tr'
+        ? '<p style="padding:8px">Bu senaryo için HTML içerik bulunamadı.</p>'
+        : '<p style="padding:8px">No HTML content was found for this campaign.</p>';
   }
 
   protected previewUrl(htmlContent: string): SafeResourceUrl {
@@ -185,12 +193,12 @@ export class CampaignDetailPageComponent implements OnDestroy {
 
   protected resolveStartsAtUtc(): string {
     const value = this.campaign()?.startsAtUtc ?? this.trackingPage()?.validFromUtc;
-    return value ?? 'Not scheduled';
+    return value ?? (this.activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled');
   }
 
   protected resolveEndsAtUtc(): string {
     const value = this.campaign()?.endsAtUtc ?? this.trackingPage()?.validUntilUtc;
-    return value ?? 'Not scheduled';
+    return value ?? (this.activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled');
   }
 
   private async loadTrackingPage(campaign: CampaignResult): Promise<void> {

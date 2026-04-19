@@ -1,13 +1,13 @@
 <section class="mb-6">
-  <h1 class="page-title">Runtime Configuration</h1>
-  <p class="page-subtitle">Canlı ortam bağımlılıklarını güvenli şekilde yönetin ve değişiklikleri kontrollü uygulayın.</p>
+  <h1 class="page-title">{{ tx('Runtime Yapılandırması', 'Runtime Configuration') }}</h1>
+  <p class="page-subtitle">{{ tx('Canlı ortam bağımlılıklarını güvenli biçimde yönetin ve değişiklikleri kontrollü uygulayın.', 'Manage live-environment dependencies securely and apply changes in a controlled way.') }}</p>
 </section>
 
 <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
   <section class="surface-card p-5 lg:p-6">
     <div class="mb-5 border-b border-slate-200 pb-4">
-      <h2 class="text-lg font-semibold text-slate-900">Configuration Inputs</h2>
-      <p class="mt-1 text-sm text-slate-500">Tüm işlemler generated proxy servisleri üzerinden API'ye gönderilir.</p>
+      <h2 class="text-lg font-semibold text-slate-900">{{ tx('Yapılandırma Girdileri', 'Configuration Inputs') }}</h2>
+      <p class="mt-1 text-sm text-slate-500">{{ tx('Tüm işlemler generated proxy servisleri üzerinden API\'ye gönderilir.', 'All operations are sent to the API through generated proxy services.') }}</p>
     </div>
 
     <form [formGroup]="form" class="space-y-4">
@@ -41,9 +41,9 @@
       </div>
 
       <div class="flex flex-wrap gap-3 pt-3">
-        <button pButton type="button" severity="secondary" icon="pi pi-refresh" label="Durumu Yenile" [disabled]="isBusy()" (click)="refreshStatus()"></button>
-        <button pButton type="button" severity="secondary" icon="pi pi-pencil" label="Değişenleri Güncelle" [disabled]="isBusy() || !canUpdateRuntimeConfiguration()" (click)="updateChanged()"></button>
-        <button pButton type="button" icon="pi pi-save" [label]="isBusy() ? 'Kaydediliyor...' : 'Tam Kaydet'" [loading]="isBusy()" [disabled]="isBusy() || !canSaveRuntimeConfiguration()" (click)="saveAll()"></button>
+        <button pButton type="button" severity="secondary" icon="pi pi-refresh" [label]="tx('Durumu Yenile', 'Refresh Status')" [disabled]="isBusy()" (click)="refreshStatus()"></button>
+        <button pButton type="button" severity="secondary" icon="pi pi-pencil" [label]="tx('Değişenleri Güncelle', 'Update Changed')" [disabled]="isBusy() || !canUpdateRuntimeConfiguration()" (click)="updateChanged()"></button>
+        <button pButton type="button" icon="pi pi-save" [label]="isBusy() ? tx('Kaydediliyor...', 'Saving...') : tx('Tam Kaydet', 'Save All')" [loading]="isBusy()" [disabled]="isBusy() || !canSaveRuntimeConfiguration()" (click)="saveAll()"></button>
       </div>
 
 
@@ -51,14 +51,14 @@
         *ngIf="!canUpdateRuntimeConfiguration() || !canSaveRuntimeConfiguration()"
         class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
       >
-        Rol kısıtları aktif: güncelleme için en az Operator, tam kaydetme için Admin rolü gerekir.
+        {{ tx('Rol kısıtları aktif: güncelleme için en az Operator, tam kaydetme için Admin rolü gerekir.', 'Role restrictions are active: Operator is required for updates, Admin is required for full save.') }}
       </p>
     </form>
   </section>
 
   <aside class="space-y-4">
     <section class="surface-card p-5">
-      <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Runtime Hazırlık</h3>
+      <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">{{ tx('Runtime Hazırlık', 'Runtime Readiness') }}</h3>
       <ul class="mt-4 m-0 list-none space-y-3 p-0 text-sm text-slate-700">
         <li class="flex items-center justify-between gap-2">
           <span>Database</span>
@@ -73,9 +73,9 @@
           </span>
         </li>
         <li class="flex items-center justify-between gap-2">
-          <span>Protected Runtime</span>
+          <span>{{ tx('Korunan Runtime', 'Protected Runtime') }}</span>
           <span class="status-chip" [ngClass]="status()?.isReadyForProtectedRuntime ? 'status-chip-success' : 'status-chip-warning'">
-            {{ status()?.isReadyForProtectedRuntime ? 'Ready' : 'Not Ready' }}
+            {{ status()?.isReadyForProtectedRuntime ? tx('Hazır', 'Ready') : tx('Hazır Değil', 'Not Ready') }}
           </span>
         </li>
       </ul>
@@ -83,7 +83,7 @@
     </section>
 
     <section *ngIf="feedback()" class="surface-card border-blue-100 bg-blue-50 p-5">
-      <h3 class="text-sm font-semibold text-blue-900">Mesaj</h3>
+      <h3 class="text-sm font-semibold text-blue-900">{{ tx('Mesaj', 'Message') }}</h3>
       <p class="mt-2 text-sm text-blue-800">{{ feedback() }}</p>
     </section>
   </aside>
