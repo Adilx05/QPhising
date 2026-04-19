@@ -44,6 +44,26 @@
       <input pInputText [(ngModel)]="createForm.validUntilUtc" class="w-full" type="datetime-local" />
     </div>
 
+    <div>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Retention (days)</label>
+      <input pInputText [(ngModel)]="createForm.retentionDays" class="w-full" type="number" min="1" max="3650" />
+    </div>
+
+    <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+      <input type="checkbox" [(ngModel)]="createForm.maskIpAddress" />
+      Mask IP address
+    </label>
+
+    <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+      <input type="checkbox" [(ngModel)]="createForm.enableBotFiltering" />
+      Enable bot filtering
+    </label>
+
+    <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+      <input type="checkbox" [(ngModel)]="createForm.captureUtmParameters" />
+      Capture UTM parameters
+    </label>
+
     <div class="md:col-span-2">
       <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">HTML Content (Optional)</label>
       <textarea pInputTextarea [(ngModel)]="createForm.htmlContent" rows="8" class="w-full font-mono text-xs"></textarea>

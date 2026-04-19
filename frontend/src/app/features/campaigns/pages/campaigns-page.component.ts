@@ -11,6 +11,7 @@ import { AuthSessionService } from '../../../core/auth/auth-session';
 import {
   CampaignLifecycleState,
   type CampaignResult,
+  TrackingService,
   TemplateService,
   type TemplateResult
 } from '../../../shared/proxy';
@@ -44,7 +45,11 @@ export class CampaignsPageComponent {
     templateId: null as string | null,
     htmlContent: '',
     validFromUtc: '',
-    validUntilUtc: ''
+    validUntilUtc: '',
+    retentionDays: 365,
+    maskIpAddress: true,
+    enableBotFiltering: true,
+    captureUtmParameters: true
   };
 
   protected readonly templateOptions = computed(() =>
@@ -90,6 +95,27 @@ export class CampaignsPageComponent {
         validUntilUtc: this.toUtcIso(this.createForm.validUntilUtc)
       });
 
+      if (created.trackingPageId) {
+        const page = await TrackingService.trackingPageGetById({ trackingPageId: created.trackingPageId });
+        await TrackingService.trackingPageUpdate({
+          trackingPageId: created.trackingPageId,
+          requestBody: {
+            slug: page.slug ?? trackingPageSlug,
+            title: page.title ?? trackingPageTitle,
+            description: page.description ?? null,
+            templateId: page.templateId ?? this.createForm.templateId,
+            customHtmlContent: page.customHtmlContent ?? (this.createForm.htmlContent.trim() || null),
+            validFromUtc: page.validFromUtc ?? this.toUtcIso(this.createForm.validFromUtc),
+            validUntilUtc: page.validUntilUtc ?? this.toUtcIso(this.createForm.validUntilUtc),
+            retentionDays: this.createForm.retentionDays,
+            maskIpAddress: this.createForm.maskIpAddress,
+            enableBotFiltering: this.createForm.enableBotFiltering,
+            captureUtmParameters: this.createForm.captureUtmParameters
+          }
+        });
+        await TrackingService.trackingPagePublish({ trackingPageId: created.trackingPageId });
+      }
+
       this.publicLinks.set({
         slugUrl: `/p/${trackingPageSlug}?campaign=${encodeURIComponent(name)}`,
         idUrl: `/p/${trackingPageSlug}?id=${created.trackingPageId}`
@@ -102,6 +128,10 @@ export class CampaignsPageComponent {
       this.createForm.htmlContent = '';
       this.createForm.validFromUtc = '';
       this.createForm.validUntilUtc = '';
+      this.createForm.retentionDays = 365;
+      this.createForm.maskIpAddress = true;
+      this.createForm.enableBotFiltering = true;
+      this.createForm.captureUtmParameters = true;
       this.feedback.set('Campaign oluşturuldu. Public linkler hazırlandı.');
       this.campaigns.set(await listCampaigns());
     });

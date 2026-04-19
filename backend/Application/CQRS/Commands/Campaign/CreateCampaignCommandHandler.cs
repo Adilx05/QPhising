@@ -6,6 +6,7 @@ using QPhising.Application.Contracts.Responses.Campaign;
 using QPhising.Domain.Campaign.Aggregates;
 using QPhising.Domain.Campaign.ValueObjects;
 using QPhising.Domain.Tracking.Aggregates;
+using QPhising.Domain.Tracking.Models;
 using QPhising.Domain.Tracking.ValueObjects;
 
 namespace QPhising.Application.CQRS.Commands.Campaign;
@@ -46,6 +47,12 @@ public sealed class CreateCampaignCommandHandler : IRequestHandler<CreateCampaig
             request.HtmlContent,
             request.ValidFromUtc,
             request.ValidUntilUtc);
+        trackingPage.ConfigureSettings(new PageSettings(
+            retentionDays: 365,
+            maskIpAddress: true,
+            enableBotFiltering: true,
+            captureUtmParameters: true));
+        trackingPage.Publish();
 
         await _trackingPageRepository.SaveAsync(trackingPage, cancellationToken);
 

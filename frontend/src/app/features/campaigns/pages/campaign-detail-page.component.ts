@@ -6,6 +6,7 @@ import { resolveApiError } from '../../../core/http/api-error-handler';
 import {
   PublicTrackingService,
   TrackingService,
+  type TrackingPageAnalyticsResult,
   type CampaignResult,
   type TrackingLandingPageResult,
   type TrackingPageResult
@@ -45,7 +46,18 @@ import { getCampaignById } from '../data-access';
         </div>
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p class="text-xs font-semibold uppercase text-slate-500">Publish State</p>
-          <p class="mt-1 text-sm text-slate-700">{{ page.publishState }}</p>
+          <p class="mt-1 text-sm text-slate-700">{{ publishStateLabel(page.publishState) }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="analytics() as analytics" class="mt-4 grid gap-3 md:grid-cols-2">
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p class="text-xs font-semibold uppercase text-slate-500">Total Clicks</p>
+          <p class="mt-1 text-sm text-slate-700">{{ analytics.summary?.totalVisits ?? 0 }}</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p class="text-xs font-semibold uppercase text-slate-500">Unique Clicks</p>
+          <p class="mt-1 text-sm text-slate-700">{{ analytics.summary?.uniqueVisitors ?? 0 }}</p>
         </div>
       </div>
 
@@ -72,6 +84,7 @@ import { getCampaignById } from '../data-access';
 export class CampaignDetailPageComponent {
   protected readonly campaign = signal<CampaignResult | null>(null);
   protected readonly trackingPage = signal<TrackingPageResult | null>(null);
+  protected readonly analytics = signal<TrackingPageAnalyticsResult | null>(null);
   protected readonly landingPage = signal<TrackingLandingPageResult | null>(null);
   protected readonly publicLinks = signal<{ slugUrl: string; idUrl: string } | null>(null);
   protected readonly feedback = signal<string | null>(null);
@@ -108,6 +121,19 @@ export class CampaignDetailPageComponent {
       : '<p style="padding:8px">Bu campaign için HTML içerik bulunamadı.</p>';
   }
 
+  protected publishStateLabel(state: number | undefined): string {
+    switch (state) {
+      case 0:
+        return 'Draft';
+      case 1:
+        return 'Published';
+      case 2:
+        return 'Archived';
+      default:
+        return 'Unknown';
+    }
+  }
+
   private async loadTrackingPage(campaign: CampaignResult): Promise<void> {
     const trackingPageId = campaign.trackingPageId;
     if (!trackingPageId) {
@@ -116,6 +142,7 @@ export class CampaignDetailPageComponent {
 
     const page = await TrackingService.trackingPageGetById({ trackingPageId });
     this.trackingPage.set(page);
+    this.analytics.set(await TrackingService.trackingPageGetAnalytics({ trackingPageId }));
 
     if (page.slug) {
       this.publicLinks.set({
