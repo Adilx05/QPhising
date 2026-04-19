@@ -49,7 +49,18 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
                 return null;
             }
 
-            return FromNode(runtimeConfigurationNode);
+            var aggregate = FromNode(runtimeConfigurationNode);
+            if (aggregate is null)
+            {
+                return null;
+            }
+
+            if (aggregate.RedisConnectionCipherText is null)
+            {
+                ApplySetupRedisFallback(aggregate, rootNode);
+            }
+
+            return aggregate;
         }
         finally
         {
@@ -184,6 +195,31 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
         }
 
         return null;
+    }
+
+    private static void ApplySetupRedisFallback(RuntimeConfigurationAggregate aggregate, JsonObject? rootNode)
+    {
+        ArgumentNullException.ThrowIfNull(aggregate);
+        if (rootNode is null)
+        {
+            return;
+        }
+
+        if (rootNode["SetupWizardState"] is not JsonObject setupNode)
+        {
+            return;
+        }
+
+        var setupRedisCipherText = GetStringValue(
+            setupNode,
+            "redisConnectionCipherText",
+            "RedisConnectionCipherText",
+            "redisConnectionCiphertext");
+
+        if (!string.IsNullOrWhiteSpace(setupRedisCipherText))
+        {
+            aggregate.SetRedisConnection(setupRedisCipherText);
+        }
     }
 
     private sealed record RuntimeConfigurationSnapshot(
