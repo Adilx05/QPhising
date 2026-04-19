@@ -2,18 +2,12 @@ import {
   CampaignService,
   type CampaignResult,
   type CreateCampaignRequest,
-  type AddCampaignTargetRequest,
   type ScheduleCampaignRequest
 } from '../../../shared/proxy';
 
 export interface CreateCampaignInput {
   name: string;
   templateId: string;
-}
-
-export interface AddCampaignTargetInput {
-  campaignId: string;
-  emailAddress: string;
 }
 
 export interface ScheduleCampaignInput {
@@ -34,19 +28,6 @@ export const createCampaign = async (
   };
 
   return CampaignService.campaignCreate({ requestBody: request });
-};
-
-export const addCampaignTarget = async (
-  input: AddCampaignTargetInput
-): Promise<CampaignResult> => {
-  const request: AddCampaignTargetRequest = {
-    emailAddress: input.emailAddress
-  };
-
-  return CampaignService.campaignAddTarget({
-    campaignId: input.campaignId,
-    requestBody: request
-  });
 };
 
 export const scheduleCampaign = async (

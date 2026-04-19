@@ -6,12 +6,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { resolveApiError } from '../../../core/http/api-error-handler';
 import { AuthSessionService } from '../../../core/auth/auth-session';
 import {
-  CampaignLifecycleState,
-  type CampaignResult,
-  type CampaignTargetResult
+  CampaignLifecycleState ,
+  type CampaignResult
 } from '../../../shared/proxy';
 import {
-  addCampaignTarget,
   cancelCampaign,
   completeCampaign,
   createCampaign,
@@ -73,12 +71,7 @@ import {
         </div>
 
         <div class="mt-4 grid gap-3 lg:grid-cols-3">
-          <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Targets</p>
-            <p class="mt-1 text-sm text-slate-700">{{ targetSummary(campaign.targets) }}</p>
-          </div>
-
-          <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                    <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
             <p class="text-xs font-semibold uppercase text-slate-500">Starts At (UTC)</p>
             <p class="mt-1 text-sm text-slate-700">{{ campaign.startsAtUtc || 'Not scheduled' }}</p>
           </div>
@@ -90,27 +83,6 @@ import {
         </div>
 
         <div class="mt-4 grid gap-3 xl:grid-cols-2">
-          <div class="rounded-xl border border-slate-200 p-4">
-            <p class="text-xs font-semibold uppercase text-slate-500">Add Target</p>
-            <div class="mt-2 flex gap-2">
-              <input
-                pInputText
-                class="w-full"
-                placeholder="target@company.com"
-                [ngModel]="targetDrafts()[campaign.id || ''] || ''"
-                (ngModelChange)="setTargetDraft(campaign.id, $event)"
-              />
-              <button
-                pButton
-                type="button"
-                icon="pi pi-user-plus"
-                label="Add"
-                [disabled]="!canOperate() || isBusy()"
-                (click)="addTarget(campaign.id)"
-              ></button>
-            </div>
-          </div>
-
           <div class="rounded-xl border border-slate-200 p-4">
             <p class="text-xs font-semibold uppercase text-slate-500">Schedule</p>
             <div class="mt-2 grid gap-2 sm:grid-cols-2">
@@ -159,7 +131,6 @@ export class CampaignsPageComponent {
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
   protected readonly campaigns = signal<CampaignResult[]>([]);
-  protected readonly targetDrafts = signal<Record<string, string>>({});
   protected readonly scheduleDrafts = signal<Record<string, { startsAtUtc: string; endsAtUtc: string }>>({});
   protected readonly canOperate = computed(() => this.authSessionService.hasRequiredRole('Operator'));
 
@@ -194,25 +165,6 @@ export class CampaignsPageComponent {
       this.createForm.templateId = '';
       this.feedback.set('Campaign oluşturuldu.');
       this.campaigns.set(await listCampaigns());
-    });
-  }
-
-  protected async addTarget(campaignId: string | undefined): Promise<void> {
-    if (!campaignId) {
-      return;
-    }
-
-    const emailAddress = (this.targetDrafts()[campaignId] || '').trim();
-    if (emailAddress.length === 0) {
-      this.feedback.set('Target email adresi boş olamaz.');
-      return;
-    }
-
-    await this.execute(async () => {
-      const updatedCampaign = await addCampaignTarget({ campaignId, emailAddress });
-      this.applyUpdatedCampaign(updatedCampaign);
-      this.setTargetDraft(campaignId, '');
-      this.feedback.set('Target eklendi.');
     });
   }
 
@@ -252,17 +204,6 @@ export class CampaignsPageComponent {
       const updatedCampaign = await this.transitionCampaign(campaignId, action);
       this.applyUpdatedCampaign(updatedCampaign);
       this.feedback.set(`Campaign ${action} işlemi başarılı.`);
-    });
-  }
-
-  protected setTargetDraft(campaignId: string | undefined, value: string): void {
-    if (!campaignId) {
-      return;
-    }
-
-    this.targetDrafts.set({
-      ...this.targetDrafts(),
-      [campaignId]: value
     });
   }
 
@@ -316,14 +257,6 @@ export class CampaignsPageComponent {
       default:
         return 'status-chip-default';
     }
-  }
-
-  protected targetSummary(targets: CampaignTargetResult[] | null | undefined): string {
-    if (!targets || targets.length === 0) {
-      return 'No targets';
-    }
-
-    return `${targets.length} target(s)`;
   }
 
   private async transitionCampaign(

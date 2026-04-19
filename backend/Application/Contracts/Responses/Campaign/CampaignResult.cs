@@ -11,16 +11,11 @@ public sealed record CampaignResult(
     DateTimeOffset? StartsAtUtc,
     DateTimeOffset? EndsAtUtc,
     DateTimeOffset CreatedAtUtc,
-    DateTimeOffset UpdatedAtUtc,
-    IReadOnlyCollection<CampaignTargetResult> Targets)
+    DateTimeOffset UpdatedAtUtc)
 {
     public static CampaignResult FromAggregate(CampaignAggregate aggregate)
     {
         ArgumentNullException.ThrowIfNull(aggregate);
-
-        var targets = aggregate.Targets
-            .Select(target => new CampaignTargetResult(target.Id, target.EmailAddress))
-            .ToArray();
 
         return new CampaignResult(
             Id: aggregate.Id,
@@ -30,7 +25,6 @@ public sealed record CampaignResult(
             StartsAtUtc: aggregate.ScheduleWindow?.StartsAtUtc,
             EndsAtUtc: aggregate.ScheduleWindow?.EndsAtUtc,
             CreatedAtUtc: aggregate.CreatedAtUtc,
-            UpdatedAtUtc: aggregate.UpdatedAtUtc,
-            Targets: targets);
+            UpdatedAtUtc: aggregate.UpdatedAtUtc);
     }
 }

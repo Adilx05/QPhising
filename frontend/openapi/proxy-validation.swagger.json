@@ -1358,217 +1358,6 @@
         ]
       }
     },
-    "/api/campaigns/{campaignId}/targets": {
-      "post": {
-        "tags": [
-          "Campaign"
-        ],
-        "operationId": "Campaign_AddTarget",
-        "parameters": [
-          {
-            "name": "campaignId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddCampaignTargetRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CampaignResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/campaigns/{campaignId}/targets/{targetId}": {
-      "delete": {
-        "tags": [
-          "Campaign"
-        ],
-        "operationId": "Campaign_RemoveTarget",
-        "parameters": [
-          {
-            "name": "campaignId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "targetId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CampaignResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
     "/api/campaigns/{campaignId}/schedule": {
       "post": {
         "tags": [
@@ -3043,18 +2832,6 @@
           }
         }
       },
-      "AddCampaignTargetRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "emailAddress"
-        ],
-        "properties": {
-          "emailAddress": {
-            "type": "string"
-          }
-        }
-      },
       "CreateCampaignRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -3114,23 +2891,6 @@
         "type": "integer",
         "format": "int32"
       },
-      "CampaignTargetResult": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "emailAddress"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "emailAddress": {
-            "type": "string"
-          }
-        }
-      },
       "CampaignResult": {
         "type": "object",
         "additionalProperties": false,
@@ -3140,8 +2900,7 @@
           "templateId",
           "lifecycleState",
           "createdAtUtc",
-          "updatedAtUtc",
-          "targets"
+          "updatedAtUtc"
         ],
         "properties": {
           "id": {
@@ -3175,12 +2934,6 @@
           "updatedAtUtc": {
             "type": "string",
             "format": "date-time"
-          },
-          "targets": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CampaignTargetResult"
-            }
           }
         }
       },

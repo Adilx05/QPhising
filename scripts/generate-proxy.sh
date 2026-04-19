@@ -60,8 +60,6 @@ const requiredPaths = [
   "/api/setup/save",
   "/api/campaigns",
   "/api/campaigns/{campaignId}",
-  "/api/campaigns/{campaignId}/targets",
-  "/api/campaigns/{campaignId}/targets/{targetId}",
   "/api/campaigns/{campaignId}/schedule",
   "/api/campaigns/{campaignId}/start",
   "/api/campaigns/{campaignId}/pause",

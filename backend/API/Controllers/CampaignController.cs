@@ -58,25 +58,6 @@ public sealed class CampaignController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{campaignId:guid}/targets", Name = "Campaign_AddTarget")]
-    [Consumes("application/json")]
-    [ProducesResponseType(typeof(CampaignResult), StatusCodes.Status200OK)]
-    [Authorize(Policy = IdentityAuthorizationPolicies.OperatorOrAbove)]
-    public Task<CampaignResult> AddTarget(
-        [FromRoute] Guid campaignId,
-        [FromBody] AddCampaignTargetRequest request,
-        CancellationToken cancellationToken) =>
-        _sender.Send(new AddCampaignTargetCommand(campaignId, request.EmailAddress), cancellationToken);
-
-    [HttpDelete("{campaignId:guid}/targets/{targetId:guid}", Name = "Campaign_RemoveTarget")]
-    [ProducesResponseType(typeof(CampaignResult), StatusCodes.Status200OK)]
-    [Authorize(Policy = IdentityAuthorizationPolicies.OperatorOrAbove)]
-    public Task<CampaignResult> RemoveTarget(
-        [FromRoute] Guid campaignId,
-        [FromRoute] Guid targetId,
-        CancellationToken cancellationToken) =>
-        _sender.Send(new RemoveCampaignTargetCommand(campaignId, targetId), cancellationToken);
-
     [HttpPost("{campaignId:guid}/schedule", Name = "Campaign_Schedule")]
     [Consumes("application/json")]
     [ProducesResponseType(typeof(CampaignResult), StatusCodes.Status200OK)]

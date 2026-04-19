@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 
-using QPhising.Domain.Campaign.Entities;
 using QPhising.Domain.Campaign.Enums;
 using QPhising.Domain.Campaign.Policies;
 using QPhising.Domain.Campaign.ValueObjects;
@@ -13,8 +10,6 @@ namespace QPhising.Domain.Campaign.Aggregates;
 
 public sealed class CampaignAggregate : Entity<Guid>
 {
-    private readonly List<CampaignTarget> _targets = [];
-
     public CampaignAggregate(Guid id, CampaignName name, Guid templateId)
         : this(
             id,
@@ -23,8 +18,7 @@ public sealed class CampaignAggregate : Entity<Guid>
             CampaignLifecycleState.Draft,
             scheduleWindow: null,
             createdAtUtc: DateTimeOffset.UtcNow,
-            updatedAtUtc: null,
-            targets: null)
+            updatedAtUtc: null)
     {
     }
 
@@ -35,8 +29,7 @@ public sealed class CampaignAggregate : Entity<Guid>
         CampaignLifecycleState lifecycleState,
         CampaignScheduleWindow? scheduleWindow,
         DateTimeOffset createdAtUtc,
-        DateTimeOffset? updatedAtUtc,
-        IEnumerable<CampaignTarget>? targets)
+        DateTimeOffset? updatedAtUtc)
         : base(id)
     {
         ArgumentNullException.ThrowIfNull(name);
@@ -52,11 +45,6 @@ public sealed class CampaignAggregate : Entity<Guid>
         ScheduleWindow = scheduleWindow;
         CreatedAtUtc = createdAtUtc;
         UpdatedAtUtc = updatedAtUtc ?? createdAtUtc;
-
-        if (targets is not null)
-        {
-            _targets.AddRange(targets);
-        }
     }
 
     public CampaignName Name { get; private set; }
@@ -70,8 +58,6 @@ public sealed class CampaignAggregate : Entity<Guid>
     public DateTimeOffset CreatedAtUtc { get; }
 
     public DateTimeOffset UpdatedAtUtc { get; private set; }
-
-    public IReadOnlyCollection<CampaignTarget> Targets => new ReadOnlyCollection<CampaignTarget>(_targets);
 
     public void Rename(CampaignName name)
     {
@@ -93,42 +79,11 @@ public sealed class CampaignAggregate : Entity<Guid>
         Touch();
     }
 
-    public void AddTarget(CampaignTarget target)
-    {
-        ArgumentNullException.ThrowIfNull(target);
-
-        EnsureMutable();
-
-        if (_targets.Any(existing => string.Equals(existing.EmailAddress, target.EmailAddress, StringComparison.OrdinalIgnoreCase)))
-        {
-            throw new InvalidOperationException($"Target '{target.EmailAddress}' is already part of this campaign.");
-        }
-
-        _targets.Add(target);
-        Touch();
-    }
-
-    public void RemoveTarget(Guid targetId)
-    {
-        EnsureMutable();
-
-        var target = _targets.FirstOrDefault(existing => existing.Id == targetId)
-            ?? throw new InvalidOperationException("Target does not exist in this campaign.");
-
-        _targets.Remove(target);
-        Touch();
-    }
-
     public void Schedule()
     {
         if (ScheduleWindow is null)
         {
             throw new InvalidOperationException("Campaign schedule is required before scheduling the campaign.");
-        }
-
-        if (_targets.Count == 0)
-        {
-            throw new InvalidOperationException("Campaign must have at least one target before scheduling.");
         }
 
         TransitionTo(CampaignLifecycleState.Scheduled);
@@ -149,11 +104,8 @@ public sealed class CampaignAggregate : Entity<Guid>
         CampaignLifecycleState lifecycleState,
         CampaignScheduleWindow? scheduleWindow,
         DateTimeOffset createdAtUtc,
-        DateTimeOffset updatedAtUtc,
-        IEnumerable<CampaignTarget> targets)
+        DateTimeOffset updatedAtUtc)
     {
-        ArgumentNullException.ThrowIfNull(targets);
-
         return new CampaignAggregate(
             id,
             name,
@@ -161,8 +113,7 @@ public sealed class CampaignAggregate : Entity<Guid>
             lifecycleState,
             scheduleWindow,
             createdAtUtc,
-            updatedAtUtc,
-            targets);
+            updatedAtUtc);
     }
 
     private void TransitionTo(CampaignLifecycleState nextState)

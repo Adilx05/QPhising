@@ -7,11 +7,9 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { AddCampaignTargetRequest } from './models/AddCampaignTargetRequest';
 export type { AssertProxyContractSyncRequest } from './models/AssertProxyContractSyncRequest';
 export { CampaignLifecycleState } from './models/CampaignLifecycleState';
 export type { CampaignResult } from './models/CampaignResult';
-export type { CampaignTargetResult } from './models/CampaignTargetResult';
 export type { CreateCampaignRequest } from './models/CreateCampaignRequest';
 export type { CreateTemplateRequest } from './models/CreateTemplateRequest';
 export { GatewayModule } from './models/GatewayModule';
