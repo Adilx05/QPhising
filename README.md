@@ -261,6 +261,12 @@ For deeper implementation details, start with:
 
 ---
 
-## License
+## Licensing
 
-Internal project repository. Add/adjust license policy here if the distribution model changes.
+QPhising is source-available under the QPhising Community License.
+
+Commercial use requires a separate license.
+See:
+- LICENSE.md
+- TRADEMARK.md
+- COMMERCIAL.md
