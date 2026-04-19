@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { PublicTrackingService, TrackingService, type TrackingLandingPageResult } from '../../../shared/proxy';
 
@@ -11,7 +12,7 @@ import { PublicTrackingService, TrackingService, type TrackingLandingPageResult 
     <ng-container *ngIf="landing() as data; else missing">
       <iframe
         class="h-screen w-screen border-0"
-        [srcdoc]="data.customHtmlContent || data.templateHtmlContent || '<p style=&quot;padding:12px&quot;>Landing content not configured.</p>'"
+        [src]="previewUrl(data.customHtmlContent || data.templateHtmlContent || '<p style=&quot;padding:12px&quot;>Landing content not configured.</p>')"
       ></iframe>
     </ng-container>
     <ng-template #missing>
@@ -24,14 +25,44 @@ import { PublicTrackingService, TrackingService, type TrackingLandingPageResult 
     </ng-template>
   `
 })
-export class PublicTrackingLandingPageComponent {
+export class PublicTrackingLandingPageComponent implements OnDestroy {
   private static readonly VisitSessionStorageKey = 'qphising_public_visit_session_id';
   private static readonly VisitCaptureThrottleStorageKeyPrefix = 'qphising_public_visit_capture';
   private static readonly VisitCaptureThrottleWindowMs = 10_000;
   protected readonly landing = signal<TrackingLandingPageResult | null>(null);
+  private readonly previewUrlCache = new Map<string, SafeResourceUrl>();
+  private readonly objectUrls = new Set<string>();
 
-  public constructor(private readonly route: ActivatedRoute) {
+  public constructor(
+    private readonly route: ActivatedRoute,
+    private readonly sanitizer: DomSanitizer
+  ) {
     void this.load();
+  }
+
+  public ngOnDestroy(): void {
+    this.objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    this.objectUrls.clear();
+    this.previewUrlCache.clear();
+  }
+
+  protected previewUrl(htmlContent: string): SafeResourceUrl {
+    const html = htmlContent.trim();
+    if (html.length === 0) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
+    }
+
+    const existing = this.previewUrlCache.get(html);
+    if (existing) {
+      return existing;
+    }
+
+    const objectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    this.objectUrls.add(objectUrl);
+
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+    this.previewUrlCache.set(html, safeUrl);
+    return safeUrl;
   }
 
   private async load(): Promise<void> {
