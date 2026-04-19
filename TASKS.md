@@ -104,12 +104,15 @@ Phase 7 evidence:
 - 2026-04-19: Added root `docker-compose.yml` with API/Gateway/PostgreSQL and optional Redis profile, introduced environment templates under `deploy/env`, enabled JSON console logging plus `X-Correlation-Id` middleware in API/Gateway, and added `.github/workflows/ci.yml` + `.github/workflows/release.yml` for CI validation and environment-guarded release baseline.
 
 ## Phase 8 - Testing
-- [ ] Add unit tests for domain invariants and analytics calculation rules.
-- [ ] Add unit tests for application handlers, validators, and mapping profiles.
-- [ ] Add integration tests for tracking page CRUD and visit ingestion endpoints.
-- [ ] Add integration tests for analytics endpoints with representative datasets.
-- [ ] Add frontend UI smoke tests for dashboard, pages grid, page editor, and analytics detail flows.
-- [ ] Add regression checks ensuring no legacy phishing/email behavior remains.
+- [x] Add unit tests for domain invariants and analytics calculation rules.
+- [x] Add unit tests for application handlers, validators, and mapping profiles.
+- [x] Add integration tests for tracking page CRUD and visit ingestion endpoints.
+- [x] Add integration tests for analytics endpoints with representative datasets.
+- [x] Add frontend UI smoke tests for dashboard, pages grid, page editor, and analytics detail flows.
+- [x] Add regression checks ensuring no legacy phishing/email behavior remains.
+
+Phase 8 evidence:
+- 2026-04-19: Added comprehensive tracking test coverage in `backend/API.Tests` (domain invariants, application handler/validator/mapping behavior, role-aware tracking CRUD/visit ingestion/analytics integration flows, and legacy-route regression checks), introduced frontend UI smoke checker script (`scripts/check-frontend-ui-smoke.*`) for dashboard + tracking grid/editor/analytics presence, and wired smoke checks into CI.
 
 ## Phase 9 - Polish
 - [ ] Optimize hot paths (visit ingestion throughput, analytics query performance, indexing).
