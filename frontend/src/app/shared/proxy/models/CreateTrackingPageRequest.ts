@@ -1,0 +1,16 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+export type CreateTrackingPageRequest = {
+  slug?: string | null;
+  title?: string | null;
+  description?: string | null;
+  destinationUrl?: string | null;
+  ownerId?: string | null;
+  retentionDays?: number | null;
+  maskIpAddress?: boolean | null;
+  enableBotFiltering?: boolean | null;
+  captureUtmParameters?: boolean | null;
+};
+
