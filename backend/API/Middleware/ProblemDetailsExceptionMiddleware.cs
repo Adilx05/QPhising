@@ -92,6 +92,14 @@ public sealed class ProblemDetailsExceptionMiddleware
                 StatusCodes.Status409Conflict,
                 "Contract drift detected",
                 "https://tools.ietf.org/html/rfc9110#section-15.5.10"),
+            KeyNotFoundException => (
+                StatusCodes.Status404NotFound,
+                "Resource not found",
+                "https://tools.ietf.org/html/rfc9110#section-15.5.5"),
+            InvalidOperationException => (
+                StatusCodes.Status409Conflict,
+                "Invalid operation",
+                "https://tools.ietf.org/html/rfc9110#section-15.5.10"),
             BadHttpRequestException => (
                 StatusCodes.Status400BadRequest,
                 "Invalid request",
