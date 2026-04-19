@@ -6,13 +6,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QPhising.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class firstin : Migration
+    public partial class firstinb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "campaign_targets");
+            migrationBuilder.CreateTable(
+                name: "templates",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    html_content = table.Column<string>(type: "character varying(200000)", maxLength: 200000, nullable: false),
+                    description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    tags = table.Column<string>(type: "jsonb", nullable: false),
+                    lifecycle_state = table.Column<int>(type: "integer", nullable: false),
+                    version = table.Column<int>(type: "integer", nullable: false),
+                    created_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    updated_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_templates", x => x.id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "tracking_pages",
@@ -24,6 +40,7 @@ namespace QPhising.Api.Migrations
                     description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     destination_url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
                     owner_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    template_id = table.Column<Guid>(type: "uuid", nullable: true),
                     publish_state = table.Column<int>(type: "integer", nullable: false),
                     retention_days = table.Column<int>(type: "integer", nullable: true),
                     mask_ip_address = table.Column<bool>(type: "boolean", nullable: true),
@@ -35,6 +52,37 @@ namespace QPhising.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_tracking_pages", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_tracking_pages_templates_template_id",
+                        column: x => x.template_id,
+                        principalTable: "templates",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "campaigns",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    tracking_page_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    template_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    lifecycle_state = table.Column<int>(type: "integer", nullable: false),
+                    schedule_starts_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    schedule_ends_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    updated_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_campaigns", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_campaigns_tracking_pages_tracking_page_id",
+                        column: x => x.tracking_page_id,
+                        principalTable: "tracking_pages",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,6 +111,12 @@ namespace QPhising.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_campaigns_tracking_page_id",
+                table: "campaigns",
+                column: "tracking_page_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_tracking_pages_owner_id",
                 table: "tracking_pages",
                 column: "owner_id");
@@ -72,6 +126,11 @@ namespace QPhising.Api.Migrations
                 table: "tracking_pages",
                 column: "slug",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tracking_pages_template_id",
+                table: "tracking_pages",
+                column: "template_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_visit_events_tracking_page_id_occurred_at_utc",
@@ -88,35 +147,16 @@ namespace QPhising.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "campaigns");
+
+            migrationBuilder.DropTable(
                 name: "visit_events");
 
             migrationBuilder.DropTable(
                 name: "tracking_pages");
 
-            migrationBuilder.CreateTable(
-                name: "campaign_targets",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    campaign_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    email_address = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_campaign_targets", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_campaign_targets_campaigns_campaign_id",
-                        column: x => x.campaign_id,
-                        principalTable: "campaigns",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_campaign_targets_campaign_id_email_address",
-                table: "campaign_targets",
-                columns: new[] { "campaign_id", "email_address" },
-                unique: true);
+            migrationBuilder.DropTable(
+                name: "templates");
         }
     }
 }

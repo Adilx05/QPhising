@@ -256,14 +256,6 @@ namespace QPhising.Api.Migrations
                     b.ToTable("visit_events", (string)null);
                 });
 
-            modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.TrackingPageEntity", b =>
-                {
-                    b.HasOne("QPhising.Api.Infrastructure.Persistence.Entities.TemplateEntity", null)
-                        .WithMany()
-                        .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.SetNull);
-                });
-
             modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignEntity", b =>
                 {
                     b.HasOne("QPhising.Api.Infrastructure.Persistence.Entities.TrackingPageEntity", null)
@@ -271,6 +263,14 @@ namespace QPhising.Api.Migrations
                         .HasForeignKey("TrackingPageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.TrackingPageEntity", b =>
+                {
+                    b.HasOne("QPhising.Api.Infrastructure.Persistence.Entities.TemplateEntity", null)
+                        .WithMany()
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.VisitEventEntity", b =>

@@ -12,8 +12,8 @@ using QPhising.Api.Infrastructure.Persistence;
 namespace QPhising.Api.Migrations
 {
     [DbContext(typeof(QPhisingDbContext))]
-    [Migration("20260419102323_firstina")]
-    partial class firstina
+    [Migration("20260419104410_firstinb")]
+    partial class firstinb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,15 +54,22 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("schedule_starts_at_utc");
 
-                    b.Property<Guid>("TemplateId")
+                    b.Property<Guid?>("TemplateId")
                         .HasColumnType("uuid")
                         .HasColumnName("template_id");
+
+                    b.Property<Guid>("TrackingPageId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tracking_page_id");
 
                     b.Property<DateTimeOffset>("UpdatedAtUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at_utc");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TrackingPageId")
+                        .IsUnique();
 
                     b.ToTable("campaigns", (string)null);
                 });
@@ -250,6 +257,15 @@ namespace QPhising.Api.Migrations
                     b.HasIndex("TrackingPageId", "SessionId", "OccurredAtUtc");
 
                     b.ToTable("visit_events", (string)null);
+                });
+
+            modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.CampaignEntity", b =>
+                {
+                    b.HasOne("QPhising.Api.Infrastructure.Persistence.Entities.TrackingPageEntity", null)
+                        .WithMany()
+                        .HasForeignKey("TrackingPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("QPhising.Api.Infrastructure.Persistence.Entities.TrackingPageEntity", b =>
