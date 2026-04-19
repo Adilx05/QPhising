@@ -92,7 +92,7 @@ export class AppComponent {
     private readonly authSessionService: AuthSessionService,
     private readonly router: Router
   ) {
-    this.currentUrl = this.router.url;
+    this.currentUrl = this.resolveInitialUrl();
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event) => {
@@ -122,5 +122,13 @@ export class AppComponent {
 
   protected isPublicLandingRoute(): boolean {
     return this.currentUrl.startsWith('/p/');
+  }
+
+  private resolveInitialUrl(): string {
+    if (typeof window !== 'undefined' && window.location?.pathname) {
+      return `${window.location.pathname}${window.location.search}`;
+    }
+
+    return this.router.url;
   }
 }
