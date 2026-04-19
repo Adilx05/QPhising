@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { SetupReadinessState, SetupService } from './shared/proxy';
 import { AuthSessionService } from './core/auth/auth-session';
 import { OidcAuthService } from './core/auth/oidc-auth.service';
 
@@ -19,20 +20,25 @@ import { OidcAuthService } from './core/auth/oidc-auth.service';
           <p class="mt-2 text-sm text-slate-500">Enterprise Security Operations Console</p>
         </div>
 
-        <nav class="flex-1 space-y-2 px-4 py-6">
+        <section class="mx-4 mt-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+          <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">User</h3>
+          <p class="mt-2 text-sm font-semibold text-slate-900">{{ getUserFullName() }}</p>
+          <p class="mt-1 text-xs text-slate-600">Role: {{ getUserRole() }}</p>
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            [disabled]="!isAuthenticated()"
+            (click)="logout()"
+          >
+            <i class="pi pi-sign-out"></i>
+            Logout
+          </button>
+        </section>
+
+        <nav class="space-y-2 px-4 py-6">
           <a routerLink="/dashboard" routerLinkActive="is-active" class="nav-item">
             <i class="pi pi-home text-sm"></i>
             <span>Dashboard</span>
-          </a>
-
-          <a routerLink="/setup" routerLinkActive="is-active" class="nav-item">
-            <i class="pi pi-cog text-sm"></i>
-            <span>Setup Wizard</span>
-          </a>
-
-          <a *ngIf="canViewConfiguration()" routerLink="/configuration" routerLinkActive="is-active" class="nav-item">
-            <i class="pi pi-sliders-h text-sm"></i>
-            <span>Runtime Configuration</span>
           </a>
 
           <a *ngIf="canViewTracking()" routerLink="/tracking" routerLinkActive="is-active" class="nav-item">
@@ -51,19 +57,16 @@ import { OidcAuthService } from './core/auth/oidc-auth.service';
           </a>
         </nav>
 
-        <section class="mx-4 mb-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-          <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">User</h3>
-          <p class="mt-2 text-sm font-semibold text-slate-900">{{ getUserFullName() }}</p>
-          <p class="mt-1 text-xs text-slate-600">Role: {{ getUserRole() }}</p>
-          <button
-            type="button"
-            class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-            [disabled]="!isAuthenticated()"
-            (click)="logout()"
-          >
-            <i class="pi pi-sign-out"></i>
-            Logout
-          </button>
+        <section class="mt-auto space-y-2 border-t border-slate-200 px-4 py-4">
+          <a *ngIf="shouldShowSetupWizard()" routerLink="/setup" routerLinkActive="is-active" class="nav-item nav-item-muted">
+            <i class="pi pi-cog text-sm"></i>
+            <span>Setup Wizard</span>
+          </a>
+
+          <a *ngIf="canViewConfiguration()" routerLink="/configuration" routerLinkActive="is-active" class="nav-item nav-item-muted">
+            <i class="pi pi-sliders-h text-sm"></i>
+            <span>Runtime Configuration</span>
+          </a>
         </section>
       </aside>
 
@@ -74,11 +77,11 @@ import { OidcAuthService } from './core/auth/oidc-auth.service';
 
             <nav class="flex items-center gap-2 text-sm lg:hidden">
               <a class="mobile-nav-item" routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
-              <a class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">Setup</a>
-              <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">Config</a>
               <a *ngIf="canViewTracking()" class="mobile-nav-item" routerLink="/tracking" routerLinkActive="is-active">Tracking</a>
               <a *ngIf="canViewCampaigns()" class="mobile-nav-item" routerLink="/campaigns" routerLinkActive="is-active">Campaigns</a>
               <a *ngIf="canViewTemplates()" class="mobile-nav-item" routerLink="/templates" routerLinkActive="is-active">Templates</a>
+              <a *ngIf="shouldShowSetupWizard()" class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">Setup</a>
+              <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">Config</a>
             </nav>
 
             <div class="hidden items-center gap-3 rounded-full border px-3 py-1.5 text-xs font-medium lg:flex"
@@ -103,6 +106,7 @@ import { OidcAuthService } from './core/auth/oidc-auth.service';
 })
 export class AppComponent {
   private currentUrl = '';
+  private setupCompleted = false;
 
   public constructor(
     private readonly authSessionService: AuthSessionService,
@@ -110,10 +114,16 @@ export class AppComponent {
     private readonly router: Router
   ) {
     this.currentUrl = this.resolveInitialUrl();
+    void this.refreshSetupVisibility();
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event) => {
+        const previousUrl = this.currentUrl;
         this.currentUrl = event.urlAfterRedirects;
+
+        if (previousUrl.startsWith('/setup') || event.urlAfterRedirects.startsWith('/setup')) {
+          void this.refreshSetupVisibility();
+        }
       });
   }
 
@@ -149,6 +159,10 @@ export class AppComponent {
     return this.authSessionService.hasRequiredRole('Viewer');
   }
 
+  protected shouldShowSetupWizard(): boolean {
+    return !this.setupCompleted;
+  }
+
   protected isPublicLandingRoute(): boolean {
     return this.currentUrl.startsWith('/p/');
   }
@@ -159,5 +173,14 @@ export class AppComponent {
     }
 
     return this.router.url;
+  }
+
+  private async refreshSetupVisibility(): Promise<void> {
+    try {
+      const status = await SetupService.getStatusSetup();
+      this.setupCompleted = status.readinessState === SetupReadinessState._2;
+    } catch {
+      this.setupCompleted = false;
+    }
   }
 }

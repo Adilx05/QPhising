@@ -145,6 +145,7 @@ Phase 9 evidence:
 - [x] Introduce auditable BaseEntity + soft-delete semantics (`IsDeleted`) for core write-side entities and enforce global EF filtering with no hard deletes.
 - [x] Add campaign delete action in campaigns list and cascade soft-delete linked tracking pages when campaign is deleted.
 - [x] Remove Redis-only setup/runtime form requirements, add appsettings bootstrap guard fallback, and expose authenticated user card with sidebar logout action.
+- [x] Hide Setup Wizard navigation once setup is completed and move Runtime Configuration into a low-prominence bottom sidebar section while placing the user card at the top.
 
 Incremental evidence:
 - 2026-04-19: Removed Redis input/test requirements from setup + runtime configuration flows (Redis now optional in setup/runtime aggregates), setup guard now allows main app when base appsettings bootstrap config is already present, and app shell now renders authenticated user card (name/role) with sidebar logout action.
@@ -164,3 +165,4 @@ Incremental evidence:
 - 2026-04-19: Added domain/infrastructure base entity abstractions for shared identity/audit fields, introduced mandatory `is_deleted` persistence for campaign/template/tracking-page records, switched delete handlers/repositories to soft delete only, and configured EF Core global query filters + filtered unique indexes to automatically exclude deleted rows.
 - 2026-04-19: Extended soft-delete metadata with optional `deleted_at_utc` and `deleted_by` fields across domain + persistence base entities, propagated metadata through aggregate rehydration/mapping/repositories, and added migration `20260419193000_AddSoftDeleteMetadataColumns`.
 - 2026-04-19: Added campaign list delete action (Admin-only UI control), wired campaign data-access `campaignDelete` proxy usage, and updated `DeleteCampaignCommandHandler` to soft-delete linked tracking pages automatically; validated with integration coverage for campaign+tracking page post-delete 404 behavior.
+- 2026-04-19: Updated app shell navigation to auto-hide Setup Wizard after setup readiness is `Ready`, moved the authenticated user card to the top of the sidebar, and repositioned Runtime Configuration into a bottom, lower-prominence system section.
