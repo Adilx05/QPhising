@@ -17,6 +17,7 @@ public sealed class DeleteTemplateCommandHandler : IRequestHandler<DeleteTemplat
         var aggregate = await _templateRepository.GetByIdAsync(request.TemplateId, cancellationToken)
             ?? throw new KeyNotFoundException($"Template '{request.TemplateId}' was not found.");
 
+        aggregate.MarkDeleted();
         await _templateRepository.DeleteAsync(aggregate, cancellationToken);
 
         return Unit.Value;

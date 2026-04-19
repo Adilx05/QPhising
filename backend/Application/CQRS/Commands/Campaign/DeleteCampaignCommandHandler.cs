@@ -17,6 +17,7 @@ public sealed class DeleteCampaignCommandHandler : IRequestHandler<DeleteCampaig
         var aggregate = await _campaignRepository.GetByIdAsync(request.CampaignId, cancellationToken)
             ?? throw new KeyNotFoundException($"Campaign '{request.CampaignId}' was not found.");
 
+        aggregate.MarkDeleted();
         await _campaignRepository.DeleteAsync(aggregate, cancellationToken);
 
         return Unit.Value;

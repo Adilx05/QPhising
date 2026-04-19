@@ -1,9 +1,7 @@
 namespace QPhising.Api.Infrastructure.Persistence.Entities;
 
-public sealed class TrackingPageEntity
+public sealed class TrackingPageEntity : BaseEntity
 {
-    public Guid Id { get; set; }
-
     public string Slug { get; set; } = string.Empty;
 
     public string Title { get; set; } = string.Empty;
@@ -31,10 +29,6 @@ public sealed class TrackingPageEntity
     public bool? EnableBotFiltering { get; set; }
 
     public bool? CaptureUtmParameters { get; set; }
-
-    public DateTimeOffset CreatedAtUtc { get; set; }
-
-    public DateTimeOffset UpdatedAtUtc { get; set; }
 
     public ICollection<VisitEventEntity> VisitEvents { get; set; } = new List<VisitEventEntity>();
 }

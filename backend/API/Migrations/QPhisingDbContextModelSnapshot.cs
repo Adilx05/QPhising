@@ -33,9 +33,24 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at_utc");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("deleted_by");
+
                     b.Property<int>("LifecycleState")
                         .HasColumnType("integer")
                         .HasColumnName("lifecycle_state");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -66,7 +81,8 @@ namespace QPhising.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("TrackingPageId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"is_deleted\" = FALSE");
 
                     b.ToTable("campaigns", (string)null);
                 });
@@ -82,6 +98,15 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at_utc");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("deleted_by");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
@@ -96,6 +121,12 @@ namespace QPhising.Api.Migrations
                     b.Property<int>("LifecycleState")
                         .HasColumnType("integer")
                         .HasColumnName("lifecycle_state");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -140,6 +171,15 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at_utc");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("deleted_by");
+
                     b.Property<string>("CustomHtmlContent")
                         .HasMaxLength(200000)
                         .HasColumnType("character varying(200000)")
@@ -157,6 +197,12 @@ namespace QPhising.Api.Migrations
                     b.Property<int?>("IpAddressHashPolicy")
                         .HasColumnType("integer")
                         .HasColumnName("ip_address_hash_policy");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
@@ -205,7 +251,8 @@ namespace QPhising.Api.Migrations
                     b.HasIndex("OwnerId");
 
                     b.HasIndex("Slug")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"is_deleted\" = FALSE");
 
                     b.HasIndex("TemplateId");
 

@@ -34,7 +34,11 @@ public sealed class QPhisingDbContext : DbContext
         campaign.Property(x => x.ScheduleEndsAtUtc).HasColumnName("schedule_ends_at_utc");
         campaign.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc").IsRequired();
         campaign.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc").IsRequired();
-        campaign.HasIndex(x => x.TrackingPageId).IsUnique();
+        campaign.Property(x => x.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false).IsRequired();
+        campaign.Property(x => x.DeletedAtUtc).HasColumnName("deleted_at_utc");
+        campaign.Property(x => x.DeletedBy).HasColumnName("deleted_by").HasMaxLength(128);
+        campaign.HasQueryFilter(x => !x.IsDeleted);
+        campaign.HasIndex(x => x.TrackingPageId).IsUnique().HasFilter("\"is_deleted\" = FALSE");
         campaign.HasOne<TrackingPageEntity>()
             .WithMany()
             .HasForeignKey(x => x.TrackingPageId)
@@ -52,6 +56,10 @@ public sealed class QPhisingDbContext : DbContext
         template.Property(x => x.Version).HasColumnName("version").IsRequired();
         template.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc").IsRequired();
         template.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc").IsRequired();
+        template.Property(x => x.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false).IsRequired();
+        template.Property(x => x.DeletedAtUtc).HasColumnName("deleted_at_utc");
+        template.Property(x => x.DeletedBy).HasColumnName("deleted_by").HasMaxLength(128);
+        template.HasQueryFilter(x => !x.IsDeleted);
 
         var trackingPage = modelBuilder.Entity<TrackingPageEntity>();
         trackingPage.ToTable("tracking_pages");
@@ -73,7 +81,11 @@ public sealed class QPhisingDbContext : DbContext
         trackingPage.Property(x => x.CaptureUtmParameters).HasColumnName("capture_utm_parameters");
         trackingPage.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc").IsRequired();
         trackingPage.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc").IsRequired();
-        trackingPage.HasIndex(x => x.Slug).IsUnique();
+        trackingPage.Property(x => x.IsDeleted).HasColumnName("is_deleted").HasDefaultValue(false).IsRequired();
+        trackingPage.Property(x => x.DeletedAtUtc).HasColumnName("deleted_at_utc");
+        trackingPage.Property(x => x.DeletedBy).HasColumnName("deleted_by").HasMaxLength(128);
+        trackingPage.HasQueryFilter(x => !x.IsDeleted);
+        trackingPage.HasIndex(x => x.Slug).IsUnique().HasFilter("\"is_deleted\" = FALSE");
         trackingPage.HasIndex(x => x.OwnerId);
         trackingPage.HasIndex(x => x.TemplateId);
         trackingPage.HasOne<TemplateEntity>()

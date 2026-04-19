@@ -142,6 +142,7 @@ Phase 9 evidence:
 - [x] Persist campaign-to-tracking-page relationship in Domain + EF Core schema.
 - [x] Fix campaign public landing availability and surface campaign-level click/unique-click analytics with configurable tracking-page privacy settings at create time.
 - [x] Fix tracking analytics detail unique-visitor query runtime failure and ensure campaign detail shows persisted start/end schedule windows.
+- [x] Introduce auditable BaseEntity + soft-delete semantics (`IsDeleted`) for core write-side entities and enforce global EF filtering with no hard deletes.
 
 Incremental evidence:
 - 2026-04-19: Campaign create flow now provisions public landing validity window + optional custom HTML, removes destination URL dependency, returns/create-UI displays slug/id public links, and public `/p/{slug}` resolution now accepts optional `id`/`campaign` query with strict 404 for unpublished or out-of-window pages.
@@ -157,3 +158,5 @@ Incremental evidence:
 - 2026-04-19: Fixed duplicate public landing slug GET/click request issue caused by initial shell/public-layout router-outlet swap; `AppComponent` now resolves first-render URL from `window.location` so `/p/:slug` renders directly in public layout without double component initialization.
 
 - 2026-04-19: Added tracking-page IP capture controls (`CaptureIpAddress` + `IpAddressHashPolicy` plain/SHA-256), wired landing-page visit capture to apply page policy, and fixed server-side ingestion/storage mapping so IP data is persisted according to selected privacy mode.
+- 2026-04-19: Added domain/infrastructure base entity abstractions for shared identity/audit fields, introduced mandatory `is_deleted` persistence for campaign/template/tracking-page records, switched delete handlers/repositories to soft delete only, and configured EF Core global query filters + filtered unique indexes to automatically exclude deleted rows.
+- 2026-04-19: Extended soft-delete metadata with optional `deleted_at_utc` and `deleted_by` fields across domain + persistence base entities, propagated metadata through aggregate rehydration/mapping/repositories, and added migration `20260419193000_AddSoftDeleteMetadataColumns`.

@@ -82,6 +82,9 @@ public sealed class EfCoreTrackingPageRepository : ITrackingPageRepository
         existing.CaptureUtmParameters = aggregate.Settings?.CaptureUtmParameters;
         existing.CreatedAtUtc = aggregate.CreatedAtUtc;
         existing.UpdatedAtUtc = aggregate.UpdatedAtUtc;
+        existing.IsDeleted = aggregate.IsDeleted;
+        existing.DeletedAtUtc = aggregate.DeletedAtUtc;
+        existing.DeletedBy = aggregate.DeletedBy;
     }
 
     public async Task DeleteAsync(TrackingPageAggregate aggregate, CancellationToken cancellationToken)
@@ -96,6 +99,9 @@ public sealed class EfCoreTrackingPageRepository : ITrackingPageRepository
             return;
         }
 
-        _dbContext.TrackingPages.Remove(existing);
+        existing.IsDeleted = aggregate.IsDeleted;
+        existing.UpdatedAtUtc = aggregate.UpdatedAtUtc;
+        existing.DeletedAtUtc = aggregate.DeletedAtUtc;
+        existing.DeletedBy = aggregate.DeletedBy;
     }
 }

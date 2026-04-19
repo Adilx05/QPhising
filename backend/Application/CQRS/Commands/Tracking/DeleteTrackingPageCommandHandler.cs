@@ -17,6 +17,7 @@ public sealed class DeleteTrackingPageCommandHandler : IRequestHandler<DeleteTra
         var aggregate = await _trackingPageRepository.GetByIdAsync(request.TrackingPageId, cancellationToken)
             ?? throw new KeyNotFoundException($"Tracking page '{request.TrackingPageId}' was not found.");
 
+        aggregate.MarkDeleted();
         await _trackingPageRepository.DeleteAsync(aggregate, cancellationToken);
 
         return Unit.Value;
