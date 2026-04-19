@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using QPhising.Api.Infrastructure.Persistence;
 
 namespace QPhising.Api.Tests.Infrastructure;
 
@@ -14,9 +18,25 @@ public sealed class TestApiFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Development");
         builder.UseContentRoot(_contentRootPath);
+        builder.ConfigureAppConfiguration((_, configurationBuilder) =>
+        {
+            configurationBuilder.AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["Database:ApplyMigrationsOnStartup"] = "false",
+                    ["Database:ContinueOnMigrationFailure"] = "true",
+                    ["ConnectionStrings:DefaultConnection"] = "Host=localhost;Database=qphising-tests"
+                });
+        });
 
         builder.ConfigureTestServices(services =>
         {
+            services.RemoveAll<DbContextOptions<QPhisingDbContext>>();
+            services.AddDbContext<QPhisingDbContext>(options =>
+            {
+                options.UseInMemoryDatabase($"qphising-tests-{Guid.NewGuid():N}");
+            });
+
             services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = TestAuthHandler.SchemeName;
