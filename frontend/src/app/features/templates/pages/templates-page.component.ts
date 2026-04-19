@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnDestroy, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { resolveApiError } from '../../../core/http/api-error-handler';
@@ -44,7 +45,7 @@ interface TemplateDraft {
 
       <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 md:col-span-2">
         <p class="text-xs font-semibold uppercase text-slate-500">Live Preview</p>
-        <iframe class="mt-2 h-64 w-full rounded-lg border border-slate-200 bg-white" [attr.srcdoc]="createForm.htmlContent"></iframe>
+        <iframe class="mt-2 h-64 w-full rounded-lg border border-slate-200 bg-white" [src]="previewUrl(createForm.htmlContent)"></iframe>
       </div>
 
       <button
@@ -98,7 +99,7 @@ interface TemplateDraft {
 
           <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
             <p class="text-xs font-semibold uppercase text-slate-500">Preview</p>
-            <iframe class="mt-2 h-64 w-full rounded-lg border border-slate-200 bg-white" [attr.srcdoc]="editDrafts()[templateItem.id || ''].htmlContent || ''"></iframe>
+            <iframe class="mt-2 h-64 w-full rounded-lg border border-slate-200 bg-white" [src]="previewUrl(editDrafts()[templateItem.id || ''].htmlContent || '')"></iframe>
           </div>
 
           <div class="mt-3 flex flex-wrap gap-2">
@@ -116,12 +117,14 @@ interface TemplateDraft {
     </section>
   `
 })
-export class TemplatesPageComponent {
+export class TemplatesPageComponent implements OnDestroy {
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
   protected readonly templates = signal<TemplateResult[]>([]);
   protected readonly editDrafts = signal<Record<string, TemplateDraft>>({});
   protected readonly canOperate = computed(() => this.authSessionService.hasRequiredRole('Operator'));
+  private readonly previewUrlCache = new Map<string, SafeResourceUrl>();
+  private readonly objectUrls = new Set<string>();
 
   protected readonly createForm: TemplateDraft = {
     name: '',
@@ -130,8 +133,15 @@ export class TemplatesPageComponent {
     tags: ''
   };
 
-  public constructor(private readonly authSessionService: AuthSessionService) {
+  public constructor(
+    private readonly authSessionService: AuthSessionService,
+    private readonly sanitizer: DomSanitizer
+  ) {
     void this.refresh();
+  }
+
+  public ngOnDestroy(): void {
+    this.revokePreviewUrls();
   }
 
   protected async create(): Promise<void> {
@@ -245,6 +255,26 @@ export class TemplatesPageComponent {
     }
   }
 
+  protected previewUrl(htmlContent: string): SafeResourceUrl {
+    const html = htmlContent.trim();
+    if (html.length === 0) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
+    }
+
+    const existing = this.previewUrlCache.get(html);
+    if (existing) {
+      return existing;
+    }
+
+    const objectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    this.objectUrls.add(objectUrl);
+
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+    this.previewUrlCache.set(html, safeUrl);
+
+    return safeUrl;
+  }
+
   private async refresh(): Promise<void> {
     await this.execute(async () => {
       const templates = await listTemplates();
@@ -317,5 +347,11 @@ export class TemplatesPageComponent {
     } finally {
       this.isBusy.set(false);
     }
+  }
+
+  private revokePreviewUrls(): void {
+    this.objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    this.objectUrls.clear();
+    this.previewUrlCache.clear();
   }
 }

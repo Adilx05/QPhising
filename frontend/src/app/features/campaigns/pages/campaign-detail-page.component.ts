@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { resolveApiError } from '../../../core/http/api-error-handler';
@@ -86,7 +87,7 @@ import { getCampaignById } from '../data-access';
       <div class="mt-4">
         <p class="mb-2 text-xs font-semibold uppercase text-slate-500">HTML Preview</p>
         <div class="rounded-xl border border-slate-200 bg-white p-3">
-          <iframe class="h-80 w-full rounded-lg" [srcdoc]="previewHtml()"></iframe>
+          <iframe class="h-80 w-full rounded-lg" [src]="previewUrl(previewHtml())"></iframe>
         </div>
       </div>
     </section>
@@ -98,7 +99,7 @@ import { getCampaignById } from '../data-access';
     </ng-template>
   `
 })
-export class CampaignDetailPageComponent {
+export class CampaignDetailPageComponent implements OnDestroy {
   protected readonly campaign = signal<CampaignResult | null>(null);
   protected readonly trackingPage = signal<TrackingPageResult | null>(null);
   protected readonly analytics = signal<TrackingPageAnalyticsResult | null>(null);
@@ -106,9 +107,20 @@ export class CampaignDetailPageComponent {
   protected readonly publicLinks = signal<{ slugUrl: string; idUrl: string } | null>(null);
   protected readonly feedback = signal<string | null>(null);
   private readonly origin = typeof window !== 'undefined' ? window.location.origin : '';
+  private readonly previewUrlCache = new Map<string, SafeResourceUrl>();
+  private readonly objectUrls = new Set<string>();
 
-  public constructor(private readonly route: ActivatedRoute) {
+  public constructor(
+    private readonly route: ActivatedRoute,
+    private readonly sanitizer: DomSanitizer
+  ) {
     void this.load();
+  }
+
+  public ngOnDestroy(): void {
+    this.objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    this.objectUrls.clear();
+    this.previewUrlCache.clear();
   }
 
   private async load(): Promise<void> {
@@ -137,6 +149,25 @@ export class CampaignDetailPageComponent {
     return templateHtml && templateHtml.length > 0
       ? templateHtml
       : '<p style="padding:8px">Bu campaign için HTML içerik bulunamadı.</p>';
+  }
+
+  protected previewUrl(htmlContent: string): SafeResourceUrl {
+    const html = htmlContent.trim();
+    if (html.length === 0) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
+    }
+
+    const existing = this.previewUrlCache.get(html);
+    if (existing) {
+      return existing;
+    }
+
+    const objectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    this.objectUrls.add(objectUrl);
+
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+    this.previewUrlCache.set(html, safeUrl);
+    return safeUrl;
   }
 
   protected publishStateLabel(state: number | undefined): string {
