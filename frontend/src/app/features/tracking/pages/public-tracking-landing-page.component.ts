@@ -26,6 +26,8 @@ import { PublicTrackingService, TrackingService, type TrackingLandingPageResult 
 })
 export class PublicTrackingLandingPageComponent {
   private static readonly VisitSessionStorageKey = 'qphising_public_visit_session_id';
+  private static readonly VisitCaptureThrottleStorageKeyPrefix = 'qphising_public_visit_capture';
+  private static readonly VisitCaptureThrottleWindowMs = 10_000;
   protected readonly landing = signal<TrackingLandingPageResult | null>(null);
 
   public constructor(private readonly route: ActivatedRoute) {
@@ -57,6 +59,10 @@ export class PublicTrackingLandingPageComponent {
       return;
     }
 
+    if (this.wasVisitRecentlyCaptured()) {
+      return;
+    }
+
     try {
       await TrackingService.trackingPageCaptureVisit({
         trackingPageId,
@@ -70,9 +76,34 @@ export class PublicTrackingLandingPageComponent {
           deduplicationWindowSeconds: 120
         }
       });
+      this.markVisitCapturedNow();
     } catch {
       // Keep public page rendering resilient if visit ingestion fails.
     }
+  }
+
+  private wasVisitRecentlyCaptured(): boolean {
+    const key = this.getCaptureThrottleStorageKey();
+    const rawValue = window.sessionStorage.getItem(key);
+    if (!rawValue) {
+      return false;
+    }
+
+    const lastCapturedAt = Number.parseInt(rawValue, 10);
+    if (Number.isNaN(lastCapturedAt)) {
+      window.sessionStorage.removeItem(key);
+      return false;
+    }
+
+    return Date.now() - lastCapturedAt < PublicTrackingLandingPageComponent.VisitCaptureThrottleWindowMs;
+  }
+
+  private markVisitCapturedNow(): void {
+    window.sessionStorage.setItem(this.getCaptureThrottleStorageKey(), Date.now().toString());
+  }
+
+  private getCaptureThrottleStorageKey(): string {
+    return `${PublicTrackingLandingPageComponent.VisitCaptureThrottleStorageKeyPrefix}:${window.location.pathname}${window.location.search}`;
   }
 
   private getSessionId(): string {
