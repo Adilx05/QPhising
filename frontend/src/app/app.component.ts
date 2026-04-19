@@ -31,6 +31,11 @@ import { AuthSessionService } from './core/auth/auth-session';
             <span>Runtime Configuration</span>
           </a>
 
+          <a *ngIf="canViewTracking()" routerLink="/tracking" routerLinkActive="is-active" class="nav-item">
+            <i class="pi pi-chart-line text-sm"></i>
+            <span>Tracking</span>
+          </a>
+
           <a *ngIf="canViewCampaigns()" routerLink="/campaigns" routerLinkActive="is-active" class="nav-item">
             <i class="pi pi-megaphone text-sm"></i>
             <span>Campaigns</span>
@@ -52,6 +57,7 @@ import { AuthSessionService } from './core/auth/auth-session';
               <a class="mobile-nav-item" routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
               <a class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">Setup</a>
               <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">Config</a>
+              <a *ngIf="canViewTracking()" class="mobile-nav-item" routerLink="/tracking" routerLinkActive="is-active">Tracking</a>
               <a *ngIf="canViewCampaigns()" class="mobile-nav-item" routerLink="/campaigns" routerLinkActive="is-active">Campaigns</a>
               <a *ngIf="canViewTemplates()" class="mobile-nav-item" routerLink="/templates" routerLinkActive="is-active">Templates</a>
             </nav>
@@ -79,6 +85,10 @@ export class AppComponent {
   }
 
   protected canViewConfiguration(): boolean {
+    return this.authSessionService.hasRequiredRole('Viewer');
+  }
+
+  protected canViewTracking(): boolean {
     return this.authSessionService.hasRequiredRole('Viewer');
   }
 

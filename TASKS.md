@@ -58,13 +58,16 @@ Phase 3 evidence:
 - 2026-04-19: Added public tracking slug resolution endpoint (`GET /p/{slug}`), visit ingestion endpoint (`POST /api/tracking/pages/{trackingPageId}/visits`), authenticated tracking CRUD + analytics endpoints, and expanded ProblemDetails exception mapping for not found/conflict semantics used by tracking workflows.
 
 ## Phase 4 - Frontend
-- [ ] Build admin dashboard shell for tracking overview.
-- [ ] Build tracking pages grid (search, sort, status, pagination).
-- [ ] Build tracking page editor (slug, metadata, settings, publish controls).
-- [ ] Build analytics detail screen per tracking page.
-- [ ] Integrate charts for trends and visit distributions.
-- [ ] Add filters (date range, page, source/referrer, device/UA buckets).
-- [ ] Ensure frontend consumes generated API proxies only (no handwritten duplicates).
+- [x] Build admin dashboard shell for tracking overview.
+- [x] Build tracking pages grid (search, sort, status, pagination).
+- [x] Build tracking page editor (slug, metadata, settings, publish controls).
+- [x] Build analytics detail screen per tracking page.
+- [x] Integrate charts for trends and visit distributions.
+- [x] Add filters (date range, page, source/referrer, device/UA buckets).
+- [x] Ensure frontend consumes generated API proxies only (no handwritten duplicates).
+
+Phase 4 evidence:
+- 2026-04-19: Added authenticated `/tracking` frontend module with generated TrackingService-based data-access, admin KPI shell, searchable/sortable/paginated tracking page grid, editor + lifecycle controls, analytics detail with date/source/device filters, and trend/distribution chart visualizations.
 
 ## Phase 5 - Analytics
 - [ ] Implement total visits metric pipeline.
