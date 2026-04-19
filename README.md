@@ -1,97 +1,160 @@
 # QPhising
 
-This repository contains a production-oriented Clean Architecture foundation for QPhising.
+QPhising is an enterprise-grade **Web Page Tracking & Visitor Analytics** platform built with a backend-first Clean Architecture approach.
 
-## Structure
+It provides:
 
-- `backend/` - Domain/Application/API/Gateway runnable services.
-- `frontend/` - Angular application and generated API client location.
-- `docs/` - Architecture decisions and operational documentation.
-- `scripts/` - Development and helper scripts.
-- `deploy/env/` - Environment-variable templates for local/staging/production containerized runtime.
+- secure campaign + tracking-page lifecycle management,
+- public tracking landing resolution (`/p/{slug}`),
+- visit ingestion with privacy-aware IP handling,
+- analytics dashboards (totals, uniques, trends, top pages, recent visits),
+- setup/runtime configuration flow,
+- API contract-driven frontend integration through generated proxies.
 
-## Containerized Runtime (API + Gateway + PostgreSQL + optional Redis)
+---
 
-Use the root `docker-compose.yml` to start the full backend stack:
+## Repository Layout
 
-1. Copy an environment template:
-   - `cp deploy/env/.env.local.example .env`
-2. Start API, Gateway, and PostgreSQL:
-   - `docker compose up --build`
-3. Start with Redis enabled:
-   - `docker compose --profile redis up --build`
+- `backend/`
+  - `Domain/` business rules and aggregates
+  - `Application/` CQRS handlers, contracts, validators
+  - `Infrastructure/` EF Core persistence, external integrations
+  - `API/` HTTP endpoints + Swagger + auth + rate limiting
+  - `Gateway/` Ocelot routing and edge concerns
+- `frontend/`
+  - Angular UI (PrimeNG + Tailwind)
+  - generated API proxies under `src/app/shared/proxy`
+- `docs/`
+  - architecture references, API contracts, operational runbooks
+- `scripts/`
+  - quality gates, proxy generation/validation, smoke checks
+- `deploy/env/`
+  - environment templates for local/staging/production
 
-Services:
+---
 
-- API: `http://localhost:5050`
-- Gateway: `http://localhost:8080`
-- PostgreSQL: `localhost:5432`
-- Redis (optional profile): `localhost:6379`
+## Core Capabilities
 
-Docker build definitions live in:
+### Tracking & Campaigns
 
-- `backend/API/Dockerfile`
-- `backend/Gateway/Dockerfile`
+- Tracking page CRUD and lifecycle controls
+- Campaign-to-tracking-page linkage
+- Public landing via slug routes (`/p/{slug}`)
+- Campaign-state-aware public availability (non-active campaigns return 404)
 
-## Configuration Model
+### Visit Collection
 
-Runnable backend projects (`backend/API`, `backend/Gateway`) use the same layered configuration model:
+- Public ingestion endpoints for tracking events
+- Deduplication/throttling protections
+- Optional bot filtering
+- UTM/referrer/device-aware event capture
 
-1. `appsettings.json` (base defaults)
-2. `appsettings.{Environment}.json` (environment override)
-3. `appsettings.runtime.json` (optional setup-wizard runtime overlay)
+### Analytics
 
-`appsettings.runtime.json` is intentionally gitignored and should be created by setup/runtime provisioning. Example templates:
+- Total visits
+- Unique visits (session/fingerprint/IP fallback strategy)
+- Top pages ranking
+- Time-based trends (hour/day/week)
+- Recent visit stream for operator visibility
+
+### Security & Reliability
+
+- JWT-based authentication + role-based authorization (`Admin`, `Operator`, `Viewer`)
+- Public endpoint rate limiting
+- ProblemDetails-based API errors
+- Correlation ID propagation (`X-Correlation-Id`)
+- Structured JSON logging
+- Soft-delete semantics for core entities
+
+---
+
+## Tech Stack
+
+### Backend
+
+- .NET (Clean Architecture)
+- MediatR (CQRS)
+- FluentValidation
+- AutoMapper
+- EF Core + PostgreSQL
+- Ocelot Gateway
+
+### Frontend
+
+- Angular
+- PrimeNG
+- TailwindCSS
+- Generated TypeScript API clients (`openapi-typescript-codegen`)
+
+### DevOps
+
+- Docker + Docker Compose
+- GitHub Actions (CI + release baseline)
+
+---
+
+## Local Development (Windows-native first, container optional)
+
+> The project is optimized for local Windows-native multi-startup (API + Gateway), while containerized runtime is available for full-stack orchestration.
+
+### 1) Configure runtime settings
+
+Create runtime overlays from templates when needed:
 
 - `backend/API/appsettings.runtime.json.example`
 - `backend/Gateway/appsettings.runtime.json.example`
 - `deploy/env/.env.local.example`
-- `deploy/env/.env.staging.example`
-- `deploy/env/.env.production.example`
 
-## Correlation IDs and Structured Logging
+### 2) Run API + Gateway locally
 
-API and Gateway both:
+- API defaults
+  - HTTP: `http://localhost:5050`
+  - HTTPS: `https://localhost:7050`
+- Gateway defaults
+  - HTTP: `http://localhost:8080`
+  - HTTPS: `https://localhost:8443`
 
-- emit JSON-formatted console logs,
-- accept and return `X-Correlation-Id`,
-- generate a correlation id automatically when a request does not provide one.
+Swagger is available in development mode (or when explicitly enabled by feature flag).
 
-This allows cross-service request tracing in local logs and centralized log sinks.
+### 3) Frontend
 
-## Local Startup
+Run the Angular app from `frontend/` and ensure gateway/API endpoints are reachable for generated proxy calls.
 
-### API
+---
 
-- HTTP: `http://localhost:5050`
-- HTTPS: `https://localhost:7050`
-- Swagger: enabled in Development or when `FeatureFlags:SwaggerEnabled=true`
+## Containerized Runtime
 
-### Gateway
+Use root `docker-compose.yml`.
 
-- HTTP: `http://localhost:8080`
-- HTTPS: `https://localhost:8443`
-- Routes in `backend/Gateway/ocelot*.json`
+### Standard stack
 
-### Visual Studio Multi-Startup
+```bash
+cp deploy/env/.env.local.example .env
+docker compose up --build
+```
 
-Set multiple startup projects:
+### With Redis profile enabled
 
-1. `QPhising.Api`
-2. `QPhising.Gateway`
+```bash
+docker compose --profile redis up --build
+```
 
-This starts API and Gateway together with non-conflicting ports.
+### Exposed services
 
-## Database Bootstrap & EF Core Migrations
+- API: `http://localhost:5050`
+- Gateway: `http://localhost:8080`
+- PostgreSQL: `localhost:5432`
+- Redis (optional): `localhost:6379`
 
-The API now uses EF Core with Npgsql for schema lifecycle management (`UseNpgsql(connectionString)`) and applies migrations on startup in Development by default.
+---
 
-### 1) Configure local PostgreSQL connection
+## Database & Migrations
 
-Set `ConnectionStrings:DefaultConnection` in:
+EF Core migrations are the source of truth for schema lifecycle.
 
-- `backend/API/appsettings.runtime.json` (recommended for local overrides), or
-- environment variable `ConnectionStrings__DefaultConnection`.
+### Configure connection
+
+Set `ConnectionStrings:DefaultConnection` in runtime settings or environment variables.
 
 Example:
 
@@ -103,107 +166,101 @@ Example:
 }
 ```
 
-### 2) Startup migration behavior
+### Common commands (from `backend/API`)
 
-Database settings (under `Database`):
+```bash
+dotnet ef migrations add <MigrationName> --output-dir Infrastructure/Persistence/Migrations
+dotnet ef database update
+dotnet ef migrations list
+```
 
-- `ApplyMigrationsOnStartup`: force migrations during startup (default `true` in Development, `false` otherwise).
-- `ContinueOnMigrationFailure`: continue startup after migration failure (`false` recommended for fail-fast behavior).
+### Notes
 
-The API logs migration attempts and failures with structured log entries.
+- `POST /api/setup/test-db` validates connectivity only.
+- Schema changes must be delivered via migrations, not ad-hoc runtime DDL.
 
-### 3) Run migrations manually (recommended for controlled environments)
+---
 
-From `backend/API`:
+## API Contract, Swagger, and Proxy Workflow
 
-- Create a migration:
-  - `dotnet ef migrations add <MigrationName> --output-dir Infrastructure/Persistence/Migrations`
-- Apply migrations to DB:
-  - `dotnet ef database update`
-- List migrations:
-  - `dotnet ef migrations list`
+Backend contracts are authoritative.
 
-EF migration history is stored in the default `__EFMigrationsHistory` table.
+When API contracts change:
 
-### 4) Setup wizard `test-db` endpoint scope
+1. Update backend domain/application/API.
+2. Ensure Swagger reflects the new contract.
+3. Regenerate frontend proxies.
+4. Fix frontend compile/runtime usage against generated clients.
 
-`POST /api/setup/test-db` remains a connectivity check only (`CanConnect`) and does **not** create/update schema. Schema lifecycle is managed exclusively via EF Core migrations.
-
-## Swagger Quality Gate
-
-Use the Swagger quality gate scripts to validate OpenAPI contract standards in local workflows and CI.
-
-- Linux/macOS:
-  - `./scripts/check-swagger-quality.sh`
-  - `./scripts/check-swagger-quality.sh http://localhost:5050/swagger/v1/swagger.json`
-- Windows:
-  - `scripts\check-swagger-quality.bat`
-  - `scripts\check-swagger-quality.bat https://localhost:7050/swagger/v1/swagger.json`
-
-The CI workflow `.github/workflows/swagger-quality-gate.yml` runs the same gate against `frontend/openapi/proxy-validation.swagger.json` on pushes and pull requests.
-
-## CI and Release Baseline Workflows
-
-The repository includes baseline DevOps workflows:
-
-- `.github/workflows/ci.yml`
-  - Backend restore/build/test
-  - Frontend install/build
-  - Swagger quality checks
-  - Proxy determinism validation
-  - Gateway/Swagger alignment and proxy-route consistency checks
-- `.github/workflows/release.yml`
-  - Manual environment-scoped release gating (`staging` / `production`)
-  - Semantic version input validation (`vMAJOR.MINOR.PATCH`)
-  - Build + test verification before artifact packaging
-  - Release artifact bundle upload
-
-## Gateway/Swagger Alignment Check
-
-Use gateway alignment scripts to verify that Ocelot API routes are backed by matching downstream Swagger operations.
-
-- Linux/macOS:
-  - `./scripts/check-gateway-swagger-alignment.sh`
-  - `./scripts/check-gateway-swagger-alignment.sh --swagger frontend/openapi/proxy-validation.swagger.json --ocelot backend/Gateway/ocelot.json`
-- Windows:
-  - `scripts\check-gateway-swagger-alignment.bat`
-  - `scripts\check-gateway-swagger-alignment.bat --swagger frontend\openapi\proxy-validation.swagger.json --ocelot backend\Gateway\ocelot.json`
-
-The check fails when an API route in Ocelot has no matching Swagger path or does not permit all matching Swagger HTTP methods.
-
-## Proxy/Gateway Consistency Check
-
-Use proxy/gateway consistency scripts to verify generated frontend proxy operations are routable through configured Ocelot upstream paths.
-
-- Linux/macOS:
-  - `./scripts/check-proxy-gateway-consistency.sh`
-  - `./scripts/check-proxy-gateway-consistency.sh --ocelot backend/Gateway/ocelot.json --proxy-dir frontend/src/app/shared/proxy/services`
-- Windows:
-  - `scripts\check-proxy-gateway-consistency.bat`
-  - `scripts\check-proxy-gateway-consistency.bat --ocelot backend\Gateway\ocelot.json --proxy-dir frontend\src\app\shared\proxy\services`
-
-The check fails if a generated service operation path/method pair is not covered by current gateway route templates.
-
-## Proxy Generation
-
-Use repeatable proxy scripts under `scripts/` to regenerate TypeScript API clients from a running backend Swagger endpoint.
+### Proxy generation
 
 - Linux/macOS:
   - `./scripts/generate-proxy.sh`
-  - `./scripts/generate-proxy.sh http://localhost:5050/swagger/v1/swagger.json`
 - Windows:
   - `scripts\generate-proxy.bat`
-  - `scripts\generate-proxy.bat http://localhost:5050/swagger/v1/swagger.json`
 
-Both scripts:
-
-- read OpenAPI/Swagger from the provided URL,
-- validate required Swagger metadata and endpoint prerequisites before generation,
-- pin `openapi-typescript-codegen` to deterministic version `0.29.0` (override with `GENERATOR_VERSION`),
-- regenerate clients into `frontend/src/app/shared/proxy`,
-- normalize generated text line endings to LF for deterministic cross-platform diffs.
-
-Use proxy validation scripts to assert the standardized Swagger fixture regenerates the checked-in proxies without drift:
+### Proxy determinism validation
 
 - Linux/macOS: `./scripts/validate-proxy-generation.sh`
 - Windows: `scripts\validate-proxy-generation.bat`
+
+---
+
+## Quality Gates
+
+### Swagger quality gate
+
+- Linux/macOS: `./scripts/check-swagger-quality.sh`
+- Windows: `scripts\check-swagger-quality.bat`
+
+### Gateway ↔ Swagger alignment
+
+- Linux/macOS: `./scripts/check-gateway-swagger-alignment.sh`
+- Windows: `scripts\check-gateway-swagger-alignment.bat`
+
+### Proxy ↔ Gateway consistency
+
+- Linux/macOS: `./scripts/check-proxy-gateway-consistency.sh`
+- Windows: `scripts\check-proxy-gateway-consistency.bat`
+
+### Frontend UI smoke checks
+
+Use the smoke checker scripts in `scripts/` to verify dashboard/tracking/campaign core views are present and wired.
+
+---
+
+## CI/CD
+
+- `.github/workflows/ci.yml`
+  - backend restore/build/test
+  - frontend install/build
+  - contract/proxy/gateway checks
+- `.github/workflows/release.yml`
+  - environment-scoped release gating
+  - semantic version input checks
+  - pre-release build/test verification
+
+---
+
+## Operational Notes
+
+- Setup wizard governs first-run bootstrap and runtime configuration persistence.
+- Redis is optional unless explicitly required by a feature/profile.
+- Main management and analytics endpoints are protected; public tracking routes are intentionally constrained and rate-limited.
+- Correlation IDs are propagated API ↔ Gateway for traceability.
+
+---
+
+## Documentation Index
+
+For deeper implementation details, start with:
+
+- `docs/architecture/`
+- `docs/api/`
+- `docs/operations/`
+
+---
+
+## License
+
+Internal project repository. Add/adjust license policy here if the distribution model changes.
