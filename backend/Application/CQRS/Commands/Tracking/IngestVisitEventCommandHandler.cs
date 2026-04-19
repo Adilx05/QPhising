@@ -22,6 +22,15 @@ public sealed class IngestVisitEventCommandHandler : IRequestHandler<IngestVisit
         var trackingPage = await _trackingPageRepository.GetByIdAsync(request.TrackingPageId, cancellationToken)
             ?? throw new KeyNotFoundException($"Tracking page '{request.TrackingPageId}' was not found.");
 
+        var sanitizedReferrerUrl = trackingPage.Settings?.CaptureUtmParameters == false
+            ? RemoveUtmParameters(request.ReferrerUrl)
+            : request.ReferrerUrl;
+
+        if (trackingPage.Settings?.EnableBotFiltering == true && IsBotUserAgent(request.UserAgent))
+        {
+            return new VisitIngestionResult(Guid.Empty, trackingPage.Id, true, DateTimeOffset.UtcNow);
+        }
+
         var deduplicationWindow = TimeSpan.FromSeconds(request.DeduplicationWindowSeconds);
         var isDuplicate = await _visitEventRepository.ExistsDuplicateAsync(
             trackingPage.Id,
@@ -43,12 +52,54 @@ public sealed class IngestVisitEventCommandHandler : IRequestHandler<IngestVisit
             new TrackingIdentifier(request.SessionId),
             new TrackingIdentifier(request.VisitorFingerprint),
             request.UserAgent,
-            request.ReferrerUrl,
-            request.IpHash,
+            sanitizedReferrerUrl,
+            trackingPage.Settings?.MaskIpAddress == true ? null : request.IpHash,
             request.IpAddressHashPolicy);
 
         await _visitEventRepository.SaveAsync(visitEvent, cancellationToken);
 
         return new VisitIngestionResult(visitEvent.Id, trackingPage.Id, false, DateTimeOffset.UtcNow);
+    }
+
+    private static bool IsBotUserAgent(string? userAgent)
+    {
+        if (string.IsNullOrWhiteSpace(userAgent))
+        {
+            return false;
+        }
+
+        var normalized = userAgent.Trim();
+        return normalized.Contains("bot", StringComparison.OrdinalIgnoreCase)
+               || normalized.Contains("spider", StringComparison.OrdinalIgnoreCase)
+               || normalized.Contains("crawler", StringComparison.OrdinalIgnoreCase)
+               || normalized.Contains("slurp", StringComparison.OrdinalIgnoreCase)
+               || normalized.Contains("headless", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string? RemoveUtmParameters(string? referrerUrl)
+    {
+        if (string.IsNullOrWhiteSpace(referrerUrl)
+            || !Uri.TryCreate(referrerUrl, UriKind.Absolute, out var absoluteUri)
+            || string.IsNullOrEmpty(absoluteUri.Query))
+        {
+            return referrerUrl;
+        }
+
+        var queryParameters = absoluteUri.Query.TrimStart('?')
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Where(parameter => !parameter.StartsWith("utm_", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+
+        if (queryParameters.Length == 0)
+        {
+            return absoluteUri.GetLeftPart(UriPartial.Path);
+        }
+
+        var uriBuilder = new UriBuilder(absoluteUri)
+        {
+            Query = string.Join('&', queryParameters)
+        };
+
+        return uriBuilder.Uri.ToString();
     }
 }

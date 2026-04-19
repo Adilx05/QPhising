@@ -54,7 +54,11 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
     public Task<int> CountUniqueVisitorsAsync(Guid trackingPageId, DateTimeOffset? fromUtc, DateTimeOffset? toUtc, CancellationToken cancellationToken)
     {
         return ApplyRangeFilter(_dbContext.VisitEvents.AsNoTracking(), trackingPageId, fromUtc, toUtc)
-            .Select(visit => visit.VisitorFingerprint)
+            .Select(visit => string.IsNullOrWhiteSpace(visit.SessionId)
+                ? (string.IsNullOrWhiteSpace(visit.VisitorFingerprint)
+                    ? (string.IsNullOrWhiteSpace(visit.IpHash) ? $"ua:{visit.UserAgent}" : $"ip:{visit.IpHash}")
+                    : $"fp:{visit.VisitorFingerprint}")
+                : $"sid:{visit.SessionId}")
             .Distinct()
             .CountAsync(cancellationToken);
     }
@@ -79,7 +83,7 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         var visits = await _dbContext.VisitEvents
             .AsNoTracking()
             .Where(visit => visit.TrackingPageId == trackingPageId && visit.OccurredAtUtc >= fromUtc && visit.OccurredAtUtc <= toUtc)
-            .Select(visit => new { visit.OccurredAtUtc, visit.VisitorFingerprint })
+            .Select(visit => new { visit.OccurredAtUtc, visit.SessionId, visit.VisitorFingerprint, visit.IpHash, visit.UserAgent })
             .ToListAsync(cancellationToken);
 
         var buckets = visits
@@ -88,7 +92,14 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
             .Select(group => new TrackingVisitTrendBucket(
                 BucketStartUtc: group.Key,
                 TotalVisits: group.Count(),
-                UniqueVisitors: group.Select(item => item.VisitorFingerprint).Distinct(StringComparer.Ordinal).Count()))
+                UniqueVisitors: group
+                    .Select(visit => string.IsNullOrWhiteSpace(visit.SessionId)
+                        ? (string.IsNullOrWhiteSpace(visit.VisitorFingerprint)
+                            ? (string.IsNullOrWhiteSpace(visit.IpHash) ? $"ua:{visit.UserAgent}" : $"ip:{visit.IpHash}")
+                            : $"fp:{visit.VisitorFingerprint}")
+                        : $"sid:{visit.SessionId}")
+                    .Distinct(StringComparer.Ordinal)
+                    .Count()))
             .ToArray();
 
         return buckets;
@@ -126,7 +137,11 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         CancellationToken cancellationToken)
     {
         return ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
-            .Select(visit => string.IsNullOrWhiteSpace(visit.SessionId) ? visit.VisitorFingerprint : visit.SessionId)
+            .Select(visit => string.IsNullOrWhiteSpace(visit.SessionId)
+                ? (string.IsNullOrWhiteSpace(visit.VisitorFingerprint)
+                    ? (string.IsNullOrWhiteSpace(visit.IpHash) ? $"ua:{visit.UserAgent}" : $"ip:{visit.IpHash}")
+                    : $"fp:{visit.VisitorFingerprint}")
+                : $"sid:{visit.SessionId}")
             .Distinct()
             .CountAsync(cancellationToken);
     }
@@ -155,7 +170,11 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
             .Select(visit => new
             {
                 visit.TrackingPageId,
-                UniqueKey = string.IsNullOrWhiteSpace(visit.SessionId) ? visit.VisitorFingerprint : visit.SessionId
+                UniqueKey = string.IsNullOrWhiteSpace(visit.SessionId)
+                    ? (string.IsNullOrWhiteSpace(visit.VisitorFingerprint)
+                        ? (string.IsNullOrWhiteSpace(visit.IpHash) ? $"ua:{visit.UserAgent}" : $"ip:{visit.IpHash}")
+                        : $"fp:{visit.VisitorFingerprint}")
+                    : $"sid:{visit.SessionId}"
             })
             .Distinct()
             .GroupBy(visit => visit.TrackingPageId)
@@ -230,7 +249,7 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         CancellationToken cancellationToken)
     {
         var visits = await ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
-            .Select(visit => new { visit.OccurredAtUtc, visit.SessionId, visit.VisitorFingerprint })
+            .Select(visit => new { visit.OccurredAtUtc, visit.SessionId, visit.VisitorFingerprint, visit.IpHash, visit.UserAgent })
             .ToListAsync(cancellationToken);
 
         return visits
@@ -239,7 +258,11 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
             .Select(group => new TrackingVisitTrendBucket(
                 BucketStartUtc: group.Key,
                 TotalVisits: group.Count(),
-                UniqueVisitors: group.Select(visit => string.IsNullOrWhiteSpace(visit.SessionId) ? visit.VisitorFingerprint : visit.SessionId)
+                UniqueVisitors: group.Select(visit => string.IsNullOrWhiteSpace(visit.SessionId)
+                        ? (string.IsNullOrWhiteSpace(visit.VisitorFingerprint)
+                            ? (string.IsNullOrWhiteSpace(visit.IpHash) ? $"ua:{visit.UserAgent}" : $"ip:{visit.IpHash}")
+                            : $"fp:{visit.VisitorFingerprint}")
+                        : $"sid:{visit.SessionId}")
                     .Distinct(StringComparer.Ordinal)
                     .Count()))
             .ToArray();

@@ -21,22 +21,31 @@ public sealed class GetTrackingPageAnalyticsQueryHandler : IRequestHandler<GetTr
         var trackingPage = await _trackingPageRepository.GetByIdAsync(request.TrackingPageId, cancellationToken)
             ?? throw new KeyNotFoundException($"Tracking page '{request.TrackingPageId}' was not found.");
 
-        var fromUtc = request.FromUtc ?? DateTimeOffset.UtcNow.AddDays(-7);
-        var toUtc = request.ToUtc ?? DateTimeOffset.UtcNow;
+        var nowUtc = DateTimeOffset.UtcNow;
+        var requestedFromUtc = request.FromUtc ?? nowUtc.AddDays(-7);
+        var requestedToUtc = request.ToUtc ?? nowUtc;
+        var retentionBoundUtc = trackingPage.Settings is null
+            ? (DateTimeOffset?)null
+            : nowUtc.AddDays(-trackingPage.Settings.RetentionDays);
 
-        var totalVisitsTask = _visitEventRepository.CountTotalAsync(trackingPage.Id, request.FromUtc, request.ToUtc, cancellationToken);
-        var uniqueVisitorsTask = _visitEventRepository.CountUniqueVisitorsAsync(trackingPage.Id, request.FromUtc, request.ToUtc, cancellationToken);
+        var effectiveFromUtc = retentionBoundUtc.HasValue && requestedFromUtc < retentionBoundUtc.Value
+            ? retentionBoundUtc.Value
+            : requestedFromUtc;
+        var effectiveToUtc = requestedToUtc;
+
+        var totalVisitsTask = _visitEventRepository.CountTotalAsync(trackingPage.Id, effectiveFromUtc, effectiveToUtc, cancellationToken);
+        var uniqueVisitorsTask = _visitEventRepository.CountUniqueVisitorsAsync(trackingPage.Id, effectiveFromUtc, effectiveToUtc, cancellationToken);
         var lastVisitAtUtcTask = _visitEventRepository.GetLastVisitAtUtcAsync(trackingPage.Id, cancellationToken);
         var trendBucketsTask = _visitEventRepository.GetTrendBucketsAsync(
             trackingPage.Id,
-            fromUtc,
-            toUtc,
+            effectiveFromUtc,
+            effectiveToUtc,
             request.TrendBucketSizeMinutes,
             cancellationToken);
         var recentVisitsTask = _visitEventRepository.ListRecentAsync(
             trackingPage.Id,
-            request.FromUtc,
-            request.ToUtc,
+            effectiveFromUtc,
+            effectiveToUtc,
             request.RecentVisitLimit,
             cancellationToken);
 

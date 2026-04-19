@@ -139,9 +139,11 @@ Phase 9 evidence:
 - [x] Rework campaign creation flow to create a real tracking page (template-based or blank) without manual GUID entry in UI.
 - [x] Add campaign detail route and screen reachable from campaign listing cards.
 - [x] Persist campaign-to-tracking-page relationship in Domain + EF Core schema.
+- [x] Fix campaign public landing availability and surface campaign-level click/unique-click analytics with configurable tracking-page privacy settings at create time.
 
 Incremental evidence:
 - 2026-04-19: Campaign create flow now provisions public landing validity window + optional custom HTML, removes destination URL dependency, returns/create-UI displays slug/id public links, and public `/p/{slug}` resolution now accepts optional `id`/`campaign` query with strict 404 for unpublished or out-of-window pages.
 - 2026-04-19: Campaign create contract now accepts tracking page fields and optional template; handler provisions tracking page + campaign atomically via CQRS, campaign aggregate now persists `TrackingPageId`, and migration `20260419140000_CampaignTrackingPageLink` introduces campaign→tracking_page FK/index.
 - 2026-04-19: Campaign UI now uses template dropdown (no GUID input), captures page slug/title/destination for create flow, lists campaigns with detail navigation, and adds dedicated `/campaigns/:campaignId` detail page.
 - 2026-04-19: Fixed campaign start lifecycle to allow Draft→Active transition, restored campaign HTML preview reactivity (custom HTML + selected template fallback), enriched campaign detail page with public links and live preview, and isolated `/p/:slug` routes from admin shell so public landing pages render standalone with strict 404 fallback.
+- 2026-04-19: Fixed tracking update command wiring in API controller, enforced campaign-linked tracking-page auto-publish on campaign create/start to prevent false 404 on valid windows, applied ingest-time bot filtering/IP masking/UTM stripping policies from page settings, normalized unique-visitor metrics to session/fingerprint/IP fallback keys, and surfaced total/unique click metrics on campaign detail with create-flow controls for retention/privacy/bot/UTM settings.
