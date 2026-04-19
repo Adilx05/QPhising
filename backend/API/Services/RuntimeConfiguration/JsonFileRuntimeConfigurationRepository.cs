@@ -48,8 +48,7 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
                 return null;
             }
 
-            var snapshot = runtimeConfigurationNode.Deserialize<RuntimeConfigurationSnapshot>(SerializerOptions);
-            return snapshot is null ? null : FromSnapshot(snapshot);
+            return FromNode(runtimeConfigurationNode);
         }
         finally
         {
@@ -104,35 +103,51 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
             aggregate.UpdatedAtUtc);
     }
 
-    private static RuntimeConfigurationAggregate? FromSnapshot(RuntimeConfigurationSnapshot snapshot)
+    private static RuntimeConfigurationAggregate? FromNode(JsonNode runtimeConfigurationNode)
     {
+        var runtimeNodeObject = runtimeConfigurationNode as JsonObject;
+        if (runtimeNodeObject is null)
+        {
+            return null;
+        }
+
         var aggregate = new RuntimeConfigurationAggregate();
 
-        if (!string.IsNullOrWhiteSpace(snapshot.DatabaseConnectionCipherText))
+        var databaseCipherText = GetStringValue(runtimeNodeObject, "databaseConnectionCipherText");
+        if (!string.IsNullOrWhiteSpace(databaseCipherText))
         {
-            aggregate.SetDatabaseConnection(snapshot.DatabaseConnectionCipherText);
+            aggregate.SetDatabaseConnection(databaseCipherText);
         }
 
-        if (!string.IsNullOrWhiteSpace(snapshot.RedisConnectionCipherText))
+        var redisCipherText = GetStringValue(runtimeNodeObject, "redisConnectionCipherText");
+        if (!string.IsNullOrWhiteSpace(redisCipherText))
         {
-            aggregate.SetRedisConnection(snapshot.RedisConnectionCipherText);
+            aggregate.SetRedisConnection(redisCipherText);
         }
 
-        if (!string.IsNullOrWhiteSpace(snapshot.KeycloakAuthority) &&
-            !string.IsNullOrWhiteSpace(snapshot.KeycloakRealm) &&
-            !string.IsNullOrWhiteSpace(snapshot.KeycloakClientId) &&
-            !string.IsNullOrWhiteSpace(snapshot.KeycloakClientSecretCipherText) &&
-            Uri.TryCreate(snapshot.KeycloakAuthority, UriKind.Absolute, out var authorityUri))
+        var keycloakAuthority = GetStringValue(runtimeNodeObject, "keycloakAuthority");
+        var keycloakRealm = GetStringValue(runtimeNodeObject, "keycloakRealm");
+        var keycloakClientId = GetStringValue(runtimeNodeObject, "keycloakClientId");
+        var keycloakClientSecretCipherText = GetStringValue(runtimeNodeObject, "keycloakClientSecretCipherText");
+
+        if (!string.IsNullOrWhiteSpace(keycloakAuthority) &&
+            !string.IsNullOrWhiteSpace(keycloakRealm) &&
+            !string.IsNullOrWhiteSpace(keycloakClientId) &&
+            !string.IsNullOrWhiteSpace(keycloakClientSecretCipherText) &&
+            Uri.TryCreate(keycloakAuthority, UriKind.Absolute, out var authorityUri))
         {
             aggregate.SetKeycloakConfiguration(
                 authorityUri,
-                snapshot.KeycloakRealm,
-                snapshot.KeycloakClientId,
-                snapshot.KeycloakClientSecretCipherText);
+                keycloakRealm,
+                keycloakClientId,
+                keycloakClientSecretCipherText);
         }
 
         return aggregate.HasAnyValueConfigured ? aggregate : null;
     }
+
+    private static string? GetStringValue(JsonObject node, string key) =>
+        node[key]?.GetValue<string>();
 
     private sealed record RuntimeConfigurationSnapshot(
         string? DatabaseConnectionCipherText,

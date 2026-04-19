@@ -155,6 +155,7 @@ Phase 9 evidence:
 - [x] Expand language support to full-page TR/EN localization across auth, dashboard, setup/runtime configuration, template management, and tracking screens.
 
 Incremental evidence:
+- 2026-04-19: Switched runtime-configuration rehydration to explicit JSON-node key parsing (`databaseConnectionCipherText`/`redisConnectionCipherText`/Keycloak tuple) to avoid deserialization mapping drift and restore persisted Redis readiness in workflow GET assertions.
 - 2026-04-19: Removed transactional UnitOfWork wrapping from setup save command (file-backed workflow) to avoid DB pipeline conflicts causing `/api/setup/save` conflict responses in persistence workflow tests.
 - 2026-04-19: Removed transactional UnitOfWork wrapping from runtime configuration save/update commands (file-backed operations) to prevent unrelated persistence pipeline conflicts and restore `/api/configuration` save success behavior.
 - 2026-04-19: Hardened runtime-configuration JSON repository persistence/rehydration to tolerate partial snapshots (including null Redis) without throwing conflict-causing `InvalidOperationException`, ensuring configuration save/patch flows can persist incrementally.
