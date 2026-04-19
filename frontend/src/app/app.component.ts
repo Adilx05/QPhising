@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthSessionService } from './core/auth/auth-session';
 
 @Component({
@@ -8,6 +10,7 @@ import { AuthSessionService } from './core/auth/auth-session';
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   template: `
+    <ng-container *ngIf="!isPublicLandingRoute(); else publicLandingOnly">
     <div class="app-shell min-h-screen">
       <aside class="hidden border-r border-slate-200/80 bg-white/95 lg:flex lg:w-72 lg:flex-col">
         <div class="border-b border-slate-200 px-6 py-6">
@@ -75,10 +78,27 @@ import { AuthSessionService } from './core/auth/auth-session';
         </main>
       </div>
     </div>
+    </ng-container>
+
+    <ng-template #publicLandingOnly>
+      <router-outlet></router-outlet>
+    </ng-template>
   `
 })
 export class AppComponent {
-  public constructor(private readonly authSessionService: AuthSessionService) {}
+  private currentUrl = '';
+
+  public constructor(
+    private readonly authSessionService: AuthSessionService,
+    private readonly router: Router
+  ) {
+    this.currentUrl = this.router.url;
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        this.currentUrl = event.urlAfterRedirects;
+      });
+  }
 
   protected isAuthenticated(): boolean {
     return this.authSessionService.getAuthSession().isAuthenticated;
@@ -98,5 +118,9 @@ export class AppComponent {
 
   protected canViewTemplates(): boolean {
     return this.authSessionService.hasRequiredRole('Viewer');
+  }
+
+  protected isPublicLandingRoute(): boolean {
+    return this.currentUrl.startsWith('/p/');
   }
 }

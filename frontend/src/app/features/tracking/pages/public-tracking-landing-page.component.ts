@@ -8,19 +8,20 @@ import { PublicTrackingService, type TrackingLandingPageResult } from '../../../
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="mx-auto max-w-5xl p-4">
-      <article *ngIf="landing() as data; else missing">
-        <h1 class="mb-2 text-2xl font-semibold text-slate-900">{{ data.title }}</h1>
-        <p class="mb-4 text-sm text-slate-500">{{ data.description }}</p>
-        <iframe class="h-[70vh] w-full rounded-xl border border-slate-200" [srcdoc]="data.customHtmlContent || data.templateHtmlContent || '<p style=&quot;padding:12px&quot;>Landing content not configured.</p>'"></iframe>
-      </article>
-      <ng-template #missing>
-        <article class="rounded-xl border border-slate-200 bg-white p-6 text-center">
-          <h1 class="text-xl font-semibold text-slate-900">404</h1>
-          <p class="text-sm text-slate-500">Tracking page bulunamadı veya pasif.</p>
-        </article>
-      </ng-template>
-    </section>
+    <ng-container *ngIf="landing() as data; else missing">
+      <iframe
+        class="h-screen w-screen border-0"
+        [srcdoc]="data.customHtmlContent || data.templateHtmlContent || '<p style=&quot;padding:12px&quot;>Landing content not configured.</p>'"
+      ></iframe>
+    </ng-container>
+    <ng-template #missing>
+      <main class="flex min-h-screen items-center justify-center bg-white p-6 text-center">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-900">404</h1>
+          <p class="mt-2 text-sm text-slate-600">Page not found.</p>
+        </div>
+      </main>
+    </ng-template>
   `
 })
 export class PublicTrackingLandingPageComponent {
