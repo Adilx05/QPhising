@@ -170,6 +170,44 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
         var trackingPageAfterDeleteResponse = await adminClient.GetAsync($"/api/tracking/pages/{trackingPageId}");
         Assert.Equal(HttpStatusCode.NotFound, trackingPageAfterDeleteResponse.StatusCode);
     }
+    
+    [Fact]
+    public async Task CampaignPublicLanding_ShouldRequireActiveLifecycleState()
+    {
+        var adminClient = _factory.CreateClient();
+        adminClient.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
+
+        var createCampaignResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
+        {
+            name = "Lifecycle Guard Campaign",
+            trackingPageSlug = "lifecycle-guard-campaign",
+            trackingPageTitle = "Lifecycle Guard Landing",
+            trackingPageDescription = "Only active campaigns can resolve publicly",
+            templateId = (Guid?)null,
+            htmlContent = "<h1>Lifecycle Guard</h1>",
+            validFromUtc = (DateTimeOffset?)null,
+            validUntilUtc = (DateTimeOffset?)null
+        });
+
+        createCampaignResponse.EnsureSuccessStatusCode();
+        var createPayload = JsonNode.Parse(await createCampaignResponse.Content.ReadAsStringAsync())!.AsObject();
+        var campaignId = createPayload["id"]!.GetValue<Guid>();
+
+        var publicWhileDraft = await adminClient.GetAsync("/p/lifecycle-guard-campaign");
+        Assert.Equal(HttpStatusCode.NotFound, publicWhileDraft.StatusCode);
+
+        var startResponse = await adminClient.PostAsync($"/api/campaigns/{campaignId}/start", content: null);
+        startResponse.EnsureSuccessStatusCode();
+
+        var publicWhileActive = await adminClient.GetAsync("/p/lifecycle-guard-campaign");
+        publicWhileActive.EnsureSuccessStatusCode();
+
+        var pauseResponse = await adminClient.PostAsync($"/api/campaigns/{campaignId}/pause", content: null);
+        pauseResponse.EnsureSuccessStatusCode();
+
+        var publicWhilePaused = await adminClient.GetAsync("/p/lifecycle-guard-campaign");
+        Assert.Equal(HttpStatusCode.NotFound, publicWhilePaused.StatusCode);
+    }
 
     [Fact]
     public async Task LegacyPhishingEmailRoutes_ShouldReturnNotFound()

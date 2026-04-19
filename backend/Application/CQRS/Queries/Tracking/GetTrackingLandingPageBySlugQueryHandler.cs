@@ -1,7 +1,9 @@
 using MediatR;
+using QPhising.Application.Contracts.Abstractions.Campaign;
 using QPhising.Application.Contracts.Abstractions.Template;
 using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.Contracts.Responses.Tracking;
+using QPhising.Domain.Campaign.Enums;
 using QPhising.Domain.Templates.Enums;
 using QPhising.Domain.Tracking.Enums;
 
@@ -11,11 +13,16 @@ public sealed class GetTrackingLandingPageBySlugQueryHandler : IRequestHandler<G
 {
     private readonly ITrackingPageRepository _trackingPageRepository;
     private readonly ITemplateRepository _templateRepository;
+    private readonly ICampaignRepository _campaignRepository;
 
-    public GetTrackingLandingPageBySlugQueryHandler(ITrackingPageRepository trackingPageRepository, ITemplateRepository templateRepository)
+    public GetTrackingLandingPageBySlugQueryHandler(
+        ITrackingPageRepository trackingPageRepository,
+        ITemplateRepository templateRepository,
+        ICampaignRepository campaignRepository)
     {
         _trackingPageRepository = trackingPageRepository;
         _templateRepository = templateRepository;
+        _campaignRepository = campaignRepository;
     }
 
     public async Task<TrackingLandingPageResult> Handle(GetTrackingLandingPageBySlugQuery request, CancellationToken cancellationToken)
@@ -24,6 +31,12 @@ public sealed class GetTrackingLandingPageBySlugQueryHandler : IRequestHandler<G
             ?? throw new KeyNotFoundException($"Tracking page slug '{request.Slug}' was not found.");
 
         if (!aggregate.IsPubliclyAccessible(DateTimeOffset.UtcNow))
+        {
+            throw new KeyNotFoundException($"Tracking page slug '{request.Slug}' was not found.");
+        }
+        
+        var campaign = await _campaignRepository.GetByTrackingPageIdAsync(aggregate.Id, cancellationToken);
+        if (campaign is not null && campaign.LifecycleState != CampaignLifecycleState.Active)
         {
             throw new KeyNotFoundException($"Tracking page slug '{request.Slug}' was not found.");
         }

@@ -5,6 +5,8 @@ namespace QPhising.Application.Contracts.Abstractions.Campaign;
 public interface ICampaignRepository
 {
     Task<CampaignAggregate?> GetByIdAsync(Guid campaignId, CancellationToken cancellationToken);
+    
+    Task<CampaignAggregate?> GetByTrackingPageIdAsync(Guid trackingPageId, CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<CampaignAggregate>> ListAsync(CancellationToken cancellationToken);
 

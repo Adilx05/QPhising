@@ -148,6 +148,7 @@ Phase 9 evidence:
 - [x] Hide Setup Wizard navigation once setup is completed and move Runtime Configuration into a low-prominence bottom sidebar section while placing the user card at the top.
 - [x] Replace setup-state home dashboard with application analytics dashboard (campaign totals, tracking summary, trends, and recent visits) using PrimeNG data components and live backend metrics.
 - [x] Simplify sidebar user card content to show only full name and role, and normalize dashboard copy/date formatting for proper Turkish character rendering.
+- [x] Ensure campaign-created public pages stay inaccessible until campaign lifecycle is Active, and return 404 for Draft/Paused/non-active lifecycle states.
 
 Incremental evidence:
 - 2026-04-19: Removed Redis input/test requirements from setup + runtime configuration flows (Redis now optional in setup/runtime aggregates), setup guard now allows main app when base appsettings bootstrap config is already present, and app shell now renders authenticated user card (name/role) with sidebar logout action.
@@ -163,6 +164,7 @@ Incremental evidence:
 - 2026-04-19: Fixed duplicate public slug click ingestion by adding short-lived sessionStorage throttling in `PublicTrackingLandingPageComponent`, preventing accidental double visit POSTs caused by rapid duplicate page-initialization events.
 - 2026-04-19: Fixed duplicate public landing slug GET/click request issue caused by initial shell/public-layout router-outlet swap; `AppComponent` now resolves first-render URL from `window.location` so `/p/:slug` renders directly in public layout without double component initialization.
 - 2026-04-19: Fixed dashboard analytics overview 409/runtime failure by replacing non-translatable `IsBotUserAgent` method usage in `EfCoreVisitEventRepository` query filters with EF-translatable PostgreSQL `ILIKE` predicates for bot signature checks.
+- 2026-04-19: Stopped campaign-create flow from auto-publishing linked tracking pages, and enforced public `/p/{slug}` resolution to return 404 whenever a linked campaign lifecycle state is not `Active` (including Draft and Paused); added integration coverage for Draft→Active→Paused accessibility transitions.
 
 - 2026-04-19: Added tracking-page IP capture controls (`CaptureIpAddress` + `IpAddressHashPolicy` plain/SHA-256), wired landing-page visit capture to apply page policy, and fixed server-side ingestion/storage mapping so IP data is persisted according to selected privacy mode.
 - 2026-04-19: Added domain/infrastructure base entity abstractions for shared identity/audit fields, introduced mandatory `is_deleted` persistence for campaign/template/tracking-page records, switched delete handlers/repositories to soft delete only, and configured EF Core global query filters + filtered unique indexes to automatically exclude deleted rows.

@@ -24,6 +24,15 @@ public sealed class EfCoreCampaignRepository : ICampaignRepository
 
         return entity is null ? null : ToDomainAggregate(entity);
     }
+    
+    public async Task<CampaignAggregate?> GetByTrackingPageIdAsync(Guid trackingPageId, CancellationToken cancellationToken)
+    {
+        var entity = await _dbContext.Campaigns
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.TrackingPageId == trackingPageId, cancellationToken);
+
+        return entity is null ? null : ToDomainAggregate(entity);
+    }
 
     public async Task<IReadOnlyCollection<CampaignAggregate>> ListAsync(CancellationToken cancellationToken)
     {
