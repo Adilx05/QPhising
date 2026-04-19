@@ -54,11 +54,19 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
     public Task<int> CountUniqueVisitorsAsync(Guid trackingPageId, DateTimeOffset? fromUtc, DateTimeOffset? toUtc, CancellationToken cancellationToken)
     {
         return ApplyRangeFilter(_dbContext.VisitEvents.AsNoTracking(), trackingPageId, fromUtc, toUtc)
-            .Select(visit => visit.SessionId != null && visit.SessionId != string.Empty
-                ? $"sid:{visit.SessionId}"
-                : (visit.VisitorFingerprint != null && visit.VisitorFingerprint != string.Empty
-                    ? $"fp:{visit.VisitorFingerprint}"
-                    : (visit.IpHash != null && visit.IpHash != string.Empty ? $"ip:{visit.IpHash}" : $"ua:{visit.UserAgent}")))
+            .Select(visit => new
+            {
+                KeyType = !string.IsNullOrEmpty(visit.SessionId)
+                    ? 1
+                    : (!string.IsNullOrEmpty(visit.VisitorFingerprint)
+                        ? 2
+                        : (!string.IsNullOrEmpty(visit.IpHash) ? 3 : 4)),
+                KeyValue = !string.IsNullOrEmpty(visit.SessionId)
+                    ? visit.SessionId
+                    : (!string.IsNullOrEmpty(visit.VisitorFingerprint)
+                        ? visit.VisitorFingerprint
+                        : (!string.IsNullOrEmpty(visit.IpHash) ? visit.IpHash : visit.UserAgent))
+            })
             .Distinct()
             .CountAsync(cancellationToken);
     }
@@ -137,11 +145,19 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         CancellationToken cancellationToken)
     {
         return ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
-            .Select(visit => visit.SessionId != null && visit.SessionId != string.Empty
-                ? $"sid:{visit.SessionId}"
-                : (visit.VisitorFingerprint != null && visit.VisitorFingerprint != string.Empty
-                    ? $"fp:{visit.VisitorFingerprint}"
-                    : (visit.IpHash != null && visit.IpHash != string.Empty ? $"ip:{visit.IpHash}" : $"ua:{visit.UserAgent}")))
+            .Select(visit => new
+            {
+                KeyType = !string.IsNullOrEmpty(visit.SessionId)
+                    ? 1
+                    : (!string.IsNullOrEmpty(visit.VisitorFingerprint)
+                        ? 2
+                        : (!string.IsNullOrEmpty(visit.IpHash) ? 3 : 4)),
+                KeyValue = !string.IsNullOrEmpty(visit.SessionId)
+                    ? visit.SessionId
+                    : (!string.IsNullOrEmpty(visit.VisitorFingerprint)
+                        ? visit.VisitorFingerprint
+                        : (!string.IsNullOrEmpty(visit.IpHash) ? visit.IpHash : visit.UserAgent))
+            })
             .Distinct()
             .CountAsync(cancellationToken);
     }
@@ -170,11 +186,16 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
             .Select(visit => new
             {
                 visit.TrackingPageId,
-                UniqueKey = visit.SessionId != null && visit.SessionId != string.Empty
-                    ? $"sid:{visit.SessionId}"
-                    : (visit.VisitorFingerprint != null && visit.VisitorFingerprint != string.Empty
-                        ? $"fp:{visit.VisitorFingerprint}"
-                        : (visit.IpHash != null && visit.IpHash != string.Empty ? $"ip:{visit.IpHash}" : $"ua:{visit.UserAgent}"))
+                KeyType = !string.IsNullOrEmpty(visit.SessionId)
+                    ? 1
+                    : (!string.IsNullOrEmpty(visit.VisitorFingerprint)
+                        ? 2
+                        : (!string.IsNullOrEmpty(visit.IpHash) ? 3 : 4)),
+                KeyValue = !string.IsNullOrEmpty(visit.SessionId)
+                    ? visit.SessionId
+                    : (!string.IsNullOrEmpty(visit.VisitorFingerprint)
+                        ? visit.VisitorFingerprint
+                        : (!string.IsNullOrEmpty(visit.IpHash) ? visit.IpHash : visit.UserAgent))
             })
             .Distinct()
             .GroupBy(visit => visit.TrackingPageId)
