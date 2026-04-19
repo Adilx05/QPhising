@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.RateLimiting;
 using QPhising.Api.Middleware;
 using QPhising.Api.Security;
 using QPhising.Api.Infrastructure.Persistence;
@@ -28,6 +29,7 @@ using QPhising.Application.Contracts.Abstractions.Template;
 using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.CQRS.Behaviors;
 using QPhising.Application.Security;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +77,35 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddHealthChecks();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.Headers.RetryAfter = "60";
+        return ValueTask.CompletedTask;
+    };
+
+    options.AddFixedWindowLimiter(
+        policyName: RateLimitPolicies.PublicTrackingLanding,
+        configureOptions =>
+        {
+            configureOptions.PermitLimit = 120;
+            configureOptions.Window = TimeSpan.FromMinutes(1);
+            configureOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            configureOptions.QueueLimit = 0;
+        });
+
+    options.AddFixedWindowLimiter(
+        policyName: RateLimitPolicies.PublicVisitIngestion,
+        configureOptions =>
+        {
+            configureOptions.PermitLimit = 60;
+            configureOptions.Window = TimeSpan.FromMinutes(1);
+            configureOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            configureOptions.QueueLimit = 0;
+        });
+});
 builder.Services.AddDataProtection();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -213,6 +244,8 @@ builder.Services.AddMediatR(config =>
     config.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 builder.Services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
+builder.Services.Configure<VisitorIpHashOptions>(builder.Configuration.GetSection("Tracking:VisitorPrivacy"));
+builder.Services.AddScoped<IVisitorIpHashService, VisitorIpHashService>();
 builder.Services.AddScoped<IAccessTokenValidator, KeycloakAccessTokenValidator>();
 builder.Services.AddScoped<IGatewayRoutePolicySettingsProvider, ConfigurationGatewayRoutePolicySettingsProvider>();
 builder.Services.AddDbContext<QPhisingDbContext>((serviceProvider, options) =>
@@ -292,8 +325,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseCors("FrontendCors");
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<SecurityAuditMiddleware>();
 
 app.MapHealthChecks("/health/live");
 app.MapControllers();
