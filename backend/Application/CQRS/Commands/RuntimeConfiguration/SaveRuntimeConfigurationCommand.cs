@@ -1,4 +1,4 @@
-using QPhising.Application.Contracts.Abstractions.Persistence;
+using MediatR;
 using QPhising.Application.Contracts.Responses.RuntimeConfiguration;
 
 namespace QPhising.Application.CQRS.Commands.RuntimeConfiguration;
@@ -9,4 +9,4 @@ public sealed record SaveRuntimeConfigurationCommand(
     string KeycloakAuthority,
     string KeycloakRealm,
     string KeycloakClientId,
-    string KeycloakClientSecret) : ITransactionalRequest<RuntimeConfigurationResult>;
+    string KeycloakClientSecret) : IRequest<RuntimeConfigurationResult>;
