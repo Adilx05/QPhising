@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using QPhising.Application.Contracts.Abstractions.RuntimeConfiguration;
@@ -113,22 +114,30 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
 
         var aggregate = new RuntimeConfigurationAggregate();
 
-        var databaseCipherText = GetStringValue(runtimeNodeObject, "databaseConnectionCipherText");
+        var databaseCipherText = GetStringValue(runtimeNodeObject, "databaseConnectionCipherText", "DatabaseConnectionCipherText");
         if (!string.IsNullOrWhiteSpace(databaseCipherText))
         {
             aggregate.SetDatabaseConnection(databaseCipherText);
         }
 
-        var redisCipherText = GetStringValue(runtimeNodeObject, "redisConnectionCipherText");
+        var redisCipherText = GetStringValue(
+            runtimeNodeObject,
+            "redisConnectionCipherText",
+            "RedisConnectionCipherText",
+            "redisConnectionCiphertext");
         if (!string.IsNullOrWhiteSpace(redisCipherText))
         {
             aggregate.SetRedisConnection(redisCipherText);
         }
 
-        var keycloakAuthority = GetStringValue(runtimeNodeObject, "keycloakAuthority");
-        var keycloakRealm = GetStringValue(runtimeNodeObject, "keycloakRealm");
-        var keycloakClientId = GetStringValue(runtimeNodeObject, "keycloakClientId");
-        var keycloakClientSecretCipherText = GetStringValue(runtimeNodeObject, "keycloakClientSecretCipherText");
+        var keycloakAuthority = GetStringValue(runtimeNodeObject, "keycloakAuthority", "KeycloakAuthority");
+        var keycloakRealm = GetStringValue(runtimeNodeObject, "keycloakRealm", "KeycloakRealm");
+        var keycloakClientId = GetStringValue(runtimeNodeObject, "keycloakClientId", "KeycloakClientId");
+        var keycloakClientSecretCipherText = GetStringValue(
+            runtimeNodeObject,
+            "keycloakClientSecretCipherText",
+            "KeycloakClientSecretCipherText",
+            "keycloakClientSecretCiphertext");
 
         if (!string.IsNullOrWhiteSpace(keycloakAuthority) &&
             !string.IsNullOrWhiteSpace(keycloakRealm) &&
@@ -146,8 +155,36 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
         return aggregate.HasAnyValueConfigured ? aggregate : null;
     }
 
-    private static string? GetStringValue(JsonObject node, string key) =>
-        node[key]?.GetValue<string>();
+    private static string? GetStringValue(JsonObject node, params string[] keys)
+    {
+        foreach (var key in keys)
+        {
+            var value = node[key]?.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        foreach (var property in node)
+        {
+            if (property.Value is null)
+            {
+                continue;
+            }
+
+            if (keys.Any(candidate => string.Equals(candidate, property.Key, StringComparison.OrdinalIgnoreCase)))
+            {
+                var value = property.Value.GetValue<string>();
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+        }
+
+        return null;
+    }
 
     private sealed record RuntimeConfigurationSnapshot(
         string? DatabaseConnectionCipherText,
