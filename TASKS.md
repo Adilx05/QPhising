@@ -11,11 +11,15 @@ Execution rules:
 - Record concise implementation evidence in commit messages and PR notes.
 
 ## Phase 0 - Cleanup & Refactor
-- [ ] Audit repository for legacy phishing/email/mail concepts across Domain, Application, Infrastructure, API, Gateway, and Frontend.
-- [ ] Remove or rename legacy phishing/email entities, value objects, enums, services, controllers, DTOs, and UI labels.
-- [ ] Remove obsolete routes/endpoints and deprecated proxy surfaces tied to phishing/email workflows.
-- [ ] Inspect package and project dependencies; remove unused libraries and stale references.
-- [ ] Update naming conventions and module boundaries to align with Web Page Tracking & Visitor Analytics terminology.
+- [x] Audit repository for legacy phishing/email/mail concepts across Domain, Application, Infrastructure, API, Gateway, and Frontend.
+- [x] Remove or rename legacy phishing/email entities, value objects, enums, services, controllers, DTOs, and UI labels.
+- [x] Remove obsolete routes/endpoints and deprecated proxy surfaces tied to phishing/email workflows.
+- [x] Inspect package and project dependencies; remove unused libraries and stale references.
+- [x] Update naming conventions and module boundaries to align with Web Page Tracking & Visitor Analytics terminology.
+
+
+Phase 0 notes:
+- 2026-04-19: Completed source audit and legacy UI exposure cleanup; see `docs/phase-0-cleanup-audit.md` for evidence and explicit carry-over items scheduled for replacement in subsequent tracking phases.
 
 ## Phase 1 - Domain & Database
 - [ ] Define `TrackingPage` aggregate (identity, slug, metadata, publish state, ownership).

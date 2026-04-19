@@ -12,7 +12,7 @@ import { AuthSessionService } from './core/auth/auth-session';
       <aside class="hidden border-r border-slate-200/80 bg-white/95 lg:flex lg:w-72 lg:flex-col">
         <div class="border-b border-slate-200 px-6 py-6">
           <a class="text-2xl font-semibold tracking-tight text-slate-900" routerLink="/dashboard">QPhising</a>
-          <p class="mt-2 text-sm text-slate-500">Enterprise Security Operations Console</p>
+          <p class="mt-2 text-sm text-slate-500">Enterprise Visitor Analytics Console</p>
         </div>
 
         <nav class="flex-1 space-y-2 px-4 py-6">
@@ -30,16 +30,6 @@ import { AuthSessionService } from './core/auth/auth-session';
             <i class="pi pi-sliders-h text-sm"></i>
             <span>Runtime Configuration</span>
           </a>
-
-          <a *ngIf="canViewCampaigns()" routerLink="/campaigns" routerLinkActive="is-active" class="nav-item">
-            <i class="pi pi-megaphone text-sm"></i>
-            <span>Campaigns</span>
-          </a>
-
-          <a *ngIf="canViewTemplates()" routerLink="/templates" routerLinkActive="is-active" class="nav-item">
-            <i class="pi pi-file-edit text-sm"></i>
-            <span>Templates</span>
-          </a>
         </nav>
       </aside>
 
@@ -52,8 +42,6 @@ import { AuthSessionService } from './core/auth/auth-session';
               <a class="mobile-nav-item" routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
               <a class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">Setup</a>
               <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">Config</a>
-              <a *ngIf="canViewCampaigns()" class="mobile-nav-item" routerLink="/campaigns" routerLinkActive="is-active">Campaigns</a>
-              <a *ngIf="canViewTemplates()" class="mobile-nav-item" routerLink="/templates" routerLinkActive="is-active">Templates</a>
             </nav>
 
             <div class="hidden items-center gap-3 rounded-full border px-3 py-1.5 text-xs font-medium lg:flex"
@@ -79,14 +67,6 @@ export class AppComponent {
   }
 
   protected canViewConfiguration(): boolean {
-    return this.authSessionService.hasRequiredRole('Viewer');
-  }
-
-  protected canViewCampaigns(): boolean {
-    return this.authSessionService.hasRequiredRole('Viewer');
-  }
-
-  protected canViewTemplates(): boolean {
     return this.authSessionService.hasRequiredRole('Viewer');
   }
 }

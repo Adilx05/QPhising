@@ -1,6 +1,6 @@
 # QPhising
 
-This repository contains a production-oriented Clean Architecture foundation for QPhising.
+This repository contains a production-oriented Clean Architecture foundation for QPhising's web page tracking and visitor analytics platform.
 
 ## Structure
 
