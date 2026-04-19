@@ -73,8 +73,14 @@ import { getCampaignById } from '../data-access';
       </div>
 
       <div *ngIf="publicLinks() as links" class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-xs text-emerald-900">
-        <p><strong>Slug URL:</strong> {{ links.slugUrl }}</p>
-        <p><strong>ID URL:</strong> {{ links.idUrl }}</p>
+        <p class="break-all">
+          <strong>Slug URL:</strong>
+          <a class="font-medium underline underline-offset-2" [href]="links.slugUrl" target="_blank" rel="noopener noreferrer">{{ links.slugUrl }}</a>
+        </p>
+        <p class="mt-1 break-all">
+          <strong>ID URL:</strong>
+          <a class="font-medium underline underline-offset-2" [href]="links.idUrl" target="_blank" rel="noopener noreferrer">{{ links.idUrl }}</a>
+        </p>
       </div>
 
       <div class="mt-4">
@@ -99,6 +105,7 @@ export class CampaignDetailPageComponent {
   protected readonly landingPage = signal<TrackingLandingPageResult | null>(null);
   protected readonly publicLinks = signal<{ slugUrl: string; idUrl: string } | null>(null);
   protected readonly feedback = signal<string | null>(null);
+  private readonly origin = typeof window !== 'undefined' ? window.location.origin : '';
 
   public constructor(private readonly route: ActivatedRoute) {
     void this.load();
@@ -167,8 +174,8 @@ export class CampaignDetailPageComponent {
 
     if (page.slug) {
       this.publicLinks.set({
-        slugUrl: `/p/${page.slug}`,
-        idUrl: `/p/${page.slug}?id=${trackingPageId}`
+        slugUrl: `${this.origin}/p/${page.slug}`,
+        idUrl: `${this.origin}/p/${page.slug}?id=${trackingPageId}`
       });
 
       try {

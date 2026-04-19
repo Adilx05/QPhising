@@ -33,29 +33,27 @@ public sealed class GetTrackingPageAnalyticsQueryHandler : IRequestHandler<GetTr
             : requestedFromUtc;
         var effectiveToUtc = requestedToUtc;
 
-        var totalVisitsTask = _visitEventRepository.CountTotalAsync(trackingPage.Id, effectiveFromUtc, effectiveToUtc, cancellationToken);
-        var uniqueVisitorsTask = _visitEventRepository.CountUniqueVisitorsAsync(trackingPage.Id, effectiveFromUtc, effectiveToUtc, cancellationToken);
-        var lastVisitAtUtcTask = _visitEventRepository.GetLastVisitAtUtcAsync(trackingPage.Id, cancellationToken);
-        var trendBucketsTask = _visitEventRepository.GetTrendBucketsAsync(
+        var totalVisits = await _visitEventRepository.CountTotalAsync(trackingPage.Id, effectiveFromUtc, effectiveToUtc, cancellationToken);
+        var uniqueVisitors = await _visitEventRepository.CountUniqueVisitorsAsync(trackingPage.Id, effectiveFromUtc, effectiveToUtc, cancellationToken);
+        var lastVisitAtUtc = await _visitEventRepository.GetLastVisitAtUtcAsync(trackingPage.Id, cancellationToken);
+        var trendBuckets = await _visitEventRepository.GetTrendBucketsAsync(
             trackingPage.Id,
             effectiveFromUtc,
             effectiveToUtc,
             request.TrendBucketSizeMinutes,
             cancellationToken);
-        var recentVisitsTask = _visitEventRepository.ListRecentAsync(
+        var recentVisits = await _visitEventRepository.ListRecentAsync(
             trackingPage.Id,
             effectiveFromUtc,
             effectiveToUtc,
             request.RecentVisitLimit,
             cancellationToken);
 
-        await Task.WhenAll(totalVisitsTask, uniqueVisitorsTask, lastVisitAtUtcTask, trendBucketsTask, recentVisitsTask);
-
         return new TrackingPageAnalyticsResult(
             TrackingPageId: trackingPage.Id,
             Slug: trackingPage.Slug.Value,
-            Summary: new TrackingAnalyticsSummaryResult(totalVisitsTask.Result, uniqueVisitorsTask.Result, lastVisitAtUtcTask.Result),
-            Trends: trendBucketsTask.Result.Select(bucket => bucket.ToResult()).ToArray(),
-            RecentVisits: recentVisitsTask.Result.Select(visit => visit.ToResult()).ToArray());
+            Summary: new TrackingAnalyticsSummaryResult(totalVisits, uniqueVisitors, lastVisitAtUtc),
+            Trends: trendBuckets.Select(bucket => bucket.ToResult()).ToArray(),
+            RecentVisits: recentVisits.Select(visit => visit.ToResult()).ToArray());
     }
 }

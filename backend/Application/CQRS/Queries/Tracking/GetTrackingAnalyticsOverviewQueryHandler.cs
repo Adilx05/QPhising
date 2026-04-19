@@ -43,27 +43,30 @@ public sealed class GetTrackingAnalyticsOverviewQueryHandler : IRequestHandler<G
         var fromUtc = request.FromUtc ?? DateTimeOffset.UtcNow.AddDays(-7);
         var toUtc = request.ToUtc ?? DateTimeOffset.UtcNow;
 
-        var totalVisitsTask = _visitEventRepository.CountTotalAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, cancellationToken);
-        var uniqueVisitorsTask = _visitEventRepository.CountUniqueVisitorsAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, cancellationToken);
-        var topPagesTask = _visitEventRepository.ListTopPagesAsync(fromUtc, toUtc, request.ExcludeBots, request.TopPagesLimit, cancellationToken);
-        var recentVisitsTask = _visitEventRepository.ListRecentAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, request.RecentVisitLimit, cancellationToken);
-        var trendsTask = _visitEventRepository.GetTrendBucketsAcrossPagesAsync(fromUtc, toUtc, request.TrendWindow, request.TimezoneOffsetMinutes, request.ExcludeBots, cancellationToken);
+        var totalVisits = await _visitEventRepository.CountTotalAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, cancellationToken);
+        var uniqueVisitors = await _visitEventRepository.CountUniqueVisitorsAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, cancellationToken);
+        var topPages = await _visitEventRepository.ListTopPagesAsync(fromUtc, toUtc, request.ExcludeBots, request.TopPagesLimit, cancellationToken);
+        var recentVisits = await _visitEventRepository.ListRecentAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, request.RecentVisitLimit, cancellationToken);
+        var trends = await _visitEventRepository.GetTrendBucketsAcrossPagesAsync(
+            fromUtc,
+            toUtc,
+            request.TrendWindow,
+            request.TimezoneOffsetMinutes,
+            request.ExcludeBots,
+            cancellationToken);
 
-        await Task.WhenAll(totalVisitsTask, uniqueVisitorsTask, topPagesTask, recentVisitsTask, trendsTask);
-
-        var recentVisits = recentVisitsTask.Result;
         var lastVisit = recentVisits.FirstOrDefault();
 
         var summary = new TrackingAnalyticsSummaryResult(
-            TotalVisits: totalVisitsTask.Result,
-            UniqueVisitors: uniqueVisitorsTask.Result,
+            TotalVisits: totalVisits,
+            UniqueVisitors: uniqueVisitors,
             LastVisitAtUtc: lastVisit?.OccurredAtUtc);
 
         return new TrackingAnalyticsOverviewResult(
             Summary: summary,
-            TopPages: topPagesTask.Result.Select(page => page.ToResult()).ToArray(),
+            TopPages: topPages.Select(page => page.ToResult()).ToArray(),
             RecentVisits: recentVisits.Select(visit => visit.ToStreamResult()).ToArray(),
-            Trends: trendsTask.Result.Select(trend => trend.ToResult()).ToArray(),
+            Trends: trends.Select(trend => trend.ToResult()).ToArray(),
             MetricDefinitions: MetricDefinitions);
     }
 }
