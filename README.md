@@ -8,6 +8,30 @@ This repository contains a production-oriented Clean Architecture foundation for
 - `frontend/` - Angular application and generated API client location.
 - `docs/` - Architecture decisions and operational documentation.
 - `scripts/` - Development and helper scripts.
+- `deploy/env/` - Environment-variable templates for local/staging/production containerized runtime.
+
+## Containerized Runtime (API + Gateway + PostgreSQL + optional Redis)
+
+Use the root `docker-compose.yml` to start the full backend stack:
+
+1. Copy an environment template:
+   - `cp deploy/env/.env.local.example .env`
+2. Start API, Gateway, and PostgreSQL:
+   - `docker compose up --build`
+3. Start with Redis enabled:
+   - `docker compose --profile redis up --build`
+
+Services:
+
+- API: `http://localhost:5050`
+- Gateway: `http://localhost:8080`
+- PostgreSQL: `localhost:5432`
+- Redis (optional profile): `localhost:6379`
+
+Docker build definitions live in:
+
+- `backend/API/Dockerfile`
+- `backend/Gateway/Dockerfile`
 
 ## Configuration Model
 
@@ -21,6 +45,19 @@ Runnable backend projects (`backend/API`, `backend/Gateway`) use the same layere
 
 - `backend/API/appsettings.runtime.json.example`
 - `backend/Gateway/appsettings.runtime.json.example`
+- `deploy/env/.env.local.example`
+- `deploy/env/.env.staging.example`
+- `deploy/env/.env.production.example`
+
+## Correlation IDs and Structured Logging
+
+API and Gateway both:
+
+- emit JSON-formatted console logs,
+- accept and return `X-Correlation-Id`,
+- generate a correlation id automatically when a request does not provide one.
+
+This allows cross-service request tracing in local logs and centralized log sinks.
 
 ## Local Startup
 
@@ -104,6 +141,22 @@ Use the Swagger quality gate scripts to validate OpenAPI contract standards in l
   - `scripts\check-swagger-quality.bat https://localhost:7050/swagger/v1/swagger.json`
 
 The CI workflow `.github/workflows/swagger-quality-gate.yml` runs the same gate against `frontend/openapi/proxy-validation.swagger.json` on pushes and pull requests.
+
+## CI and Release Baseline Workflows
+
+The repository includes baseline DevOps workflows:
+
+- `.github/workflows/ci.yml`
+  - Backend restore/build/test
+  - Frontend install/build
+  - Swagger quality checks
+  - Proxy determinism validation
+  - Gateway/Swagger alignment and proxy-route consistency checks
+- `.github/workflows/release.yml`
+  - Manual environment-scoped release gating (`staging` / `production`)
+  - Semantic version input validation (`vMAJOR.MINOR.PATCH`)
+  - Build + test verification before artifact packaging
+  - Release artifact bundle upload
 
 ## Gateway/Swagger Alignment Check
 

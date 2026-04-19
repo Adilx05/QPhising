@@ -30,6 +30,9 @@ TestResults/
 # Secrets
 .env
 .env.*
+!deploy/env/.env.local.example
+!deploy/env/.env.staging.example
+!deploy/env/.env.production.example
 *.secrets.json
 *.angular/
 # Runtime setup overlays (generated after first-run setup)

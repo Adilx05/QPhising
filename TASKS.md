@@ -94,11 +94,14 @@ Phase 6 evidence:
 - 2026-04-19: Finalized policy-based authentication/authorization coverage for management + analytics endpoints, added fixed-window rate limiting policies on public tracking routes, enforced visit payload constraints (timestamp validity + request body size), moved IP hash derivation to server-side privacy service with optional pepper, and added audit middleware logging for 401/403/429 security events.
 
 ## Phase 7 - DevOps
-- [ ] Provide docker-compose setup for API, Gateway, database, and optional Redis.
-- [ ] Normalize environment configuration templates for local/staging/production.
-- [ ] Add structured logging sinks and correlation-id propagation.
-- [ ] Add CI pipeline for build, test, lint, migration checks, and proxy sync checks.
-- [ ] Add CD/release workflow baseline with environment-specific safeguards.
+- [x] Provide docker-compose setup for API, Gateway, database, and optional Redis.
+- [x] Normalize environment configuration templates for local/staging/production.
+- [x] Add structured logging sinks and correlation-id propagation.
+- [x] Add CI pipeline for build, test, lint, migration checks, and proxy sync checks.
+- [x] Add CD/release workflow baseline with environment-specific safeguards.
+
+Phase 7 evidence:
+- 2026-04-19: Added root `docker-compose.yml` with API/Gateway/PostgreSQL and optional Redis profile, introduced environment templates under `deploy/env`, enabled JSON console logging plus `X-Correlation-Id` middleware in API/Gateway, and added `.github/workflows/ci.yml` + `.github/workflows/release.yml` for CI validation and environment-guarded release baseline.
 
 ## Phase 8 - Testing
 - [ ] Add unit tests for domain invariants and analytics calculation rules.
