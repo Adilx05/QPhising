@@ -68,10 +68,14 @@ public sealed class BackendConfigurationUnitTests
             CancellationToken.None);
 
         Assert.True(result.IsReadyForProtectedRuntime);
-        Assert.Equal("https://keycloak.old.example.com", result.KeycloakAuthority);
-        Assert.Equal("old-realm", result.KeycloakRealm);
-        Assert.Equal("old-client", result.KeycloakClientId);
+        Assert.True(result.IsKeycloakConfigured);
         Assert.True(result.IsRedisConfigured);
+
+        var persisted = await repository.GetCurrentAsync(CancellationToken.None);
+        Assert.NotNull(persisted);
+        Assert.Equal("https://keycloak.old.example.com", persisted!.KeycloakAuthority);
+        Assert.Equal("old-realm", persisted.KeycloakRealm);
+        Assert.Equal("old-client", persisted.KeycloakClientId);
     }
 
     private sealed class FakeRuntimeConfigurationRepository : IRuntimeConfigurationRepository
