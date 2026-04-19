@@ -10,3 +10,4 @@ export type TrackingPageSettingsResult = {
   enableBotFiltering?: boolean;
   captureUtmParameters?: boolean;
 };
+

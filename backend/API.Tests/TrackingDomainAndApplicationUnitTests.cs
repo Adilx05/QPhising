@@ -120,6 +120,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             ValidUntilUtc: null,
             RetentionDays: 10000,
             CaptureIpAddress: true,
+            IpAddressHashPolicy: IpAddressHashPolicy.Sha256,
             EnableBotFiltering: true,
             CaptureUtmParameters: true);
 

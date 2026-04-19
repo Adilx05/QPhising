@@ -13,7 +13,8 @@ export type UpdateTrackingPageRequest = {
   validUntilUtc?: string | null;
   retentionDays?: number | null;
   captureIpAddress?: boolean | null;
-  ipAddressHashPolicy?: IpAddressHashPolicy | null;
+  ipAddressHashPolicy?: IpAddressHashPolicy;
   enableBotFiltering?: boolean | null;
   captureUtmParameters?: boolean | null;
 };
+

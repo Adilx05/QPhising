@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QPhising.Api.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using QPhising.Api.Infrastructure.Persistence;
 namespace QPhising.Api.Migrations
 {
     [DbContext(typeof(QPhisingDbContext))]
-    partial class QPhisingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260419121920_firstine")]
+    partial class firstine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,10 +131,6 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<bool?>("CaptureIpAddress")
-                        .HasColumnType("boolean")
-                        .HasColumnName("capture_ip_address");
-
                     b.Property<bool?>("CaptureUtmParameters")
                         .HasColumnType("boolean")
                         .HasColumnName("capture_utm_parameters");
@@ -154,9 +153,9 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("enable_bot_filtering");
 
-                    b.Property<int?>("IpAddressHashPolicy")
-                        .HasColumnType("integer")
-                        .HasColumnName("ip_address_hash_policy");
+                    b.Property<bool?>("MaskIpAddress")
+                        .HasColumnType("boolean")
+                        .HasColumnName("mask_ip_address");
 
                     b.Property<string>("OwnerId")
                         .IsRequired()

@@ -17,3 +17,4 @@ export type TrackingLandingPageResult = {
   captureIpAddress?: boolean;
   ipAddressHashPolicy?: IpAddressHashPolicy;
 };
+

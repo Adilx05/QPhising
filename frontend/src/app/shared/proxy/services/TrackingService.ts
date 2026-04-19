@@ -203,6 +203,42 @@ export class TrackingService {
     });
   }
   /**
+   * @returns VisitIngestionResult OK
+   * @throws ApiError
+   */
+  public static trackingPageCaptureVisitBySlug({
+    slug,
+    id,
+    campaign,
+    requestBody,
+  }: {
+    slug: string,
+    id?: string,
+    campaign?: string,
+    requestBody?: CaptureVisitRequest,
+  }): CancelablePromise<VisitIngestionResult> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/api/tracking/pages/{slug}/visits',
+      path: {
+        'slug': slug,
+      },
+      query: {
+        'id': id,
+        'campaign': campaign,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        404: `Not Found`,
+        500: `Internal Server Error`,
+      },
+    });
+  }
+  /**
    * @returns TrackingPageAnalyticsResult OK
    * @throws ApiError
    */

@@ -12,3 +12,4 @@ export type CaptureVisitRequest = {
   ipAddressHashPolicy?: IpAddressHashPolicy;
   deduplicationWindowSeconds?: number;
 };
+
