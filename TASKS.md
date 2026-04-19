@@ -155,6 +155,7 @@ Phase 9 evidence:
 - [x] Expand language support to full-page TR/EN localization across auth, dashboard, setup/runtime configuration, template management, and tracking screens.
 
 Incremental evidence:
+- 2026-04-19: Replaced runtime configuration save request contract from positional record to explicit init-property class to eliminate constructor-binding ambiguity (notably Redis field hydration) during `/api/configuration` POST model binding.
 - 2026-04-19: Added case-tolerant/legacy-key fallback parsing for runtime-configuration JSON fields (notably Redis cipher text) during rehydration so persisted readiness flags remain true even with historical casing/key variations.
 - 2026-04-19: Switched runtime-configuration rehydration to explicit JSON-node key parsing (`databaseConnectionCipherText`/`redisConnectionCipherText`/Keycloak tuple) to avoid deserialization mapping drift and restore persisted Redis readiness in workflow GET assertions.
 - 2026-04-19: Removed transactional UnitOfWork wrapping from setup save command (file-backed workflow) to avoid DB pipeline conflicts causing `/api/setup/save` conflict responses in persistence workflow tests.
