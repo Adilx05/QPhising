@@ -4,16 +4,18 @@ namespace QPhising.Api.Middleware;
 
 public sealed class SecurityAuditMiddleware
 {
+    private readonly RequestDelegate _next;
     private readonly ILogger<SecurityAuditMiddleware> _logger;
 
-    public SecurityAuditMiddleware(ILogger<SecurityAuditMiddleware> logger)
+    public SecurityAuditMiddleware(RequestDelegate next, ILogger<SecurityAuditMiddleware> logger)
     {
+        _next = next;
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    public async Task InvokeAsync(HttpContext context)
     {
-        await next(context);
+        await _next(context);
 
         if (context.Response.StatusCode is not (StatusCodes.Status401Unauthorized or StatusCodes.Status403Forbidden or StatusCodes.Status429TooManyRequests))
         {
