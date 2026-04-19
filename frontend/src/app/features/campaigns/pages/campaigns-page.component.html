@@ -1,17 +1,21 @@
 <section class="mb-6">
-  <h1 class="page-title">Campaigns</h1>
-  <p class="page-subtitle">Template seçerek veya özel HTML ile herkese açık slug campaign sayfası oluşturabilirsin.</p>
+  <h1 class="page-title">{{ activeLanguage() === 'tr' ? 'Senaryolar' : 'Campaigns' }}</h1>
+  <p class="page-subtitle">
+    {{ activeLanguage() === 'tr'
+      ? 'Şablon seçerek veya özel HTML ile herkese açık kısa ad üzerinden senaryo sayfası oluşturabilirsiniz.'
+      : 'Create a public slug campaign page using a template or custom HTML.' }}
+  </p>
 </section>
 
 <section class="surface-card p-5">
   <div class="grid gap-3 md:grid-cols-2">
     <div>
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Campaign Name</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Senaryo Adı' : 'Campaign Name' }}</label>
       <input pInputText [(ngModel)]="createForm.name" class="w-full" placeholder="Q2 Signup Simulation" />
     </div>
 
     <div>
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Template (Optional)</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Şablon (Opsiyonel)' : 'Template (Optional)' }}</label>
       <p-dropdown
         [options]="templateOptions()"
         optionLabel="label"
@@ -19,65 +23,65 @@
         [showClear]="true"
         [ngModel]="createForm.templateId"
         (ngModelChange)="createForm.templateId = $event"
-        placeholder="Blank campaign page"
+        [placeholder]="activeLanguage() === 'tr' ? 'Boş senaryo sayfası' : 'Blank campaign page'"
         styleClass="w-full"
       ></p-dropdown>
     </div>
 
     <div>
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Page Slug</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Sayfa Kısa Adı' : 'Page Slug' }}</label>
       <input pInputText [(ngModel)]="createForm.slug" class="w-full" placeholder="q2-signup" />
     </div>
 
     <div>
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Page Title</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Sayfa Başlığı' : 'Page Title' }}</label>
       <input pInputText [(ngModel)]="createForm.pageTitle" class="w-full" placeholder="Q2 Signup Landing" />
     </div>
 
     <div>
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Start (UTC)</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Başlangıç (UTC)' : 'Start (UTC)' }}</label>
       <input pInputText [(ngModel)]="createForm.validFromUtc" class="w-full" type="datetime-local" />
     </div>
 
     <div>
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">End (UTC)</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Bitiş (UTC)' : 'End (UTC)' }}</label>
       <input pInputText [(ngModel)]="createForm.validUntilUtc" class="w-full" type="datetime-local" />
     </div>
 
     <div>
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Retention (days)</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Saklama (gün)' : 'Retention (days)' }}</label>
       <input pInputText [(ngModel)]="createForm.retentionDays" class="w-full" type="number" min="1" max="3650" />
     </div>
 
     <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
       <input type="checkbox" [(ngModel)]="createForm.captureIpAddress" />
-      Capture IP address
+      {{ activeLanguage() === 'tr' ? 'IP adresini kaydet' : 'Capture IP address' }}
     </label>
     <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-      <span>IP storage</span>
+      <span>{{ activeLanguage() === 'tr' ? 'IP saklama' : 'IP storage' }}</span>
       <select class="rounded border border-slate-300 bg-white px-2 py-1 text-xs" [(ngModel)]="createForm.ipAddressHashPolicy" [disabled]="!createForm.captureIpAddress">
-        <option [ngValue]="IpAddressHashPolicy._1">Plain</option>
+        <option [ngValue]="IpAddressHashPolicy._1">{{ activeLanguage() === 'tr' ? 'Düz Metin' : 'Plain' }}</option>
         <option [ngValue]="IpAddressHashPolicy._2">SHA-256</option>
       </select>
     </label>
 
     <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
       <input type="checkbox" [(ngModel)]="createForm.enableBotFiltering" />
-      Enable bot filtering
+      {{ activeLanguage() === 'tr' ? 'Bot filtrelemeyi etkinleştir' : 'Enable bot filtering' }}
     </label>
 
     <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
       <input type="checkbox" [(ngModel)]="createForm.captureUtmParameters" />
-      Capture UTM parameters
+      {{ activeLanguage() === 'tr' ? 'UTM parametrelerini kaydet' : 'Capture UTM parameters' }}
     </label>
 
     <div class="md:col-span-2">
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">HTML Content (Optional)</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'HTML İçeriği (Opsiyonel)' : 'HTML Content (Optional)' }}</label>
       <textarea pInputTextarea [(ngModel)]="createForm.htmlContent" rows="8" class="w-full font-mono text-xs"></textarea>
     </div>
 
     <div class="md:col-span-2">
-      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Preview</label>
+      <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Önizleme' : 'Preview' }}</label>
       <div class="rounded-xl border border-slate-200 bg-white p-3">
         <iframe class="h-72 w-full rounded-lg" [srcdoc]="previewHtml()"></iframe>
       </div>
@@ -89,7 +93,7 @@
       pButton
       type="button"
       icon="pi pi-plus"
-      label="Create Campaign"
+      [label]="activeLanguage() === 'tr' ? 'Senaryo Oluştur' : 'Create Campaign'"
       [disabled]="!canOperate() || isBusy()"
       [loading]="isBusy()"
       (click)="create()"
@@ -99,8 +103,8 @@
   <p *ngIf="feedback()" class="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-800">{{ feedback() }}</p>
 
   <div *ngIf="publicLinks() as links" class="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
-    <p><strong>Slug link:</strong> {{ links.slugUrl }}</p>
-    <p><strong>ID link:</strong> {{ links.idUrl }}</p>
+    <p><strong>{{ activeLanguage() === 'tr' ? 'Kısa ad bağlantısı:' : 'Slug link:' }}</strong> {{ links.slugUrl }}</p>
+    <p><strong>{{ activeLanguage() === 'tr' ? 'Kimlik bağlantısı:' : 'ID link:' }}</strong> {{ links.idUrl }}</p>
   </div>
 </section>
 
@@ -108,8 +112,8 @@
   <article *ngFor="let campaign of campaigns()" class="surface-card p-5">
     <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h2 class="text-lg font-semibold text-slate-900">{{ campaign.name || 'Unnamed Campaign' }}</h2>
-        <p class="text-sm text-slate-500">Tracking Page: {{ campaign.trackingPageId }}</p>
+        <h2 class="text-lg font-semibold text-slate-900">{{ campaign.name || (activeLanguage() === 'tr' ? 'Adsız Senaryo' : 'Unnamed Campaign') }}</h2>
+        <p class="text-sm text-slate-500">{{ activeLanguage() === 'tr' ? 'Takip Sayfası:' : 'Tracking Page:' }} {{ campaign.trackingPageId }}</p>
       </div>
 
       <span class="status-chip" [ngClass]="stateChipClass(campaign.lifecycleState)">
@@ -119,27 +123,27 @@
 
     <div class="mt-4 grid gap-3 lg:grid-cols-3">
       <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-        <p class="text-xs font-semibold uppercase text-slate-500">Starts At (UTC)</p>
-        <p class="mt-1 text-sm text-slate-700">{{ campaign.startsAtUtc || 'Not scheduled' }}</p>
+        <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Başlangıç (UTC)' : 'Starts At (UTC)' }}</p>
+        <p class="mt-1 text-sm text-slate-700">{{ campaign.startsAtUtc || (activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled') }}</p>
       </div>
 
       <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-        <p class="text-xs font-semibold uppercase text-slate-500">Ends At (UTC)</p>
-        <p class="mt-1 text-sm text-slate-700">{{ campaign.endsAtUtc || 'Not scheduled' }}</p>
+        <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Bitiş (UTC)' : 'Ends At (UTC)' }}</p>
+        <p class="mt-1 text-sm text-slate-700">{{ campaign.endsAtUtc || (activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled') }}</p>
       </div>
     </div>
 
     <div class="mt-4 flex flex-wrap gap-2">
-      <a pButton type="button" size="small" severity="info" [routerLink]="['/campaigns', campaign.id]" label="Details"></a>
-      <button pButton type="button" size="small" label="Start" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'start')"></button>
-      <button pButton type="button" size="small" severity="secondary" label="Pause" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'pause')"></button>
-      <button pButton type="button" size="small" severity="success" label="Complete" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'complete')"></button>
-      <button pButton type="button" size="small" severity="danger" label="Cancel" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'cancel')"></button>
-      <button pButton type="button" size="small" severity="danger" outlined="true" label="Delete" [disabled]="!canDelete() || isBusy()" (click)="removeCampaign(campaign.id)"></button>
+      <a pButton type="button" size="small" severity="info" [routerLink]="['/campaigns', campaign.id]" [label]="activeLanguage() === 'tr' ? 'Detay' : 'Details'"></a>
+      <button pButton type="button" size="small" [label]="activeLanguage() === 'tr' ? 'Başlat' : 'Start'" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'start')"></button>
+      <button pButton type="button" size="small" severity="secondary" [label]="activeLanguage() === 'tr' ? 'Duraklat' : 'Pause'" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'pause')"></button>
+      <button pButton type="button" size="small" severity="success" [label]="activeLanguage() === 'tr' ? 'Tamamla' : 'Complete'" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'complete')"></button>
+      <button pButton type="button" size="small" severity="danger" [label]="activeLanguage() === 'tr' ? 'İptal Et' : 'Cancel'" [disabled]="!canOperate() || isBusy()" (click)="transition(campaign.id, 'cancel')"></button>
+      <button pButton type="button" size="small" severity="danger" outlined="true" [label]="activeLanguage() === 'tr' ? 'Sil' : 'Delete'" [disabled]="!canDelete() || isBusy()" (click)="removeCampaign(campaign.id)"></button>
     </div>
   </article>
 
   <article *ngIf="campaigns().length === 0" class="surface-card p-5 text-sm text-slate-500">
-    Henüz campaign kaydı bulunmuyor.
+    {{ activeLanguage() === 'tr' ? 'Henüz senaryo kaydı bulunmuyor.' : 'No campaigns were found yet.' }}
   </article>
 </section>

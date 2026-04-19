@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { resolveApiError } from '../../../core/http/api-error-handler';
 import { AuthSessionService } from '../../../core/auth/auth-session';
+import { UserPreferencesService } from '../../../core/ui/user-preferences.service';
 import {
   TrackingPagePublishState,
   type TrackingPageAnalyticsResult,
@@ -52,68 +53,68 @@ interface AnalyticsFilters {
   imports: [CommonModule, FormsModule, ButtonModule, InputTextModule],
   template: `
     <section class="mb-6">
-      <h1 class="page-title">Tracking Analytics Dashboard</h1>
+      <h1 class="page-title">{{ tx('Takip Analitik Gösterge Paneli', 'Tracking Analytics Dashboard') }}</h1>
       <p class="page-subtitle">
-        Manage tracking pages, publish lifecycle, and visit analytics using generated TrackingService proxies.
+        {{ tx('Takip sayfalarını, yayın yaşam döngüsünü ve ziyaret analitiğini generated TrackingService proxyleri ile yönetin.', 'Manage tracking pages, publish lifecycle, and visit analytics using generated TrackingService proxies.') }}
       </p>
     </section>
 
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <article class="surface-card p-4">
-        <p class="text-xs font-semibold uppercase text-slate-500">Total Pages</p>
+        <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Toplam Sayfa', 'Total Pages') }}</p>
         <p class="mt-2 text-2xl font-semibold text-slate-900">{{ trackingPages().length }}</p>
       </article>
 
       <article class="surface-card p-4">
-        <p class="text-xs font-semibold uppercase text-slate-500">Published Pages</p>
+        <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Yayımlanan Sayfalar', 'Published Pages') }}</p>
         <p class="mt-2 text-2xl font-semibold text-emerald-700">{{ publishedCount() }}</p>
       </article>
 
       <article class="surface-card p-4">
-        <p class="text-xs font-semibold uppercase text-slate-500">Draft Pages</p>
+        <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Taslak Sayfalar', 'Draft Pages') }}</p>
         <p class="mt-2 text-2xl font-semibold text-amber-700">{{ draftCount() }}</p>
       </article>
 
       <article class="surface-card p-4">
-        <p class="text-xs font-semibold uppercase text-slate-500">Archived Pages</p>
+        <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Arşivlenen Sayfalar', 'Archived Pages') }}</p>
         <p class="mt-2 text-2xl font-semibold text-slate-700">{{ archivedCount() }}</p>
       </article>
     </section>
 
     <section class="surface-card mt-6 p-5">
-      <h2 class="text-base font-semibold text-slate-900">Tracking Pages Grid</h2>
+      <h2 class="text-base font-semibold text-slate-900">{{ tx('Takip Sayfaları Tablosu', 'Tracking Pages Grid') }}</h2>
 
       <div class="mt-4 grid gap-3 xl:grid-cols-5">
         <input
           pInputText
           class="w-full xl:col-span-2"
-          placeholder="Search by slug/title/owner"
+          [placeholder]="tx('Kısa ad/başlık/sahip ile ara', 'Search by slug/title/owner')"
           [ngModel]="gridQuery().search"
           (ngModelChange)="setGridFilter('search', $event)"
         />
 
         <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [ngModel]="gridQuery().status" (ngModelChange)="setGridFilter('status', $event)">
-          <option value="all">All status</option>
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-          <option value="archived">Archived</option>
+          <option value="all">{{ tx('Tüm durumlar', 'All status') }}</option>
+          <option value="draft">{{ tx('Taslak', 'Draft') }}</option>
+          <option value="published">{{ tx('Yayımlandı', 'Published') }}</option>
+          <option value="archived">{{ tx('Arşivlendi', 'Archived') }}</option>
         </select>
 
         <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [ngModel]="gridQuery().sortBy" (ngModelChange)="setGridFilter('sortBy', $event)">
-          <option value="updated">Sort: Updated</option>
-          <option value="created">Sort: Created</option>
-          <option value="slug">Sort: Slug</option>
-          <option value="title">Sort: Title</option>
+          <option value="updated">{{ tx('Sıralama: Güncellenen', 'Sort: Updated') }}</option>
+          <option value="created">{{ tx('Sıralama: Oluşturulan', 'Sort: Created') }}</option>
+          <option value="slug">{{ tx('Sıralama: Kısa ad', 'Sort: Slug') }}</option>
+          <option value="title">{{ tx('Sıralama: Başlık', 'Sort: Title') }}</option>
         </select>
 
-        <button pButton type="button" icon="pi pi-refresh" label="Refresh" [loading]="isBusy()" (click)="refresh()"></button>
+        <button pButton type="button" icon="pi pi-refresh" [label]="tx('Yenile', 'Refresh')" [loading]="isBusy()" (click)="refresh()"></button>
       </div>
 
       <div class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2">
         <div class="flex flex-wrap items-center gap-2">
-        <button pButton type="button" size="small" label="Asc" severity="secondary" [outlined]="gridQuery().sortDirection === 'desc'" (click)="setGridFilter('sortDirection', 'asc')"></button>
-        <button pButton type="button" size="small" label="Desc" severity="secondary" [outlined]="gridQuery().sortDirection === 'asc'" (click)="setGridFilter('sortDirection', 'desc')"></button>
-        <span class="text-xs font-medium text-slate-600">Page {{ gridQuery().page }} / {{ maxPage() }}</span>
+        <button pButton type="button" size="small" [label]="tx('Artan', 'Asc')" severity="secondary" [outlined]="gridQuery().sortDirection === 'desc'" (click)="setGridFilter('sortDirection', 'asc')"></button>
+        <button pButton type="button" size="small" [label]="tx('Azalan', 'Desc')" severity="secondary" [outlined]="gridQuery().sortDirection === 'asc'" (click)="setGridFilter('sortDirection', 'desc')"></button>
+        <span class="text-xs font-medium text-slate-600">{{ tx('Sayfa', 'Page') }} {{ gridQuery().page }} / {{ maxPage() }}</span>
         </div>
         <div class="flex items-center gap-2">
         <button pButton type="button" size="small" icon="pi pi-angle-left" [disabled]="gridQuery().page <= 1" (click)="changePage(-1)"></button>
@@ -125,120 +126,120 @@ interface AnalyticsFilters {
         <article *ngFor="let page of pagedTrackingPages()" class="rounded-2xl border border-slate-200 p-4">
           <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h3 class="text-base font-semibold text-slate-900">{{ page.title || page.slug || 'Untitled Page' }}</h3>
-              <p class="text-sm text-slate-500">Slug: {{ page.slug || '-' }} · Owner: {{ page.ownerId || '-' }}</p>
-              <p class="mt-1 text-xs text-slate-500">Updated: {{ page.updatedAtUtc || '-' }}</p>
+              <h3 class="text-base font-semibold text-slate-900">{{ page.title || page.slug || tx('Başlıksız Sayfa', 'Untitled Page') }}</h3>
+              <p class="text-sm text-slate-500">{{ tx('Kısa ad', 'Slug') }}: {{ page.slug || '-' }} · {{ tx('Sahip', 'Owner') }}: {{ page.ownerId || '-' }}</p>
+              <p class="mt-1 text-xs text-slate-500">{{ tx('Güncellenme', 'Updated') }}: {{ page.updatedAtUtc || '-' }}</p>
             </div>
 
             <span class="status-chip" [ngClass]="pageStateChip(page.publishState)">{{ pageStateLabel(page.publishState) }}</span>
           </div>
 
           <div class="mt-4 flex flex-wrap gap-2">
-            <button pButton type="button" size="small" label="Select" [outlined]="selectedPageId() !== page.id" (click)="selectPage(page.id)"></button>
-            <button pButton type="button" size="small" severity="success" label="Publish" [disabled]="!canOperate() || isBusy() || !page.id" (click)="publish(page.id)"></button>
-            <button pButton type="button" size="small" severity="secondary" label="Archive" [disabled]="!canOperate() || isBusy() || !page.id" (click)="archive(page.id)"></button>
-            <button pButton type="button" size="small" severity="danger" label="Delete" [disabled]="!canOperate() || isBusy() || !page.id" (click)="remove(page.id)"></button>
+            <button pButton type="button" size="small" [label]="tx('Seç', 'Select')" [outlined]="selectedPageId() !== page.id" (click)="selectPage(page.id)"></button>
+            <button pButton type="button" size="small" severity="success" [label]="tx('Yayımla', 'Publish')" [disabled]="!canOperate() || isBusy() || !page.id" (click)="publish(page.id)"></button>
+            <button pButton type="button" size="small" severity="secondary" [label]="tx('Arşivle', 'Archive')" [disabled]="!canOperate() || isBusy() || !page.id" (click)="archive(page.id)"></button>
+            <button pButton type="button" size="small" severity="danger" [label]="tx('Sil', 'Delete')" [disabled]="!canOperate() || isBusy() || !page.id" (click)="remove(page.id)"></button>
           </div>
         </article>
 
         <article *ngIf="pagedTrackingPages().length === 0" class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm text-slate-500">
-          No tracking page found for current filter.
+          {{ tx('Mevcut filtre için takip sayfası bulunamadı.', 'No tracking page found for current filter.') }}
         </article>
       </div>
     </section>
 
     <section class="mt-6 grid gap-4 2xl:grid-cols-2">
       <article class="surface-card p-5">
-        <h2 class="text-base font-semibold text-slate-900">Tracking Page Editor</h2>
-        <p class="mt-1 text-sm text-slate-500">Create or update slug/metadata/settings and manage publish lifecycle.</p>
+        <h2 class="text-base font-semibold text-slate-900">{{ tx('Takip Sayfası Düzenleyici', 'Tracking Page Editor') }}</h2>
+        <p class="mt-1 text-sm text-slate-500">{{ tx('Kısa ad, metadata ve ayarları oluşturun/güncelleyin; yayın yaşam döngüsünü yönetin.', 'Create or update slug/metadata/settings and manage publish lifecycle.') }}</p>
 
         <div class="mt-4 grid gap-3">
           <input pInputText class="w-full" placeholder="Slug" [(ngModel)]="editorDraft.slug" />
           <input pInputText class="w-full" placeholder="Title" [(ngModel)]="editorDraft.title" />
           <input pInputText class="w-full" placeholder="Description" [(ngModel)]="editorDraft.description" />
-          <input pInputText class="w-full" placeholder="Owner Id" [(ngModel)]="editorDraft.ownerId" />
+          <input pInputText class="w-full" [placeholder]="tx('Sahip Kimliği', 'Owner Id')" [(ngModel)]="editorDraft.ownerId" />
           <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="editorDraft.templateId">
-            <option [ngValue]="''">No template</option>
+            <option [ngValue]="''">{{ tx('Şablon yok', 'No template') }}</option>
             <option *ngFor="let templateItem of templates()" [ngValue]="templateItem.id">{{ templateItem.name || templateItem.id }}</option>
           </select>
-          <input pInputText class="w-full" type="number" min="1" placeholder="Retention Days" [(ngModel)]="editorDraft.retentionDays" />
+          <input pInputText class="w-full" type="number" min="1" [placeholder]="tx('Saklama Gün Sayısı', 'Retention Days')" [(ngModel)]="editorDraft.retentionDays" />
         </div>
 
         <div class="mt-3 grid gap-2 sm:grid-cols-3">
           <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
-            <input type="checkbox" [(ngModel)]="editorDraft.captureIpAddress" /> Capture IP
+            <input type="checkbox" [(ngModel)]="editorDraft.captureIpAddress" /> {{ tx('IP Kaydet', 'Capture IP') }}
           </label>
           <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
-            <span>IP Storage</span>
+            <span>{{ tx('IP Saklama', 'IP Storage') }}</span>
             <select class="rounded border border-slate-300 bg-white px-2 py-1 text-xs" [(ngModel)]="editorDraft.ipAddressHashPolicy" [disabled]="!editorDraft.captureIpAddress">
               <option [ngValue]="IpAddressHashPolicy._1">Plain</option>
               <option [ngValue]="IpAddressHashPolicy._2">SHA-256</option>
             </select>
           </label>
           <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
-            <input type="checkbox" [(ngModel)]="editorDraft.enableBotFiltering" /> Bot Filter
+            <input type="checkbox" [(ngModel)]="editorDraft.enableBotFiltering" /> {{ tx('Bot Filtresi', 'Bot Filter') }}
           </label>
           <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
-            <input type="checkbox" [(ngModel)]="editorDraft.captureUtmParameters" /> Capture UTM
+            <input type="checkbox" [(ngModel)]="editorDraft.captureUtmParameters" /> {{ tx('UTM Kaydet', 'Capture UTM') }}
           </label>
         </div>
 
         <div class="mt-4 flex flex-wrap gap-2">
-          <button pButton type="button" label="Create" icon="pi pi-plus" [disabled]="!canOperate() || isBusy()" (click)="create()"></button>
-          <button pButton type="button" label="Update" severity="secondary" [disabled]="!canOperate() || isBusy() || !selectedPageId()" (click)="save()"></button>
-          <button pButton type="button" label="Reset" severity="contrast" [disabled]="isBusy()" (click)="resetEditor()"></button>
+          <button pButton type="button" [label]="tx('Oluştur', 'Create')" icon="pi pi-plus" [disabled]="!canOperate() || isBusy()" (click)="create()"></button>
+          <button pButton type="button" [label]="tx('Güncelle', 'Update')" severity="secondary" [disabled]="!canOperate() || isBusy() || !selectedPageId()" (click)="save()"></button>
+          <button pButton type="button" [label]="tx('Sıfırla', 'Reset')" severity="contrast" [disabled]="isBusy()" (click)="resetEditor()"></button>
         </div>
       </article>
 
       <article class="surface-card p-5">
-        <h2 class="text-base font-semibold text-slate-900">Analytics Detail</h2>
-        <p class="mt-1 text-sm text-slate-500">Select a page and apply filters for summary, trends and recent events.</p>
+        <h2 class="text-base font-semibold text-slate-900">{{ tx('Analitik Detayı', 'Analytics Detail') }}</h2>
+        <p class="mt-1 text-sm text-slate-500">{{ tx('Bir sayfa seçin ve özet, trend ve son olaylar için filtre uygulayın.', 'Select a page and apply filters for summary, trends and recent events.') }}</p>
 
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
           <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [ngModel]="selectedPageId()" (ngModelChange)="selectPage($event)">
-            <option [ngValue]="null">Choose tracking page</option>
+            <option [ngValue]="null">{{ tx('Takip sayfası seçin', 'Choose tracking page') }}</option>
             <option *ngFor="let page of trackingPages()" [ngValue]="page.id">{{ page.slug || page.title || page.id }}</option>
           </select>
 
           <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="analyticsFilters.trendBucketSizeMinutes">
-            <option [ngValue]="15">15 min buckets</option>
-            <option [ngValue]="30">30 min buckets</option>
-            <option [ngValue]="60">60 min buckets</option>
-            <option [ngValue]="180">3 hour buckets</option>
+            <option [ngValue]="15">{{ tx('15 dk kovalar', '15 min buckets') }}</option>
+            <option [ngValue]="30">{{ tx('30 dk kovalar', '30 min buckets') }}</option>
+            <option [ngValue]="60">{{ tx('60 dk kovalar', '60 min buckets') }}</option>
+            <option [ngValue]="180">{{ tx('3 saat kovalar', '3 hour buckets') }}</option>
           </select>
 
           <input pInputText class="w-full" type="datetime-local" [(ngModel)]="analyticsFilters.fromUtc" />
           <input pInputText class="w-full" type="datetime-local" [(ngModel)]="analyticsFilters.toUtc" />
-          <input pInputText class="w-full" placeholder="Referrer/source filter" [(ngModel)]="analyticsFilters.sourceReferrerFilter" />
-          <input pInputText class="w-full" placeholder="Device/User-Agent filter" [(ngModel)]="analyticsFilters.userAgentFilter" />
+          <input pInputText class="w-full" [placeholder]="tx('Yönlendiren/kaynak filtresi', 'Referrer/source filter')" [(ngModel)]="analyticsFilters.sourceReferrerFilter" />
+          <input pInputText class="w-full" [placeholder]="tx('Cihaz/Kullanıcı Aracı filtresi', 'Device/User-Agent filter')" [(ngModel)]="analyticsFilters.userAgentFilter" />
         </div>
 
         <div class="mt-3 flex flex-wrap items-center gap-2">
-          <button pButton type="button" label="Load Analytics" icon="pi pi-chart-line" [disabled]="isBusy() || !selectedPageId()" (click)="loadAnalytics()"></button>
+          <button pButton type="button" [label]="tx('Analitiği Yükle', 'Load Analytics')" icon="pi pi-chart-line" [disabled]="isBusy() || !selectedPageId()" (click)="loadAnalytics()"></button>
           <label class="inline-flex items-center gap-2 text-xs text-slate-600">
-            Recent limit
+            {{ tx('Son kayıt limiti', 'Recent limit') }}
             <input pInputText class="w-24" type="number" min="5" max="200" [(ngModel)]="analyticsFilters.recentVisitLimit" />
           </label>
         </div>
 
         <div class="mt-4 grid gap-3 sm:grid-cols-3" *ngIf="analytics() as data">
           <div class="rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-3">
-            <p class="text-xs uppercase text-slate-500">Total Visits</p>
+            <p class="text-xs uppercase text-slate-500">{{ tx('Toplam Ziyaret', 'Total Visits') }}</p>
             <p class="mt-1 text-xl font-semibold text-slate-900">{{ data.summary?.totalVisits ?? 0 }}</p>
           </div>
           <div class="rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-3">
-            <p class="text-xs uppercase text-slate-500">Unique Visitors</p>
+            <p class="text-xs uppercase text-slate-500">{{ tx('Benzersiz Ziyaretçi', 'Unique Visitors') }}</p>
             <p class="mt-1 text-xl font-semibold text-slate-900">{{ data.summary?.uniqueVisitors ?? 0 }}</p>
           </div>
           <div class="rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-3">
-            <p class="text-xs uppercase text-slate-500">Last Visit</p>
+            <p class="text-xs uppercase text-slate-500">{{ tx('Son Ziyaret', 'Last Visit') }}</p>
             <p class="mt-1 text-xs font-medium text-slate-700">{{ data.summary?.lastVisitAtUtc || '-' }}</p>
           </div>
         </div>
 
         <div class="mt-4 grid gap-4 xl:grid-cols-2" *ngIf="analytics() as data">
           <div class="rounded-xl border border-slate-200 p-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Trend Chart (Total Visits)</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">Trend Chart ({{ tx('Toplam Ziyaret', 'Total Visits') }})</p>
             <div class="mt-3 space-y-2" *ngIf="filteredTrends().length > 0; else noTrends">
               <div *ngFor="let point of filteredTrends()" class="flex items-center gap-2">
                 <span class="w-24 shrink-0 text-[11px] text-slate-500">{{ point.bucketStartUtc | date: 'MM-dd HH:mm' }}</span>
@@ -249,12 +250,12 @@ interface AnalyticsFilters {
               </div>
             </div>
             <ng-template #noTrends>
-              <p class="mt-2 text-sm text-slate-500">No trend data for active filters.</p>
+              <p class="mt-2 text-sm text-slate-500">{{ tx('Aktif filtreler için trend verisi yok.', 'No trend data for active filters.') }}</p>
             </ng-template>
           </div>
 
           <div class="rounded-xl border border-slate-200 p-3">
-            <p class="text-xs font-semibold uppercase text-slate-500">Visit Distribution (Referrer)</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Ziyaret Dağılımı (Yönlendiren)', 'Visit Distribution (Referrer)') }}</p>
             <div class="mt-3 space-y-2" *ngIf="sourceDistribution().length > 0; else noSource">
               <div *ngFor="let bucket of sourceDistribution()" class="flex items-center gap-2">
                 <span class="w-28 truncate text-[11px] text-slate-600" [title]="bucket.label">{{ bucket.label }}</span>
@@ -265,12 +266,12 @@ interface AnalyticsFilters {
               </div>
             </div>
             <ng-template #noSource>
-              <p class="mt-2 text-sm text-slate-500">No referrer distribution for active filters.</p>
+              <p class="mt-2 text-sm text-slate-500">{{ tx('Aktif filtreler için yönlendiren dağılımı yok.', 'No referrer distribution for active filters.') }}</p>
             </ng-template>
           </div>
 
           <div class="rounded-xl border border-slate-200 p-3 xl:col-span-2">
-            <p class="text-xs font-semibold uppercase text-slate-500">Visit Distribution (Device / User-Agent)</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Ziyaret Dağılımı (Cihaz / Kullanıcı Aracı)', 'Visit Distribution (Device / User-Agent)') }}</p>
             <div class="mt-3 grid gap-2 lg:grid-cols-2" *ngIf="deviceDistribution().length > 0; else noDevice">
               <div *ngFor="let bucket of deviceDistribution()" class="flex items-center gap-2">
                 <span class="w-28 truncate text-[11px] text-slate-600" [title]="bucket.label">{{ bucket.label }}</span>
@@ -281,23 +282,23 @@ interface AnalyticsFilters {
               </div>
             </div>
             <ng-template #noDevice>
-              <p class="mt-2 text-sm text-slate-500">No device distribution for active filters.</p>
+              <p class="mt-2 text-sm text-slate-500">{{ tx('Aktif filtreler için cihaz dağılımı yok.', 'No device distribution for active filters.') }}</p>
             </ng-template>
           </div>
         </div>
 
         <div class="mt-4 rounded-xl border border-slate-200 p-3" *ngIf="analytics() as data">
-          <p class="text-xs font-semibold uppercase text-slate-500">Recent Events</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ tx('Son Olaylar', 'Recent Events') }}</p>
           <div class="mt-2 max-h-72 space-y-2 overflow-auto" *ngIf="filteredRecentVisits(data.recentVisits || []).length > 0; else noRecent">
             <article *ngFor="let visit of filteredRecentVisits(data.recentVisits || [])" class="rounded-lg border border-slate-100 bg-slate-50/60 p-2 text-xs text-slate-700">
               <p class="font-medium text-slate-900">{{ visit.occurredAtUtc || '-' }}</p>
-              <p>Referrer: {{ visit.referrerUrl || 'direct' }}</p>
-              <p>User-Agent: {{ visit.userAgent || '-' }}</p>
-              <p>Session: {{ visit.sessionId || '-' }}</p>
+              <p>{{ tx('Yönlendiren', 'Referrer') }}: {{ visit.referrerUrl || tx('doğrudan', 'direct') }}</p>
+              <p>{{ tx('Kullanıcı Aracı', 'User-Agent') }}: {{ visit.userAgent || '-' }}</p>
+              <p>{{ tx('Oturum', 'Session') }}: {{ visit.sessionId || '-' }}</p>
             </article>
           </div>
           <ng-template #noRecent>
-            <p class="mt-2 text-sm text-slate-500">No recent visits for active filters.</p>
+            <p class="mt-2 text-sm text-slate-500">{{ tx('Aktif filtreler için son ziyaret yok.', 'No recent visits for active filters.') }}</p>
           </ng-template>
         </div>
       </article>
@@ -404,25 +405,32 @@ export class TrackingDashboardPageComponent {
   protected readonly sourceDistribution = computed(() =>
     this.toDistribution(
       this.filteredRecentVisits(this.analytics()?.recentVisits ?? []),
-      (visit) => this.normalizeDistributionLabel(visit.referrerUrl, 'direct')
+      (visit) => this.normalizeDistributionLabel(visit.referrerUrl, this.tx('doğrudan', 'direct'))
     )
   );
 
   protected readonly deviceDistribution = computed(() =>
     this.toDistribution(
       this.filteredRecentVisits(this.analytics()?.recentVisits ?? []),
-      (visit) => this.normalizeDistributionLabel(this.toDeviceBucket(visit.userAgent), 'unknown-device')
+      (visit) => this.normalizeDistributionLabel(this.toDeviceBucket(visit.userAgent), this.tx('bilinmeyen-cihaz', 'unknown-device'))
     )
   );
 
-  public constructor(private readonly authSessionService: AuthSessionService) {
+  public constructor(
+    private readonly authSessionService: AuthSessionService,
+    private readonly userPreferencesService: UserPreferencesService
+  ) {
     void this.refresh();
+  }
+
+  protected tx(tr: string, en: string): string {
+    return this.userPreferencesService.language() === 'tr' ? tr : en;
   }
 
   protected async refresh(): Promise<void> {
     await this.execute(async () => {
       this.trackingPages.set(await listTrackingPages());
-      this.feedback.set('Tracking page listesi güncellendi.');
+      this.feedback.set(this.tx('Takip sayfası listesi güncellendi.', 'Tracking page list refreshed.'));
       this.ensurePageBounds();
       this.autoSelectFirstPage();
     });
@@ -452,14 +460,14 @@ export class TrackingDashboardPageComponent {
       const created = await createTrackingPage(input);
       this.trackingPages.set([created, ...this.trackingPages()]);
       this.selectPage(created.id ?? null);
-      this.feedback.set('Tracking page oluşturuldu.');
+      this.feedback.set(this.tx('Takip sayfası oluşturuldu.', 'Tracking page created.'));
     });
   }
 
   protected async save(): Promise<void> {
     const pageId = this.selectedPageId();
     if (!pageId) {
-      this.feedback.set('Update için önce bir tracking page seçin.');
+      this.feedback.set(this.tx('Güncelleme için önce bir takip sayfası seçin.', 'Select a tracking page before updating.'));
       return;
     }
 
@@ -471,7 +479,7 @@ export class TrackingDashboardPageComponent {
     await this.execute(async () => {
       const updated = await updateTrackingPage(pageId, input);
       this.applyUpdatedPage(updated);
-      this.feedback.set('Tracking page güncellendi.');
+      this.feedback.set(this.tx('Takip sayfası güncellendi.', 'Tracking page updated.'));
     });
   }
 
@@ -482,7 +490,7 @@ export class TrackingDashboardPageComponent {
 
     await this.execute(async () => {
       this.applyUpdatedPage(await publishTrackingPage(pageId));
-      this.feedback.set('Tracking page publish edildi.');
+      this.feedback.set(this.tx('Takip sayfası yayımlandı.', 'Tracking page published.'));
     });
   }
 
@@ -493,7 +501,7 @@ export class TrackingDashboardPageComponent {
 
     await this.execute(async () => {
       this.applyUpdatedPage(await archiveTrackingPage(pageId));
-      this.feedback.set('Tracking page archive edildi.');
+      this.feedback.set(this.tx('Takip sayfası arşivlendi.', 'Tracking page archived.'));
     });
   }
 
@@ -512,7 +520,7 @@ export class TrackingDashboardPageComponent {
       }
 
       this.autoSelectFirstPage();
-      this.feedback.set('Tracking page silindi.');
+      this.feedback.set(this.tx('Takip sayfası silindi.', 'Tracking page deleted.'));
     });
   }
 
@@ -536,7 +544,7 @@ export class TrackingDashboardPageComponent {
   protected async loadAnalytics(): Promise<void> {
     const pageId = this.selectedPageId();
     if (!pageId) {
-      this.feedback.set('Analytics için bir tracking page seçin.');
+      this.feedback.set(this.tx('Analitik için bir takip sayfası seçin.', 'Select a tracking page for analytics.'));
       return;
     }
 
@@ -550,7 +558,7 @@ export class TrackingDashboardPageComponent {
       });
 
       this.analytics.set(analytics);
-      this.feedback.set('Analytics verisi güncellendi.');
+      this.feedback.set(this.tx('Analitik verisi güncellendi.', 'Analytics data refreshed.'));
     });
   }
 
@@ -573,11 +581,11 @@ export class TrackingDashboardPageComponent {
   protected pageStateLabel(state: TrackingPagePublishState | undefined): string {
     switch (state) {
       case TrackingPagePublishState._1:
-        return 'Published';
+        return this.tx('Yayımlandı', 'Published');
       case TrackingPagePublishState._2:
-        return 'Archived';
+        return this.tx('Arşivlendi', 'Archived');
       default:
-        return 'Draft';
+        return this.tx('Taslak', 'Draft');
     }
   }
 
@@ -675,7 +683,7 @@ export class TrackingDashboardPageComponent {
     const slug = this.editorDraft.slug.trim();
     const title = this.editorDraft.title.trim();
     if (slug.length === 0 || title.length === 0) {
-      this.feedback.set('Slug ve title zorunludur.');
+      this.feedback.set(this.tx('Kısa ad ve başlık zorunludur.', 'Slug and title are required.'));
       return null;
     }
 

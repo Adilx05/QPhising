@@ -6,6 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { SetupReadinessState, type SetupDependencyTestResult, type SetupStatusResult } from '../../../shared/proxy';
 import { resolveApiError } from '../../../core/http/api-error-handler';
+import { UserPreferencesService } from '../../../core/ui/user-preferences.service';
 import {
   getSetupStatus,
   saveSetupConfiguration,
@@ -35,14 +36,21 @@ export class SetupWizardPageComponent {
     keycloakClientSecret: ['', [Validators.required]]
   });
 
-  public constructor(private readonly formBuilder: FormBuilder) {
+  public constructor(
+    private readonly formBuilder: FormBuilder,
+    private readonly userPreferencesService: UserPreferencesService
+  ) {
     void this.loadStatus();
+  }
+
+  protected tx(tr: string, en: string): string {
+    return this.userPreferencesService.language() === 'tr' ? tr : en;
   }
 
   protected async testDatabase(): Promise<void> {
     await this.executeAsync(async () => {
       this.dbTestResult.set(await testDatabaseConnection(this.form.controls.databaseConnectionString.getRawValue()));
-      this.feedback.set('Database bağlantı testi tamamlandı.');
+      this.feedback.set(this.tx('Veritabanı bağlantı testi tamamlandı.', 'Database connection test completed.'));
     });
   }
 
@@ -53,7 +61,7 @@ export class SetupWizardPageComponent {
       this.keycloakTestResult.set(
         await testKeycloakConnection(keycloakAuthority, keycloakRealm, keycloakClientId, keycloakClientSecret)
       );
-      this.feedback.set('Keycloak bağlantı testi tamamlandı.');
+      this.feedback.set(this.tx('Keycloak bağlantı testi tamamlandı.', 'Keycloak connection test completed.'));
     });
   }
 
@@ -66,7 +74,7 @@ export class SetupWizardPageComponent {
     await this.executeAsync(async () => {
       const value = this.form.getRawValue();
       this.status.set(await saveSetupConfiguration(value));
-      this.feedback.set('Kurulum ayarları başarıyla kaydedildi.');
+      this.feedback.set(this.tx('Kurulum ayarları başarıyla kaydedildi.', 'Setup settings saved successfully.'));
     });
   }
 

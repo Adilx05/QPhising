@@ -149,6 +149,8 @@ Phase 9 evidence:
 - [x] Replace setup-state home dashboard with application analytics dashboard (campaign totals, tracking summary, trends, and recent visits) using PrimeNG data components and live backend metrics.
 - [x] Simplify sidebar user card content to show only full name and role, and normalize dashboard copy/date formatting for proper Turkish character rendering.
 - [x] Ensure campaign-created public pages stay inaccessible until campaign lifecycle is Active, and return 404 for Draft/Paused/non-active lifecycle states.
+- [x] Add app-shell language selector and dark-mode toggle in top bar, ensure Turkish campaign naming uses "Senaryo", and hide sidebar user card for unauthenticated sessions.
+- [x] Expand language support to full-page TR/EN localization across auth, dashboard, setup/runtime configuration, template management, and tracking screens.
 
 Incremental evidence:
 - 2026-04-19: Removed Redis input/test requirements from setup + runtime configuration flows (Redis now optional in setup/runtime aggregates), setup guard now allows main app when base appsettings bootstrap config is already present, and app shell now renders authenticated user card (name/role) with sidebar logout action.
@@ -172,3 +174,6 @@ Incremental evidence:
 - 2026-04-19: Added campaign list delete action (Admin-only UI control), wired campaign data-access `campaignDelete` proxy usage, and updated `DeleteCampaignCommandHandler` to soft-delete linked tracking pages automatically; validated with integration coverage for campaign+tracking page post-delete 404 behavior.
 - 2026-04-19: Updated app shell navigation to auto-hide Setup Wizard after setup readiness is `Ready`, moved the authenticated user card to the top of the sidebar, and repositioned Runtime Configuration into a bottom, lower-prominence system section.
 - 2026-04-19: Replaced `/dashboard` setup health view with a production-focused analytics dashboard powered by campaign list, tracking page list, and tracking overview endpoints; added PrimeNG table/tag/progress widgets for KPI, top-page, trend, and recent-visit summaries; simplified sidebar user card copy to name+role only; and standardized dashboard Turkish text/date formatting (`tr-TR`).
+
+- 2026-04-19: Added app-shell language selector (TR/EN) + theme toggle controls on the top bar, localized campaign-area copy with Turkish "Senaryo" naming, and hid the sidebar authenticated-user card whenever no session is active.
+- 2026-04-19: Expanded bilingual UI coverage to all major frontend pages (auth callback/unauthorized, dashboard, setup wizard, runtime configuration, templates, tracking dashboard, and public landing fallback) with consistent TR/EN copy driven by language preference.

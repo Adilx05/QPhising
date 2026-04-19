@@ -6,25 +6,18 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextarea } from 'primeng/inputtextarea';
-import { resolveApiError } from '../../../core/http/api-error-handler';
 import { AuthSessionService } from '../../../core/auth/auth-session';
+import { resolveApiError } from '../../../core/http/api-error-handler';
+import { AppLanguage, UserPreferencesService } from '../../../core/ui/user-preferences.service';
 import {
   CampaignLifecycleState,
-  type CampaignResult,
-  TrackingService,
+  IpAddressHashPolicy,
   TemplateService,
-  type TemplateResult,
-  IpAddressHashPolicy
+  TrackingService,
+  type CampaignResult,
+  type TemplateResult
 } from '../../../shared/proxy';
-import {
-  cancelCampaign,
-  completeCampaign,
-  createCampaign,
-  deleteCampaign,
-  listCampaigns,
-  pauseCampaign,
-  startCampaign
-} from '../data-access';
+import { cancelCampaign, completeCampaign, createCampaign, deleteCampaign, listCampaigns, pauseCampaign, startCampaign } from '../data-access';
 
 @Component({
   selector: 'app-campaigns-page',
@@ -33,6 +26,27 @@ import {
   templateUrl: './campaigns-page.component.html'
 })
 export class CampaignsPageComponent {
+  private readonly translations: Record<AppLanguage, Record<string, string>> = {
+    tr: {
+      feedbackRefreshed: 'Senaryo listesi güncellendi.',
+      feedbackRequired: 'Senaryo adı, sayfa kısa adı ve sayfa başlığı zorunludur.',
+      feedbackCreated: 'Senaryo oluşturuldu. Genel erişim bağlantıları hazırlandı.',
+      feedbackAction: 'Senaryo işlemi başarılı.',
+      feedbackDeleted: 'Senaryo ve bağlı takip sayfası soft-delete ile silindi.',
+      confirmDelete: 'Senaryo silinsin mi? Bağlı takip sayfası da soft-delete ile kaldırılacak.',
+      previewEmpty: '<p style="padding:8px">Önizleme boş.</p>'
+    },
+    en: {
+      feedbackRefreshed: 'Campaign list refreshed.',
+      feedbackRequired: 'Campaign name, page slug, and page title are required.',
+      feedbackCreated: 'Campaign created. Public links are ready.',
+      feedbackAction: 'Campaign action completed successfully.',
+      feedbackDeleted: 'Campaign and linked tracking page were soft-deleted.',
+      confirmDelete: 'Delete this campaign? The linked tracking page will also be soft-deleted.',
+      previewEmpty: '<p style="padding:8px">Preview is empty.</p>'
+    }
+  };
+
   protected readonly IpAddressHashPolicy = IpAddressHashPolicy;
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
@@ -65,8 +79,20 @@ export class CampaignsPageComponent {
         label: template.name || template.id!
       })));
 
-  public constructor(private readonly authSessionService: AuthSessionService) {
+  public constructor(
+    private readonly authSessionService: AuthSessionService,
+    private readonly userPreferencesService: UserPreferencesService
+  ) {
     void this.refresh();
+  }
+
+  protected activeLanguage(): AppLanguage {
+    return this.userPreferencesService.language();
+  }
+
+  protected t(key: string): string {
+    const language = this.userPreferencesService.language();
+    return this.translations[language][key] ?? key;
   }
 
   protected async refresh(): Promise<void> {
@@ -74,7 +100,7 @@ export class CampaignsPageComponent {
       const [campaigns, templates] = await Promise.all([listCampaigns(), TemplateService.templateList()]);
       this.campaigns.set(campaigns);
       this.templates.set(templates);
-      this.feedback.set('Campaign listesi güncellendi.');
+      this.feedback.set(this.t('feedbackRefreshed'));
     });
   }
 
@@ -84,7 +110,7 @@ export class CampaignsPageComponent {
     const trackingPageTitle = this.createForm.pageTitle.trim();
 
     if (!name || !trackingPageSlug || !trackingPageTitle) {
-      this.feedback.set('Campaign name, page slug ve page title zorunludur.');
+      this.feedback.set(this.t('feedbackRequired'));
       return;
     }
 
@@ -139,15 +165,12 @@ export class CampaignsPageComponent {
       this.createForm.ipAddressHashPolicy = IpAddressHashPolicy._2;
       this.createForm.enableBotFiltering = true;
       this.createForm.captureUtmParameters = true;
-      this.feedback.set('Campaign oluşturuldu. Public linkler hazırlandı.');
+      this.feedback.set(this.t('feedbackCreated'));
       this.campaigns.set(await listCampaigns());
     });
   }
 
-  protected async transition(
-    campaignId: string | undefined,
-    action: 'start' | 'pause' | 'complete' | 'cancel'
-  ): Promise<void> {
+  protected async transition(campaignId: string | undefined, action: 'start' | 'pause' | 'complete' | 'cancel'): Promise<void> {
     if (!campaignId) {
       return;
     }
@@ -155,7 +178,7 @@ export class CampaignsPageComponent {
     await this.execute(async () => {
       const updatedCampaign = await this.transitionCampaign(campaignId, action);
       this.applyUpdatedCampaign(updatedCampaign);
-      this.feedback.set(`Campaign ${action} işlemi başarılı.`);
+      this.feedback.set(this.t('feedbackAction'));
     });
   }
 
@@ -164,14 +187,14 @@ export class CampaignsPageComponent {
       return;
     }
 
-    if (!window.confirm('Campaign silinsin mi? Bağlı tracking page de soft-delete ile kaldırılacak.')) {
+    if (!window.confirm(this.t('confirmDelete'))) {
       return;
     }
 
     await this.execute(async () => {
       await deleteCampaign(campaignId);
       this.campaigns.set(this.campaigns().filter((campaign) => campaign.id !== campaignId));
-      this.feedback.set('Campaign ve bağlı tracking page soft-delete ile silindi.');
+      this.feedback.set(this.t('feedbackDeleted'));
     });
   }
 
@@ -218,19 +241,14 @@ export class CampaignsPageComponent {
       ?.htmlContent
       ?.trim();
 
-    return selectedTemplateHtml && selectedTemplateHtml.length > 0
-      ? selectedTemplateHtml
-      : '<p style="padding:8px">Preview boş.</p>';
+    return selectedTemplateHtml && selectedTemplateHtml.length > 0 ? selectedTemplateHtml : this.t('previewEmpty');
   }
 
   private toUtcIso(value: string): string | null {
     return value ? new Date(value).toISOString() : null;
   }
 
-  private async transitionCampaign(
-    campaignId: string,
-    action: 'start' | 'pause' | 'complete' | 'cancel'
-  ): Promise<CampaignResult> {
+  private async transitionCampaign(campaignId: string, action: 'start' | 'pause' | 'complete' | 'cancel'): Promise<CampaignResult> {
     switch (action) {
       case 'start':
         return startCampaign(campaignId);

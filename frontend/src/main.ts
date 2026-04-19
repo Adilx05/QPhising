@@ -8,7 +8,7 @@ import { appRoutes } from './app/app.routes';
 import { provideOpenApiConfiguration } from './app/core/config/openapi-config.provider';
 
 bootstrapApplication(AppComponent, {
-  providers: [provideRouter(appRoutes), provideAnimationsAsync(), provideOpenApiConfiguration(), providePrimeNG({ theme: { preset: Aura }, ripple: true })]
+  providers: [provideRouter(appRoutes), provideAnimationsAsync(), provideOpenApiConfiguration(), providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } }, ripple: true })]
 }).catch((error: unknown) => {
   console.error('QPhising frontend bootstrap failed.', error);
 });
