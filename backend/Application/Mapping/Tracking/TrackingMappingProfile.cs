@@ -49,4 +49,33 @@ public static class TrackingMappingProfile
             IpHash: visitEvent.IpHash,
             IpAddressHashPolicy: visitEvent.IpAddressHashPolicy);
     }
+
+    public static TrackingTopPageResult ToResult(this TrackingTopPageMetric metric)
+    {
+        ArgumentNullException.ThrowIfNull(metric);
+
+        return new TrackingTopPageResult(
+            TrackingPageId: metric.TrackingPageId,
+            Slug: metric.Slug,
+            Title: metric.Title,
+            TotalVisits: metric.TotalVisits,
+            UniqueVisitors: metric.UniqueVisitors);
+    }
+
+    public static TrackingRecentVisitStreamItemResult ToStreamResult(this TrackingRecentVisitMetric metric)
+    {
+        ArgumentNullException.ThrowIfNull(metric);
+
+        return new TrackingRecentVisitStreamItemResult(
+            VisitId: metric.VisitId,
+            TrackingPageId: metric.TrackingPageId,
+            TrackingPageSlug: metric.TrackingPageSlug,
+            OccurredAtUtc: metric.OccurredAtUtc,
+            SessionId: metric.SessionId,
+            VisitorFingerprint: metric.VisitorFingerprint,
+            UserAgent: metric.UserAgent,
+            ReferrerUrl: metric.ReferrerUrl,
+            IpHash: metric.IpHash,
+            IpAddressHashPolicy: metric.IpAddressHashPolicy);
+    }
 }

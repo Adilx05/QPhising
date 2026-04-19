@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QPhising.Api.Infrastructure.Persistence.Mapping;
 using QPhising.Application.Contracts.Abstractions.Tracking;
+using QPhising.Domain.Tracking.Enums;
 using QPhising.Domain.Tracking.Entities;
 using PersistenceVisitEventEntity = QPhising.Api.Infrastructure.Persistence.Entities.VisitEventEntity;
 
@@ -108,6 +109,125 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         return entities.Select(entity => entity.ToDomainEntity()).ToArray();
     }
 
+    public Task<int> CountTotalAcrossPagesAsync(
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        CancellationToken cancellationToken)
+    {
+        return ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
+            .CountAsync(cancellationToken);
+    }
+
+    public Task<int> CountUniqueVisitorsAcrossPagesAsync(
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        CancellationToken cancellationToken)
+    {
+        return ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
+            .Select(UniqueVisitorKeySelector)
+            .Distinct()
+            .CountAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<TrackingTopPageMetric>> ListTopPagesAsync(
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        var candidates = await ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
+            .Select(visit => new
+            {
+                visit.TrackingPageId,
+                visit.TrackingPage.Slug,
+                visit.TrackingPage.Title,
+                UniqueKey = string.IsNullOrWhiteSpace(visit.SessionId) ? visit.VisitorFingerprint : visit.SessionId
+            })
+            .ToListAsync(cancellationToken);
+
+        return candidates
+            .GroupBy(candidate => new { candidate.TrackingPageId, candidate.Slug, candidate.Title })
+            .Select(group => new TrackingTopPageMetric(
+                TrackingPageId: group.Key.TrackingPageId,
+                Slug: group.Key.Slug,
+                Title: group.Key.Title,
+                TotalVisits: group.Count(),
+                UniqueVisitors: group.Select(item => item.UniqueKey).Distinct(StringComparer.Ordinal).Count()))
+            .OrderByDescending(metric => metric.TotalVisits)
+            .ThenByDescending(metric => metric.UniqueVisitors)
+            .ThenBy(metric => metric.Slug, StringComparer.Ordinal)
+            .Take(limit)
+            .ToArray();
+    }
+
+    public async Task<IReadOnlyCollection<TrackingRecentVisitMetric>> ListRecentAcrossPagesAsync(
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        var visits = await ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
+            .OrderByDescending(visit => visit.OccurredAtUtc)
+            .ThenByDescending(visit => visit.Id)
+            .Take(limit)
+            .Select(visit => new
+            {
+                visit.Id,
+                visit.TrackingPageId,
+                visit.TrackingPage.Slug,
+                visit.OccurredAtUtc,
+                visit.SessionId,
+                visit.VisitorFingerprint,
+                visit.UserAgent,
+                visit.ReferrerUrl,
+                visit.IpHash,
+                visit.IpAddressHashPolicy
+            })
+            .ToListAsync(cancellationToken);
+
+        return visits
+            .Select(visit => new TrackingRecentVisitMetric(
+                VisitId: visit.Id,
+                TrackingPageId: visit.TrackingPageId,
+                TrackingPageSlug: visit.Slug,
+                OccurredAtUtc: visit.OccurredAtUtc,
+                SessionId: visit.SessionId,
+                VisitorFingerprint: visit.VisitorFingerprint,
+                UserAgent: visit.UserAgent,
+                ReferrerUrl: visit.ReferrerUrl,
+                IpHash: visit.IpHash,
+                IpAddressHashPolicy: (IpAddressHashPolicy)visit.IpAddressHashPolicy))
+            .ToArray();
+    }
+
+    public async Task<IReadOnlyCollection<TrackingVisitTrendBucket>> GetTrendBucketsAcrossPagesAsync(
+        DateTimeOffset fromUtc,
+        DateTimeOffset toUtc,
+        TrackingVisitTrendBucketWindow window,
+        int timezoneOffsetMinutes,
+        bool excludeBots,
+        CancellationToken cancellationToken)
+    {
+        var visits = await ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
+            .Select(visit => new { visit.OccurredAtUtc, visit.SessionId, visit.VisitorFingerprint })
+            .ToListAsync(cancellationToken);
+
+        return visits
+            .GroupBy(visit => AlignTrendBucket(visit.OccurredAtUtc, window, timezoneOffsetMinutes))
+            .OrderBy(group => group.Key)
+            .Select(group => new TrackingVisitTrendBucket(
+                BucketStartUtc: group.Key,
+                TotalVisits: group.Count(),
+                UniqueVisitors: group.Select(visit => string.IsNullOrWhiteSpace(visit.SessionId) ? visit.VisitorFingerprint : visit.SessionId)
+                    .Distinct(StringComparer.Ordinal)
+                    .Count()))
+            .ToArray();
+    }
+
     private static IQueryable<PersistenceVisitEventEntity> ApplyRangeFilter(
         IQueryable<PersistenceVisitEventEntity> source,
         Guid trackingPageId,
@@ -129,11 +249,85 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         return query;
     }
 
+    private static IQueryable<PersistenceVisitEventEntity> ApplyRangeFilterAcrossPages(
+        IQueryable<PersistenceVisitEventEntity> source,
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots)
+    {
+        var query = source;
+
+        if (fromUtc.HasValue)
+        {
+            query = query.Where(visit => visit.OccurredAtUtc >= fromUtc.Value);
+        }
+
+        if (toUtc.HasValue)
+        {
+            query = query.Where(visit => visit.OccurredAtUtc <= toUtc.Value);
+        }
+
+        if (excludeBots)
+        {
+            query = query.Where(visit => visit.TrackingPage.EnableBotFiltering != true || !IsBotUserAgent(visit.UserAgent));
+        }
+
+        return query;
+    }
+
+    private static string UniqueVisitorKeySelector(PersistenceVisitEventEntity visit)
+    {
+        return string.IsNullOrWhiteSpace(visit.SessionId)
+            ? visit.VisitorFingerprint
+            : visit.SessionId;
+    }
+
     private static DateTimeOffset FloorBucket(DateTimeOffset value, int bucketSizeMinutes)
     {
         var utcValue = value.ToUniversalTime();
         var bucketTicks = TimeSpan.FromMinutes(bucketSizeMinutes).Ticks;
         var flooredTicks = utcValue.Ticks - (utcValue.Ticks % bucketTicks);
         return new DateTimeOffset(flooredTicks, TimeSpan.Zero);
+    }
+
+    private static DateTimeOffset AlignTrendBucket(
+        DateTimeOffset value,
+        TrackingVisitTrendBucketWindow window,
+        int timezoneOffsetMinutes)
+    {
+        var offset = TimeSpan.FromMinutes(timezoneOffsetMinutes);
+        var local = value.ToOffset(offset);
+
+        var localStart = window switch
+        {
+            TrackingVisitTrendBucketWindow.Hour => new DateTimeOffset(local.Year, local.Month, local.Day, local.Hour, 0, 0, offset),
+            TrackingVisitTrendBucketWindow.Day => new DateTimeOffset(local.Year, local.Month, local.Day, 0, 0, 0, offset),
+            TrackingVisitTrendBucketWindow.Week => AlignToWeekStart(local, offset),
+            _ => throw new ArgumentOutOfRangeException(nameof(window), window, "Unsupported trend window.")
+        };
+
+        return localStart.ToUniversalTime();
+    }
+
+    private static DateTimeOffset AlignToWeekStart(DateTimeOffset local, TimeSpan offset)
+    {
+        var startOfDay = new DateTimeOffset(local.Year, local.Month, local.Day, 0, 0, 0, offset);
+        var daysSinceMonday = ((int)startOfDay.DayOfWeek + 6) % 7;
+        return startOfDay.AddDays(-daysSinceMonday);
+    }
+
+    private static bool IsBotUserAgent(string? userAgent)
+    {
+        if (string.IsNullOrWhiteSpace(userAgent))
+        {
+            return false;
+        }
+
+        var normalized = userAgent.Trim();
+        return normalized.Contains("bot", StringComparison.OrdinalIgnoreCase)
+               || normalized.Contains("spider", StringComparison.OrdinalIgnoreCase)
+               || normalized.Contains("crawler", StringComparison.OrdinalIgnoreCase)
+               || normalized.Contains("slurp", StringComparison.OrdinalIgnoreCase)
+               || normalized.Contains("headless", StringComparison.OrdinalIgnoreCase);
     }
 }
