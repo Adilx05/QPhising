@@ -49,7 +49,7 @@ jobs:
           dotnet build QPhising.slnx --configuration Release --no-restore
 
       - name: Run backend tests
-        run: dotnet test backend/API.Tests/QPhising.Api.Tests.csproj --configuration Release --no-build
+        run: dotnet test backend/API.Tests/QPhising.Api.Tests.csproj --configuration Release --no-build --settings backend/API.Tests/test.runsettings --collect:"XPlat Code Coverage"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

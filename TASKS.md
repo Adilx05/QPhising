@@ -113,6 +113,7 @@ Phase 7 evidence:
 
 Phase 8 evidence:
 - 2026-04-19: Added comprehensive tracking test coverage in `backend/API.Tests` (domain invariants, application handler/validator/mapping behavior, role-aware tracking CRUD/visit ingestion/analytics integration flows, and legacy-route regression checks), introduced frontend UI smoke checker script (`scripts/check-frontend-ui-smoke.*`) for dashboard + tracking grid/editor/analytics presence, and wired smoke checks into CI.
+- 2026-04-19: Expanded backend configuration test suite with runtime/setup validator and handler unit tests plus role/validation integration coverage for `/api/configuration`; added `backend/API.Tests/test.runsettings` and CI/release coverage collection flags for consistent backend test execution settings.
 
 ## Phase 9 - Polish
 - [x] Optimize hot paths (visit ingestion throughput, analytics query performance, indexing).
