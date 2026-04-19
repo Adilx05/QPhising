@@ -69,5 +69,8 @@ export const completeCampaign = async (
 export const cancelCampaign = async (campaignId: string): Promise<CampaignResult> =>
   CampaignService.campaignCancel({ campaignId });
 
+export const deleteCampaign = async (campaignId: string): Promise<void> =>
+  CampaignService.campaignDelete({ campaignId });
+
 export const getCampaignById = async (campaignId: string): Promise<CampaignResult> =>
   CampaignService.campaignGetById({ campaignId });

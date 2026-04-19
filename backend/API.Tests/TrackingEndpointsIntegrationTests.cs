@@ -139,6 +139,39 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
     }
 
     [Fact]
+    public async Task CampaignDelete_ShouldSoftDeleteLinkedTrackingPage()
+    {
+        var adminClient = _factory.CreateClient();
+        adminClient.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
+
+        var createCampaignResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
+        {
+            name = "Delete Cascade Campaign",
+            trackingPageSlug = "delete-cascade-campaign",
+            trackingPageTitle = "Delete Cascade Landing",
+            trackingPageDescription = "Cascade soft-delete check",
+            templateId = (Guid?)null,
+            htmlContent = "<h1>Landing</h1>",
+            validFromUtc = (DateTimeOffset?)null,
+            validUntilUtc = (DateTimeOffset?)null
+        });
+
+        createCampaignResponse.EnsureSuccessStatusCode();
+        var createPayload = JsonNode.Parse(await createCampaignResponse.Content.ReadAsStringAsync())!.AsObject();
+        var campaignId = createPayload["id"]!.GetValue<Guid>();
+        var trackingPageId = createPayload["trackingPageId"]!.GetValue<Guid>();
+
+        var deleteCampaignResponse = await adminClient.DeleteAsync($"/api/campaigns/{campaignId}");
+        Assert.Equal(HttpStatusCode.NoContent, deleteCampaignResponse.StatusCode);
+
+        var campaignAfterDeleteResponse = await adminClient.GetAsync($"/api/campaigns/{campaignId}");
+        Assert.Equal(HttpStatusCode.NotFound, campaignAfterDeleteResponse.StatusCode);
+
+        var trackingPageAfterDeleteResponse = await adminClient.GetAsync($"/api/tracking/pages/{trackingPageId}");
+        Assert.Equal(HttpStatusCode.NotFound, trackingPageAfterDeleteResponse.StatusCode);
+    }
+
+    [Fact]
     public async Task LegacyPhishingEmailRoutes_ShouldReturnNotFound()
     {
         var client = _factory.CreateClient();
