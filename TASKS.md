@@ -21,13 +21,16 @@ Phase 0 evidence:
 - 2026-04-19: Removed campaign target email workflow across Domain/Application/API/Frontend, updated proxy contract guards, and refreshed proxy validation OpenAPI artifact to remove obsolete target surfaces.
 
 ## Phase 1 - Domain & Database
-- [ ] Define `TrackingPage` aggregate (identity, slug, metadata, publish state, ownership).
-- [ ] Define `VisitEvent` aggregate/entity (timestamp, page reference, visitor fingerprint/session, user-agent, referrer, IP-hash policy).
-- [ ] Define optional `PageSettings` model (retention, privacy options, bot filtering, UTM capture toggles).
-- [ ] Add domain invariants and value objects for slugs, URLs, and tracking identifiers.
-- [ ] Implement EF Core entity configurations for tracking models.
-- [ ] Add database migration(s) for tracking pages, visit events, and supporting indexes.
-- [ ] Validate migration rollback/forward strategy for local and CI environments.
+- [x] Define `TrackingPage` aggregate (identity, slug, metadata, publish state, ownership).
+- [x] Define `VisitEvent` aggregate/entity (timestamp, page reference, visitor fingerprint/session, user-agent, referrer, IP-hash policy).
+- [x] Define optional `PageSettings` model (retention, privacy options, bot filtering, UTM capture toggles).
+- [x] Add domain invariants and value objects for slugs, URLs, and tracking identifiers.
+- [x] Implement EF Core entity configurations for tracking models.
+- [x] Add database migration(s) for tracking pages, visit events, and supporting indexes.
+- [x] Validate migration rollback/forward strategy for local and CI environments.
+
+Phase 1 evidence:
+- 2026-04-19: Added tracking domain models (TrackingPageAggregate, VisitEventEntity, PageSettings), new EF Core persistence entities/configuration, and migration `20260419101500_AddTrackingPersistence` with explicit `Down` rollback for CI/local forward-backward migration verification.
 
 ## Phase 2 - Application
 - [ ] Implement commands for tracking page create/update/publish/archive/delete flows.
