@@ -33,13 +33,17 @@ Phase 1 evidence:
 - 2026-04-19: Added tracking domain models (TrackingPageAggregate, VisitEventEntity, PageSettings), new EF Core persistence entities/configuration, and migration `20260419101500_AddTrackingPersistence` with explicit `Down` rollback for CI/local forward-backward migration verification.
 
 ## Phase 2 - Application
-- [ ] Implement commands for tracking page create/update/publish/archive/delete flows.
-- [ ] Implement commands for visit ingestion and deduplication guard behavior.
-- [ ] Implement queries for page detail/list and analytics read models.
-- [ ] Add FluentValidation validators for all tracking commands/queries.
-- [ ] Define DTOs/contracts for tracking page CRUD and analytics outputs.
-- [ ] Configure mapping profiles between Domain, persistence models, and DTOs.
-- [ ] Ensure handlers are cancellation-aware and use async I/O patterns.
+- [x] Implement commands for tracking page create/update/publish/archive/delete flows.
+- [x] Implement commands for visit ingestion and deduplication guard behavior.
+- [x] Implement queries for page detail/list and analytics read models.
+- [x] Add FluentValidation validators for all tracking commands/queries.
+- [x] Define DTOs/contracts for tracking page CRUD and analytics outputs.
+- [x] Configure mapping profiles between Domain, persistence models, and DTOs.
+- [x] Ensure handlers are cancellation-aware and use async I/O patterns.
+
+
+Phase 2 evidence:
+- 2026-04-19: Added Tracking CQRS command/query flows with validation, DTO contracts, mapping profiles, EF Core repositories, and visit deduplication/analytics read models for tracking pages and visit events.
 
 ## Phase 3 - API
 - [ ] Implement public landing endpoint `GET /p/{slug}` for page resolution and visitor flow entry.
