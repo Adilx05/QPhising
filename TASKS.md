@@ -83,12 +83,15 @@ Phase 5 evidence:
 - 2026-04-19: Fixed analytics compile-time regressions by normalizing unique-visitor selector translation in EF Core repository and removing index-based access on IReadOnlyCollection in overview query handler.
 
 ## Phase 6 - Security
-- [ ] Enforce authentication for all admin and analytics management endpoints.
-- [ ] Apply role-based authorization rules for Admin, Operator, Viewer.
-- [ ] Add rate limiting for public tracking and visit ingestion endpoints.
-- [ ] Harden request validation and payload size constraints.
-- [ ] Ensure sensitive visitor fields follow privacy policy (hashing/masking/retention controls).
-- [ ] Add security-focused logging/auditing for access and anomaly events.
+- [x] Enforce authentication for all admin and analytics management endpoints.
+- [x] Apply role-based authorization rules for Admin, Operator, Viewer.
+- [x] Add rate limiting for public tracking and visit ingestion endpoints.
+- [x] Harden request validation and payload size constraints.
+- [x] Ensure sensitive visitor fields follow privacy policy (hashing/masking/retention controls).
+- [x] Add security-focused logging/auditing for access and anomaly events.
+
+Phase 6 evidence:
+- 2026-04-19: Finalized policy-based authentication/authorization coverage for management + analytics endpoints, added fixed-window rate limiting policies on public tracking routes, enforced visit payload constraints (timestamp validity + request body size), moved IP hash derivation to server-side privacy service with optional pepper, and added audit middleware logging for 401/403/429 security events.
 
 ## Phase 7 - DevOps
 - [ ] Provide docker-compose setup for API, Gateway, database, and optional Redis.

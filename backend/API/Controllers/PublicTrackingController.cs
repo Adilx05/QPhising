@@ -1,5 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using QPhising.Api.Security;
 using QPhising.Application.Contracts.Responses.Tracking;
 using QPhising.Application.CQRS.Queries.Tracking;
 
@@ -18,6 +20,7 @@ public sealed class PublicTrackingController : ControllerBase
     }
 
     [HttpGet("{slug}", Name = "Tracking_PublicLandingBySlug")]
+    [EnableRateLimiting(RateLimitPolicies.PublicTrackingLanding)]
     [ProducesResponseType(typeof(TrackingLandingPageResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public Task<TrackingLandingPageResult> ResolveLandingPage([FromRoute] string slug, CancellationToken cancellationToken) =>
