@@ -83,7 +83,7 @@
     <div class="md:col-span-2">
       <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Önizleme' : 'Preview' }}</label>
       <div class="rounded-xl border border-slate-200 bg-white p-3">
-        <iframe class="h-72 w-full rounded-lg" [srcdoc]="previewHtml()"></iframe>
+        <iframe class="h-72 w-full rounded-lg" [src]="previewUrl()"></iframe>
       </div>
     </div>
   </div>

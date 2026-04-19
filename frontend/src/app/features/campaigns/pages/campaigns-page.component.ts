@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -25,7 +26,7 @@ import { cancelCampaign, completeCampaign, createCampaign, deleteCampaign, listC
   imports: [CommonModule, FormsModule, RouterLink, ButtonModule, DropdownModule, InputTextModule, InputTextarea],
   templateUrl: './campaigns-page.component.html'
 })
-export class CampaignsPageComponent {
+export class CampaignsPageComponent implements OnDestroy {
   private readonly translations: Record<AppLanguage, Record<string, string>> = {
     tr: {
       feedbackRefreshed: 'Senaryo listesi güncellendi.',
@@ -55,6 +56,8 @@ export class CampaignsPageComponent {
   protected readonly templates = signal<TemplateResult[]>([]);
   protected readonly canOperate = computed(() => this.authSessionService.hasRequiredRole('Operator'));
   protected readonly canDelete = computed(() => this.authSessionService.hasRequiredRole('Admin'));
+  private readonly previewUrlCache = new Map<string, SafeResourceUrl>();
+  private readonly objectUrls = new Set<string>();
 
   protected readonly createForm = {
     name: '',
@@ -81,9 +84,14 @@ export class CampaignsPageComponent {
 
   public constructor(
     private readonly authSessionService: AuthSessionService,
-    private readonly userPreferencesService: UserPreferencesService
+    private readonly userPreferencesService: UserPreferencesService,
+    private readonly sanitizer: DomSanitizer
   ) {
     void this.refresh();
+  }
+
+  public ngOnDestroy(): void {
+    this.revokePreviewUrls();
   }
 
   protected activeLanguage(): AppLanguage {
@@ -230,18 +238,41 @@ export class CampaignsPageComponent {
     }
   }
 
-  protected previewHtml(): string {
+  protected previewUrl(): SafeResourceUrl {
     const customHtml = this.createForm.htmlContent.trim();
+    let html = '';
+
     if (customHtml.length > 0) {
-      return customHtml;
+      html = customHtml;
+    } else {
+      const selectedTemplateHtml = this.templates()
+        .find((template) => template.id === this.createForm.templateId)
+        ?.htmlContent
+        ?.trim();
+
+      if (selectedTemplateHtml && selectedTemplateHtml.length > 0) {
+        html = selectedTemplateHtml;
+      } else {
+        html = this.t('previewEmpty');
+      }
     }
 
-    const selectedTemplateHtml = this.templates()
-      .find((template) => template.id === this.createForm.templateId)
-      ?.htmlContent
-      ?.trim();
+    if (html.length === 0) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
+    }
 
-    return selectedTemplateHtml && selectedTemplateHtml.length > 0 ? selectedTemplateHtml : this.t('previewEmpty');
+    const existing = this.previewUrlCache.get(html);
+    if (existing) {
+      return existing;
+    }
+
+    const objectUrl = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    this.objectUrls.add(objectUrl);
+
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+    this.previewUrlCache.set(html, safeUrl);
+
+    return safeUrl;
   }
 
   private toUtcIso(value: string): string | null {
@@ -288,5 +319,13 @@ export class CampaignsPageComponent {
     } finally {
       this.isBusy.set(false);
     }
+  }
+
+  private revokePreviewUrls(): void {
+    for (const url of this.objectUrls) {
+      URL.revokeObjectURL(url);
+    }
+    this.objectUrls.clear();
+    this.previewUrlCache.clear();
   }
 }

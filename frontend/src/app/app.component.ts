@@ -95,14 +95,6 @@ import { SetupReadinessState, SetupService } from './shared/proxy';
                 <option value="en">English</option>
               </select>
 
-              <button
-                type="button"
-                class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
-                (click)="toggleTheme()"
-              >
-                <i class="pi" [ngClass]="isDarkTheme() ? 'pi-sun' : 'pi-moon'"></i>
-                {{ isDarkTheme() ? t('lightMode') : t('darkMode') }}
-              </button>
 
               <div class="hidden items-center gap-3 rounded-full border px-3 py-1.5 text-xs font-medium lg:flex"
                   [ngClass]="isAuthenticated() ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'">

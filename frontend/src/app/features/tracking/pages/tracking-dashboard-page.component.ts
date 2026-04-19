@@ -55,7 +55,7 @@ interface AnalyticsFilters {
     <section class="mb-6">
       <h1 class="page-title">{{ tx('Takip Analitik Gösterge Paneli', 'Tracking Analytics Dashboard') }}</h1>
       <p class="page-subtitle">
-        {{ tx('Takip sayfalarını, yayın yaşam döngüsünü ve ziyaret analitiğini generated TrackingService proxyleri ile yönetin.', 'Manage tracking pages, publish lifecycle, and visit analytics using generated TrackingService proxies.') }}
+        {{ tx('Takip sayfalarını, yayın yaşam döngüsünü ve ziyaret analitiğini yönetin.', 'Manage tracking pages, publish lifecycle, and visit analytics.') }}
       </p>
     </section>
 

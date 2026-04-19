@@ -32,7 +32,7 @@ interface TemplateDraft {
   template: `
     <section class="mb-6">
       <h1 class="page-title">{{ tx('HTML Şablon Yönetimi', 'HTML Template Management') }}</h1>
-      <p class="page-subtitle">{{ tx('Bu ekran e-posta yerine doğrudan HTML sayfa şablonları üretmek için kullanılır.', 'This page is used to manage direct HTML page templates (not email templates).') }}</p>
+      <p class="page-subtitle">{{ tx('Bu ekran doğrudan HTML sayfa şablonları üretmek için kullanılır.', 'This page is used to manage direct HTML page templates.') }}</p>
     </section>
 
     <section class="surface-card p-5">
