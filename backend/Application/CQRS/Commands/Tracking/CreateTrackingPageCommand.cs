@@ -1,5 +1,6 @@
 using QPhising.Application.Contracts.Abstractions.Persistence;
 using QPhising.Application.Contracts.Responses.Tracking;
+using QPhising.Domain.Tracking.Enums;
 
 namespace QPhising.Application.CQRS.Commands.Tracking;
 
@@ -13,6 +14,7 @@ public sealed record CreateTrackingPageCommand(
     DateTimeOffset? ValidFromUtc,
     DateTimeOffset? ValidUntilUtc,
     int? RetentionDays,
-    bool? MaskIpAddress,
+    bool? CaptureIpAddress,
+    IpAddressHashPolicy? IpAddressHashPolicy,
     bool? EnableBotFiltering,
     bool? CaptureUtmParameters) : ITransactionalRequest<TrackingPageResult>;

@@ -1,3 +1,5 @@
+using QPhising.Domain.Tracking.Enums;
+
 namespace QPhising.Application.Contracts.Responses.Tracking;
 
 public sealed record TrackingLandingPageResult(
@@ -10,4 +12,6 @@ public sealed record TrackingLandingPageResult(
     string? TemplateHtmlContent,
     string? CustomHtmlContent,
     DateTimeOffset? ValidFromUtc,
-    DateTimeOffset? ValidUntilUtc);
+    DateTimeOffset? ValidUntilUtc,
+    bool CaptureIpAddress,
+    IpAddressHashPolicy IpAddressHashPolicy);

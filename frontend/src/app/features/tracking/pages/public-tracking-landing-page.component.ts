@@ -66,7 +66,7 @@ export class PublicTrackingLandingPageComponent {
           visitorFingerprint: this.buildVisitorFingerprint(),
           userAgent: navigator.userAgent,
           referrerUrl: document.referrer || window.location.href,
-          ipAddressHashPolicy: 0,
+          ipAddressHashPolicy: landing.captureIpAddress ? (landing.ipAddressHashPolicy ?? 2) : 0,
           deduplicationWindowSeconds: 120
         }
       });

@@ -13,7 +13,8 @@ import {
   type CampaignResult,
   TrackingService,
   TemplateService,
-  type TemplateResult
+  type TemplateResult,
+  IpAddressHashPolicy
 } from '../../../shared/proxy';
 import {
   cancelCampaign,
@@ -31,6 +32,7 @@ import {
   templateUrl: './campaigns-page.component.html'
 })
 export class CampaignsPageComponent {
+  protected readonly IpAddressHashPolicy = IpAddressHashPolicy;
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
   protected readonly publicLinks = signal<{ slugUrl: string; idUrl: string } | null>(null);
@@ -47,7 +49,8 @@ export class CampaignsPageComponent {
     validFromUtc: '',
     validUntilUtc: '',
     retentionDays: 365,
-    maskIpAddress: true,
+    captureIpAddress: true,
+    ipAddressHashPolicy: IpAddressHashPolicy._2,
     enableBotFiltering: true,
     captureUtmParameters: true
   };
@@ -108,7 +111,8 @@ export class CampaignsPageComponent {
             validFromUtc: page.validFromUtc ?? this.toUtcIso(this.createForm.validFromUtc),
             validUntilUtc: page.validUntilUtc ?? this.toUtcIso(this.createForm.validUntilUtc),
             retentionDays: this.createForm.retentionDays,
-            maskIpAddress: this.createForm.maskIpAddress,
+            captureIpAddress: this.createForm.captureIpAddress,
+            ipAddressHashPolicy: this.createForm.captureIpAddress ? this.createForm.ipAddressHashPolicy : IpAddressHashPolicy._0,
             enableBotFiltering: this.createForm.enableBotFiltering,
             captureUtmParameters: this.createForm.captureUtmParameters
           }
@@ -129,7 +133,8 @@ export class CampaignsPageComponent {
       this.createForm.validFromUtc = '';
       this.createForm.validUntilUtc = '';
       this.createForm.retentionDays = 365;
-      this.createForm.maskIpAddress = true;
+      this.createForm.captureIpAddress = true;
+      this.createForm.ipAddressHashPolicy = IpAddressHashPolicy._2;
       this.createForm.enableBotFiltering = true;
       this.createForm.captureUtmParameters = true;
       this.feedback.set('Campaign oluşturuldu. Public linkler hazırlandı.');

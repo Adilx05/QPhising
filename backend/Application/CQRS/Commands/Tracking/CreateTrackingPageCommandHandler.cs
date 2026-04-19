@@ -6,6 +6,7 @@ using QPhising.Application.Contracts.Responses.Tracking;
 using QPhising.Application.Mapping.Tracking;
 using QPhising.Domain.Tracking.Aggregates;
 using QPhising.Domain.Tracking.Models;
+using QPhising.Domain.Tracking.Enums;
 using QPhising.Domain.Tracking.ValueObjects;
 
 namespace QPhising.Application.CQRS.Commands.Tracking;
@@ -35,7 +36,7 @@ public sealed class CreateTrackingPageCommandHandler : IRequestHandler<CreateTra
 
         var templateId = await ResolveTemplateIdAsync(request.TemplateId, cancellationToken);
         var ownerId = ResolveOwnerId(request.OwnerId);
-        var settings = BuildSettings(request.RetentionDays, request.MaskIpAddress, request.EnableBotFiltering, request.CaptureUtmParameters);
+        var settings = BuildSettings(request.RetentionDays, request.CaptureIpAddress, request.IpAddressHashPolicy, request.EnableBotFiltering, request.CaptureUtmParameters);
 
         var aggregate = new TrackingPageAggregate(
             Guid.NewGuid(),
@@ -85,16 +86,17 @@ public sealed class CreateTrackingPageCommandHandler : IRequestHandler<CreateTra
         throw new InvalidOperationException("Tracking page owner could not be resolved from request or authenticated user context.");
     }
 
-    private static PageSettings? BuildSettings(int? retentionDays, bool? maskIpAddress, bool? enableBotFiltering, bool? captureUtmParameters)
+    private static PageSettings? BuildSettings(int? retentionDays, bool? captureIpAddress, IpAddressHashPolicy? ipAddressHashPolicy, bool? enableBotFiltering, bool? captureUtmParameters)
     {
-        if (!retentionDays.HasValue && !maskIpAddress.HasValue && !enableBotFiltering.HasValue && !captureUtmParameters.HasValue)
+        if (!retentionDays.HasValue && !captureIpAddress.HasValue && !ipAddressHashPolicy.HasValue && !enableBotFiltering.HasValue && !captureUtmParameters.HasValue)
         {
             return null;
         }
 
         return new PageSettings(
             retentionDays ?? 365,
-            maskIpAddress ?? true,
+            captureIpAddress ?? true,
+            ipAddressHashPolicy ?? IpAddressHashPolicy.Sha256,
             enableBotFiltering ?? true,
             captureUtmParameters ?? true);
     }

@@ -136,6 +136,7 @@ Phase 9 evidence:
 - [ ] TASKS.md statuses are accurate and evidence is documented.
 
 ## Incremental Feature Requests
+- [x] Add configurable visitor IP capture policy (off/plain/hashed) and ensure visit ingestion records IP according to tracking-page settings.
 - [x] Rework campaign creation flow to create a real tracking page (template-based or blank) without manual GUID entry in UI.
 - [x] Add campaign detail route and screen reachable from campaign listing cards.
 - [x] Persist campaign-to-tracking-page relationship in Domain + EF Core schema.
@@ -152,3 +153,5 @@ Incremental evidence:
 - 2026-04-19: Fixed remaining analytics 409/runtime faults by removing parallel query execution against a shared EF Core DbContext in tracking analytics handlers; wired public `/p/:slug` page load to call visit-ingestion API with generated session/fingerprint identifiers; and made campaign detail public links visible/clickable as absolute URLs.
 - 2026-04-19: Added anonymous slug-based visit ingestion route (`POST /api/tracking/pages/{slug}/visits`) in API + Gateway so slug-entry traffic can record visits without JWT, while still reusing public landing-page accessibility checks.
 - 2026-04-19: Stabilized unique-visitor analytics counting by replacing string-interpolated distinct keys with EF-translatable typed key projection (`KeyType` + `KeyValue`) in `EfCoreVisitEventRepository`, resolving `InvalidOperationException` during unique visitor count queries.
+
+- 2026-04-19: Added tracking-page IP capture controls (`CaptureIpAddress` + `IpAddressHashPolicy` plain/SHA-256), wired landing-page visit capture to apply page policy, and fixed server-side ingestion/storage mapping so IP data is persisted according to selected privacy mode.

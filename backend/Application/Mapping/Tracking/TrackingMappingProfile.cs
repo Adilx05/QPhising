@@ -26,7 +26,8 @@ public static class TrackingMappingProfile
                 ? null
                 : new TrackingPageSettingsResult(
                     aggregate.Settings.RetentionDays,
-                    aggregate.Settings.MaskIpAddress,
+                    aggregate.Settings.CaptureIpAddress,
+                    aggregate.Settings.IpAddressHashPolicy,
                     aggregate.Settings.EnableBotFiltering,
                     aggregate.Settings.CaptureUtmParameters),
             CreatedAtUtc: aggregate.CreatedAtUtc,

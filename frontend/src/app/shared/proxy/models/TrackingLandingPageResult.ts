@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { IpAddressHashPolicy } from './IpAddressHashPolicy';
 export type TrackingLandingPageResult = {
   trackingPageId?: string;
   slug?: string | null;
@@ -13,5 +14,6 @@ export type TrackingLandingPageResult = {
   customHtmlContent?: string | null;
   validFromUtc?: string | null;
   validUntilUtc?: string | null;
+  captureIpAddress?: boolean;
+  ipAddressHashPolicy?: IpAddressHashPolicy;
 };
-

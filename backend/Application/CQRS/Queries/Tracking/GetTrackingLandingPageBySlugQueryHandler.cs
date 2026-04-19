@@ -3,6 +3,7 @@ using QPhising.Application.Contracts.Abstractions.Template;
 using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.Contracts.Responses.Tracking;
 using QPhising.Domain.Templates.Enums;
+using QPhising.Domain.Tracking.Enums;
 
 namespace QPhising.Application.CQRS.Queries.Tracking;
 
@@ -50,7 +51,9 @@ public sealed class GetTrackingLandingPageBySlugQueryHandler : IRequestHandler<G
             templateHtmlContent,
             aggregate.CustomHtmlContent,
             aggregate.ValidFromUtc,
-            aggregate.ValidUntilUtc);
+            aggregate.ValidUntilUtc,
+            aggregate.Settings?.CaptureIpAddress ?? true,
+            aggregate.Settings?.IpAddressHashPolicy ?? IpAddressHashPolicy.Sha256);
     }
 
     private async Task<QPhising.Domain.Tracking.Aggregates.TrackingPageAggregate?> ResolveAggregateAsync(GetTrackingLandingPageBySlugQuery request, CancellationToken cancellationToken)

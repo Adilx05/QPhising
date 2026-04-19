@@ -2,10 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { IpAddressHashPolicy } from './IpAddressHashPolicy';
 export type TrackingPageSettingsResult = {
   retentionDays?: number;
-  maskIpAddress?: boolean;
+  captureIpAddress?: boolean;
+  ipAddressHashPolicy?: IpAddressHashPolicy;
   enableBotFiltering?: boolean;
   captureUtmParameters?: boolean;
 };
-
