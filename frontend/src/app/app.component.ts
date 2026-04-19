@@ -4,6 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthSessionService } from './core/auth/auth-session';
+import { OidcAuthService } from './core/auth/oidc-auth.service';
 
 @Component({
   selector: 'app-root',
@@ -49,6 +50,21 @@ import { AuthSessionService } from './core/auth/auth-session';
             <span>Templates</span>
           </a>
         </nav>
+
+        <section class="mx-4 mb-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+          <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">User</h3>
+          <p class="mt-2 text-sm font-semibold text-slate-900">{{ getUserFullName() }}</p>
+          <p class="mt-1 text-xs text-slate-600">Role: {{ getUserRole() }}</p>
+          <button
+            type="button"
+            class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            [disabled]="!isAuthenticated()"
+            (click)="logout()"
+          >
+            <i class="pi pi-sign-out"></i>
+            Logout
+          </button>
+        </section>
       </aside>
 
       <div class="flex min-h-screen flex-1 flex-col">
@@ -90,6 +106,7 @@ export class AppComponent {
 
   public constructor(
     private readonly authSessionService: AuthSessionService,
+    private readonly oidcAuthService: OidcAuthService,
     private readonly router: Router
   ) {
     this.currentUrl = this.resolveInitialUrl();
@@ -102,6 +119,18 @@ export class AppComponent {
 
   protected isAuthenticated(): boolean {
     return this.authSessionService.getAuthSession().isAuthenticated;
+  }
+
+  protected getUserFullName(): string {
+    return this.authSessionService.getUserProfile().fullName;
+  }
+
+  protected getUserRole(): string {
+    return this.authSessionService.getUserProfile().primaryRole ?? 'None';
+  }
+
+  protected async logout(): Promise<void> {
+    await this.oidcAuthService.logout();
   }
 
   protected canViewConfiguration(): boolean {

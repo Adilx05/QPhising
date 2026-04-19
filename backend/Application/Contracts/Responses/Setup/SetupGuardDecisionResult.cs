@@ -26,6 +26,9 @@ public sealed record SetupGuardDecisionResult(
     public static SetupGuardDecisionResult SetupRequired() =>
         FromAccessState(SetupAccessState.SetupRequired, isSetupCompleted: false);
 
+    public static SetupGuardDecisionResult MainApplicationAccessibleWithoutWizard() =>
+        FromAccessState(SetupAccessState.MainApplicationAccessible, isSetupCompleted: true);
+
     private static SetupGuardDecisionResult FromAccessState(SetupAccessState accessState, bool isSetupCompleted)
     {
         var allowMainApplication = accessState == SetupAccessState.MainApplicationAccessible;

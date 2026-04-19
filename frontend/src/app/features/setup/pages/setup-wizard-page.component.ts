@@ -10,8 +10,7 @@ import {
   getSetupStatus,
   saveSetupConfiguration,
   testDatabaseConnection,
-  testKeycloakConnection,
-  testRedisConnection
+  testKeycloakConnection
 } from '../data-access/setup-flow.client';
 
 @Component({
@@ -25,13 +24,11 @@ export class SetupWizardPageComponent {
   protected readonly status = signal<SetupStatusResult | null>(null);
   protected readonly feedback = signal<string | null>(null);
   protected readonly dbTestResult = signal<SetupDependencyTestResult | null>(null);
-  protected readonly redisTestResult = signal<SetupDependencyTestResult | null>(null);
   protected readonly keycloakTestResult = signal<SetupDependencyTestResult | null>(null);
   protected readonly setupCompleted = computed(() => this.status()?.readinessState === SetupReadinessState._2);
 
   protected readonly form = this.formBuilder.nonNullable.group({
     databaseConnectionString: ['', [Validators.required]],
-    redisConnectionString: ['', [Validators.required]],
     keycloakAuthority: ['', [Validators.required]],
     keycloakRealm: ['', [Validators.required]],
     keycloakClientId: ['', [Validators.required]],
@@ -46,13 +43,6 @@ export class SetupWizardPageComponent {
     await this.executeAsync(async () => {
       this.dbTestResult.set(await testDatabaseConnection(this.form.controls.databaseConnectionString.getRawValue()));
       this.feedback.set('Database bağlantı testi tamamlandı.');
-    });
-  }
-
-  protected async testRedis(): Promise<void> {
-    await this.executeAsync(async () => {
-      this.redisTestResult.set(await testRedisConnection(this.form.controls.redisConnectionString.getRawValue()));
-      this.feedback.set('Redis bağlantı testi tamamlandı.');
     });
   }
 

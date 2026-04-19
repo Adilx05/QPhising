@@ -7,10 +7,14 @@ namespace QPhising.Application.CQRS.Queries.Setup;
 public sealed class GetSetupGuardDecisionQueryHandler : IRequestHandler<GetSetupGuardDecisionQuery, SetupGuardDecisionResult>
 {
     private readonly ISetupConfigurationRepository _setupConfigurationRepository;
+    private readonly ISetupBootstrapConfigurationReader _setupBootstrapConfigurationReader;
 
-    public GetSetupGuardDecisionQueryHandler(ISetupConfigurationRepository setupConfigurationRepository)
+    public GetSetupGuardDecisionQueryHandler(
+        ISetupConfigurationRepository setupConfigurationRepository,
+        ISetupBootstrapConfigurationReader setupBootstrapConfigurationReader)
     {
         _setupConfigurationRepository = setupConfigurationRepository;
+        _setupBootstrapConfigurationReader = setupBootstrapConfigurationReader;
     }
 
     public async Task<SetupGuardDecisionResult> Handle(
@@ -18,8 +22,13 @@ public sealed class GetSetupGuardDecisionQueryHandler : IRequestHandler<GetSetup
         CancellationToken cancellationToken)
     {
         var aggregate = await _setupConfigurationRepository.GetCurrentAsync(cancellationToken);
-        return aggregate is null
-            ? SetupGuardDecisionResult.SetupRequired()
-            : SetupGuardDecisionResult.FromAggregate(aggregate);
+        if (aggregate is not null)
+        {
+            return SetupGuardDecisionResult.FromAggregate(aggregate);
+        }
+
+        return _setupBootstrapConfigurationReader.IsBootstrapConfigurationReady()
+            ? SetupGuardDecisionResult.MainApplicationAccessibleWithoutWizard()
+            : SetupGuardDecisionResult.SetupRequired();
     }
 }

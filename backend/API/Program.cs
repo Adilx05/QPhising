@@ -267,6 +267,7 @@ builder.Services.AddScoped<ITrackingPageRepository, EfCoreTrackingPageRepository
 builder.Services.AddScoped<IVisitEventRepository, EfCoreVisitEventRepository>();
 builder.Services.AddScoped<IProxyContractDriftValidator, FileTimestampProxyContractDriftValidator>();
 builder.Services.AddScoped<ISetupDependencyConnectionTester, SetupDependencyConnectionTester>();
+builder.Services.AddSingleton<ISetupBootstrapConfigurationReader, ConfigurationSetupBootstrapConfigurationReader>();
 builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>();
 builder.Services.AddScoped<IRuntimeConfigurationSecretCipher, DataProtectionRuntimeConfigurationSecretCipher>();
 builder.Services.AddSingleton<ISetupConfigurationRepository, JsonFileSetupConfigurationRepository>();

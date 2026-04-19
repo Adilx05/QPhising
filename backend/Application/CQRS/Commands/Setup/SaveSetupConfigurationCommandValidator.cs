@@ -10,9 +10,6 @@ public sealed class SaveSetupConfigurationCommandValidator : AbstractValidator<S
             .NotEmpty()
             .WithMessage("Database connection string is required.");
 
-        RuleFor(command => command.RedisConnectionString)
-            .NotEmpty()
-            .WithMessage("Redis connection string is required.");
 
         RuleFor(command => command.KeycloakAuthority)
             .NotEmpty()

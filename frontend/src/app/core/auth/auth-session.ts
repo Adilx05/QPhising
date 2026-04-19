@@ -18,6 +18,10 @@ interface JwtPayloadShape {
   roles?: unknown;
   realm_access?: KeycloakRealmAccess;
   resource_access?: Record<string, KeycloakResourceAccess>;
+  given_name?: unknown;
+  family_name?: unknown;
+  name?: unknown;
+  preferred_username?: unknown;
 }
 
 const normalizeRole = (value: string): IdentityRole | null => {
@@ -89,6 +93,16 @@ export interface AuthSession {
   roles: Set<IdentityRole>;
 }
 
+export interface AuthUserProfile {
+  fullName: string;
+  primaryRole: IdentityRole | null;
+}
+
+const claimAsTrimmedString = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim().length > 0
+    ? value.trim()
+    : null;
+
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
   public constructor(private readonly oidcAuthService: OidcAuthService) {}
@@ -125,5 +139,33 @@ export class AuthSessionService {
     }
 
     return false;
+  }
+
+  public getUserProfile(): AuthUserProfile {
+    const session = this.getAuthSession();
+
+    if (!session.isAuthenticated) {
+      return {
+        fullName: 'Guest User',
+        primaryRole: null
+      };
+    }
+
+    const claims = this.oidcAuthService.getTokenClaims() as JwtPayloadShape;
+    const givenName = claimAsTrimmedString(claims.given_name);
+    const familyName = claimAsTrimmedString(claims.family_name);
+    const name = claimAsTrimmedString(claims.name);
+    const preferredUsername = claimAsTrimmedString(claims.preferred_username);
+
+    const fullName = (givenName && familyName)
+      ? `${givenName} ${familyName}`
+      : name ?? preferredUsername ?? 'Authenticated User';
+
+    const primaryRole = [...session.roles].sort((left, right) => roleRanks[right] - roleRanks[left])[0] ?? null;
+
+    return {
+      fullName,
+      primaryRole
+    };
   }
 }

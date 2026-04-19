@@ -27,7 +27,6 @@ export class RuntimeConfigurationPageComponent {
 
   protected readonly form = this.formBuilder.nonNullable.group({
     databaseConnectionString: ['', [Validators.required]],
-    redisConnectionString: ['', [Validators.required]],
     keycloakAuthority: ['', [Validators.required]],
     keycloakRealm: ['', [Validators.required]],
     keycloakClientId: ['', [Validators.required]],

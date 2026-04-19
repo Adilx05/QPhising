@@ -16,11 +16,6 @@
         <input id="runtimeDatabaseConnectionString" pInputText class="w-full" formControlName="databaseConnectionString" />
       </div>
 
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-slate-700" for="runtimeRedisConnectionString">Redis Connection String</label>
-        <input id="runtimeRedisConnectionString" pInputText class="w-full" formControlName="redisConnectionString" />
-      </div>
-
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700" for="runtimeKeycloakAuthority">Keycloak Authority</label>
@@ -69,12 +64,6 @@
           <span>Database</span>
           <span class="status-chip" [ngClass]="status()?.isDatabaseConfigured ? 'status-chip-success' : 'status-chip-warning'">
             {{ status()?.isDatabaseConfigured ? 'Configured' : 'Missing' }}
-          </span>
-        </li>
-        <li class="flex items-center justify-between gap-2">
-          <span>Redis</span>
-          <span class="status-chip" [ngClass]="status()?.isRedisConfigured ? 'status-chip-success' : 'status-chip-warning'">
-            {{ status()?.isRedisConfigured ? 'Configured' : 'Missing' }}
           </span>
         </li>
         <li class="flex items-center justify-between gap-2">

@@ -88,7 +88,7 @@ public sealed class SetupAggregate
         ReadinessState = SetupReadinessState.Ready;
     }
 
-    public bool IsFullyConfigured() => IsDatabaseConfigured && IsKeycloakConfigured && IsRedisConfigured;
+    public bool IsFullyConfigured() => IsDatabaseConfigured && IsKeycloakConfigured;
 
     private void UpdateReadinessState()
     {
@@ -98,7 +98,7 @@ public sealed class SetupAggregate
             return;
         }
 
-        if (!IsDatabaseConfigured && !IsKeycloakConfigured && !IsRedisConfigured)
+        if (!IsDatabaseConfigured && !IsKeycloakConfigured)
         {
             ReadinessState = SetupReadinessState.NotStarted;
             return;

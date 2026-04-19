@@ -107,7 +107,6 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
     private static RuntimeConfigurationSnapshot ToSnapshot(RuntimeConfigurationAggregate aggregate)
     {
         if (aggregate.DatabaseConnectionCipherText is null ||
-            aggregate.RedisConnectionCipherText is null ||
             aggregate.KeycloakClientSecretCipherText is null ||
             string.IsNullOrWhiteSpace(aggregate.KeycloakAuthority) ||
             string.IsNullOrWhiteSpace(aggregate.KeycloakRealm) ||
@@ -118,7 +117,7 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
 
         return new RuntimeConfigurationSnapshot(
             aggregate.DatabaseConnectionCipherText.CipherText,
-            aggregate.RedisConnectionCipherText.CipherText,
+            aggregate.RedisConnectionCipherText?.CipherText,
             aggregate.KeycloakAuthority,
             aggregate.KeycloakRealm,
             aggregate.KeycloakClientId,
@@ -128,7 +127,7 @@ public sealed class JsonFileRuntimeConfigurationRepository : IRuntimeConfigurati
 
     private sealed record RuntimeConfigurationSnapshot(
         string DatabaseConnectionCipherText,
-        string RedisConnectionCipherText,
+        string? RedisConnectionCipherText,
         string KeycloakAuthority,
         string KeycloakRealm,
         string KeycloakClientId,
