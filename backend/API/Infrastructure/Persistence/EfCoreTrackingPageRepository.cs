@@ -76,7 +76,8 @@ public sealed class EfCoreTrackingPageRepository : ITrackingPageRepository
         existing.ValidUntilUtc = aggregate.ValidUntilUtc;
         existing.PublishState = (int)aggregate.PublishState;
         existing.RetentionDays = aggregate.Settings?.RetentionDays;
-        existing.MaskIpAddress = aggregate.Settings?.MaskIpAddress;
+        existing.CaptureIpAddress = aggregate.Settings?.CaptureIpAddress;
+        existing.IpAddressHashPolicy = aggregate.Settings is null ? null : (int)aggregate.Settings.IpAddressHashPolicy;
         existing.EnableBotFiltering = aggregate.Settings?.EnableBotFiltering;
         existing.CaptureUtmParameters = aggregate.Settings?.CaptureUtmParameters;
         existing.CreatedAtUtc = aggregate.CreatedAtUtc;

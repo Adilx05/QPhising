@@ -24,6 +24,7 @@ public sealed class VisitorIpHashService : IVisitorIpHashService
 
         return hashPolicy switch
         {
+            IpAddressHashPolicy.PlainText => remoteIpAddress.ToString(),
             IpAddressHashPolicy.Sha256 => ComputeSha256(remoteIpAddress),
             _ => throw new ArgumentOutOfRangeException(nameof(hashPolicy), hashPolicy, "Unsupported IP hash policy.")
         };

@@ -1,5 +1,6 @@
 using FluentValidation;
 using QPhising.Domain.Tracking.Aggregates;
+using QPhising.Domain.Tracking.Enums;
 using QPhising.Domain.Tracking.Models;
 using QPhising.Domain.Tracking.ValueObjects;
 
@@ -40,5 +41,14 @@ public sealed class CreateTrackingPageCommandValidator : AbstractValidator<Creat
         RuleFor(command => command.RetentionDays)
             .InclusiveBetween(PageSettings.MinRetentionDays, PageSettings.MaxRetentionDays)
             .When(command => command.RetentionDays.HasValue);
+        RuleFor(command => command)
+            .Must(command =>
+            {
+                var captureIpAddress = command.CaptureIpAddress ?? true;
+                var hashPolicy = command.IpAddressHashPolicy ?? IpAddressHashPolicy.Sha256;
+                return captureIpAddress ? hashPolicy != IpAddressHashPolicy.None : hashPolicy == IpAddressHashPolicy.None;
+            })
+            .WithMessage("IP capture policy is invalid. Disabled capture must use None, enabled capture must use PlainText or Sha256.");
+
     }
 }

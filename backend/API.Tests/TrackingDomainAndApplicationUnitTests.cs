@@ -36,7 +36,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             null,
             null,
             null,
-            new PageSettings(30, maskIpAddress: true, enableBotFiltering: true, captureUtmParameters: true));
+            new PageSettings(30, captureIpAddress: true, ipAddressHashPolicy: IpAddressHashPolicy.Sha256, enableBotFiltering: true, captureUtmParameters: true));
 
         aggregate.Archive();
 
@@ -119,7 +119,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             ValidFromUtc: null,
             ValidUntilUtc: null,
             RetentionDays: 10000,
-            MaskIpAddress: true,
+            CaptureIpAddress: true,
             EnableBotFiltering: true,
             CaptureUtmParameters: true);
 
@@ -192,13 +192,13 @@ public sealed class TrackingDomainAndApplicationUnitTests
             null,
             null,
             null,
-            new PageSettings(90, maskIpAddress: true, enableBotFiltering: false, captureUtmParameters: true));
+            new PageSettings(90, captureIpAddress: true, ipAddressHashPolicy: IpAddressHashPolicy.Sha256, enableBotFiltering: false, captureUtmParameters: true));
 
         var result = aggregate.ToResult();
 
         Assert.Equal(aggregate.Slug.Value, result.Slug);
         Assert.NotNull(result.Settings);
-        Assert.True(result.Settings!.MaskIpAddress);
+        Assert.True(result.Settings!.CaptureIpAddress);
         Assert.Equal(90, result.Settings.RetentionDays);
     }
 

@@ -50,8 +50,15 @@
     </div>
 
     <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-      <input type="checkbox" [(ngModel)]="createForm.maskIpAddress" />
-      Mask IP address
+      <input type="checkbox" [(ngModel)]="createForm.captureIpAddress" />
+      Capture IP address
+    </label>
+    <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+      <span>IP storage</span>
+      <select class="rounded border border-slate-300 bg-white px-2 py-1 text-xs" [(ngModel)]="createForm.ipAddressHashPolicy" [disabled]="!createForm.captureIpAddress">
+        <option [ngValue]="IpAddressHashPolicy._1">Plain</option>
+        <option [ngValue]="IpAddressHashPolicy._2">SHA-256</option>
+      </select>
     </label>
 
     <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">

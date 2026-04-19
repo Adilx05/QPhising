@@ -24,7 +24,9 @@ public sealed class TrackingPageEntity
 
     public int? RetentionDays { get; set; }
 
-    public bool? MaskIpAddress { get; set; }
+    public bool? CaptureIpAddress { get; set; }
+
+    public int? IpAddressHashPolicy { get; set; }
 
     public bool? EnableBotFiltering { get; set; }
 

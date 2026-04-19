@@ -18,13 +18,11 @@ public sealed class TrackingController : ControllerBase
 {
     private readonly ISender _sender;
     private readonly IVisitorIpHashService _visitorIpHashService;
-    private readonly ILogger<TrackingController> _logger;
 
-    public TrackingController(ISender sender, IVisitorIpHashService visitorIpHashService, ILogger<TrackingController> logger)
+    public TrackingController(ISender sender, IVisitorIpHashService visitorIpHashService)
     {
         _sender = sender;
         _visitorIpHashService = visitorIpHashService;
-        _logger = logger;
     }
 
     [HttpGet(Name = "TrackingPage_List")]
@@ -56,7 +54,8 @@ public sealed class TrackingController : ControllerBase
                 request.ValidFromUtc,
                 request.ValidUntilUtc,
                 request.RetentionDays,
-                request.MaskIpAddress,
+                request.CaptureIpAddress,
+                request.IpAddressHashPolicy,
                 request.EnableBotFiltering,
                 request.CaptureUtmParameters),
             cancellationToken);
@@ -81,7 +80,8 @@ public sealed class TrackingController : ControllerBase
                 request.ValidFromUtc,
                 request.ValidUntilUtc,
                 request.RetentionDays,
-                request.MaskIpAddress,
+                request.CaptureIpAddress,
+                request.IpAddressHashPolicy,
                 request.EnableBotFiltering,
                 request.CaptureUtmParameters),
             cancellationToken);
@@ -123,14 +123,6 @@ public sealed class TrackingController : ControllerBase
         CancellationToken cancellationToken)
     {
         var resolvedIpHash = _visitorIpHashService.ResolveHash(HttpContext.Connection.RemoteIpAddress, request.IpAddressHashPolicy);
-        if (!string.IsNullOrWhiteSpace(request.IpHash))
-        {
-            _logger.LogInformation(
-                "Ignored client-supplied IP hash for tracking page {TrackingPageId}. Policy {Policy} uses server-side hashing.",
-                trackingPageId,
-                request.IpAddressHashPolicy);
-        }
-
         return _sender.Send(
             new IngestVisitEventCommand(
                 trackingPageId,

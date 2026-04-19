@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { IpAddressHashPolicy } from './IpAddressHashPolicy';
 export type UpdateTrackingPageRequest = {
   slug?: string | null;
   title?: string | null;
@@ -11,8 +12,8 @@ export type UpdateTrackingPageRequest = {
   validFromUtc?: string | null;
   validUntilUtc?: string | null;
   retentionDays?: number | null;
-  maskIpAddress?: boolean | null;
+  captureIpAddress?: boolean | null;
+  ipAddressHashPolicy?: IpAddressHashPolicy | null;
   enableBotFiltering?: boolean | null;
   captureUtmParameters?: boolean | null;
 };
-

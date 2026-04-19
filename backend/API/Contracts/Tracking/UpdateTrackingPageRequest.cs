@@ -1,3 +1,5 @@
+using QPhising.Domain.Tracking.Enums;
+
 namespace QPhising.Api.Contracts.Tracking;
 
 public sealed record UpdateTrackingPageRequest(
@@ -9,6 +11,7 @@ public sealed record UpdateTrackingPageRequest(
     DateTimeOffset? ValidFromUtc,
     DateTimeOffset? ValidUntilUtc,
     int? RetentionDays,
-    bool? MaskIpAddress,
+    bool? CaptureIpAddress,
+    IpAddressHashPolicy? IpAddressHashPolicy,
     bool? EnableBotFiltering,
     bool? CaptureUtmParameters);

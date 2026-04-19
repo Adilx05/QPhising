@@ -9,8 +9,6 @@ export type CaptureVisitRequest = {
   visitorFingerprint?: string | null;
   userAgent?: string | null;
   referrerUrl?: string | null;
-  ipHash?: string | null;
   ipAddressHashPolicy?: IpAddressHashPolicy;
   deduplicationWindowSeconds?: number;
 };
-

@@ -15,7 +15,8 @@ public static class TrackingPersistenceMappingProfile
         var settings = entity.RetentionDays.HasValue
             ? new PageSettings(
                 entity.RetentionDays.Value,
-                entity.MaskIpAddress ?? true,
+                entity.CaptureIpAddress ?? true,
+                (IpAddressHashPolicy)(entity.IpAddressHashPolicy ?? (int)IpAddressHashPolicy.Sha256),
                 entity.EnableBotFiltering ?? true,
                 entity.CaptureUtmParameters ?? true)
             : null;
@@ -53,7 +54,8 @@ public static class TrackingPersistenceMappingProfile
             ValidUntilUtc = aggregate.ValidUntilUtc,
             PublishState = (int)aggregate.PublishState,
             RetentionDays = aggregate.Settings?.RetentionDays,
-            MaskIpAddress = aggregate.Settings?.MaskIpAddress,
+            CaptureIpAddress = aggregate.Settings?.CaptureIpAddress,
+            IpAddressHashPolicy = aggregate.Settings is null ? null : (int)aggregate.Settings.IpAddressHashPolicy,
             EnableBotFiltering = aggregate.Settings?.EnableBotFiltering,
             CaptureUtmParameters = aggregate.Settings?.CaptureUtmParameters,
             CreatedAtUtc = aggregate.CreatedAtUtc,

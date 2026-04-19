@@ -11,7 +11,8 @@ import {
   type TrackingPageResult,
   type TrackingRecentVisitResult,
   type TrackingVisitTrendPointResult,
-  type TemplateResult
+  type TemplateResult,
+  IpAddressHashPolicy
 } from '../../../shared/proxy';
 import {
   archiveTrackingPage,
@@ -165,7 +166,14 @@ interface AnalyticsFilters {
 
         <div class="mt-3 grid gap-2 sm:grid-cols-3">
           <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
-            <input type="checkbox" [(ngModel)]="editorDraft.maskIpAddress" /> Mask IP
+            <input type="checkbox" [(ngModel)]="editorDraft.captureIpAddress" /> Capture IP
+          </label>
+          <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
+            <span>IP Storage</span>
+            <select class="rounded border border-slate-300 bg-white px-2 py-1 text-xs" [(ngModel)]="editorDraft.ipAddressHashPolicy" [disabled]="!editorDraft.captureIpAddress">
+              <option [ngValue]="IpAddressHashPolicy._1">Plain</option>
+              <option [ngValue]="IpAddressHashPolicy._2">SHA-256</option>
+            </select>
           </label>
           <label class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
             <input type="checkbox" [(ngModel)]="editorDraft.enableBotFiltering" /> Bot Filter
@@ -301,6 +309,7 @@ interface AnalyticsFilters {
   `
 })
 export class TrackingDashboardPageComponent {
+  protected readonly IpAddressHashPolicy = IpAddressHashPolicy;
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
   protected readonly trackingPages = signal<TrackingPageResult[]>([]);
@@ -328,7 +337,8 @@ export class TrackingDashboardPageComponent {
     ownerId: '',
     templateId: '',
     retentionDays: 30,
-    maskIpAddress: true,
+    captureIpAddress: true,
+    ipAddressHashPolicy: IpAddressHashPolicy._2,
     enableBotFiltering: true,
     captureUtmParameters: true
   };
@@ -554,7 +564,8 @@ export class TrackingDashboardPageComponent {
     this.editorDraft.ownerId = '';
     this.editorDraft.templateId = '';
     this.editorDraft.retentionDays = 30;
-    this.editorDraft.maskIpAddress = true;
+    this.editorDraft.captureIpAddress = true;
+    this.editorDraft.ipAddressHashPolicy = IpAddressHashPolicy._2;
     this.editorDraft.enableBotFiltering = true;
     this.editorDraft.captureUtmParameters = true;
   }
@@ -652,7 +663,10 @@ export class TrackingDashboardPageComponent {
     this.editorDraft.ownerId = page.ownerId ?? '';
     this.editorDraft.templateId = page.templateId ?? '';
     this.editorDraft.retentionDays = page.settings?.retentionDays ?? 30;
-    this.editorDraft.maskIpAddress = page.settings?.maskIpAddress ?? true;
+    this.editorDraft.captureIpAddress = page.settings?.captureIpAddress ?? true;
+    this.editorDraft.ipAddressHashPolicy = this.editorDraft.captureIpAddress
+      ? (page.settings?.ipAddressHashPolicy ?? IpAddressHashPolicy._2)
+      : IpAddressHashPolicy._0;
     this.editorDraft.enableBotFiltering = page.settings?.enableBotFiltering ?? true;
     this.editorDraft.captureUtmParameters = page.settings?.captureUtmParameters ?? true;
   }
@@ -675,7 +689,8 @@ export class TrackingDashboardPageComponent {
       ownerId: this.editorDraft.ownerId.trim(),
       templateId: this.editorDraft.templateId.trim(),
       retentionDays: Number(this.editorDraft.retentionDays) || 30,
-      maskIpAddress: this.editorDraft.maskIpAddress,
+      captureIpAddress: this.editorDraft.captureIpAddress,
+      ipAddressHashPolicy: this.editorDraft.captureIpAddress ? this.editorDraft.ipAddressHashPolicy : IpAddressHashPolicy._0,
       enableBotFiltering: this.editorDraft.enableBotFiltering,
       captureUtmParameters: this.editorDraft.captureUtmParameters
     };

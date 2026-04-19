@@ -2,6 +2,7 @@ using MediatR;
 using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.Contracts.Responses.Tracking;
 using QPhising.Domain.Tracking.Entities;
+using QPhising.Domain.Tracking.Enums;
 using QPhising.Domain.Tracking.ValueObjects;
 
 namespace QPhising.Application.CQRS.Commands.Tracking;
@@ -31,6 +32,20 @@ public sealed class IngestVisitEventCommandHandler : IRequestHandler<IngestVisit
             return new VisitIngestionResult(Guid.Empty, trackingPage.Id, true, DateTimeOffset.UtcNow);
         }
 
+
+        var settingsCaptureIp = trackingPage.Settings?.CaptureIpAddress ?? true;
+        var settingsIpPolicy = trackingPage.Settings?.IpAddressHashPolicy ?? IpAddressHashPolicy.Sha256;
+
+        if (!settingsCaptureIp)
+        {
+            settingsIpPolicy = IpAddressHashPolicy.None;
+        }
+
+        if (settingsCaptureIp && request.IpAddressHashPolicy != settingsIpPolicy)
+        {
+            throw new InvalidOperationException("Visit IP policy does not match tracking page privacy settings.");
+        }
+
         var deduplicationWindow = TimeSpan.FromSeconds(request.DeduplicationWindowSeconds);
         var isDuplicate = await _visitEventRepository.ExistsDuplicateAsync(
             trackingPage.Id,
@@ -53,8 +68,8 @@ public sealed class IngestVisitEventCommandHandler : IRequestHandler<IngestVisit
             new TrackingIdentifier(request.VisitorFingerprint),
             request.UserAgent,
             sanitizedReferrerUrl,
-            trackingPage.Settings?.MaskIpAddress == true ? null : request.IpHash,
-            request.IpAddressHashPolicy);
+            settingsCaptureIp ? request.IpHash : null,
+            settingsIpPolicy);
 
         await _visitEventRepository.SaveAsync(visitEvent, cancellationToken);
 

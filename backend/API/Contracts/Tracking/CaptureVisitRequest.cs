@@ -8,6 +8,5 @@ public sealed record CaptureVisitRequest(
     string VisitorFingerprint,
     string? UserAgent,
     string? ReferrerUrl,
-    string? IpHash,
     IpAddressHashPolicy IpAddressHashPolicy,
     int DeduplicationWindowSeconds = 120);

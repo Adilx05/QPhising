@@ -67,7 +67,8 @@ public sealed class QPhisingDbContext : DbContext
         trackingPage.Property(x => x.ValidUntilUtc).HasColumnName("valid_until_utc");
         trackingPage.Property(x => x.PublishState).HasColumnName("publish_state").IsRequired();
         trackingPage.Property(x => x.RetentionDays).HasColumnName("retention_days");
-        trackingPage.Property(x => x.MaskIpAddress).HasColumnName("mask_ip_address");
+        trackingPage.Property(x => x.CaptureIpAddress).HasColumnName("capture_ip_address");
+        trackingPage.Property(x => x.IpAddressHashPolicy).HasColumnName("ip_address_hash_policy");
         trackingPage.Property(x => x.EnableBotFiltering).HasColumnName("enable_bot_filtering");
         trackingPage.Property(x => x.CaptureUtmParameters).HasColumnName("capture_utm_parameters");
         trackingPage.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc").IsRequired();

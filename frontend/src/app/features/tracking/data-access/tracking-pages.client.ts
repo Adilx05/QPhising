@@ -3,7 +3,8 @@ import {
   type CreateTrackingPageRequest,
   type TrackingPageAnalyticsResult,
   type TrackingPageResult,
-  type UpdateTrackingPageRequest
+  type UpdateTrackingPageRequest,
+  IpAddressHashPolicy
 } from '../../../shared/proxy';
 
 export interface UpsertTrackingPageInput {
@@ -16,7 +17,8 @@ export interface UpsertTrackingPageInput {
   ownerId: string;
   templateId: string;
   retentionDays: number;
-  maskIpAddress: boolean;
+  captureIpAddress: boolean;
+  ipAddressHashPolicy: IpAddressHashPolicy;
   enableBotFiltering: boolean;
   captureUtmParameters: boolean;
 }
@@ -41,7 +43,8 @@ const toCreateRequest = (
   ownerId: input.ownerId,
   templateId: input.templateId || undefined,
   retentionDays: input.retentionDays,
-  maskIpAddress: input.maskIpAddress,
+  captureIpAddress: input.captureIpAddress,
+  ipAddressHashPolicy: input.ipAddressHashPolicy,
   enableBotFiltering: input.enableBotFiltering,
   captureUtmParameters: input.captureUtmParameters
 });
@@ -57,7 +60,8 @@ const toUpdateRequest = (
   validUntilUtc: input.validUntilUtc,
   templateId: input.templateId || undefined,
   retentionDays: input.retentionDays,
-  maskIpAddress: input.maskIpAddress,
+  captureIpAddress: input.captureIpAddress,
+  ipAddressHashPolicy: input.ipAddressHashPolicy,
   enableBotFiltering: input.enableBotFiltering,
   captureUtmParameters: input.captureUtmParameters
 });

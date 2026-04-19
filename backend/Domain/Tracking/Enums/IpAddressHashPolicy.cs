@@ -3,5 +3,6 @@ namespace QPhising.Domain.Tracking.Enums;
 public enum IpAddressHashPolicy
 {
     None = 0,
-    Sha256 = 1,
+    PlainText = 1,
+    Sha256 = 2,
 }
