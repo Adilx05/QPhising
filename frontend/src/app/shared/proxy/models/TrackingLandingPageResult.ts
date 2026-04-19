@@ -14,3 +14,4 @@ export type TrackingLandingPageResult = {
   validFromUtc?: string | null;
   validUntilUtc?: string | null;
 };
+

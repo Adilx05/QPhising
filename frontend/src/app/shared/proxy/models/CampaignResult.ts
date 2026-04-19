@@ -14,3 +14,4 @@ export type CampaignResult = {
   createdAtUtc?: string;
   updatedAtUtc?: string;
 };
+

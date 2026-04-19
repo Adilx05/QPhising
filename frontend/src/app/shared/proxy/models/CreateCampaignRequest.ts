@@ -12,3 +12,4 @@ export type CreateCampaignRequest = {
   validFromUtc?: string | null;
   validUntilUtc?: string | null;
 };
+

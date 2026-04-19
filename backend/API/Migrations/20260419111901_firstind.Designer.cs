@@ -12,8 +12,8 @@ using QPhising.Api.Infrastructure.Persistence;
 namespace QPhising.Api.Migrations
 {
     [DbContext(typeof(QPhisingDbContext))]
-    [Migration("20260419104410_firstinb")]
-    partial class firstinb
+    [Migration("20260419111901_firstind")]
+    partial class firstind
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,16 +139,15 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at_utc");
 
+                    b.Property<string>("CustomHtmlContent")
+                        .HasMaxLength(200000)
+                        .HasColumnType("character varying(200000)")
+                        .HasColumnName("custom_html_content");
+
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("description");
-
-                    b.Property<string>("DestinationUrl")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)")
-                        .HasColumnName("destination_url");
 
                     b.Property<bool?>("EnableBotFiltering")
                         .HasColumnType("boolean")
@@ -191,6 +190,14 @@ namespace QPhising.Api.Migrations
                     b.Property<DateTimeOffset>("UpdatedAtUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at_utc");
+
+                    b.Property<DateTimeOffset?>("ValidFromUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("valid_from_utc");
+
+                    b.Property<DateTimeOffset?>("ValidUntilUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("valid_until_utc");
 
                     b.HasKey("Id");
 

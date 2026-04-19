@@ -31,9 +31,11 @@ public sealed class TrackingDomainAndApplicationUnitTests
             new TrackingPageSlug("immutable-page"),
             "Immutable Page",
             "description",
-            new TrackingPageUrl("https://example.com/page"),
             "owner-1",
-            templateId: null,
+            null,
+            null,
+            null,
+            null,
             new PageSettings(30, maskIpAddress: true, enableBotFiltering: true, captureUtmParameters: true));
 
         aggregate.Archive();
@@ -42,8 +44,10 @@ public sealed class TrackingDomainAndApplicationUnitTests
             new TrackingPageSlug("new-slug"),
             "Updated",
             "updated",
-            new TrackingPageUrl("https://example.com/new"),
-            templateId: null));
+            null,
+            null,
+            null,
+            null));
     }
 
     [Fact]
@@ -69,9 +73,12 @@ public sealed class TrackingDomainAndApplicationUnitTests
             new TrackingPageSlug("dedupe-page"),
             "Dedupe Page",
             null,
-            new TrackingPageUrl("https://example.com/dedupe"),
             "owner-1",
-            templateId: null);
+            null,
+            null,
+            null,
+            null,
+            null);
 
         var trackingRepo = new FakeTrackingPageRepository(trackingPage);
         var visitRepo = new FakeVisitEventRepository
@@ -106,9 +113,11 @@ public sealed class TrackingDomainAndApplicationUnitTests
             Slug: "valid-slug",
             Title: "Valid title",
             Description: null,
-            DestinationUrl: "https://example.com",
             OwnerId: "owner-1",
             TemplateId: null,
+            CustomHtmlContent: null,
+            ValidFromUtc: null,
+            ValidUntilUtc: null,
             RetentionDays: 10000,
             MaskIpAddress: true,
             EnableBotFiltering: true,
@@ -126,12 +135,12 @@ public sealed class TrackingDomainAndApplicationUnitTests
         {
             TotalAcrossPages = 42,
             UniqueAcrossPages = 27,
-            TopPages =
-            [
+            TopPages = new[]
+            {
                 new TrackingTopPageMetric(Guid.NewGuid(), "landing-page", "Landing", 30, 20)
-            ],
-            RecentAcrossPages =
-            [
+            },
+            RecentAcrossPages = new[]
+            {
                 new TrackingRecentVisitMetric(
                     Guid.NewGuid(),
                     Guid.NewGuid(),
@@ -143,11 +152,11 @@ public sealed class TrackingDomainAndApplicationUnitTests
                     "https://ref.example",
                     "hashed-ip",
                     IpAddressHashPolicy.Sha256)
-            ],
-            TrendAcrossPages =
-            [
+            },
+            TrendAcrossPages = new[]
+            {
                 new TrackingVisitTrendBucket(now.AddHours(-1), 10, 8)
-            ]
+            }
         };
 
         var handler = new GetTrackingAnalyticsOverviewQueryHandler(visitRepo);
@@ -178,9 +187,11 @@ public sealed class TrackingDomainAndApplicationUnitTests
             new TrackingPageSlug("profile-page"),
             "Profile Page",
             "Description",
-            new TrackingPageUrl("https://example.com/profile"),
             "owner-2",
-            templateId: null,
+            null,
+            null,
+            null,
+            null,
             new PageSettings(90, maskIpAddress: true, enableBotFiltering: false, captureUtmParameters: true));
 
         var result = aggregate.ToResult();
@@ -207,7 +218,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             => Task.FromResult<TrackingPageAggregate?>(_aggregate.Slug.Value == slug ? _aggregate : null);
 
         public Task<IReadOnlyCollection<TrackingPageAggregate>> ListAsync(CancellationToken cancellationToken)
-            => Task.FromResult<IReadOnlyCollection<TrackingPageAggregate>>([_aggregate]);
+            => Task.FromResult<IReadOnlyCollection<TrackingPageAggregate>>(new[] { _aggregate });
 
         public Task<bool> SlugExistsAsync(string slug, Guid? excludingTrackingPageId, CancellationToken cancellationToken)
             => Task.FromResult(false);
@@ -223,7 +234,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
     {
         public bool DuplicateResult { get; init; }
 
-        public List<VisitEventEntity> SavedEvents { get; } = [];
+        public List<VisitEventEntity> SavedEvents { get; } = new List<VisitEventEntity>();
 
         public int TotalAcrossPages { get; init; }
 

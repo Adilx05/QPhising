@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QPhising.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class firstinb : Migration
+    public partial class firstinc : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,9 +38,11 @@ namespace QPhising.Api.Migrations
                     slug = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     title = table.Column<string>(type: "character varying(160)", maxLength: 160, nullable: false),
                     description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
-                    destination_url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
                     owner_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     template_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    custom_html_content = table.Column<string>(type: "character varying(200000)", maxLength: 200000, nullable: true),
+                    valid_from_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    valid_until_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     publish_state = table.Column<int>(type: "integer", nullable: false),
                     retention_days = table.Column<int>(type: "integer", nullable: true),
                     mask_ip_address = table.Column<bool>(type: "boolean", nullable: true),
