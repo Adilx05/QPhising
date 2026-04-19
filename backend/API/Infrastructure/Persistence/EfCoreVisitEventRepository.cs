@@ -138,24 +138,41 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
         int limit,
         CancellationToken cancellationToken)
     {
-        var candidates = await ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots)
-            .Select(visit => new
+        var query = ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots);
+
+        var totalByPage = await query
+            .GroupBy(visit => new { visit.TrackingPageId, visit.TrackingPage.Slug, visit.TrackingPage.Title })
+            .Select(group => new
             {
-                visit.TrackingPageId,
-                visit.TrackingPage.Slug,
-                visit.TrackingPage.Title,
-                UniqueKey = string.IsNullOrWhiteSpace(visit.SessionId) ? visit.VisitorFingerprint : visit.SessionId
+                group.Key.TrackingPageId,
+                group.Key.Slug,
+                group.Key.Title,
+                TotalVisits = group.Count()
             })
             .ToListAsync(cancellationToken);
 
-        return candidates
-            .GroupBy(candidate => new { candidate.TrackingPageId, candidate.Slug, candidate.Title })
-            .Select(group => new TrackingTopPageMetric(
-                TrackingPageId: group.Key.TrackingPageId,
-                Slug: group.Key.Slug,
-                Title: group.Key.Title,
-                TotalVisits: group.Count(),
-                UniqueVisitors: group.Select(item => item.UniqueKey).Distinct(StringComparer.Ordinal).Count()))
+        var uniqueByPage = await query
+            .Select(visit => new
+            {
+                visit.TrackingPageId,
+                UniqueKey = string.IsNullOrWhiteSpace(visit.SessionId) ? visit.VisitorFingerprint : visit.SessionId
+            })
+            .Distinct()
+            .GroupBy(visit => visit.TrackingPageId)
+            .Select(group => new
+            {
+                TrackingPageId = group.Key,
+                UniqueVisitors = group.Count()
+            })
+            .ToDictionaryAsync(entry => entry.TrackingPageId, entry => entry.UniqueVisitors, cancellationToken);
+
+        return totalByPage
+            .Select(metric => new TrackingTopPageMetric(
+                TrackingPageId: metric.TrackingPageId,
+                Slug: metric.Slug,
+                Title: metric.Title,
+                TotalVisits: metric.TotalVisits,
+                UniqueVisitors: uniqueByPage.GetValueOrDefault(metric.TrackingPageId)))
             .OrderByDescending(metric => metric.TotalVisits)
             .ThenByDescending(metric => metric.UniqueVisitors)
             .ThenBy(metric => metric.Slug, StringComparer.Ordinal)

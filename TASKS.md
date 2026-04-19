@@ -115,11 +115,15 @@ Phase 8 evidence:
 - 2026-04-19: Added comprehensive tracking test coverage in `backend/API.Tests` (domain invariants, application handler/validator/mapping behavior, role-aware tracking CRUD/visit ingestion/analytics integration flows, and legacy-route regression checks), introduced frontend UI smoke checker script (`scripts/check-frontend-ui-smoke.*`) for dashboard + tracking grid/editor/analytics presence, and wired smoke checks into CI.
 
 ## Phase 9 - Polish
-- [ ] Optimize hot paths (visit ingestion throughput, analytics query performance, indexing).
-- [ ] Perform UX cleanup for layout consistency, readability, and responsive behavior.
-- [ ] Finalize docs (architecture, API contracts, analytics definitions, runbooks).
-- [ ] Run final production-readiness review across security, observability, and reliability.
+- [x] Optimize hot paths (visit ingestion throughput, analytics query performance, indexing).
+- [x] Perform UX cleanup for layout consistency, readability, and responsive behavior.
+- [x] Finalize docs (architecture, API contracts, analytics definitions, runbooks).
+- [x] Run final production-readiness review across security, observability, and reliability.
 - [ ] Confirm Definition of Done criteria are fully met before release.
+
+Phase 9 evidence:
+- 2026-04-19: Reduced analytics query latency by parallelizing page-analytics read tasks and moving top-pages aggregation work to database grouping in `EfCoreVisitEventRepository`; refreshed tracking dashboard UX copy/layout controls for responsive readability; and added final architecture/API/runbook/readiness docs under `docs/architecture` and `docs/operations`.
+- 2026-04-19: Verified frontend build + tracking UI smoke checks locally; backend/gateway build verification remains blocked in this execution environment because `dotnet` CLI is unavailable.
 
 ## Definition of Done (Cross-Phase Exit Criteria)
 - [ ] Builds pass for backend, gateway, and frontend.

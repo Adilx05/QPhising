@@ -21,32 +21,32 @@ public sealed class GetTrackingPageAnalyticsQueryHandler : IRequestHandler<GetTr
         var trackingPage = await _trackingPageRepository.GetByIdAsync(request.TrackingPageId, cancellationToken)
             ?? throw new KeyNotFoundException($"Tracking page '{request.TrackingPageId}' was not found.");
 
-        var totalVisits = await _visitEventRepository.CountTotalAsync(trackingPage.Id, request.FromUtc, request.ToUtc, cancellationToken);
-        var uniqueVisitors = await _visitEventRepository.CountUniqueVisitorsAsync(trackingPage.Id, request.FromUtc, request.ToUtc, cancellationToken);
-        var lastVisitAtUtc = await _visitEventRepository.GetLastVisitAtUtcAsync(trackingPage.Id, cancellationToken);
-
         var fromUtc = request.FromUtc ?? DateTimeOffset.UtcNow.AddDays(-7);
         var toUtc = request.ToUtc ?? DateTimeOffset.UtcNow;
 
-        var trendBuckets = await _visitEventRepository.GetTrendBucketsAsync(
+        var totalVisitsTask = _visitEventRepository.CountTotalAsync(trackingPage.Id, request.FromUtc, request.ToUtc, cancellationToken);
+        var uniqueVisitorsTask = _visitEventRepository.CountUniqueVisitorsAsync(trackingPage.Id, request.FromUtc, request.ToUtc, cancellationToken);
+        var lastVisitAtUtcTask = _visitEventRepository.GetLastVisitAtUtcAsync(trackingPage.Id, cancellationToken);
+        var trendBucketsTask = _visitEventRepository.GetTrendBucketsAsync(
             trackingPage.Id,
             fromUtc,
             toUtc,
             request.TrendBucketSizeMinutes,
             cancellationToken);
-
-        var recentVisits = await _visitEventRepository.ListRecentAsync(
+        var recentVisitsTask = _visitEventRepository.ListRecentAsync(
             trackingPage.Id,
             request.FromUtc,
             request.ToUtc,
             request.RecentVisitLimit,
             cancellationToken);
 
+        await Task.WhenAll(totalVisitsTask, uniqueVisitorsTask, lastVisitAtUtcTask, trendBucketsTask, recentVisitsTask);
+
         return new TrackingPageAnalyticsResult(
             TrackingPageId: trackingPage.Id,
             Slug: trackingPage.Slug.Value,
-            Summary: new TrackingAnalyticsSummaryResult(totalVisits, uniqueVisitors, lastVisitAtUtc),
-            Trends: trendBuckets.Select(bucket => bucket.ToResult()).ToArray(),
-            RecentVisits: recentVisits.Select(visit => visit.ToResult()).ToArray());
+            Summary: new TrackingAnalyticsSummaryResult(totalVisitsTask.Result, uniqueVisitorsTask.Result, lastVisitAtUtcTask.Result),
+            Trends: trendBucketsTask.Result.Select(bucket => bucket.ToResult()).ToArray(),
+            RecentVisits: recentVisitsTask.Result.Select(visit => visit.ToResult()).ToArray());
     }
 }
