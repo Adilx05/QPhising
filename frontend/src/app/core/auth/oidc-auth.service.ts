@@ -32,7 +32,8 @@ const oidcStorageKeys = {
   authorizationState: 'qphising.oidc.authorization.state'
 } as const;
 
-const decoder = new TextEncoder();
+const encoder = new TextEncoder();
+const utf8Decoder = new TextDecoder('utf-8', { fatal: false });
 
 const normalizeBase64Url = (bytes: Uint8Array): string => {
   let binary = '';
@@ -114,7 +115,9 @@ const decodeJwtPayload = (token: string): Record<string, unknown> | null => {
       .replace(/-/g, '+')
       .replace(/_/g, '/');
     const paddedPayload = payload.padEnd(Math.ceil(payload.length / 4) * 4, '=');
-    const decodedJson = globalThis.atob(paddedPayload);
+    const decodedBinary = globalThis.atob(paddedPayload);
+    const decodedBytes = Uint8Array.from(decodedBinary, (character) => character.charCodeAt(0));
+    const decodedJson = utf8Decoder.decode(decodedBytes);
 
     return JSON.parse(decodedJson) as Record<string, unknown>;
   } catch {
@@ -289,7 +292,7 @@ export class OidcAuthService {
   }
 
   private async createCodeChallenge(codeVerifier: string): Promise<string> {
-    const digest = await globalThis.crypto.subtle.digest('SHA-256', decoder.encode(codeVerifier));
+    const digest = await globalThis.crypto.subtle.digest('SHA-256', encoder.encode(codeVerifier));
 
     return normalizeBase64Url(new Uint8Array(digest));
   }
