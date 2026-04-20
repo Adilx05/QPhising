@@ -180,3 +180,4 @@ Incremental evidence:
 
 - 2026-04-19: Added app-shell language selector (TR/EN) + theme toggle controls on the top bar, localized campaign-area copy with Turkish "Senaryo" naming, and hid the sidebar authenticated-user card whenever no session is active.
 - 2026-04-19: Expanded bilingual UI coverage to all major frontend pages (auth callback/unauthorized, dashboard, setup wizard, runtime configuration, templates, tracking dashboard, and public landing fallback) with consistent TR/EN copy driven by language preference.
+- 2026-04-20: Fixed JWT claim decoding to properly parse UTF-8 payloads in frontend OIDC auth service so Turkish characters (e.g., `KÖSE`) render correctly in the authenticated user card instead of mojibake.
