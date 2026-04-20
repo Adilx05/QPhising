@@ -1,4 +1,7 @@
+using QPhising.Application.Contracts.Abstractions.Reporting;
 using QPhising.Application.Contracts.Abstractions.Tracking;
+using QPhising.Application.Contracts.Responses.Reporting;
+using QPhising.Application.CQRS.Queries.Reporting;
 using QPhising.Application.Contracts.Responses.Tracking;
 using QPhising.Application.CQRS.Commands.Tracking;
 using QPhising.Application.CQRS.Queries.Tracking;
@@ -203,6 +206,95 @@ public sealed class TrackingDomainAndApplicationUnitTests
         Assert.Equal(90, result.Settings.RetentionDays);
     }
 
+    [Fact]
+    public async Task ExportTrackingAnalyticsReportQueryHandler_GlobalScope_ShouldUseCumulativeTrendTotals()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var visitRepo = new FakeVisitEventRepository
+        {
+            TotalAcrossPages = 3,
+            UniqueAcrossPages = 1,
+            TrendAcrossPages = new[]
+            {
+                new TrackingVisitTrendBucket(now.AddDays(-1), 1, 1),
+                new TrackingVisitTrendBucket(now, 2, 1)
+            }
+        };
+
+        var exporter = new CapturingTrackingReportExporter();
+        var trackingRepo = new FakeTrackingPageRepository(CreateTrackingPage("global-report"));
+        var handler = new ExportTrackingAnalyticsReportQueryHandler(trackingRepo, visitRepo, exporter);
+
+        await handler.Handle(
+            new ExportTrackingAnalyticsReportQuery(
+                Format: TrackingReportFormat.Csv,
+                Scope: TrackingReportScope.Global,
+                DetailLevel: TrackingReportDetailLevel.Summary,
+                TrackingPageId: null,
+                FromUtc: null,
+                ToUtc: null,
+                ExcludeBots: false,
+                TimezoneOffsetMinutes: 0,
+                IncludeVisitorClickDetails: false,
+                Language: "en"),
+            CancellationToken.None);
+
+        Assert.NotNull(exporter.CapturedData);
+        Assert.Equal(2, exporter.CapturedData!.TrendRows.Count);
+        Assert.Equal(1, exporter.CapturedData.TrendRows.ElementAt(0).TotalVisits);
+        Assert.Equal(3, exporter.CapturedData.TrendRows.ElementAt(1).TotalVisits);
+    }
+
+    [Fact]
+    public async Task ExportTrackingAnalyticsReportQueryHandler_TrackingPageScope_ShouldUseAllTimeTrendRangeWhenRangeIsNull()
+    {
+        var trackingPage = CreateTrackingPage("page-report");
+        var visitRepo = new FakeVisitEventRepository
+        {
+            TrendByPage = new[]
+            {
+                new TrackingVisitTrendBucket(DateTimeOffset.UtcNow.AddDays(-2), 2, 1),
+                new TrackingVisitTrendBucket(DateTimeOffset.UtcNow.AddDays(-1), 1, 1)
+            }
+        };
+
+        var exporter = new CapturingTrackingReportExporter();
+        var trackingRepo = new FakeTrackingPageRepository(trackingPage);
+        var handler = new ExportTrackingAnalyticsReportQueryHandler(trackingRepo, visitRepo, exporter);
+
+        await handler.Handle(
+            new ExportTrackingAnalyticsReportQuery(
+                Format: TrackingReportFormat.Pdf,
+                Scope: TrackingReportScope.TrackingPage,
+                DetailLevel: TrackingReportDetailLevel.Summary,
+                TrackingPageId: trackingPage.Id,
+                FromUtc: null,
+                ToUtc: null,
+                ExcludeBots: false,
+                TimezoneOffsetMinutes: 0,
+                IncludeVisitorClickDetails: false,
+                Language: "en"),
+            CancellationToken.None);
+
+        Assert.NotNull(visitRepo.LastTrendByPageQuery);
+        Assert.Equal(DateTimeOffset.UnixEpoch, visitRepo.LastTrendByPageQuery!.Value.FromUtc);
+        Assert.NotNull(exporter.CapturedData);
+        Assert.Equal(3, exporter.CapturedData!.TrendRows.Last().TotalVisits);
+    }
+
+    private static TrackingPageAggregate CreateTrackingPage(string slug)
+        => new(
+            Guid.NewGuid(),
+            new TrackingPageSlug(slug),
+            $"{slug} title",
+            null,
+            "owner-1",
+            null,
+            null,
+            null,
+            null,
+            null);
+
     private sealed class FakeTrackingPageRepository : ITrackingPageRepository
     {
         private readonly TrackingPageAggregate _aggregate;
@@ -247,6 +339,10 @@ public sealed class TrackingDomainAndApplicationUnitTests
 
         public IReadOnlyCollection<TrackingVisitTrendBucket> TrendAcrossPages { get; init; } = Array.Empty<TrackingVisitTrendBucket>();
 
+        public IReadOnlyCollection<TrackingVisitTrendBucket> TrendByPage { get; init; } = Array.Empty<TrackingVisitTrendBucket>();
+
+        public (Guid TrackingPageId, DateTimeOffset FromUtc, DateTimeOffset ToUtc, int BucketSizeMinutes)? LastTrendByPageQuery { get; private set; }
+
         public Task<bool> ExistsDuplicateAsync(Guid trackingPageId, string sessionId, string visitorFingerprint, DateTimeOffset occurredAtUtc, TimeSpan deduplicationWindow, CancellationToken cancellationToken)
             => Task.FromResult(DuplicateResult);
 
@@ -266,7 +362,10 @@ public sealed class TrackingDomainAndApplicationUnitTests
             => Task.FromResult<DateTimeOffset?>(null);
 
         public Task<IReadOnlyCollection<TrackingVisitTrendBucket>> GetTrendBucketsAsync(Guid trackingPageId, DateTimeOffset fromUtc, DateTimeOffset toUtc, int bucketSizeMinutes, CancellationToken cancellationToken)
-            => Task.FromResult<IReadOnlyCollection<TrackingVisitTrendBucket>>(Array.Empty<TrackingVisitTrendBucket>());
+        {
+            LastTrendByPageQuery = (trackingPageId, fromUtc, toUtc, bucketSizeMinutes);
+            return Task.FromResult(TrendByPage);
+        }
 
         public Task<IReadOnlyCollection<VisitEventEntity>> ListRecentAsync(Guid trackingPageId, DateTimeOffset? fromUtc, DateTimeOffset? toUtc, int limit, CancellationToken cancellationToken)
             => Task.FromResult<IReadOnlyCollection<VisitEventEntity>>(Array.Empty<VisitEventEntity>());
@@ -285,5 +384,22 @@ public sealed class TrackingDomainAndApplicationUnitTests
 
         public Task<IReadOnlyCollection<TrackingVisitTrendBucket>> GetTrendBucketsAcrossPagesAsync(DateTimeOffset fromUtc, DateTimeOffset toUtc, TrackingVisitTrendBucketWindow window, int timezoneOffsetMinutes, bool excludeBots, CancellationToken cancellationToken)
             => Task.FromResult(TrendAcrossPages);
+    }
+
+    private sealed class CapturingTrackingReportExporter : ITrackingReportExporter
+    {
+        public TrackingReportData? CapturedData { get; private set; }
+
+        public byte[] BuildCsv(TrackingReportData data, string language)
+        {
+            CapturedData = data;
+            return Array.Empty<byte>();
+        }
+
+        public byte[] BuildPdf(TrackingReportData data, string language)
+        {
+            CapturedData = data;
+            return Array.Empty<byte>();
+        }
     }
 }
