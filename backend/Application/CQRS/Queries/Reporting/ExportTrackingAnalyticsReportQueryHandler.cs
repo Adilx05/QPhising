@@ -57,12 +57,15 @@ public sealed class ExportTrackingAnalyticsReportQueryHandler : IRequestHandler<
         DateTimeOffset? toUtc,
         CancellationToken cancellationToken)
     {
+        var trendFromUtc = fromUtc ?? DateTimeOffset.UnixEpoch;
+        var trendToUtc = toUtc ?? DateTimeOffset.UtcNow;
+
         var totalVisits = await _visitEventRepository.CountTotalAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, cancellationToken);
         var uniqueVisitors = await _visitEventRepository.CountUniqueVisitorsAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, cancellationToken);
         var recentVisits = await _visitEventRepository.ListRecentAcrossPagesAsync(fromUtc, toUtc, request.ExcludeBots, 150, cancellationToken);
         var trends = await _visitEventRepository.GetTrendBucketsAcrossPagesAsync(
-            fromUtc ?? DateTimeOffset.UtcNow.AddYears(-5),
-            toUtc ?? DateTimeOffset.UtcNow,
+            trendFromUtc,
+            trendToUtc,
             TrackingVisitTrendBucketWindow.Day,
             request.TimezoneOffsetMinutes,
             request.ExcludeBots,
@@ -95,7 +98,11 @@ public sealed class ExportTrackingAnalyticsReportQueryHandler : IRequestHandler<
             TotalVisits: totalVisits,
             UniqueVisitors: uniqueVisitors,
             LastVisitAtUtc: recentVisits.FirstOrDefault()?.OccurredAtUtc,
-            TrendRows: trends.GroupBy(x => x.BucketStartUtc.Date).Select(g => (Label: g.Key.ToString("yyyy-MM-dd"),TotalVisits: g.Sum(x => x.TotalVisits),UniqueVisitors: g.Sum(x => x.UniqueVisitors))).OrderBy(x => x.Label).ToArray(),
+            TrendRows: BuildCumulativeTotalTrendRows(
+                trends
+                    .GroupBy(x => x.BucketStartUtc.Date)
+                    .Select(g => (Label: g.Key.ToString("yyyy-MM-dd"), TotalVisits: g.Sum(x => x.TotalVisits), UniqueVisitors: g.Sum(x => x.UniqueVisitors)))
+                    .OrderBy(x => x.Label)),
             DistributionRows: topPages.Select(page => ($"/{page.Slug}", page.TotalVisits)).ToArray().Length > 0
                 ? topPages.Select(page => ($"/{page.Slug}", page.TotalVisits)).ToArray()
                 : recentByReferrer,
@@ -115,10 +122,13 @@ public sealed class ExportTrackingAnalyticsReportQueryHandler : IRequestHandler<
         var totalVisits = await _visitEventRepository.CountTotalAsync(trackingPage.Id, fromUtc, toUtc, cancellationToken);
         var uniqueVisitors = await _visitEventRepository.CountUniqueVisitorsAsync(trackingPage.Id, fromUtc, toUtc, cancellationToken);
         var lastVisitAtUtc = await _visitEventRepository.GetLastVisitAtUtcAsync(trackingPage.Id, cancellationToken);
+
+        var trendFromUtc = fromUtc ?? DateTimeOffset.UnixEpoch;
+        var trendToUtc = toUtc ?? DateTimeOffset.UtcNow;
         var trends = await _visitEventRepository.GetTrendBucketsAsync(
             trackingPage.Id,
-            fromUtc ?? DateTimeOffset.UtcNow.AddDays(-30),
-            toUtc ?? DateTimeOffset.UtcNow,
+            trendFromUtc,
+            trendToUtc,
             60,
             cancellationToken);
         var recentVisits = await _visitEventRepository.ListRecentAsync(trackingPage.Id, fromUtc, toUtc, 250, cancellationToken);
@@ -148,9 +158,27 @@ public sealed class ExportTrackingAnalyticsReportQueryHandler : IRequestHandler<
             TotalVisits: totalVisits,
             UniqueVisitors: uniqueVisitors,
             LastVisitAtUtc: lastVisitAtUtc,
-            TrendRows: trends.Select(trend => (trend.BucketStartUtc.ToString("yyyy-MM-dd HH:mm"), trend.TotalVisits, trend.UniqueVisitors)).ToArray(),
+            TrendRows: BuildCumulativeTotalTrendRows(
+                trends
+                    .Select(trend => (Label: trend.BucketStartUtc.ToString("yyyy-MM-dd HH:mm"), TotalVisits: trend.TotalVisits, UniqueVisitors: trend.UniqueVisitors))
+                    .OrderBy(trend => trend.Label)),
             DistributionRows: deviceDistribution,
             VisitorRows: visitorRows,
             AppliedNotes: notes);
+    }
+
+    private static IReadOnlyCollection<(string Label, int TotalVisits, int UniqueVisitors)> BuildCumulativeTotalTrendRows(
+        IEnumerable<(string Label, int TotalVisits, int UniqueVisitors)> orderedRows)
+    {
+        var runningTotal = 0;
+        var result = new List<(string Label, int TotalVisits, int UniqueVisitors)>();
+
+        foreach (var row in orderedRows)
+        {
+            runningTotal += row.TotalVisits;
+            result.Add((row.Label, runningTotal, row.UniqueVisitors));
+        }
+
+        return result;
     }
 }
