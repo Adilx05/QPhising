@@ -53,6 +53,11 @@ import { SetupReadinessState, SetupService } from './shared/proxy';
             <span>{{ t('campaigns') }}</span>
           </a>
 
+          <a *ngIf="canViewReports()" routerLink="/reports" routerLinkActive="is-active" class="nav-item">
+            <i class="pi pi-file-export text-sm"></i>
+            <span>{{ t('reports') }}</span>
+          </a>
+
           <a *ngIf="canViewTemplates()" routerLink="/templates" routerLinkActive="is-active" class="nav-item">
             <i class="pi pi-file-edit text-sm"></i>
             <span>{{ t('templates') }}</span>
@@ -82,6 +87,7 @@ import { SetupReadinessState, SetupService } from './shared/proxy';
               <a *ngIf="canViewTracking()" class="mobile-nav-item" routerLink="/tracking" routerLinkActive="is-active">{{ t('tracking') }}</a>
               <a *ngIf="canViewCampaigns()" class="mobile-nav-item" routerLink="/campaigns" routerLinkActive="is-active">{{ t('campaigns') }}</a>
               <a *ngIf="canViewTemplates()" class="mobile-nav-item" routerLink="/templates" routerLinkActive="is-active">{{ t('templates') }}</a>
+              <a *ngIf="canViewReports()" class="mobile-nav-item" routerLink="/reports" routerLinkActive="is-active">{{ t('reports') }}</a>
               <a *ngIf="shouldShowSetupWizard()" class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">{{ t('setup') }}</a>
               <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">{{ t('configShort') }}</a>
             </nav>
@@ -128,6 +134,7 @@ export class AppComponent {
       tracking: 'Takip',
       campaigns: 'Senaryolar',
       templates: 'Şablonlar',
+      reports: 'Raporlar',
       setupWizard: 'Kurulum Sihirbazı',
       runtimeConfig: 'Çalışma Zamanı Ayarları',
       setup: 'Kurulum',
@@ -145,6 +152,7 @@ export class AppComponent {
       tracking: 'Tracking',
       campaigns: 'Campaigns',
       templates: 'Templates',
+      reports: 'Reports',
       setupWizard: 'Setup Wizard',
       runtimeConfig: 'Runtime Configuration',
       setup: 'Setup',
@@ -230,6 +238,10 @@ export class AppComponent {
   }
 
   protected canViewTemplates(): boolean {
+    return this.authSessionService.hasRequiredRole('Viewer');
+  }
+
+  protected canViewReports(): boolean {
     return this.authSessionService.hasRequiredRole('Viewer');
   }
 

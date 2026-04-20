@@ -1,3 +1,4 @@
+using QPhising.Application.Contracts.Abstractions.Reporting;
 using QPhising.Domain.Tracking.Entities;
 
 namespace QPhising.Application.Contracts.Abstractions.Tracking;
@@ -66,5 +67,13 @@ public interface IVisitEventRepository
         TrackingVisitTrendBucketWindow window,
         int timezoneOffsetMinutes,
         bool excludeBots,
+        CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<TrackingVisitorClickStat>> ListVisitorClickStatsAsync(
+        Guid? trackingPageId,
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        int limit,
         CancellationToken cancellationToken);
 }

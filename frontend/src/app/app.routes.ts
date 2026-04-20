@@ -10,6 +10,7 @@ import { AuthUnauthorizedPageComponent } from './features/auth/pages/auth-unauth
 import { CampaignsPageComponent } from './features/campaigns/pages/campaigns-page.component';
 import { CampaignDetailPageComponent } from './features/campaigns/pages/campaign-detail-page.component';
 import { DashboardPageComponent } from './features/dashboard/pages/dashboard-page.component';
+import { ReportsPageComponent } from './features/reports/pages/reports-page.component';
 import { RuntimeConfigurationPageComponent } from './features/setup/pages/runtime-configuration-page.component';
 import { TrackingDashboardPageComponent } from './features/tracking/pages/tracking-dashboard-page.component';
 import { PublicTrackingLandingPageComponent } from './features/tracking/pages/public-tracking-landing-page.component';
@@ -72,6 +73,16 @@ export const appRoutes: Routes = [
     }
   },
 
+
+  {
+    path: 'reports',
+    component: ReportsPageComponent,
+    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    data: {
+      requiredRole: 'Viewer'
+    }
+  },
   {
     path: 'tracking',
     component: TrackingDashboardPageComponent,

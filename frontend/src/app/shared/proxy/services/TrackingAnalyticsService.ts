@@ -3,6 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { TrackingAnalyticsOverviewResult } from '../models/TrackingAnalyticsOverviewResult';
+import type { TrackingReportDetailLevel } from '../models/TrackingReportDetailLevel';
+import type { TrackingReportFormat } from '../models/TrackingReportFormat';
+import type { TrackingReportScope } from '../models/TrackingReportScope';
 import type { TrackingVisitTrendBucketWindow } from '../models/TrackingVisitTrendBucketWindow';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -45,6 +48,53 @@ export class TrackingAnalyticsService {
         400: `Bad Request`,
         401: `Unauthorized`,
         403: `Forbidden`,
+        500: `Internal Server Error`,
+      },
+    });
+  }
+
+  /**
+   * @returns binary file
+   * @throws ApiError
+   */
+  public static trackingAnalyticsExportReport({
+    format,
+    scope,
+    detailLevel,
+    trackingPageId,
+    fromUtc,
+    toUtc,
+    excludeBots,
+    timezoneOffsetMinutes,
+  }: {
+    format?: TrackingReportFormat,
+    scope?: TrackingReportScope,
+    detailLevel?: TrackingReportDetailLevel,
+    trackingPageId?: string,
+    fromUtc?: string,
+    toUtc?: string,
+    excludeBots?: boolean,
+    timezoneOffsetMinutes?: number,
+  }): CancelablePromise<Blob> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/api/tracking/analytics/reports/export',
+      query: {
+        'format': format,
+        'scope': scope,
+        'detailLevel': detailLevel,
+        'trackingPageId': trackingPageId,
+        'fromUtc': fromUtc,
+        'toUtc': toUtc,
+        'excludeBots': excludeBots,
+        'timezoneOffsetMinutes': timezoneOffsetMinutes,
+      },
+      responseType: 'blob',
+      errors: {
+        400: `Bad Request`,
+        401: `Unauthorized`,
+        403: `Forbidden`,
+        404: `Not Found`,
         500: `Internal Server Error`,
       },
     });
