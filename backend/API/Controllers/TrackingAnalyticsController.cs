@@ -1,8 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QPhising.Application.Contracts.Abstractions.Reporting;
 using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.Contracts.Responses.Tracking;
+using QPhising.Application.CQRS.Queries.Reporting;
 using QPhising.Application.CQRS.Queries.Tracking;
 using QPhising.Application.Security;
 
@@ -42,4 +44,33 @@ public sealed class TrackingAnalyticsController : ControllerBase
                 topPagesLimit,
                 recentVisitLimit),
             cancellationToken);
+
+    [HttpGet("reports/export", Name = "TrackingAnalytics_ExportReport")]
+    [Authorize(Policy = IdentityAuthorizationPolicies.ViewerOrAbove)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ExportReport(
+        [FromQuery] TrackingReportFormat format = TrackingReportFormat.Csv,
+        [FromQuery] TrackingReportScope scope = TrackingReportScope.Global,
+        [FromQuery] TrackingReportDetailLevel detailLevel = TrackingReportDetailLevel.Summary,
+        [FromQuery] Guid? trackingPageId = null,
+        [FromQuery] DateTimeOffset? fromUtc = null,
+        [FromQuery] DateTimeOffset? toUtc = null,
+        [FromQuery] bool excludeBots = true,
+        [FromQuery] int timezoneOffsetMinutes = 0,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _sender.Send(
+            new ExportTrackingAnalyticsReportQuery(
+                format,
+                scope,
+                detailLevel,
+                trackingPageId,
+                fromUtc,
+                toUtc,
+                excludeBots,
+                timezoneOffsetMinutes),
+            cancellationToken);
+
+        return File(result.Content, result.ContentType, result.FileName);
+    }
 }

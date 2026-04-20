@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QPhising.Api.Infrastructure.Persistence.Mapping;
+using QPhising.Application.Contracts.Abstractions.Reporting;
 using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Domain.Tracking.Enums;
 using QPhising.Domain.Tracking.Entities;
@@ -258,6 +259,53 @@ public sealed class EfCoreVisitEventRepository : IVisitEventRepository
                 ReferrerUrl: visit.ReferrerUrl,
                 IpHash: visit.IpHash,
                 IpAddressHashPolicy: (IpAddressHashPolicy)visit.IpAddressHashPolicy))
+            .ToArray();
+    }
+
+
+    public async Task<IReadOnlyCollection<TrackingVisitorClickStat>> ListVisitorClickStatsAsync(
+        Guid? trackingPageId,
+        DateTimeOffset? fromUtc,
+        DateTimeOffset? toUtc,
+        bool excludeBots,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        var query = ApplyRangeFilterAcrossPages(_dbContext.VisitEvents.AsNoTracking(), fromUtc, toUtc, excludeBots);
+
+        if (trackingPageId.HasValue)
+        {
+            query = query.Where(visit => visit.TrackingPageId == trackingPageId.Value);
+        }
+
+        var grouped = await query
+            .GroupBy(visit => new
+            {
+                SessionId = visit.SessionId == null || visit.SessionId == "" ? null : visit.SessionId,
+                VisitorFingerprint = visit.VisitorFingerprint == null || visit.VisitorFingerprint == "" ? null : visit.VisitorFingerprint,
+                IpHash = visit.IpHash == null || visit.IpHash == "" ? null : visit.IpHash
+            })
+            .Select(group => new
+            {
+                group.Key.SessionId,
+                group.Key.VisitorFingerprint,
+                group.Key.IpHash,
+                ClickCount = group.Count(),
+                LastOccurredAtUtc = group.Max(visit => visit.OccurredAtUtc)
+            })
+            .OrderByDescending(entry => entry.ClickCount)
+            .ThenByDescending(entry => entry.LastOccurredAtUtc)
+            .Take(limit)
+            .ToListAsync(cancellationToken);
+
+        return grouped
+            .Select(entry => new TrackingVisitorClickStat(
+                VisitorKey: entry.SessionId ?? entry.VisitorFingerprint ?? entry.IpHash ?? "anonymous",
+                SessionId: entry.SessionId,
+                VisitorFingerprint: entry.VisitorFingerprint,
+                IpHash: entry.IpHash,
+                ClickCount: entry.ClickCount,
+                LastOccurredAtUtc: entry.LastOccurredAtUtc))
             .ToArray();
     }
 

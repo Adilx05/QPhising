@@ -153,6 +153,7 @@ Phase 9 evidence:
 - [x] Ensure campaign-created public pages stay inaccessible until campaign lifecycle is Active, and return 404 for Draft/Paused/non-active lifecycle states.
 - [x] Add app-shell language selector and dark-mode toggle in top bar, ensure Turkish campaign naming uses "Senaryo", and hide sidebar user card for unauthenticated sessions.
 - [x] Expand language support to full-page TR/EN localization across auth, dashboard, setup/runtime configuration, template management, and tracking screens.
+- [x] Add analytics report export center with CSV/PDF outputs (global/selected scope, summary/detailed levels, selectable/all-time ranges, and TR/EN localization).
 
 Incremental evidence:
 - 2026-04-19: Fixed `RuntimeConfigurationResult` unit-test regressions in `backend/API.Tests/BackendConfigurationUnitTests.cs` by asserting configuration flags from the result contract and validating persisted Keycloak tuple values from repository state.
@@ -181,3 +182,4 @@ Incremental evidence:
 - 2026-04-19: Added app-shell language selector (TR/EN) + theme toggle controls on the top bar, localized campaign-area copy with Turkish "Senaryo" naming, and hid the sidebar authenticated-user card whenever no session is active.
 - 2026-04-19: Expanded bilingual UI coverage to all major frontend pages (auth callback/unauthorized, dashboard, setup wizard, runtime configuration, templates, tracking dashboard, and public landing fallback) with consistent TR/EN copy driven by language preference.
 - 2026-04-20: Fixed JWT claim decoding to properly parse UTF-8 payloads in frontend OIDC auth service so Turkish characters (e.g., `KÖSE`) render correctly in the authenticated user card instead of mojibake.
+- 2026-04-20: Added authenticated `/reports` export center with TR/EN localized controls for scope/detail/range presets, implemented backend CQRS export endpoint (`GET /api/tracking/analytics/reports/export`) for CSV/PDF generation (global or selected tracking page), and extended analytics repository/reporting services with visitor click aggregation for detailed exports.
