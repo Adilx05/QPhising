@@ -31,7 +31,7 @@ import { exportTrackingReport, reportScopeRequiresPage } from '../data-access';
       <div class="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
         <label class="text-sm text-slate-600">
           {{ tx('Kapsam', 'Scope') }}
-          <select class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="scope">
+          <select class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="scope" (ngModelChange)="onScopeChanged()">
             <option [ngValue]="TrackingReportScope._0">{{ tx('Genel (Tüm Sayfalar)', 'Global (All Pages)') }}</option>
             <option [ngValue]="TrackingReportScope._1">{{ tx('Seçili Takip Sayfası', 'Selected Tracking Page') }}</option>
           </select>
@@ -67,14 +67,24 @@ import { exportTrackingReport, reportScopeRequiresPage } from '../data-access';
       <div class="mt-3 grid gap-3 lg:grid-cols-2" *ngIf="scopeRequiresPage()">
         <label class="text-sm text-slate-600">
           {{ tx('Takip Sayfası', 'Tracking Page') }}
-          <select class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="trackingPageId">
+          <select class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="trackingPageId" [disabled]="trackingPages().length === 0">
             <option [ngValue]="''">{{ tx('Seçiniz', 'Select') }}</option>
             <option *ngFor="let page of trackingPages()" [ngValue]="page.id">/{{ page.slug || page.title || page.id }}</option>
           </select>
+          <span *ngIf="trackingPages().length === 0" class="mt-1 block text-xs text-amber-700">
+            {{ tx('Seçilecek takip sayfası bulunamadı. Önce takip sayfası oluşturun veya Yenile butonunu kullanın.', 'No tracking pages available. Create one first or use Refresh.') }}
+          </span>
         </label>
         <label class="mt-6 inline-flex items-center gap-2 text-sm text-slate-600">
           <input type="checkbox" [(ngModel)]="excludeBots" />
           {{ tx('Bot trafiğini hariç tut', 'Exclude bot traffic') }}
+        </label>
+      </div>
+
+      <div class="mt-2 grid gap-3 lg:grid-cols-2">
+        <label class="inline-flex items-center gap-2 text-sm text-slate-600">
+          <input type="checkbox" [(ngModel)]="includeVisitorBreakdown" />
+          {{ tx('Kullanıcı/IP tıklama listesini ekle', 'Include user/IP click list') }}
         </label>
       </div>
 
@@ -96,10 +106,20 @@ import { exportTrackingReport, reportScopeRequiresPage } from '../data-access';
 
     <section class="surface-card mt-6 p-5">
       <h2 class="text-base font-semibold text-slate-900">{{ tx('Rapor İçeriği Önizleme', 'Report Content Preview') }}</h2>
+      <div class="mt-3 grid gap-3 text-sm text-slate-700 md:grid-cols-2">
+        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+          <span class="font-medium">{{ tx('Seçilen Kapsam', 'Selected Scope') }}:</span>
+          <span class="ml-1">{{ scopeRequiresPage() ? selectedTrackingPageLabel() : tx('Global', 'Global') }}</span>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+          <span class="font-medium">{{ tx('Kullanıcı Listesi', 'User List') }}:</span>
+          <span class="ml-1">{{ includeVisitorBreakdown ? tx('Açık', 'Enabled') : tx('Kapalı', 'Disabled') }}</span>
+        </div>
+      </div>
       <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600">
         <li>{{ tx('Özet seviyede KPI, trend ve dağılım verileri yer alır.', 'Summary level includes KPI, trend, and distribution data.') }}</li>
-        <li>{{ tx('Detaylı seviyede ziyaretçi bazlı tıklama sayıları, oturum/fingerprint/IP referansları eklenir.', 'Detailed level adds visitor click counts with session/fingerprint/IP references.') }}</li>
-        <li>{{ tx('PDF çıktısında trend grafiği metinsel chart olarak temsil edilir.', 'PDF export includes a trend chart rendered as textual bars.') }}</li>
+        <li>{{ tx('Kullanıcı/IP listesi açıldığında ziyaretçi bazlı tıklama sayıları ve kimlik referansları eklenir.', 'When user/IP list is enabled, visitor click counts and identity references are added.') }}</li>
+        <li>{{ tx('PDF çıktısı KPI, trend bar-chart, dağılım ve ziyaretçi tablosu bölümleriyle zenginleştirilir.', 'PDF export is enriched with KPI, trend bar chart, distribution, and visitor table sections.') }}</li>
       </ul>
     </section>
 
@@ -117,6 +137,7 @@ export class ReportsPageComponent {
 
   protected scope: TrackingReportScope = TrackingReportScope._0;
   protected detailLevel: TrackingReportDetailLevel = TrackingReportDetailLevel._0;
+  protected includeVisitorBreakdown = false;
   protected format: TrackingReportFormat = TrackingReportFormat._0;
   protected rangePreset: 'all' | 'selected' | 'last7' | 'last30' = 'all';
   protected trackingPageId = '';
@@ -146,6 +167,17 @@ export class ReportsPageComponent {
     return true;
   }
 
+  protected onScopeChanged(): void {
+    if (!this.scopeRequiresPage()) {
+      this.trackingPageId = '';
+      return;
+    }
+
+    if (this.trackingPages().length === 0) {
+      void this.refreshPages();
+    }
+  }
+
   protected async refreshPages(): Promise<void> {
     this.feedback.set(null);
     this.isBusy.set(true);
@@ -172,7 +204,7 @@ export class ReportsPageComponent {
       await exportTrackingReport({
         format: this.format,
         scope: this.scope,
-        detailLevel: this.detailLevel,
+        detailLevel: this.includeVisitorBreakdown ? TrackingReportDetailLevel._1 : this.detailLevel,
         trackingPageId: this.scopeRequiresPage() ? this.trackingPageId : undefined,
         fromUtc,
         toUtc,
@@ -214,5 +246,14 @@ export class ReportsPageComponent {
     }
 
     return date.toISOString();
+  }
+
+  protected selectedTrackingPageLabel(): string {
+    const selectedPage = this.trackingPages().find(page => page.id === this.trackingPageId);
+    if (!selectedPage) {
+      return this.tx('Seçilmedi', 'Not selected');
+    }
+
+    return `/${selectedPage.slug || selectedPage.title || selectedPage.id}`;
   }
 }
