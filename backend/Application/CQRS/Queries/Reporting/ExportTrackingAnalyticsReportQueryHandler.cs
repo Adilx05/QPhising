@@ -42,11 +42,11 @@ public sealed class ExportTrackingAnalyticsReportQueryHandler : IRequestHandler<
             TrackingReportFormat.Csv => new TrackingReportFileResult(
                 ContentType: "text/csv",
                 FileName: $"tracking-report-{scopeSegment}-{detailSegment}-{timestamp}.csv",
-                Content: _trackingReportExporter.BuildCsv(data)),
+                Content: _trackingReportExporter.BuildCsv(data, request.Language)),
             TrackingReportFormat.Pdf => new TrackingReportFileResult(
                 ContentType: "application/pdf",
                 FileName: $"tracking-report-{scopeSegment}-{detailSegment}-{timestamp}.pdf",
-                Content: _trackingReportExporter.BuildPdf(data)),
+                Content: _trackingReportExporter.BuildPdf(data, request.Language)),
             _ => throw new ArgumentOutOfRangeException(nameof(request.Format), request.Format, "Unsupported tracking report format.")
         };
     }

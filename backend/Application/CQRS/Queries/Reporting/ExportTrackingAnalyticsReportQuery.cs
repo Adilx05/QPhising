@@ -12,4 +12,5 @@ public sealed record ExportTrackingAnalyticsReportQuery(
     DateTimeOffset? FromUtc,
     DateTimeOffset? ToUtc,
     bool ExcludeBots,
-    int TimezoneOffsetMinutes) : IRequest<TrackingReportFileResult>;
+    int TimezoneOffsetMinutes,
+    string Language) : IRequest<TrackingReportFileResult>;

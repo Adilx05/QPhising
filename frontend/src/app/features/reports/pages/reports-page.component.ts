@@ -105,7 +105,8 @@ export class ReportsPageComponent {
         fromUtc,
         toUtc,
         excludeBots: this.excludeBots,
-        timezoneOffsetMinutes: -new Date().getTimezoneOffset()
+        timezoneOffsetMinutes: -new Date().getTimezoneOffset(),
+        language: this.userPreferencesService.language().toString()
       });
 
       this.feedback.set(this.tx('Rapor başarıyla indirildi.', 'Report downloaded successfully.'));

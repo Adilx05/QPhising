@@ -65,6 +65,7 @@ export class TrackingAnalyticsService {
     toUtc,
     excludeBots = true,
     timezoneOffsetMinutes,
+    language = 'en',
   }: {
     format?: TrackingReportFormat,
     scope?: TrackingReportScope,
@@ -74,6 +75,7 @@ export class TrackingAnalyticsService {
     toUtc?: string,
     excludeBots?: boolean,
     timezoneOffsetMinutes?: number,
+    language?: string,
   }): CancelablePromise<any> {
     return __request(OpenAPI, {
       method: 'GET',
@@ -87,6 +89,7 @@ export class TrackingAnalyticsService {
         'toUtc': toUtc,
         'excludeBots': excludeBots,
         'timezoneOffsetMinutes': timezoneOffsetMinutes,
+        'language': language,
       },
       errors: {
         400: `Bad Request`,

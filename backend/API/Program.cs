@@ -32,6 +32,7 @@ using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.CQRS.Behaviors;
 using QPhising.Application.Security;
 using System.Threading.RateLimiting;
+using QuestPDF.Infrastructure;
 using System.IO;
 
 // Ensure the content root (used by WebApplicationFactory in tests) exists before building the host.
@@ -44,10 +45,13 @@ if (!Directory.Exists(contentRoot))
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = args, ContentRootPath = contentRoot });
 
 builder.Configuration.AddJsonFile("appsettings.runtime.json", optional: true, reloadOnChange: true);
+
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
-
+QuestPDF.Settings.License = LicenseType.Community;
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+builder.Services.Configure<TrackingReportBrandingOptions>(builder.Configuration.GetSection("TrackingReportBranding"));
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
@@ -283,6 +287,8 @@ builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>(
 builder.Services.AddScoped<IRuntimeConfigurationSecretCipher, DataProtectionRuntimeConfigurationSecretCipher>();
 builder.Services.AddSingleton<ISetupConfigurationRepository, JsonFileSetupConfigurationRepository>();
 builder.Services.AddSingleton<IRuntimeConfigurationRepository, JsonFileRuntimeConfigurationRepository>();
+builder.Services.AddScoped<ITrackingReportExporter, TrackingReportExporter>();
+
 
 var app = builder.Build();
 

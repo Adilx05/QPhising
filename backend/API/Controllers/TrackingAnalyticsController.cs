@@ -47,8 +47,9 @@ public sealed class TrackingAnalyticsController : ControllerBase
 
     [HttpGet("reports/export", Name = "TrackingAnalytics_ExportReport")]
     [Authorize(Policy = IdentityAuthorizationPolicies.ViewerOrAbove)]
+    [Produces("application/pdf", "text/csv")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> ExportReport(
+    public async Task<FileResult> ExportReport(
         [FromQuery] TrackingReportFormat format = TrackingReportFormat.Csv,
         [FromQuery] TrackingReportScope scope = TrackingReportScope.Global,
         [FromQuery] TrackingReportDetailLevel detailLevel = TrackingReportDetailLevel.Summary,
@@ -57,6 +58,7 @@ public sealed class TrackingAnalyticsController : ControllerBase
         [FromQuery] DateTimeOffset? toUtc = null,
         [FromQuery] bool excludeBots = true,
         [FromQuery] int timezoneOffsetMinutes = 0,
+        [FromQuery] string language = "en",
         CancellationToken cancellationToken = default)
     {
         var result = await _sender.Send(
@@ -68,7 +70,8 @@ public sealed class TrackingAnalyticsController : ControllerBase
                 fromUtc,
                 toUtc,
                 excludeBots,
-                timezoneOffsetMinutes),
+                timezoneOffsetMinutes,
+                language),
             cancellationToken);
 
         return File(result.Content, result.ContentType, result.FileName);
