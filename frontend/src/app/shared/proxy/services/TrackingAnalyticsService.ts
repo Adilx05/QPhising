@@ -52,9 +52,8 @@ export class TrackingAnalyticsService {
       },
     });
   }
-
   /**
-   * @returns binary file
+   * @returns any OK
    * @throws ApiError
    */
   public static trackingAnalyticsExportReport({
@@ -64,7 +63,7 @@ export class TrackingAnalyticsService {
     trackingPageId,
     fromUtc,
     toUtc,
-    excludeBots,
+    excludeBots = true,
     timezoneOffsetMinutes,
   }: {
     format?: TrackingReportFormat,
@@ -75,7 +74,7 @@ export class TrackingAnalyticsService {
     toUtc?: string,
     excludeBots?: boolean,
     timezoneOffsetMinutes?: number,
-  }): CancelablePromise<Blob> {
+  }): CancelablePromise<any> {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/tracking/analytics/reports/export',
@@ -89,12 +88,10 @@ export class TrackingAnalyticsService {
         'excludeBots': excludeBots,
         'timezoneOffsetMinutes': timezoneOffsetMinutes,
       },
-      responseType: 'blob',
       errors: {
         400: `Bad Request`,
         401: `Unauthorized`,
         403: `Forbidden`,
-        404: `Not Found`,
         500: `Internal Server Error`,
       },
     });

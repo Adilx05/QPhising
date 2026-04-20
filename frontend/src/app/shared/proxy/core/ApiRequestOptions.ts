@@ -1,4 +1,3 @@
-import type { AxiosRequestConfig } from 'axios';
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -14,6 +13,5 @@ export type ApiRequestOptions = {
   readonly body?: any;
   readonly mediaType?: string;
   readonly responseHeader?: string;
-  readonly responseType?: AxiosRequestConfig['responseType'];
   readonly errors?: Record<number, string>;
 };
