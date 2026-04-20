@@ -58,10 +58,7 @@ public sealed class TrackingReportExporter : ITrackingReportExporter
             NormalizeLanguage(language),
             ResolveLogoBytes(),
             _branding);
-        var bytes = document.GeneratePdf();
 
-        File.WriteAllBytes("test.pdf", bytes);
-        return bytes;
         return document.GeneratePdf();
     }
 

@@ -80,6 +80,10 @@ export class TrackingAnalyticsService {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/tracking/analytics/reports/export',
+      responseType: 'blob',
+      headers: {
+        Accept: 'application/pdf, text/csv'
+      },
       query: {
         'format': format,
         'scope': scope,

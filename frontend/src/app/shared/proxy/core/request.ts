@@ -214,6 +214,7 @@ export const sendRequest = async <T>(
     headers,
     data: body ?? formData,
     method: options.method,
+    responseType: options.responseType,
     withCredentials: config.WITH_CREDENTIALS,
     withXSRFToken: config.CREDENTIALS === 'include' ? config.WITH_CREDENTIALS : false,
     cancelToken: source.token,

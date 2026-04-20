@@ -26,10 +26,14 @@ const triggerDownload = (blob: Blob, filename: string): void => {
   const anchor = document.createElement('a');
   anchor.href = objectUrl;
   anchor.download = filename;
+  anchor.rel = 'noopener';
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  URL.revokeObjectURL(objectUrl);
+
+  // Some browsers may resolve PDF object URLs asynchronously after the click event.
+  // Revoke on next tick to avoid producing blank pages on downloaded PDFs.
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 };
 const resolveMimeType = (format: TrackingReportFormat): string =>
   format === TrackingReportFormat._1 ? 'application/pdf' : 'text/csv;charset=utf-8';
