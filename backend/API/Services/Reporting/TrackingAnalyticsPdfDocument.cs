@@ -205,7 +205,30 @@ public sealed class TrackingAnalyticsPdfDocument : IDocument
                     .FontSize(9)
                     .FontColor(_branding.MutedTextColor);
 
-                col.Item().MaxHeight(220).Image(trendImage).FitArea();
+                col.Item().Row(row =>
+                {
+                    row.Spacing(16);
+
+                    row.AutoItem().Row(r =>
+                    {
+                        r.Spacing(6);
+                        r.AutoItem().AlignMiddle().Height(4).Width(18).Background(_branding.PrimaryColor);
+                        r.AutoItem().AlignMiddle().Text(T("Toplam Ziyaret", "Total Visits"))
+                            .FontSize(9)
+                            .FontColor(_branding.MutedTextColor);
+                    });
+
+                    row.AutoItem().Row(r =>
+                    {
+                        r.Spacing(6);
+                        r.AutoItem().AlignMiddle().Height(4).Width(18).Background(_branding.AccentColor);
+                        r.AutoItem().AlignMiddle().Text(T("Benzersiz Ziyaretçi", "Unique Visitors"))
+                            .FontSize(9)
+                            .FontColor(_branding.MutedTextColor);
+                    });
+                });
+
+                col.Item().PaddingTop(6).MaxHeight(260).Image(trendImage).FitArea();
             });
     }
 

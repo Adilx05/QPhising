@@ -85,10 +85,37 @@ public static class TrackingChartRenderer
             IsAntialias = true
         };
 
-        for (var i = 0; i <= 4; i++)
+        const int tickCount = 4;
+
+        var rawStep = maxY / (float)tickCount;
+        var step = Math.Max(1, (int)Math.Ceiling(rawStep));
+        var axisMax = Math.Max(maxY, step * tickCount);
+
+        using var axisLabelPaint = new SKPaint
         {
-            var y = top + (plotHeight / 4f) * i;
+            Color = SKColor.Parse(textColorHex),
+            IsAntialias = true
+        };
+
+        using var axisFont = new SKFont
+        {
+            Size = 16
+        };
+
+        for (var i = 0; i <= tickCount; i++)
+        {
+            var value = axisMax - (i * step);
+            var y = top + (plotHeight * i / (float)tickCount);
+
             canvas.DrawLine(left, y, width - right, y, gridPaint);
+
+            canvas.DrawText(
+                value.ToString(),
+                left - 10,
+                y + 5,
+                SKTextAlign.Right,
+                axisFont,
+                axisLabelPaint);
         }
 
         canvas.DrawLine(left, top, left, height - bottom, axisPaint);
@@ -100,8 +127,11 @@ public static class TrackingChartRenderer
         for (var i = 0; i < items.Length; i++)
         {
             var x = left + (plotWidth * (i / (float)Math.Max(1, items.Length - 1)));
-            var totalY = top + plotHeight - ((items[i].TotalVisits / (float)maxY) * plotHeight);
-            var uniqueY = top + plotHeight - ((items[i].UniqueVisitors / (float)maxY) * plotHeight);
+            var totalRatio = items[i].TotalVisits / (float)axisMax;
+            var uniqueRatio = items[i].UniqueVisitors / (float)axisMax;
+
+            var totalY = top + plotHeight - (totalRatio * plotHeight);
+            var uniqueY = top + plotHeight - (uniqueRatio * plotHeight);
 
             if (i == 0)
             {
@@ -114,6 +144,21 @@ public static class TrackingChartRenderer
                 uniquePath.LineTo(x, uniqueY);
             }
 
+            var align = SKTextAlign.Center;
+
+            if (i == 0)
+                align = SKTextAlign.Left;
+            else if (i == items.Length - 1)
+                align = SKTextAlign.Right;
+
+            canvas.DrawText(
+                items[i].Label,
+                x,
+                height - bottom + 24,
+                align,
+                axisFont,
+                axisLabelPaint);
+
             canvas.DrawCircle(x, totalY, 4, pointTotalPaint);
             canvas.DrawCircle(x, uniqueY, 4, pointUniquePaint);
 
@@ -121,12 +166,6 @@ public static class TrackingChartRenderer
 
         canvas.DrawPath(totalPath, totalPaint);
         canvas.DrawPath(uniquePath, uniquePaint);
-
-        using var totalLegendPaint = new SKPaint { Color = SKColor.Parse(primaryColorHex), StrokeWidth = 6, IsAntialias = true };
-        canvas.DrawLine(width - 380, 18, width - 330, 18, totalLegendPaint);
-
-        using var uniqueLegendPaint = new SKPaint { Color = SKColor.Parse(accentColorHex), StrokeWidth = 6, IsAntialias = true };
-        canvas.DrawLine(width - 380, 45, width - 330, 45, uniqueLegendPaint);
 
         return Encode(bitmap);
     }

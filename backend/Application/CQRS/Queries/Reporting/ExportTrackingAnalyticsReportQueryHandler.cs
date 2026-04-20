@@ -95,7 +95,7 @@ public sealed class ExportTrackingAnalyticsReportQueryHandler : IRequestHandler<
             TotalVisits: totalVisits,
             UniqueVisitors: uniqueVisitors,
             LastVisitAtUtc: recentVisits.FirstOrDefault()?.OccurredAtUtc,
-            TrendRows: trends.Select(trend => (trend.BucketStartUtc.ToString("yyyy-MM-dd"), trend.TotalVisits, trend.UniqueVisitors)).ToArray(),
+            TrendRows: trends.GroupBy(x => x.BucketStartUtc.Date).Select(g => (Label: g.Key.ToString("yyyy-MM-dd"),TotalVisits: g.Sum(x => x.TotalVisits),UniqueVisitors: g.Sum(x => x.UniqueVisitors))).OrderBy(x => x.Label).ToArray(),
             DistributionRows: topPages.Select(page => ($"/{page.Slug}", page.TotalVisits)).ToArray().Length > 0
                 ? topPages.Select(page => ($"/{page.Slug}", page.TotalVisits)).ToArray()
                 : recentByReferrer,
