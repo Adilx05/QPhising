@@ -44,6 +44,7 @@ export type { TrackingPageSettingsResult } from './models/TrackingPageSettingsRe
 export type { TrackingRecentVisitResult } from './models/TrackingRecentVisitResult';
 export type { TrackingRecentVisitStreamItemResult } from './models/TrackingRecentVisitStreamItemResult';
 export { TrackingReportDetailLevel } from './models/TrackingReportDetailLevel';
+export type { TrackingReportFileResult } from './models/TrackingReportFileResult';
 export { TrackingReportFormat } from './models/TrackingReportFormat';
 export { TrackingReportScope } from './models/TrackingReportScope';
 export type { TrackingTopPageResult } from './models/TrackingTopPageResult';

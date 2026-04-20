@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { TrackingAnalyticsOverviewResult } from '../models/TrackingAnalyticsOverviewResult';
 import type { TrackingReportDetailLevel } from '../models/TrackingReportDetailLevel';
+import type { TrackingReportFileResult } from '../models/TrackingReportFileResult';
 import type { TrackingReportFormat } from '../models/TrackingReportFormat';
 import type { TrackingReportScope } from '../models/TrackingReportScope';
 import type { TrackingVisitTrendBucketWindow } from '../models/TrackingVisitTrendBucketWindow';
@@ -53,7 +54,7 @@ export class TrackingAnalyticsService {
     });
   }
   /**
-   * @returns any OK
+   * @returns TrackingReportFileResult OK
    * @throws ApiError
    */
   public static trackingAnalyticsExportReport({
@@ -76,7 +77,7 @@ export class TrackingAnalyticsService {
     excludeBots?: boolean,
     timezoneOffsetMinutes?: number,
     language?: string,
-  }): CancelablePromise<any> {
+  }): CancelablePromise<TrackingReportFileResult> {
     return __request(OpenAPI, {
       method: 'GET',
       url: '/api/tracking/analytics/reports/export',
