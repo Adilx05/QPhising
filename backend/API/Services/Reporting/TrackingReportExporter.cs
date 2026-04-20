@@ -52,21 +52,24 @@ public sealed class TrackingReportExporter : ITrackingReportExporter
         var lines = new List<string>
         {
             data.Title,
+            new string('=', 70),
             $"Scope: {data.ScopeLabel}",
             $"Range: {(data.FromUtc?.ToString("u", CultureInfo.InvariantCulture) ?? "all-time")} - {(data.ToUtc?.ToString("u", CultureInfo.InvariantCulture) ?? "now")}",
+            $"Applied Notes: {(data.AppliedNotes.Count == 0 ? "-" : string.Join(" | ", data.AppliedNotes))}",
             string.Empty,
+            "KPI Summary",
             $"Total Visits: {data.TotalVisits}",
             $"Unique Visitors: {data.UniqueVisitors}",
             $"Last Visit: {(data.LastVisitAtUtc?.ToString("u", CultureInfo.InvariantCulture) ?? "-")}",
             string.Empty,
-            "Trend Overview"
+            "Trend Overview (bar chart)"
         };
 
         var maxTrend = Math.Max(1, data.TrendRows.Select(static row => row.TotalVisits).DefaultIfEmpty(0).Max());
         foreach (var trend in data.TrendRows.Take(12))
         {
-            var width = (int)Math.Round((trend.TotalVisits / (double)maxTrend) * 20);
-            lines.Add($"{trend.Label}: {new string('█', Math.Max(1, width))} {trend.TotalVisits}");
+            var width = (int)Math.Round((trend.TotalVisits / (double)maxTrend) * 26);
+            lines.Add($"{trend.Label}: [{new string('#', Math.Max(1, width))}] total={trend.TotalVisits}, unique={trend.UniqueVisitors}");
         }
 
         lines.Add(string.Empty);
@@ -79,10 +82,11 @@ public sealed class TrackingReportExporter : ITrackingReportExporter
         if (data.VisitorRows.Count > 0)
         {
             lines.Add(string.Empty);
-            lines.Add("Visitor Click Summary");
+            lines.Add("Visitor Click Summary (top 20)");
+            lines.Add("visitorKey | clicks | session | fingerprint | ipHash");
             foreach (var visitor in data.VisitorRows.Take(20))
             {
-                lines.Add($"{visitor.VisitorKey} -> {visitor.ClickCount} clicks");
+                lines.Add($"{visitor.VisitorKey} | {visitor.ClickCount} | {visitor.SessionId ?? "-"} | {visitor.VisitorFingerprint ?? "-"} | {visitor.IpHash ?? "-"}");
             }
         }
 
@@ -149,7 +153,21 @@ internal static class SimplePdfWriter
 
     private static string SanitizePdfText(string value)
     {
-        var ascii = new string(value.Select(ch => ch <= 127 ? ch : '?').ToArray());
+        var latinized = value
+            .Replace('ç', 'c')
+            .Replace('Ç', 'C')
+            .Replace('ğ', 'g')
+            .Replace('Ğ', 'G')
+            .Replace('ı', 'i')
+            .Replace('İ', 'I')
+            .Replace('ö', 'o')
+            .Replace('Ö', 'O')
+            .Replace('ş', 's')
+            .Replace('Ş', 'S')
+            .Replace('ü', 'u')
+            .Replace('Ü', 'U');
+
+        var ascii = new string(latinized.Select(ch => ch <= 127 ? ch : '?').ToArray());
         return ascii.Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)");
     }
 }
