@@ -18,6 +18,12 @@ export interface ExportReportInput {
   language?: string;
 }
 
+interface ReportFilePayload {
+  contentType?: string;
+  fileName?: string;
+  content?: unknown;
+}
+
 const resolveExtension = (format: TrackingReportFormat): string =>
   format === TrackingReportFormat._1 ? 'pdf' : 'csv';
 
@@ -66,6 +72,15 @@ const toBlob = (payload: unknown, format: TrackingReportFormat): Blob => {
     return new Blob([payload], { type: mimeType });
   }
 
+  if (payload && typeof payload === 'object') {
+    const filePayload = payload as ReportFilePayload;
+    if (typeof filePayload.content === 'string') {
+      const binary = atob(filePayload.content);
+      const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+      return new Blob([bytes], { type: filePayload.contentType ?? mimeType });
+    }
+  }
+
   throw new Error('Export response was not a downloadable file payload.');
 };
 
@@ -82,8 +97,11 @@ export const exportTrackingReport = async (input: ExportReportInput): Promise<vo
     language: input.language
   });
 
+  const payloadObject = payload && typeof payload === 'object'
+    ? payload as ReportFilePayload
+    : undefined;
   const now = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
-  const filename = `tracking-report-${now}.${resolveExtension(input.format)}`;
+  const filename = payloadObject?.fileName?.trim() || `tracking-report-${now}.${resolveExtension(input.format)}`;
   const blob = toBlob(payload, input.format);
   triggerDownload(blob, filename);
 };
