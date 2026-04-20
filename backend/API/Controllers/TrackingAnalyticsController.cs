@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QPhising.Application.Contracts.Abstractions.Reporting;
 using QPhising.Application.Contracts.Abstractions.Tracking;
+using QPhising.Application.Contracts.Responses.Reporting;
 using QPhising.Application.Contracts.Responses.Tracking;
 using QPhising.Application.CQRS.Queries.Reporting;
 using QPhising.Application.CQRS.Queries.Tracking;
@@ -47,9 +48,8 @@ public sealed class TrackingAnalyticsController : ControllerBase
 
     [HttpGet("reports/export", Name = "TrackingAnalytics_ExportReport")]
     [Authorize(Policy = IdentityAuthorizationPolicies.ViewerOrAbove)]
-    [Produces("application/pdf", "text/csv")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<FileResult> ExportReport(
+    [ProducesResponseType(typeof(TrackingReportFileResult), StatusCodes.Status200OK)]
+    public async Task<TrackingReportFileResult> ExportReport(
         [FromQuery] TrackingReportFormat format = TrackingReportFormat.Csv,
         [FromQuery] TrackingReportScope scope = TrackingReportScope.Global,
         [FromQuery] TrackingReportDetailLevel detailLevel = TrackingReportDetailLevel.Summary,
@@ -74,6 +74,6 @@ public sealed class TrackingAnalyticsController : ControllerBase
                 language),
             cancellationToken);
 
-        return File(result.Content, result.ContentType, result.FileName);
+        return result;
     }
 }
