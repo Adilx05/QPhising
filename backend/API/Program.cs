@@ -30,6 +30,8 @@ using QPhising.Application.Security;
 using System.Threading.RateLimiting;
 using QuestPDF.Infrastructure;
 using System.IO;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using QPhising.Api.Health;
 
 // Ensure the content root (used by WebApplicationFactory in tests) exists before building the host.
 var contentRoot = Environment.GetEnvironmentVariable("ASPNETCORE_CONTENTROOT") ?? Directory.GetCurrentDirectory();
@@ -85,7 +87,16 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
     });
 });
-builder.Services.AddHealthChecks();
+builder.Services.AddHttpClient("health-keycloak", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(3);
+});
+
+builder.Services.AddHealthChecks()
+    .AddCheck("process", () => HealthCheckResult.Healthy("Process is running."), tags: ["live"])
+    .AddCheck<PostgreSqlConnectionHealthCheck>("postgresql", tags: ["ready"])
+    .AddCheck<RedisOptionalHealthCheck>("redis", tags: ["ready"])
+    .AddCheck<KeycloakReadinessHealthCheck>("keycloak", tags: ["ready"]);
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -329,7 +340,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<SecurityAuditMiddleware>();
 
-app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("live"),
+    ResponseWriter = OperationalHealthResponseWriter.WriteAsync
+});
+app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("ready"),
+    ResponseWriter = OperationalHealthResponseWriter.WriteAsync
+});
 app.MapControllers();
 
 app.Run();

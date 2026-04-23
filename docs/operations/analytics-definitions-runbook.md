@@ -17,6 +17,12 @@
 ## Operational Checks
 
 1. Validate API + Gateway startup and health checks.
+   - API: `GET /health/live` (process), `GET /health/ready` (PostgreSQL + Redis optional + Keycloak metadata/token probe).
+   - Gateway: `GET /health/live` (process), `GET /health/ready` (downstream API readiness + Keycloak metadata/token probe).
+   - Expected readiness payload contract on both services:
+     - `overallStatus`: `Healthy | Degraded | Unhealthy`
+     - `latencyMs`: total readiness probe latency
+     - `dependencies[]`: each dependency item includes `name`, `status`, `latencyMs`, `failureReason`
 2. Validate tracking CRUD flow and publish lifecycle transitions.
 3. Validate public slug resolution and visit ingestion with representative traffic.
 4. Validate analytics overview and page detail endpoint outputs for known fixture datasets.
@@ -27,3 +33,5 @@
 - If analytics totals are unexpectedly low: confirm bot-exclusion flags and date filters.
 - If unique visitor counts spike: verify session id quality and fallback fingerprint generation inputs.
 - If ingestion throughput regresses: inspect duplicate-guard query timing and database resource saturation.
+- If readiness is `Degraded`: inspect optional dependency failures (typically Redis) before escalating to critical incident.
+- If readiness is `Unhealthy`: inspect PostgreSQL and Keycloak probes first, then downstream API probe from Gateway.

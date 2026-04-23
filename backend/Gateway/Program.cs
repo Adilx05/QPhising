@@ -3,6 +3,8 @@ using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using QPhising.Gateway.Middleware;
 using QPhising.Gateway.Services;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using QPhising.Gateway.Health;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +50,19 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddHealthChecks();
+builder.Services.AddHttpClient("health-keycloak", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(3);
+});
+builder.Services.AddHttpClient("health-downstream-api", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(3);
+});
+
+builder.Services.AddHealthChecks()
+    .AddCheck("process", () => HealthCheckResult.Healthy("Process is running."), tags: ["live"])
+    .AddCheck<DownstreamApiReadinessHealthCheck>("downstream-api", tags: ["ready"])
+    .AddCheck<KeycloakReadinessHealthCheck>("keycloak", tags: ["ready"]);
 builder.Services.AddSingleton(gatewayRoutePolicySettingsProvider);
 builder.Services.AddOcelot(builder.Configuration);
 
@@ -61,7 +75,16 @@ app.UseAuthentication();
 app.UseMiddleware<ClaimsToHeadersForwardingMiddleware>();
 app.UseAuthorization();
 
-app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("live"),
+    ResponseWriter = OperationalHealthResponseWriter.WriteAsync
+});
+app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("ready"),
+    ResponseWriter = OperationalHealthResponseWriter.WriteAsync
+});
 
 await app.UseOcelot();
 
