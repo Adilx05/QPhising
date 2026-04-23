@@ -100,7 +100,7 @@ export const exportTrackingReport = async (input: ExportReportInput): Promise<vo
   const payloadObject = payload && typeof payload === 'object'
     ? payload as ReportFilePayload
     : undefined;
-  const now = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
+  const now = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
   const filename = payloadObject?.fileName?.trim() || `tracking-report-${now}.${resolveExtension(input.format)}`;
   const blob = toBlob(payload, input.format);
   triggerDownload(blob, filename);
