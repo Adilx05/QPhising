@@ -156,6 +156,7 @@ Phase 9 evidence:
 - [x] Add analytics report export center with CSV/PDF outputs (global/selected scope, summary/detailed levels, selectable/all-time ranges, and TR/EN localization).
 - [x] Improve report center selected-tracking-page UX and enrich PDF export layout with chart/table sections plus visitor IP/session click breakdown toggle.
 - [x] Remove setup wizard and runtime configuration surfaces from frontend/backend, rely on appsettings-based Keycloak/PostgreSQL configuration, and always run EF Core migration checks on API startup.
+- [x] Split API/Gateway health model into liveness/readiness endpoints with standardized dependency payload, dependency-specific readiness probes (PostgreSQL, Redis optional degrade, Keycloak timeout probe), and admin dashboard readiness summary card.
 
 Incremental evidence:
 - 2026-04-19: Fixed `RuntimeConfigurationResult` unit-test regressions in `backend/API.Tests/BackendConfigurationUnitTests.cs` by asserting configuration flags from the result contract and validating persisted Keycloak tuple values from repository state.
@@ -194,3 +195,5 @@ Incremental evidence:
 - 2026-04-23: Removed setup/runtime configuration controllers, CQRS flows, frontend pages/guards/navigation, and gateway setup route forwarding; API/Gateway startup now reads static appsettings configuration (no runtime override file) and API always executes EF Core migration check (`Database.Migrate`) during startup.
 
 - 2026-04-23: Updated proxy-generation and Swagger quality-gate scripts to remove removed setup/runtime-configuration contract prerequisites (`/api/configuration`, `/api/setup/*`) so contract validation now targets active endpoints only.
+
+- 2026-04-23: Updated API and Gateway health architecture to expose `/health/live` and `/health/ready` with a shared response contract (overall status, dependency list, latency, failure reason); added real PostgreSQL connectivity check, optional Redis degrade probe, timeout-based Keycloak metadata/token readiness checks, gateway downstream API readiness probe, refreshed operations runbooks, and surfaced read-only system health summary in admin dashboard.

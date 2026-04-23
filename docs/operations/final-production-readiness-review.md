@@ -18,6 +18,9 @@
 - EF Core migrations are configured and tracked.
 - Runtime supports local compose-based API/Gateway/PostgreSQL (+ optional Redis).
 - Setup/runtime configuration templates exist for local/staging/production.
+- Health endpoints are split by liveness/readiness with a shared response contract on API and Gateway:
+  - `GET /health/live`: process liveness only; expected `Healthy` when service is running.
+  - `GET /health/ready`: dependency readiness; expected `Healthy` in steady state, `Degraded` when optional dependencies (e.g., Redis) are unavailable/disabled, `Unhealthy` when critical dependencies fail.
 
 ## Remaining Release Gate
 
