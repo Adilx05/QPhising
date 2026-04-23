@@ -235,7 +235,6 @@ public sealed class TrackingDomainAndApplicationUnitTests
                 ToUtc: null,
                 ExcludeBots: false,
                 TimezoneOffsetMinutes: 0,
-                IncludeVisitorClickDetails: false,
                 Language: "en"),
             CancellationToken.None);
 
@@ -272,7 +271,6 @@ public sealed class TrackingDomainAndApplicationUnitTests
                 ToUtc: null,
                 ExcludeBots: false,
                 TimezoneOffsetMinutes: 0,
-                IncludeVisitorClickDetails: false,
                 Language: "en"),
             CancellationToken.None);
 
@@ -384,6 +382,10 @@ public sealed class TrackingDomainAndApplicationUnitTests
 
         public Task<IReadOnlyCollection<TrackingVisitTrendBucket>> GetTrendBucketsAcrossPagesAsync(DateTimeOffset fromUtc, DateTimeOffset toUtc, TrackingVisitTrendBucketWindow window, int timezoneOffsetMinutes, bool excludeBots, CancellationToken cancellationToken)
             => Task.FromResult(TrendAcrossPages);
+
+        // Implemented to satisfy IVisitEventRepository interface
+        public Task<IReadOnlyCollection<TrackingVisitorClickStat>> ListVisitorClickStatsAsync(Guid? trackingPageId, DateTimeOffset? fromUtc, DateTimeOffset? toUtc, bool excludeBots, int limit, CancellationToken cancellationToken)
+            => Task.FromResult<IReadOnlyCollection<TrackingVisitorClickStat>>(Array.Empty<TrackingVisitorClickStat>());
     }
 
     private sealed class CapturingTrackingReportExporter : ITrackingReportExporter

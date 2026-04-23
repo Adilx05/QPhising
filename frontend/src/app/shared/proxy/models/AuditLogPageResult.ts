@@ -4,8 +4,9 @@
 /* eslint-disable */
 import type { AuditLogEntryResult } from './AuditLogEntryResult';
 export type AuditLogPageResult = {
-  items?: Array<AuditLogEntryResult>;
+  items?: Array<AuditLogEntryResult> | null;
   page?: number;
   pageSize?: number;
   totalCount?: number;
 };
+

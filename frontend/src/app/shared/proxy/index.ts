@@ -8,10 +8,9 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AssertProxyContractSyncRequest } from './models/AssertProxyContractSyncRequest';
-export { SortDirection } from './models/SortDirection';
-export { AuditLogSortField } from './models/AuditLogSortField';
-export type { AuditLogPageResult } from './models/AuditLogPageResult';
 export type { AuditLogEntryResult } from './models/AuditLogEntryResult';
+export type { AuditLogPageResult } from './models/AuditLogPageResult';
+export { AuditLogSortField } from './models/AuditLogSortField';
 export { CampaignLifecycleState } from './models/CampaignLifecycleState';
 export type { CampaignResult } from './models/CampaignResult';
 export type { CaptureVisitRequest } from './models/CaptureVisitRequest';
@@ -24,6 +23,7 @@ export type { GatewayRoutePolicyDefinitionResult } from './models/GatewayRoutePo
 export { IpAddressHashPolicy } from './models/IpAddressHashPolicy';
 export type { ProblemDetails } from './models/ProblemDetails';
 export type { ScheduleCampaignRequest } from './models/ScheduleCampaignRequest';
+export { SortDirection } from './models/SortDirection';
 export { TemplateLifecycleState } from './models/TemplateLifecycleState';
 export type { TemplateResult } from './models/TemplateResult';
 export type { TrackingAnalyticsOverviewResult } from './models/TrackingAnalyticsOverviewResult';
@@ -48,6 +48,7 @@ export type { UpdateTemplateRequest } from './models/UpdateTemplateRequest';
 export type { UpdateTrackingPageRequest } from './models/UpdateTrackingPageRequest';
 export type { VisitIngestionResult } from './models/VisitIngestionResult';
 
+export { AuditService } from './services/AuditService';
 export { CampaignService } from './services/CampaignService';
 export { GatewayService } from './services/GatewayService';
 export { HealthService } from './services/HealthService';
@@ -56,4 +57,3 @@ export { PublicTrackingService } from './services/PublicTrackingService';
 export { TemplateService } from './services/TemplateService';
 export { TrackingService } from './services/TrackingService';
 export { TrackingAnalyticsService } from './services/TrackingAnalyticsService';
-export { AuditService } from './services/AuditService';

@@ -5,11 +5,12 @@
 export type AuditLogEntryResult = {
   id?: string;
   timestampUtc?: string;
-  actor?: string;
-  action?: string;
-  resource?: string;
-  outcome?: string;
+  actor?: string | null;
+  action?: string | null;
+  resource?: string | null;
+  outcome?: string | null;
   outcomeCode?: number;
-  correlationId?: string;
+  correlationId?: string | null;
   ipHash?: string | null;
 };
+

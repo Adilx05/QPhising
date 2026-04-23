@@ -3,6 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export enum SortDirection {
-  _0 = 0,
-  _1 = 1,
+  '_0' = 0,
+  '_1' = 1,
 }
