@@ -8,7 +8,6 @@ import { resolveApiError } from '../../../core/http/api-error-handler';
 import { UserPreferencesService } from '../../../core/ui/user-preferences.service';
 import {
   CampaignLifecycleState,
-  HealthService,
   TrackingPagePublishState,
   TrackingVisitTrendBucketWindow,
   TrackingAnalyticsService,
@@ -106,20 +105,6 @@ import { listTrackingPages } from '../../tracking/data-access';
           </div>
         </div>
       </article>
-
-      <article class="surface-card p-4">
-        <div class="flex items-center justify-between gap-2">
-          <h2 class="text-base font-semibold text-slate-900">{{ tx('Sistem Sağlığı', 'System Health') }}</h2>
-          <p-tag [severity]="healthSeverity()" [value]="healthStatusLabel()"></p-tag>
-        </div>
-        <p class="mt-2 text-xs text-slate-500">
-          {{ tx('Readiness özeti (salt okunur):', 'Readiness summary (read-only):') }}
-          {{ healthDependencySummary() }}
-        </p>
-        <p class="mt-2 text-xs text-slate-500">
-          {{ tx('Gecikme', 'Latency') }}: {{ healthLatencyLabel() }}
-        </p>
-      </article>
     </section>
 
     <section class="mt-6 grid gap-4 xl:grid-cols-2">
@@ -176,7 +161,6 @@ import { listTrackingPages } from '../../tracking/data-access';
   `
 })
 export class DashboardPageComponent {
-  protected readonly systemHealth = signal<SystemHealthSummary | null>(null);
   protected readonly isBusy = signal(false);
   protected readonly feedback = signal<string | null>(null);
   protected readonly campaigns = signal<CampaignResult[]>([]);
@@ -262,10 +246,9 @@ export class DashboardPageComponent {
     this.isBusy.set(true);
 
     try {
-      const [campaigns, trackingPages, _health, overview] = await Promise.all([
+      const [campaigns, trackingPages, overview] = await Promise.all([
         listCampaigns(),
         listTrackingPages(),
-        this.loadSystemHealth(),
         TrackingAnalyticsService.trackingAnalyticsGetOverview({
           trendWindow: TrackingVisitTrendBucketWindow._1,
           topPagesLimit: 6,
@@ -292,67 +275,7 @@ export class DashboardPageComponent {
     }
   }
 
-  protected healthStatusLabel(): string {
-    return this.systemHealth()?.overallStatus ?? this.tx('Bilinmiyor', 'Unknown');
-  }
-
-  protected healthSeverity(): 'success' | 'warning' | 'danger' | 'secondary' {
-    const status = this.systemHealth()?.overallStatus;
-    if (status === 'Healthy') {
-      return 'success';
-    }
-
-    if (status === 'Degraded') {
-      return 'warning';
-    }
-
-    if (status === 'Unhealthy') {
-      return 'danger';
-    }
-
-    return 'secondary';
-  }
-
-  protected healthDependencySummary(): string {
-    const dependencies = this.systemHealth()?.dependencies;
-    if (!dependencies || dependencies.length === 0) {
-      return this.tx('Bağımlılık bilgisi yok.', 'No dependency information.');
-    }
-
-    const healthyCount = dependencies.filter((dependency) => dependency.status === 'Healthy').length;
-    const degradedCount = dependencies.filter((dependency) => dependency.status === 'Degraded').length;
-    const unhealthyCount = dependencies.filter((dependency) => dependency.status === 'Unhealthy').length;
-
-    return this.tx(
-      `Sağlıklı: ${healthyCount}, Degrade: ${degradedCount}, Sağlıksız: ${unhealthyCount}`,
-      `Healthy: ${healthyCount}, Degraded: ${degradedCount}, Unhealthy: ${unhealthyCount}`);
-  }
-
-  protected healthLatencyLabel(): string {
-    const latency = this.systemHealth()?.latencyMs;
-    if (typeof latency !== 'number' || latency < 0) {
-      return '-';
-    }
-
-    return `${latency}ms`;
-  }
-
-  private async loadSystemHealth(): Promise<void> {
-    const health = (await HealthService.getHealth()) as SystemHealthSummary;
-    this.systemHealth.set(health);
-  }
-
   private countCampaignsByState(targetState: CampaignLifecycleState): number {
     return this.campaigns().filter((campaign) => campaign.lifecycleState === targetState).length;
   }
-}
-
-interface SystemHealthSummary {
-  overallStatus?: string;
-  latencyMs?: number;
-  dependencies?: ReadonlyArray<SystemHealthDependency>;
-}
-
-interface SystemHealthDependency {
-  status?: string;
 }
