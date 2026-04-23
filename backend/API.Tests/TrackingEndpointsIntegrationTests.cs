@@ -9,7 +9,7 @@ namespace QPhising.Api.Tests;
 public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFactory>
 {
     private readonly TestApiFactory _factory;
-    private static string UniqueSuffix => Guid.NewGuid().ToString("N")[..8];
+    private static string UniqueSuffix => Guid.NewGuid().ToString("N");
 
     public TrackingEndpointsIntegrationTests(TestApiFactory factory)
     {
@@ -145,21 +145,15 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
     [Fact]
     public async Task CampaignDelete_ShouldSoftDeleteLinkedTrackingPage()
     {
-        var suffix = UniqueSuffix;
         var adminClient = _factory.CreateClient();
         adminClient.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
-
-        var createCampaignResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
-        {
-            name = $"Delete Cascade Campaign {suffix}",
-            trackingPageSlug = $"delete-cascade-campaign-{suffix}",
-            trackingPageTitle = "Delete Cascade Landing",
-            trackingPageDescription = "Cascade soft-delete check",
-            templateId = (Guid?)null,
-            htmlContent = "<h1>Landing</h1>",
-            validFromUtc = (DateTimeOffset?)null,
-            validUntilUtc = (DateTimeOffset?)null
-        });
+        var (createCampaignResponse, _) = await CreateCampaignWithUniqueSlugAsync(
+            adminClient,
+            campaignNamePrefix: "Delete Cascade Campaign",
+            trackingPageSlugPrefix: "delete-cascade-campaign",
+            trackingPageTitle: "Delete Cascade Landing",
+            trackingPageDescription: "Cascade soft-delete check",
+            htmlContent: "<h1>Landing</h1>");
 
         createCampaignResponse.EnsureSuccessStatusCode();
         var createPayload = JsonNode.Parse(await createCampaignResponse.Content.ReadAsStringAsync())!.AsObject();
@@ -179,22 +173,15 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
     [Fact]
     public async Task CampaignPublicLanding_ShouldRequireActiveLifecycleState()
     {
-        var suffix = UniqueSuffix;
-        var slug = $"lifecycle-guard-campaign-{suffix}";
         var adminClient = _factory.CreateClient();
         adminClient.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
-
-        var createCampaignResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
-        {
-            name = $"Lifecycle Guard Campaign {suffix}",
-            trackingPageSlug = slug,
-            trackingPageTitle = "Lifecycle Guard Landing",
-            trackingPageDescription = "Only active campaigns can resolve publicly",
-            templateId = (Guid?)null,
-            htmlContent = "<h1>Lifecycle Guard</h1>",
-            validFromUtc = (DateTimeOffset?)null,
-            validUntilUtc = (DateTimeOffset?)null
-        });
+        var (createCampaignResponse, slug) = await CreateCampaignWithUniqueSlugAsync(
+            adminClient,
+            campaignNamePrefix: "Lifecycle Guard Campaign",
+            trackingPageSlugPrefix: "lifecycle-guard-campaign",
+            trackingPageTitle: "Lifecycle Guard Landing",
+            trackingPageDescription: "Only active campaigns can resolve publicly",
+            htmlContent: "<h1>Lifecycle Guard</h1>");
 
         createCampaignResponse.EnsureSuccessStatusCode();
         var createPayload = JsonNode.Parse(await createCampaignResponse.Content.ReadAsStringAsync())!.AsObject();
@@ -214,6 +201,52 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
 
         var publicWhilePaused = await adminClient.GetAsync($"/p/{slug}");
         Assert.Equal(HttpStatusCode.NotFound, publicWhilePaused.StatusCode);
+    }
+
+    private static async Task<(HttpResponseMessage Response, string Slug)> CreateCampaignWithUniqueSlugAsync(
+        HttpClient adminClient,
+        string campaignNamePrefix,
+        string trackingPageSlugPrefix,
+        string trackingPageTitle,
+        string trackingPageDescription,
+        string htmlContent)
+    {
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            var suffix = UniqueSuffix;
+            var slug = $"{trackingPageSlugPrefix}-{suffix}";
+            var createCampaignResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
+            {
+                name = $"{campaignNamePrefix} {suffix}",
+                trackingPageSlug = slug,
+                trackingPageTitle,
+                trackingPageDescription,
+                templateId = (Guid?)null,
+                htmlContent,
+                validFromUtc = (DateTimeOffset?)null,
+                validUntilUtc = (DateTimeOffset?)null
+            });
+
+            if (createCampaignResponse.StatusCode != HttpStatusCode.Conflict)
+            {
+                return (createCampaignResponse, slug);
+            }
+        }
+
+        var fallbackSlug = $"{trackingPageSlugPrefix}-{UniqueSuffix}";
+        var fallbackResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
+        {
+            name = $"{campaignNamePrefix} {UniqueSuffix}",
+            trackingPageSlug = fallbackSlug,
+            trackingPageTitle,
+            trackingPageDescription,
+            templateId = (Guid?)null,
+            htmlContent,
+            validFromUtc = (DateTimeOffset?)null,
+            validUntilUtc = (DateTimeOffset?)null
+        });
+
+        return (fallbackResponse, fallbackSlug);
     }
 
     [Fact]
