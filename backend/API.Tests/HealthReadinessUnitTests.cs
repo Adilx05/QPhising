@@ -38,7 +38,9 @@ public sealed class HealthReadinessUnitTests
         await OperationalHealthResponseWriter.WriteAsync(context, report);
 
         context.Response.Body.Seek(0, SeekOrigin.Begin);
-        var payload = await JsonSerializer.DeserializeAsync<OperationalHealthResponse>(context.Response.Body);
+        var payload = await JsonSerializer.DeserializeAsync<OperationalHealthResponse>(
+            context.Response.Body,
+            new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
         Assert.NotNull(payload);
         Assert.Equal("Degraded", payload!.OverallStatus);
