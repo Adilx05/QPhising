@@ -11,7 +11,6 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class CampaignService {
   /**
-   * List campaigns with lifecycle and targeting details.
    * @returns CampaignResult OK
    * @throws ApiError
    */
@@ -28,7 +27,6 @@ export class CampaignService {
     });
   }
   /**
-   * Create a new campaign in Draft lifecycle state.
    * @returns CampaignResult OK
    * @throws ApiError
    */
@@ -51,7 +49,6 @@ export class CampaignService {
     });
   }
   /**
-   * Get a campaign by identifier.
    * @returns CampaignResult OK
    * @throws ApiError
    */
@@ -75,7 +72,6 @@ export class CampaignService {
     });
   }
   /**
-   * Update mutable campaign details while preserving lifecycle history.
    * @returns CampaignResult OK
    * @throws ApiError
    */
@@ -126,7 +122,6 @@ export class CampaignService {
     });
   }
   /**
-   * Schedule campaign execution window.
    * @returns CampaignResult OK
    * @throws ApiError
    */
@@ -154,7 +149,6 @@ export class CampaignService {
     });
   }
   /**
-   * Transition a scheduled campaign to Active.
    * @returns CampaignResult OK
    * @throws ApiError
    */
@@ -178,7 +172,6 @@ export class CampaignService {
     });
   }
   /**
-   * Pause an active campaign.
    * @returns CampaignResult OK
    * @throws ApiError
    */
@@ -202,7 +195,6 @@ export class CampaignService {
     });
   }
   /**
-   * Complete a campaign lifecycle.
    * @returns CampaignResult OK
    * @throws ApiError
    */
@@ -226,7 +218,6 @@ export class CampaignService {
     });
   }
   /**
-   * Cancel a campaign lifecycle.
    * @returns CampaignResult OK
    * @throws ApiError
    */
