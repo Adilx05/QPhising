@@ -1,0 +1,92 @@
+<section class="mb-6 flex flex-wrap items-start justify-between gap-3">
+  <div>
+    <h1 class="page-title">{{ tx('Audit Kayıtları', 'Audit Logs') }}</h1>
+    <p class="page-subtitle">{{ tx('Güvenlik ve aksiyon event kayıtlarını filtreleyin ve inceleyin.', 'Filter and inspect security and action audit events.') }}</p>
+  </div>
+</section>
+
+<section class="surface-card p-5">
+  <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <input pInputText class="w-full" type="datetime-local" [(ngModel)]="fromUtc" [placeholder]="tx('Başlangıç (UTC)', 'From (UTC)')" />
+    <input pInputText class="w-full" type="datetime-local" [(ngModel)]="toUtc" [placeholder]="tx('Bitiş (UTC)', 'To (UTC)')" />
+    <input pInputText class="w-full" [(ngModel)]="actor" [placeholder]="tx('Kullanıcı/Actor', 'User/Actor')" />
+    <input pInputText class="w-full" [(ngModel)]="endpoint" [placeholder]="tx('Endpoint/Resource', 'Endpoint/Resource')" />
+    <input pInputText class="w-full" [(ngModel)]="outcomeCode" [placeholder]="tx('Sonuç Kodu', 'Outcome Code')" />
+    <input pInputText class="w-full" [(ngModel)]="correlationId" [placeholder]="tx('Correlation Id ile ara', 'Search by correlation id')" />
+
+    <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="sortBy">
+      <option *ngFor="let option of sortByOptions" [ngValue]="option.value">{{ option.label }}</option>
+    </select>
+
+    <select class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" [(ngModel)]="sortDirection">
+      <option [ngValue]="0">Desc</option>
+      <option [ngValue]="1">Asc</option>
+    </select>
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2">
+    <button pButton type="button" icon="pi pi-search" [label]="tx('Ara', 'Search')" [loading]="isBusy()" (click)="search(1)"></button>
+    <button pButton type="button" severity="secondary" icon="pi pi-filter-slash" [label]="tx('Filtreleri Temizle', 'Clear Filters')" [disabled]="isBusy()" (click)="clearFilters()"></button>
+  </div>
+</section>
+
+<section class="surface-card mt-6 p-5">
+  <div class="mb-3 flex items-center justify-between">
+    <h2 class="text-base font-semibold text-slate-900">{{ tx('Kayıtlar', 'Records') }}</h2>
+    <span class="text-xs text-slate-500">{{ tx('Toplam', 'Total') }}: {{ totalCount() }}</span>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[860px] text-sm">
+      <thead>
+        <tr class="border-b border-slate-200 text-left text-slate-500">
+          <th class="px-2 py-2">{{ tx('Zaman', 'Timestamp') }}</th>
+          <th class="px-2 py-2">{{ tx('Actor', 'Actor') }}</th>
+          <th class="px-2 py-2">{{ tx('Action', 'Action') }}</th>
+          <th class="px-2 py-2">{{ tx('Resource', 'Resource') }}</th>
+          <th class="px-2 py-2">{{ tx('Sonuç', 'Outcome') }}</th>
+          <th class="px-2 py-2">{{ tx('Kod', 'Code') }}</th>
+          <th class="px-2 py-2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of logs()" class="border-b border-slate-100">
+          <td class="px-2 py-2">{{ item.timestampUtc | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+          <td class="px-2 py-2">{{ item.actor }}</td>
+          <td class="px-2 py-2">{{ item.action }}</td>
+          <td class="px-2 py-2">{{ item.resource }}</td>
+          <td class="px-2 py-2">{{ item.outcome }}</td>
+          <td class="px-2 py-2">{{ item.outcomeCode }}</td>
+          <td class="px-2 py-2">
+            <button pButton type="button" size="small" icon="pi pi-eye" [label]="tx('Detay', 'Detail')" (click)="openDetails(item)"></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4 flex items-center justify-end gap-2">
+    <button pButton type="button" size="small" icon="pi pi-angle-left" [disabled]="page <= 1 || isBusy()" (click)="previousPage()"></button>
+    <span class="text-xs text-slate-600">{{ tx('Sayfa', 'Page') }} {{ page }}</span>
+    <button pButton type="button" size="small" icon="pi pi-angle-right" [disabled]="(page * pageSize) >= totalCount() || isBusy()" (click)="nextPage()"></button>
+  </div>
+</section>
+
+<aside *ngIf="selectedLog() as detail" class="fixed inset-y-0 right-0 z-50 w-full max-w-xl border-l border-slate-200 bg-white p-5 shadow-2xl">
+  <div class="flex items-center justify-between">
+    <h3 class="text-base font-semibold text-slate-900">{{ tx('Olay Detayı', 'Event Detail') }}</h3>
+    <button pButton type="button" size="small" severity="secondary" icon="pi pi-times" (click)="closeDetails()"></button>
+  </div>
+
+  <dl class="mt-4 space-y-2 text-sm">
+    <div><dt class="font-medium">Timestamp</dt><dd>{{ detail.timestampUtc }}</dd></div>
+    <div><dt class="font-medium">Actor</dt><dd>{{ detail.actor }}</dd></div>
+    <div><dt class="font-medium">Action</dt><dd>{{ detail.action }}</dd></div>
+    <div><dt class="font-medium">Resource</dt><dd>{{ detail.resource }}</dd></div>
+    <div><dt class="font-medium">Outcome</dt><dd>{{ detail.outcome }} ({{ detail.outcomeCode }})</dd></div>
+    <div><dt class="font-medium">Correlation Id</dt><dd>{{ detail.correlationId }}</dd></div>
+    <div><dt class="font-medium">IP Hash</dt><dd>{{ detail.ipHash || '-' }}</dd></div>
+  </dl>
+</aside>
+
+<p *ngIf="feedback()" class="mt-4 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-800">{{ feedback() }}</p>

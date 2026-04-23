@@ -8,6 +8,10 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AssertProxyContractSyncRequest } from './models/AssertProxyContractSyncRequest';
+export { SortDirection } from './models/SortDirection';
+export { AuditLogSortField } from './models/AuditLogSortField';
+export type { AuditLogPageResult } from './models/AuditLogPageResult';
+export type { AuditLogEntryResult } from './models/AuditLogEntryResult';
 export { CampaignLifecycleState } from './models/CampaignLifecycleState';
 export type { CampaignResult } from './models/CampaignResult';
 export type { CaptureVisitRequest } from './models/CaptureVisitRequest';
@@ -52,3 +56,4 @@ export { PublicTrackingService } from './services/PublicTrackingService';
 export { TemplateService } from './services/TemplateService';
 export { TrackingService } from './services/TrackingService';
 export { TrackingAnalyticsService } from './services/TrackingAnalyticsService';
+export { AuditService } from './services/AuditService';

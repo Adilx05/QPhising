@@ -138,6 +138,7 @@ Phase 9 evidence:
 - [ ] TASKS.md statuses are accurate and evidence is documented.
 
 ## Incremental Feature Requests
+- [x] Add queryable audit-log read model and admin/operator audit console with critical event taxonomy coverage.
 - [x] Add configurable visitor IP capture policy (off/plain/hashed) and ensure visit ingestion records IP according to tracking-page settings.
 - [x] Rework campaign creation flow to create a real tracking page (template-based or blank) without manual GUID entry in UI.
 - [x] Add campaign detail route and screen reachable from campaign listing cards.
@@ -159,6 +160,7 @@ Phase 9 evidence:
 - [x] Split API/Gateway health model into liveness/readiness endpoints with standardized dependency payload, dependency-specific readiness probes (PostgreSQL, Redis optional degrade, Keycloak timeout probe), and admin dashboard readiness summary card.
 
 Incremental evidence:
+- 2026-04-23: Added queryable `audit_log_entries` read model (timestamp/actor/action/resource/outcome/outcomeCode/correlationId/ipHash), CQRS audit query use-case (date/user/endpoint/result filters + pagination/sorting), operator/admin `GET /api/audit/logs` endpoint with FluentValidation/ProblemDetails integration, frontend `/audit-logs` table + quick filters + correlation search + event detail drawer, and documented critical event taxonomy (`401/403/429`, `campaign.delete`, `template.publish`) in `docs/operations/audit-event-taxonomy.md`.
 - 2026-04-19: Fixed `RuntimeConfigurationResult` unit-test regressions in `backend/API.Tests/BackendConfigurationUnitTests.cs` by asserting configuration flags from the result contract and validating persisted Keycloak tuple values from repository state.
 - 2026-04-19: Removed Redis input/test requirements from setup + runtime configuration flows (Redis now optional in setup/runtime aggregates), setup guard now allows main app when base appsettings bootstrap config is already present, and app shell now renders authenticated user card (name/role) with sidebar logout action.
 - 2026-04-19: Campaign create flow now provisions public landing validity window + optional custom HTML, removes destination URL dependency, returns/create-UI displays slug/id public links, and public `/p/{slug}` resolution now accepts optional `id`/`campaign` query with strict 404 for unpublished or out-of-window pages.

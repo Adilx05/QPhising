@@ -4,6 +4,7 @@ import {
   authenticationCanMatchGuard
 } from './core/guards';
 import { AuthCallbackPageComponent } from './features/auth/pages/auth-callback-page.component';
+import { AuditLogsPageComponent } from './features/audit/pages/audit-logs-page.component';
 import { AuthUnauthorizedPageComponent } from './features/auth/pages/auth-unauthorized-page.component';
 import { CampaignsPageComponent } from './features/campaigns/pages/campaigns-page.component';
 import { CampaignDetailPageComponent } from './features/campaigns/pages/campaign-detail-page.component';
@@ -66,6 +67,16 @@ export const appRoutes: Routes = [
   },
 
 
+
+  {
+    path: 'audit-logs',
+    component: AuditLogsPageComponent,
+    canActivate: [authenticationCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard],
+    data: {
+      requiredRole: 'Operator'
+    }
+  },
   {
     path: 'reports',
     component: ReportsPageComponent,
