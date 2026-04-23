@@ -20,12 +20,6 @@ public sealed class GatewayRouteOwnershipMap
         var map = new GatewayRouteOwnershipMap();
 
         map.AddDefinition(new GatewayRouteOwnershipDefinition(
-            new GatewayRouteTemplate("/api/setup/{everything}"),
-            GatewayModule.Setup,
-            requiresAuthentication: false,
-            purpose: "Setup wizard endpoints remain reachable before runtime setup completion."));
-
-        map.AddDefinition(new GatewayRouteOwnershipDefinition(
             new GatewayRouteTemplate("/api/{everything}"),
             GatewayModule.PlatformApi,
             requiresAuthentication: true,

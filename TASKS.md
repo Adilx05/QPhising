@@ -155,6 +155,7 @@ Phase 9 evidence:
 - [x] Expand language support to full-page TR/EN localization across auth, dashboard, setup/runtime configuration, template management, and tracking screens.
 - [x] Add analytics report export center with CSV/PDF outputs (global/selected scope, summary/detailed levels, selectable/all-time ranges, and TR/EN localization).
 - [x] Improve report center selected-tracking-page UX and enrich PDF export layout with chart/table sections plus visitor IP/session click breakdown toggle.
+- [x] Remove setup wizard and runtime configuration surfaces from frontend/backend, rely on appsettings-based Keycloak/PostgreSQL configuration, and always run EF Core migration checks on API startup.
 
 Incremental evidence:
 - 2026-04-19: Fixed `RuntimeConfigurationResult` unit-test regressions in `backend/API.Tests/BackendConfigurationUnitTests.cs` by asserting configuration flags from the result contract and validating persisted Keycloak tuple values from repository state.
@@ -190,3 +191,4 @@ Incremental evidence:
 - 2026-04-20: Fixed PDF download corruption/blank-page issue by deferring object-URL revocation after browser download trigger and removing leftover debug disk-write side effect in backend PDF exporter.
 - 2026-04-20: Reworked report export contract to return `TrackingReportFileResult` JSON payload (base64 content + filename/contentType) directly from controller so generated proxies remain stable after regeneration; frontend export flow now decodes base64 safely into Blob and uses server-provided filename when available.
 - 2026-04-20: Fixed report trend-chart KPI mismatch by switching report trend rows to cumulative total-click rendering (final point now aligns with summary total clicks) and aligned tracking-page report trend query defaults to true all-time (`UnixEpoch` -> `UtcNow`) when no explicit date range is provided.
+- 2026-04-23: Removed setup/runtime configuration controllers, CQRS flows, frontend pages/guards/navigation, and gateway setup route forwarding; API/Gateway startup now reads static appsettings configuration (no runtime override file) and API always executes EF Core migration check (`Database.Migrate`) during startup.

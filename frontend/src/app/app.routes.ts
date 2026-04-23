@@ -1,9 +1,7 @@
 import { Routes } from '@angular/router';
 import {
   authenticationCanActivateGuard,
-  authenticationCanMatchGuard,
-  setupCompletionCanActivateGuard,
-  setupCompletionCanMatchGuard
+  authenticationCanMatchGuard
 } from './core/guards';
 import { AuthCallbackPageComponent } from './features/auth/pages/auth-callback-page.component';
 import { AuthUnauthorizedPageComponent } from './features/auth/pages/auth-unauthorized-page.component';
@@ -11,10 +9,8 @@ import { CampaignsPageComponent } from './features/campaigns/pages/campaigns-pag
 import { CampaignDetailPageComponent } from './features/campaigns/pages/campaign-detail-page.component';
 import { DashboardPageComponent } from './features/dashboard/pages/dashboard-page.component';
 import { ReportsPageComponent } from './features/reports/pages/reports-page.component';
-import { RuntimeConfigurationPageComponent } from './features/setup/pages/runtime-configuration-page.component';
 import { TrackingDashboardPageComponent } from './features/tracking/pages/tracking-dashboard-page.component';
 import { PublicTrackingLandingPageComponent } from './features/tracking/pages/public-tracking-landing-page.component';
-import { SetupWizardPageComponent } from './features/setup/pages/setup-wizard-page.component';
 import { TemplatesPageComponent } from './features/templates/pages/templates-page.component';
 
 export const appRoutes: Routes = [
@@ -31,14 +27,10 @@ export const appRoutes: Routes = [
     component: AuthUnauthorizedPageComponent
   },
   {
-    path: 'setup',
-    component: SetupWizardPageComponent
-  },
-  {
     path: 'dashboard',
     component: DashboardPageComponent,
-    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
-    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    canActivate: [authenticationCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard],
     data: {
       requiredRole: 'Viewer'
     }
@@ -47,8 +39,8 @@ export const appRoutes: Routes = [
   {
     path: 'campaigns',
     component: CampaignsPageComponent,
-    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
-    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    canActivate: [authenticationCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard],
     data: {
       requiredRole: 'Viewer'
     }
@@ -56,8 +48,8 @@ export const appRoutes: Routes = [
   {
     path: 'campaigns/:campaignId',
     component: CampaignDetailPageComponent,
-    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
-    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    canActivate: [authenticationCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard],
     data: {
       requiredRole: 'Viewer'
     }
@@ -66,8 +58,8 @@ export const appRoutes: Routes = [
   {
     path: 'templates',
     component: TemplatesPageComponent,
-    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
-    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    canActivate: [authenticationCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard],
     data: {
       requiredRole: 'Viewer'
     }
@@ -77,8 +69,8 @@ export const appRoutes: Routes = [
   {
     path: 'reports',
     component: ReportsPageComponent,
-    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
-    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    canActivate: [authenticationCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard],
     data: {
       requiredRole: 'Viewer'
     }
@@ -86,17 +78,8 @@ export const appRoutes: Routes = [
   {
     path: 'tracking',
     component: TrackingDashboardPageComponent,
-    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
-    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
-    data: {
-      requiredRole: 'Viewer'
-    }
-  },
-  {
-    path: 'configuration',
-    component: RuntimeConfigurationPageComponent,
-    canActivate: [authenticationCanActivateGuard, setupCompletionCanActivateGuard],
-    canMatch: [authenticationCanMatchGuard, setupCompletionCanMatchGuard],
+    canActivate: [authenticationCanActivateGuard],
+    canMatch: [authenticationCanMatchGuard],
     data: {
       requiredRole: 'Viewer'
     }
