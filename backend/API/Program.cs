@@ -16,8 +16,6 @@ using QPhising.Api.Services.Gateway;
 using QPhising.Api.Services.Identity;
 using QPhising.Api.Services.ProxyValidation;
 using QPhising.Api.Services.Reporting;
-using QPhising.Api.Services.RuntimeConfiguration;
-using QPhising.Api.Services.Setup;
 using QPhising.Api.Swagger;
 using QPhising.Application.Contracts.Abstractions.Authorization;
 using QPhising.Application.Contracts.Abstractions.Campaign;
@@ -25,8 +23,6 @@ using QPhising.Application.Contracts.Abstractions.Gateway;
 using QPhising.Application.Contracts.Abstractions.Persistence;
 using QPhising.Application.Contracts.Abstractions.ProxyValidation;
 using QPhising.Application.Contracts.Abstractions.Reporting;
-using QPhising.Application.Contracts.Abstractions.RuntimeConfiguration;
-using QPhising.Application.Contracts.Abstractions.Setup;
 using QPhising.Application.Contracts.Abstractions.Template;
 using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.CQRS.Behaviors;
@@ -43,8 +39,6 @@ if (!Directory.Exists(contentRoot))
 }
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = args, ContentRootPath = contentRoot });
-
-builder.Configuration.AddJsonFile("appsettings.runtime.json", optional: true, reloadOnChange: true);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
@@ -77,7 +71,6 @@ builder.Services.AddSwaggerGen(options =>
 
     options.OperationFilter<AuthorizationMetadataOperationFilter>();
     options.OperationFilter<GlobalProblemDetailsResponsesOperationFilter>();
-    options.OperationFilter<SetupEndpointsExamplesOperationFilter>();
 });
 builder.Services.AddCors(options =>
 {
@@ -226,10 +219,6 @@ builder.Services.AddAuthorization(options =>
         });
     }
 });
-builder.Services.AddHttpClient(nameof(SetupDependencyConnectionTester), client =>
-{
-    client.Timeout = TimeSpan.FromSeconds(10);
-});
 builder.Services.AddOptions<JwtValidationOptions>()
     .Bind(builder.Configuration.GetSection("Authentication:Jwt"));
 
@@ -281,13 +270,6 @@ builder.Services.AddScoped<ITrackingPageRepository, EfCoreTrackingPageRepository
 builder.Services.AddScoped<IVisitEventRepository, EfCoreVisitEventRepository>();
 builder.Services.AddScoped<ITrackingReportExporter, TrackingReportExporter>();
 builder.Services.AddScoped<IProxyContractDriftValidator, FileTimestampProxyContractDriftValidator>();
-builder.Services.AddScoped<ISetupDependencyConnectionTester, SetupDependencyConnectionTester>();
-builder.Services.AddSingleton<ISetupBootstrapConfigurationReader, ConfigurationSetupBootstrapConfigurationReader>();
-builder.Services.AddScoped<ISetupSecretCipher, DataProtectionSetupSecretCipher>();
-builder.Services.AddScoped<IRuntimeConfigurationSecretCipher, DataProtectionRuntimeConfigurationSecretCipher>();
-builder.Services.AddSingleton<ISetupConfigurationRepository, JsonFileSetupConfigurationRepository>();
-builder.Services.AddSingleton<IRuntimeConfigurationRepository, JsonFileRuntimeConfigurationRepository>();
-builder.Services.AddScoped<ITrackingReportExporter, TrackingReportExporter>();
 
 
 var app = builder.Build();
@@ -295,10 +277,6 @@ var app = builder.Build();
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ProblemDetailsExceptionMiddleware>();
 
-var shouldRunMigrations = app.Environment.IsDevelopment() ||
-                          app.Configuration.GetValue("Database:ApplyMigrationsOnStartup", false);
-
-if (shouldRunMigrations)
 {
     using var migrationScope = app.Services.CreateScope();
     var logger = migrationScope.ServiceProvider.GetRequiredService<ILoggerFactory>()
@@ -308,13 +286,13 @@ if (shouldRunMigrations)
     try
     {
         logger.LogInformation(
-            "Applying EF Core migrations for context {DbContext} in environment {EnvironmentName}.",
+            "Checking and applying pending EF Core migrations for context {DbContext} in environment {EnvironmentName}.",
             nameof(QPhisingDbContext),
             app.Environment.EnvironmentName);
 
         dbContext.Database.Migrate();
 
-        logger.LogInformation("EF Core migrations applied successfully.");
+        logger.LogInformation("EF Core migration check completed successfully.");
     }
     catch (Exception ex)
     {

@@ -13,18 +13,6 @@
       ]
     },
     {
-      "UpstreamPathTemplate": "/api/setup/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
-      "DownstreamPathTemplate": "/api/setup/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 5050
-        }
-      ]
-    },
-    {
       "UpstreamPathTemplate": "/api/tracking/pages/{slug}/visits",
       "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
       "DownstreamPathTemplate": "/api/tracking/pages/{slug}/visits",

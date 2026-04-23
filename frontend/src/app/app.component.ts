@@ -7,7 +7,6 @@ import { filter } from 'rxjs/operators';
 import { AuthSessionService } from './core/auth/auth-session';
 import { OidcAuthService } from './core/auth/oidc-auth.service';
 import { AppLanguage, UserPreferencesService } from './core/ui/user-preferences.service';
-import { SetupReadinessState, SetupService } from './shared/proxy';
 
 @Component({
   selector: 'app-root',
@@ -64,17 +63,6 @@ import { SetupReadinessState, SetupService } from './shared/proxy';
           </a>
         </nav>
 
-        <section class="mt-auto space-y-2 border-t border-slate-200 px-4 py-4">
-          <a *ngIf="shouldShowSetupWizard()" routerLink="/setup" routerLinkActive="is-active" class="nav-item nav-item-muted">
-            <i class="pi pi-cog text-sm"></i>
-            <span>{{ t('setupWizard') }}</span>
-          </a>
-
-          <a *ngIf="canViewConfiguration()" routerLink="/configuration" routerLinkActive="is-active" class="nav-item nav-item-muted">
-            <i class="pi pi-sliders-h text-sm"></i>
-            <span>{{ t('runtimeConfig') }}</span>
-          </a>
-        </section>
       </aside>
 
       <div class="flex min-h-screen flex-1 flex-col">
@@ -88,8 +76,6 @@ import { SetupReadinessState, SetupService } from './shared/proxy';
               <a *ngIf="canViewCampaigns()" class="mobile-nav-item" routerLink="/campaigns" routerLinkActive="is-active">{{ t('campaigns') }}</a>
               <a *ngIf="canViewTemplates()" class="mobile-nav-item" routerLink="/templates" routerLinkActive="is-active">{{ t('templates') }}</a>
               <a *ngIf="canViewReports()" class="mobile-nav-item" routerLink="/reports" routerLinkActive="is-active">{{ t('reports') }}</a>
-              <a *ngIf="shouldShowSetupWizard()" class="mobile-nav-item" routerLink="/setup" routerLinkActive="is-active">{{ t('setup') }}</a>
-              <a *ngIf="canViewConfiguration()" class="mobile-nav-item" routerLink="/configuration" routerLinkActive="is-active">{{ t('configShort') }}</a>
             </nav>
 
             <div class="flex items-center gap-2">
@@ -135,10 +121,6 @@ export class AppComponent {
       campaigns: 'Senaryolar',
       templates: 'Şablonlar',
       reports: 'Raporlar',
-      setupWizard: 'Kurulum Sihirbazı',
-      runtimeConfig: 'Çalışma Zamanı Ayarları',
-      setup: 'Kurulum',
-      configShort: 'Ayarlar',
       language: 'Dil',
       darkMode: 'Koyu Mod',
       lightMode: 'Açık Mod',
@@ -153,10 +135,6 @@ export class AppComponent {
       campaigns: 'Campaigns',
       templates: 'Templates',
       reports: 'Reports',
-      setupWizard: 'Setup Wizard',
-      runtimeConfig: 'Runtime Configuration',
-      setup: 'Setup',
-      configShort: 'Config',
       language: 'Language',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
@@ -166,8 +144,6 @@ export class AppComponent {
   };
 
   private currentUrl = '';
-  private setupCompleted = false;
-
   public constructor(
     private readonly authSessionService: AuthSessionService,
     private readonly oidcAuthService: OidcAuthService,
@@ -175,16 +151,10 @@ export class AppComponent {
     private readonly router: Router
   ) {
     this.currentUrl = this.resolveInitialUrl();
-    void this.refreshSetupVisibility();
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event) => {
-        const previousUrl = this.currentUrl;
         this.currentUrl = event.urlAfterRedirects;
-
-        if (previousUrl.startsWith('/setup') || event.urlAfterRedirects.startsWith('/setup')) {
-          void this.refreshSetupVisibility();
-        }
       });
   }
 
@@ -225,10 +195,6 @@ export class AppComponent {
     await this.oidcAuthService.logout();
   }
 
-  protected canViewConfiguration(): boolean {
-    return this.authSessionService.hasRequiredRole('Viewer');
-  }
-
   protected canViewTracking(): boolean {
     return this.authSessionService.hasRequiredRole('Viewer');
   }
@@ -245,10 +211,6 @@ export class AppComponent {
     return this.authSessionService.hasRequiredRole('Viewer');
   }
 
-  protected shouldShowSetupWizard(): boolean {
-    return !this.setupCompleted;
-  }
-
   protected isPublicLandingRoute(): boolean {
     return this.currentUrl.startsWith('/p/');
   }
@@ -259,14 +221,5 @@ export class AppComponent {
     }
 
     return this.router.url;
-  }
-
-  private async refreshSetupVisibility(): Promise<void> {
-    try {
-      const status = await SetupService.getStatusSetup();
-      this.setupCompleted = status.readinessState === SetupReadinessState._2;
-    } catch {
-      this.setupCompleted = false;
-    }
   }
 }
