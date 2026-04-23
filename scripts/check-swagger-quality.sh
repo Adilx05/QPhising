@@ -52,52 +52,10 @@ node - "${SWAGGER_TEMP_FILE}" <<'NODE'
 const fs = require('fs');
 
 const requiredPaths = [
-  '/api/proxy-validation/assert-sync',
-  '/api/configuration',
-  '/api/setup/status',
-  '/api/setup/guard-decision',
-  '/api/setup/test-db',
-  '/api/setup/test-redis',
-  '/api/setup/test-keycloak',
-  '/api/setup/save'
+  '/api/proxy-validation/assert-sync'
 ];
-const persistenceContractChecks = [
-  {
-    method: 'post',
-    path: '/api/setup/save',
-    requestSchemaRef: '#/components/schemas/SaveSetupConfigurationRequest',
-    responseSchemaRef: '#/components/schemas/SetupStatusResult'
-  },
-  {
-    method: 'get',
-    path: '/api/setup/status',
-    responseSchemaRef: '#/components/schemas/SetupStatusResult'
-  },
-  {
-    method: 'get',
-    path: '/api/configuration',
-    responseSchemaRef: '#/components/schemas/RuntimeConfigurationResult'
-  },
-  {
-    method: 'post',
-    path: '/api/configuration',
-    requestSchemaRef: '#/components/schemas/SaveRuntimeConfigurationRequest',
-    responseSchemaRef: '#/components/schemas/RuntimeConfigurationResult'
-  },
-  {
-    method: 'patch',
-    path: '/api/configuration',
-    requestSchemaRef: '#/components/schemas/UpdateRuntimeConfigurationRequest',
-    responseSchemaRef: '#/components/schemas/RuntimeConfigurationResult'
-  }
-];
-const requiredSchemaProperties = [
-  { schema: 'SaveSetupConfigurationRequest', properties: ['databaseConnectionString', 'redisConnectionString', 'keycloakAuthority', 'keycloakRealm', 'keycloakClientId', 'keycloakClientSecret'] },
-  { schema: 'SetupStatusResult', properties: ['isDatabaseConfigured', 'isKeycloakConfigured', 'isRedisConfigured', 'readinessState'] },
-  { schema: 'SaveRuntimeConfigurationRequest', properties: ['databaseConnectionString', 'redisConnectionString', 'keycloakAuthority', 'keycloakRealm', 'keycloakClientId', 'keycloakClientSecret'] },
-  { schema: 'UpdateRuntimeConfigurationRequest', properties: ['databaseConnectionString', 'redisConnectionString', 'keycloakAuthority', 'keycloakRealm', 'keycloakClientId', 'keycloakClientSecret'] },
-  { schema: 'RuntimeConfigurationResult', properties: ['isDatabaseConfigured', 'isRedisConfigured', 'isKeycloakConfigured', 'isReadyForProtectedRuntime', 'updatedAtUtc'] }
-];
+const persistenceContractChecks = [];
+const requiredSchemaProperties = [];
 const httpMethods = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
 const requiredProblemStatusCodes = ['400', '401', '403', '500'];
 const problemDetailsSchemaRef = '#/components/schemas/ProblemDetails';

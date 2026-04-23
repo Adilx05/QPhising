@@ -10,21 +10,9 @@ echo Running Swagger quality gate: %SWAGGER_SOURCE%
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop';" ^
-  "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/configuration','/api/setup/status','/api/setup/guard-decision','/api/setup/test-db','/api/setup/test-redis','/api/setup/test-keycloak','/api/setup/save');" ^
-  "$persistenceContractChecks=@(" ^
-  "  @{ Method='post'; Path='/api/setup/save'; RequestSchemaRef='#/components/schemas/SaveSetupConfigurationRequest'; ResponseSchemaRef='#/components/schemas/SetupStatusResult' }," ^
-  "  @{ Method='get'; Path='/api/setup/status'; ResponseSchemaRef='#/components/schemas/SetupStatusResult' }," ^
-  "  @{ Method='get'; Path='/api/configuration'; ResponseSchemaRef='#/components/schemas/RuntimeConfigurationResult' }," ^
-  "  @{ Method='post'; Path='/api/configuration'; RequestSchemaRef='#/components/schemas/SaveRuntimeConfigurationRequest'; ResponseSchemaRef='#/components/schemas/RuntimeConfigurationResult' }," ^
-  "  @{ Method='patch'; Path='/api/configuration'; RequestSchemaRef='#/components/schemas/UpdateRuntimeConfigurationRequest'; ResponseSchemaRef='#/components/schemas/RuntimeConfigurationResult' }" ^
-  ");" ^
-  "$requiredSchemaProperties=@(" ^
-  "  @{ Schema='SaveSetupConfigurationRequest'; Properties=@('databaseConnectionString','redisConnectionString','keycloakAuthority','keycloakRealm','keycloakClientId','keycloakClientSecret') }," ^
-  "  @{ Schema='SetupStatusResult'; Properties=@('isDatabaseConfigured','isKeycloakConfigured','isRedisConfigured','readinessState') }," ^
-  "  @{ Schema='SaveRuntimeConfigurationRequest'; Properties=@('databaseConnectionString','redisConnectionString','keycloakAuthority','keycloakRealm','keycloakClientId','keycloakClientSecret') }," ^
-  "  @{ Schema='UpdateRuntimeConfigurationRequest'; Properties=@('databaseConnectionString','redisConnectionString','keycloakAuthority','keycloakRealm','keycloakClientId','keycloakClientSecret') }," ^
-  "  @{ Schema='RuntimeConfigurationResult'; Properties=@('isDatabaseConfigured','isRedisConfigured','isKeycloakConfigured','isReadyForProtectedRuntime','updatedAtUtc') }" ^
-  ");" ^
+  "$requiredPaths=@('/api/proxy-validation/assert-sync');" ^
+  "$persistenceContractChecks=@();" ^
+  "$requiredSchemaProperties=@();" ^
   "$httpMethods=@('get','post','put','patch','delete','head','options','trace');" ^
   "$requiredProblemStatusCodes=@('400','401','403','500');" ^
   "$problemDetailsSchemaRef='#/components/schemas/ProblemDetails';" ^

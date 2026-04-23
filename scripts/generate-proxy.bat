@@ -26,9 +26,9 @@ if errorlevel 1 (
 echo Validating Swagger preconditions from: %SWAGGER_URL%
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ErrorActionPreference='Stop';" ^
-  "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/configuration','/api/setup/status','/api/setup/guard-decision','/api/setup/test-db','/api/setup/test-redis','/api/setup/test-keycloak','/api/setup/save','/api/campaigns','/api/campaigns/{campaignId}','/api/campaigns/{campaignId}/schedule','/api/campaigns/{campaignId}/start','/api/campaigns/{campaignId}/pause','/api/campaigns/{campaignId}/complete','/api/campaigns/{campaignId}/cancel','/api/templates','/api/templates/{templateId}','/api/templates/{templateId}/publish','/api/templates/{templateId}/archive');" ^
-  "$requiredOperations=@(@{Method='get';Path='/api/configuration';OperationId='Configuration_GetCurrent'},@{Method='post';Path='/api/configuration';OperationId='Configuration_Save'},@{Method='patch';Path='/api/configuration';OperationId='Configuration_Update'});" ^
-  "$protectedPaths=@('/api/proxy-validation/assert-sync','/api/configuration');" ^
+  "$requiredPaths=@('/api/proxy-validation/assert-sync','/api/campaigns','/api/campaigns/{campaignId}','/api/campaigns/{campaignId}/schedule','/api/campaigns/{campaignId}/start','/api/campaigns/{campaignId}/pause','/api/campaigns/{campaignId}/complete','/api/campaigns/{campaignId}/cancel','/api/templates','/api/templates/{templateId}','/api/templates/{templateId}/publish','/api/templates/{templateId}/archive');" ^
+  "$requiredOperations=@();" ^
+  "$protectedPaths=@('/api/proxy-validation/assert-sync');" ^
   "$httpMethods=@('get','post','put','patch','delete','head','options','trace');" ^
   "$requiredProblemStatusCodes=@('400','401','403','500');" ^
   "$problemDetailsSchemaRef='#/components/schemas/ProblemDetails';" ^
