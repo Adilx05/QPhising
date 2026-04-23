@@ -1,4 +1,5 @@
 using QPhising.Application.Contracts.Abstractions.Reporting;
+using QPhising.Application.Contracts.Abstractions.Campaign;
 using QPhising.Application.Contracts.Abstractions.Tracking;
 using QPhising.Application.Contracts.Responses.Reporting;
 using QPhising.Application.CQRS.Queries.Reporting;
@@ -11,6 +12,9 @@ using QPhising.Domain.Tracking.Entities;
 using QPhising.Domain.Tracking.Enums;
 using QPhising.Domain.Tracking.Models;
 using QPhising.Domain.Tracking.ValueObjects;
+using QPhising.Domain.Campaign.Aggregates;
+using QPhising.Domain.Campaign.Enums;
+using QPhising.Domain.Campaign.ValueObjects;
 using Xunit;
 
 namespace QPhising.Api.Tests;
@@ -106,6 +110,28 @@ public sealed class TrackingDomainAndApplicationUnitTests
         Assert.True(result.IsDuplicate);
         Assert.Equal(Guid.Empty, result.VisitEventId);
         Assert.Empty(visitRepo.SavedEvents);
+    }
+
+    [Fact]
+    public async Task DeleteTrackingPageCommandHandler_ShouldCancelLinkedCampaignBeforeDelete()
+    {
+        var trackingPage = CreateTrackingPage("campaign-linked");
+        var campaign = new CampaignAggregate(
+            Guid.NewGuid(),
+            new CampaignName("Campaign One"),
+            trackingPage.Id,
+            templateId: null);
+        campaign.Start();
+
+        var trackingRepo = new FakeTrackingPageRepository(trackingPage);
+        var campaignRepo = new FakeCampaignRepository(campaign);
+        var handler = new DeleteTrackingPageCommandHandler(trackingRepo, campaignRepo);
+
+        await handler.Handle(new DeleteTrackingPageCommand(trackingPage.Id), CancellationToken.None);
+
+        Assert.NotNull(campaignRepo.SavedCampaign);
+        Assert.Equal(CampaignLifecycleState.Cancelled, campaignRepo.SavedCampaign!.LifecycleState);
+        Assert.True(trackingRepo.DeletedAggregate?.IsDeleted);
     }
 
     [Fact]
@@ -296,6 +322,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
     private sealed class FakeTrackingPageRepository : ITrackingPageRepository
     {
         private readonly TrackingPageAggregate _aggregate;
+        public TrackingPageAggregate? DeletedAggregate { get; private set; }
 
         public FakeTrackingPageRepository(TrackingPageAggregate aggregate)
         {
@@ -318,6 +345,39 @@ public sealed class TrackingDomainAndApplicationUnitTests
             => Task.CompletedTask;
 
         public Task DeleteAsync(TrackingPageAggregate aggregate, CancellationToken cancellationToken)
+        {
+            DeletedAggregate = aggregate;
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class FakeCampaignRepository : ICampaignRepository
+    {
+        private readonly CampaignAggregate? _campaign;
+
+        public FakeCampaignRepository(CampaignAggregate? campaign)
+        {
+            _campaign = campaign;
+        }
+
+        public CampaignAggregate? SavedCampaign { get; private set; }
+
+        public Task<CampaignAggregate?> GetByIdAsync(Guid campaignId, CancellationToken cancellationToken)
+            => Task.FromResult(_campaign?.Id == campaignId ? _campaign : null);
+
+        public Task<CampaignAggregate?> GetByTrackingPageIdAsync(Guid trackingPageId, CancellationToken cancellationToken)
+            => Task.FromResult(_campaign?.TrackingPageId == trackingPageId ? _campaign : null);
+
+        public Task<IReadOnlyCollection<CampaignAggregate>> ListAsync(CancellationToken cancellationToken)
+            => Task.FromResult<IReadOnlyCollection<CampaignAggregate>>(_campaign is null ? Array.Empty<CampaignAggregate>() : new[] { _campaign });
+
+        public Task SaveAsync(CampaignAggregate aggregate, CancellationToken cancellationToken)
+        {
+            SavedCampaign = aggregate;
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAsync(CampaignAggregate aggregate, CancellationToken cancellationToken)
             => Task.CompletedTask;
     }
 
