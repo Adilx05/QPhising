@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -7,6 +7,7 @@ import { filter } from 'rxjs/operators';
 import { AuthSessionService } from './core/auth/auth-session';
 import { OidcAuthService } from './core/auth/oidc-auth.service';
 import { AppLanguage, UserPreferencesService } from './core/ui/user-preferences.service';
+import { HealthService } from './shared/proxy';
 
 @Component({
   selector: 'app-root',
@@ -36,7 +37,7 @@ import { AppLanguage, UserPreferencesService } from './core/ui/user-preferences.
           </button>
         </section>
 
-        <nav class="space-y-2 px-4 py-6">
+        <nav class="flex-1 space-y-2 px-4 py-6">
           <a routerLink="/dashboard" routerLinkActive="is-active" class="nav-item">
             <i class="pi pi-home text-sm"></i>
             <span>{{ t('dashboard') }}</span>
@@ -67,6 +68,18 @@ import { AppLanguage, UserPreferencesService } from './core/ui/user-preferences.
             <span>{{ t('templates') }}</span>
           </a>
         </nav>
+
+        <section class="mx-4 mb-5 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ t('systemHealth') }}</p>
+            <span class="rounded-full px-2 py-1 text-[11px] font-semibold"
+                  [ngClass]="systemHealthSeverityClass()">
+              {{ systemHealthStatusLabel() }}
+            </span>
+          </div>
+          <p class="mt-2 text-xs text-slate-600">{{ systemHealthDependencySummary() }}</p>
+          <p class="mt-1 text-xs text-slate-500">{{ t('latency') }}: {{ systemHealthLatencyLabel() }}</p>
+        </section>
 
       </aside>
 
@@ -132,7 +145,12 @@ export class AppComponent {
       darkMode: 'Koyu Mod',
       lightMode: 'Açık Mod',
       sessionAuthenticated: 'Oturum Açık',
-      sessionUnauthenticated: 'Oturum Kapalı'
+      sessionUnauthenticated: 'Oturum Kapalı',
+      systemHealth: 'Sistem Sağlığı',
+      latency: 'Gecikme',
+      healthUnknown: 'Bilinmiyor',
+      healthNoDependency: 'Bağımlılık bilgisi yok.',
+      healthSummary: 'Sağlıklı: {0}, Degrade: {1}, Sağlıksız: {2}'
     },
     en: {
       shellSubtitle: 'Enterprise Security Operations Console',
@@ -147,11 +165,17 @@ export class AppComponent {
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
       sessionAuthenticated: 'Authenticated Session',
-      sessionUnauthenticated: 'Unauthenticated Session'
+      sessionUnauthenticated: 'Unauthenticated Session',
+      systemHealth: 'System Health',
+      latency: 'Latency',
+      healthUnknown: 'Unknown',
+      healthNoDependency: 'No dependency information.',
+      healthSummary: 'Healthy: {0}, Degraded: {1}, Unhealthy: {2}'
     }
   };
 
   private currentUrl = '';
+  private readonly systemHealth = signal<SystemHealthSummary | null>(null);
   public constructor(
     private readonly authSessionService: AuthSessionService,
     private readonly oidcAuthService: OidcAuthService,
@@ -164,6 +188,8 @@ export class AppComponent {
       .subscribe((event) => {
         this.currentUrl = event.urlAfterRedirects;
       });
+
+    void this.loadSystemHealth();
   }
 
   protected isAuthenticated(): boolean {
@@ -227,6 +253,51 @@ export class AppComponent {
     return this.currentUrl.startsWith('/p/');
   }
 
+  protected systemHealthStatusLabel(): string {
+    return this.systemHealth()?.overallStatus ?? this.t('healthUnknown');
+  }
+
+  protected systemHealthLatencyLabel(): string {
+    const latency = this.systemHealth()?.latencyMs;
+    if (typeof latency !== 'number' || latency < 0) {
+      return '-';
+    }
+
+    return `${latency}ms`;
+  }
+
+  protected systemHealthDependencySummary(): string {
+    const dependencies = this.systemHealth()?.dependencies;
+    if (!dependencies || dependencies.length === 0) {
+      return this.t('healthNoDependency');
+    }
+
+    const healthyCount = dependencies.filter((dependency) => dependency.status === 'Healthy').length;
+    const degradedCount = dependencies.filter((dependency) => dependency.status === 'Degraded').length;
+    const unhealthyCount = dependencies.filter((dependency) => dependency.status === 'Unhealthy').length;
+    return this.t('healthSummary')
+      .replace('{0}', healthyCount.toString())
+      .replace('{1}', degradedCount.toString())
+      .replace('{2}', unhealthyCount.toString());
+  }
+
+  protected systemHealthSeverityClass(): string {
+    const status = this.systemHealth()?.overallStatus;
+    if (status === 'Healthy') {
+      return 'bg-emerald-100 text-emerald-700';
+    }
+
+    if (status === 'Degraded') {
+      return 'bg-amber-100 text-amber-700';
+    }
+
+    if (status === 'Unhealthy') {
+      return 'bg-rose-100 text-rose-700';
+    }
+
+    return 'bg-slate-100 text-slate-600';
+  }
+
   private resolveInitialUrl(): string {
     if (typeof window !== 'undefined' && window.location?.pathname) {
       return `${window.location.pathname}${window.location.search}`;
@@ -234,4 +305,24 @@ export class AppComponent {
 
     return this.router.url;
   }
+
+  private async loadSystemHealth(): Promise<void> {
+    try {
+      const health = (await HealthService.getHealth()) as SystemHealthSummary;
+      this.systemHealth.set(health);
+    } catch (error) {
+      console.error('Failed to load sidebar system health summary.', error);
+      this.systemHealth.set(null);
+    }
+  }
+}
+
+interface SystemHealthSummary {
+  overallStatus?: string;
+  latencyMs?: number;
+  dependencies?: ReadonlyArray<SystemHealthDependency>;
+}
+
+interface SystemHealthDependency {
+  status?: string;
 }

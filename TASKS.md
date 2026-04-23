@@ -158,6 +158,7 @@ Phase 9 evidence:
 - [x] Improve report center selected-tracking-page UX and enrich PDF export layout with chart/table sections plus visitor IP/session click breakdown toggle.
 - [x] Remove setup wizard and runtime configuration surfaces from frontend/backend, rely on appsettings-based Keycloak/PostgreSQL configuration, and always run EF Core migration checks on API startup.
 - [x] Split API/Gateway health model into liveness/readiness endpoints with standardized dependency payload, dependency-specific readiness probes (PostgreSQL, Redis optional degrade, Keycloak timeout probe), and admin dashboard readiness summary card.
+- [x] Move the System Health summary card from dashboard content into the sidebar bottom section with a compact read-only layout.
 
 Incremental evidence:
 - 2026-04-23: Expanded audit taxonomy coverage to include template save/delete, campaign lifecycle transitions (start/pause/complete/cancel), and tracking publish/archive/delete actions; also updated tracking delete command flow to automatically cancel any linked non-terminal campaign before tracking-page soft-delete so orphaned active campaigns cannot remain.
@@ -200,3 +201,4 @@ Incremental evidence:
 - 2026-04-23: Updated proxy-generation and Swagger quality-gate scripts to remove removed setup/runtime-configuration contract prerequisites (`/api/configuration`, `/api/setup/*`) so contract validation now targets active endpoints only.
 
 - 2026-04-23: Updated API and Gateway health architecture to expose `/health/live` and `/health/ready` with a shared response contract (overall status, dependency list, latency, failure reason); added real PostgreSQL connectivity check, optional Redis degrade probe, timeout-based Keycloak metadata/token readiness checks, gateway downstream API readiness probe, refreshed operations runbooks, and surfaced read-only system health summary in admin dashboard.
+- 2026-04-23: Moved frontend System Health summary from dashboard widget area into the left sidebar bottom card, preserving readiness/dependency/latency data and bilingual labels while keeping dashboard focused on analytics content.
