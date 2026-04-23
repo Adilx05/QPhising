@@ -162,6 +162,7 @@ Phase 9 evidence:
 - [x] Move the System Health summary card from dashboard content into the sidebar bottom section with a compact read-only layout.
 
 Incremental evidence:
+- 2026-04-23: Fixed tracking representative-dataset integration ingestion payloads to use `captureIpAddress = false` with `ipAddressHashPolicy = None`, preventing validation-time `400 Bad Request` when test-host remote IP is unavailable for hash derivation.
 - 2026-04-23: Fixed `TrackingCrud_VisitIngestion_AnalyticsOverview_ShouldWorkWithRepresentativeDataset` integration flow by publishing the created tracking page before requesting `/p/{slug}`, aligning test expectations with public-access publish-state guards and preventing false 404 failures.
 - 2026-04-23: Fixed `TrackingEndpointsIntegrationTests` create-flow collisions by generating per-test unique campaign/tracking slugs and names, preventing cross-test data conflicts (`409 Conflict`) when integration fixtures reuse persisted state.
 - 2026-04-23: Hardened campaign integration-test setup with conflict-aware retry helper (`CreateCampaignWithUniqueSlugAsync`) so campaign-create tests self-heal from rare persisted slug collisions and keep lifecycle/delete assertions deterministic.

@@ -30,7 +30,7 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
             destinationUrl = "https://example.com/reports/q1",
             ownerId = "ops-admin",
             retentionDays = 30,
-            captureIpAddress = true,
+            captureIpAddress = false,
             enableBotFiltering = true,
             captureUtmParameters = true
         });
@@ -53,7 +53,7 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
             visitorFingerprint = "visitor-001",
             userAgent = "Mozilla/5.0",
             referrerUrl = "https://search.example",
-            ipAddressHashPolicy = 2,
+            ipAddressHashPolicy = 0,
             deduplicationWindowSeconds = 180
         });
 
@@ -66,7 +66,7 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
             visitorFingerprint = "visitor-001",
             userAgent = "Mozilla/5.0",
             referrerUrl = "https://search.example",
-            ipAddressHashPolicy = 2,
+            ipAddressHashPolicy = 0,
             deduplicationWindowSeconds = 180
         });
 
@@ -81,7 +81,7 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
             visitorFingerprint = "visitor-002",
             userAgent = "Mozilla/5.0",
             referrerUrl = "https://news.example",
-            ipAddressHashPolicy = 2,
+            ipAddressHashPolicy = 0,
             deduplicationWindowSeconds = 60
         });
 
