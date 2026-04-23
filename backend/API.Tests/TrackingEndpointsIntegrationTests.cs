@@ -9,6 +9,7 @@ namespace QPhising.Api.Tests;
 public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFactory>
 {
     private readonly TestApiFactory _factory;
+    private static string UniqueSuffix => Guid.NewGuid().ToString("N");
 
     public TrackingEndpointsIntegrationTests(TestApiFactory factory)
     {
@@ -19,10 +20,11 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
     public async Task TrackingCrud_VisitIngestion_AnalyticsOverview_ShouldWorkWithRepresentativeDataset()
     {
         var client = _factory.CreateClient();
+        var slug = $"quarterly-report-{UniqueSuffix}";
 
         var createResponse = await client.PostAsJsonAsync("/api/tracking/pages", new
         {
-            slug = "quarterly-report",
+            slug,
             title = "Quarterly Report",
             description = "Investor report tracking page",
             destinationUrl = "https://example.com/reports/q1",
@@ -37,7 +39,7 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
         var created = JsonNode.Parse(await createResponse.Content.ReadAsStringAsync())!.AsObject();
         var trackingPageId = created["id"]!.GetValue<Guid>();
 
-        var publicLandingResponse = await client.GetAsync("/p/quarterly-report");
+        var publicLandingResponse = await client.GetAsync($"/p/{slug}");
         publicLandingResponse.EnsureSuccessStatusCode();
 
         var now = DateTimeOffset.UtcNow;
@@ -100,12 +102,13 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
     [Fact]
     public async Task TrackingEndpoints_ShouldEnforceRoleBasedAuthorization()
     {
+        var viewerSlug = $"viewer-blocked-{UniqueSuffix}";
         var viewerClient = _factory.CreateClient();
         viewerClient.DefaultRequestHeaders.Add("X-Test-Role", "Viewer");
 
         var createAsViewer = await viewerClient.PostAsJsonAsync("/api/tracking/pages", new
         {
-            slug = "viewer-blocked",
+            slug = viewerSlug,
             title = "Viewer Blocked",
             destinationUrl = "https://example.com",
             ownerId = "viewer-1"
@@ -113,12 +116,13 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
 
         Assert.Equal(HttpStatusCode.Forbidden, createAsViewer.StatusCode);
 
+        var operatorSlug = $"operator-page-{UniqueSuffix}";
         var operatorClient = _factory.CreateClient();
         operatorClient.DefaultRequestHeaders.Add("X-Test-Role", "Operator");
 
         var createAsOperator = await operatorClient.PostAsJsonAsync("/api/tracking/pages", new
         {
-            slug = "operator-page",
+            slug = operatorSlug,
             title = "Operator Page",
             destinationUrl = "https://example.com/operator",
             ownerId = "operator-1"
@@ -143,18 +147,13 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
     {
         var adminClient = _factory.CreateClient();
         adminClient.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
-
-        var createCampaignResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
-        {
-            name = "Delete Cascade Campaign",
-            trackingPageSlug = "delete-cascade-campaign",
-            trackingPageTitle = "Delete Cascade Landing",
-            trackingPageDescription = "Cascade soft-delete check",
-            templateId = (Guid?)null,
-            htmlContent = "<h1>Landing</h1>",
-            validFromUtc = (DateTimeOffset?)null,
-            validUntilUtc = (DateTimeOffset?)null
-        });
+        var (createCampaignResponse, _) = await CreateCampaignWithUniqueSlugAsync(
+            adminClient,
+            campaignNamePrefix: "Delete Cascade Campaign",
+            trackingPageSlugPrefix: "delete-cascade-campaign",
+            trackingPageTitle: "Delete Cascade Landing",
+            trackingPageDescription: "Cascade soft-delete check",
+            htmlContent: "<h1>Landing</h1>");
 
         createCampaignResponse.EnsureSuccessStatusCode();
         var createPayload = JsonNode.Parse(await createCampaignResponse.Content.ReadAsStringAsync())!.AsObject();
@@ -176,37 +175,78 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
     {
         var adminClient = _factory.CreateClient();
         adminClient.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
-
-        var createCampaignResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
-        {
-            name = "Lifecycle Guard Campaign",
-            trackingPageSlug = "lifecycle-guard-campaign",
-            trackingPageTitle = "Lifecycle Guard Landing",
-            trackingPageDescription = "Only active campaigns can resolve publicly",
-            templateId = (Guid?)null,
-            htmlContent = "<h1>Lifecycle Guard</h1>",
-            validFromUtc = (DateTimeOffset?)null,
-            validUntilUtc = (DateTimeOffset?)null
-        });
+        var (createCampaignResponse, slug) = await CreateCampaignWithUniqueSlugAsync(
+            adminClient,
+            campaignNamePrefix: "Lifecycle Guard Campaign",
+            trackingPageSlugPrefix: "lifecycle-guard-campaign",
+            trackingPageTitle: "Lifecycle Guard Landing",
+            trackingPageDescription: "Only active campaigns can resolve publicly",
+            htmlContent: "<h1>Lifecycle Guard</h1>");
 
         createCampaignResponse.EnsureSuccessStatusCode();
         var createPayload = JsonNode.Parse(await createCampaignResponse.Content.ReadAsStringAsync())!.AsObject();
         var campaignId = createPayload["id"]!.GetValue<Guid>();
 
-        var publicWhileDraft = await adminClient.GetAsync("/p/lifecycle-guard-campaign");
+        var publicWhileDraft = await adminClient.GetAsync($"/p/{slug}");
         Assert.Equal(HttpStatusCode.NotFound, publicWhileDraft.StatusCode);
 
         var startResponse = await adminClient.PostAsync($"/api/campaigns/{campaignId}/start", content: null);
         startResponse.EnsureSuccessStatusCode();
 
-        var publicWhileActive = await adminClient.GetAsync("/p/lifecycle-guard-campaign");
+        var publicWhileActive = await adminClient.GetAsync($"/p/{slug}");
         publicWhileActive.EnsureSuccessStatusCode();
 
         var pauseResponse = await adminClient.PostAsync($"/api/campaigns/{campaignId}/pause", content: null);
         pauseResponse.EnsureSuccessStatusCode();
 
-        var publicWhilePaused = await adminClient.GetAsync("/p/lifecycle-guard-campaign");
+        var publicWhilePaused = await adminClient.GetAsync($"/p/{slug}");
         Assert.Equal(HttpStatusCode.NotFound, publicWhilePaused.StatusCode);
+    }
+
+    private static async Task<(HttpResponseMessage Response, string Slug)> CreateCampaignWithUniqueSlugAsync(
+        HttpClient adminClient,
+        string campaignNamePrefix,
+        string trackingPageSlugPrefix,
+        string trackingPageTitle,
+        string trackingPageDescription,
+        string htmlContent)
+    {
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            var suffix = UniqueSuffix;
+            var slug = $"{trackingPageSlugPrefix}-{suffix}";
+            var createCampaignResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
+            {
+                name = $"{campaignNamePrefix} {suffix}",
+                trackingPageSlug = slug,
+                trackingPageTitle,
+                trackingPageDescription,
+                templateId = (Guid?)null,
+                htmlContent,
+                validFromUtc = (DateTimeOffset?)null,
+                validUntilUtc = (DateTimeOffset?)null
+            });
+
+            if (createCampaignResponse.StatusCode != HttpStatusCode.Conflict)
+            {
+                return (createCampaignResponse, slug);
+            }
+        }
+
+        var fallbackSlug = $"{trackingPageSlugPrefix}-{UniqueSuffix}";
+        var fallbackResponse = await adminClient.PostAsJsonAsync("/api/campaigns", new
+        {
+            name = $"{campaignNamePrefix} {UniqueSuffix}",
+            trackingPageSlug = fallbackSlug,
+            trackingPageTitle,
+            trackingPageDescription,
+            templateId = (Guid?)null,
+            htmlContent,
+            validFromUtc = (DateTimeOffset?)null,
+            validUntilUtc = (DateTimeOffset?)null
+        });
+
+        return (fallbackResponse, fallbackSlug);
     }
 
     [Fact]

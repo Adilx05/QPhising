@@ -13,6 +13,7 @@ namespace QPhising.Api.Tests.Infrastructure;
 public sealed class TestApiFactory : WebApplicationFactory<Program>
 {
     private readonly string _contentRootPath = Path.Combine(Path.GetTempPath(), $"qphising-api-tests-{Guid.NewGuid():N}");
+    private readonly string _inMemoryDbName = $"qphising-tests-{Guid.NewGuid():N}";
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -31,10 +32,20 @@ public sealed class TestApiFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
+            // Remove any previously registered DbContext options/registrations for the app's real DB provider
             services.RemoveAll<DbContextOptions<QPhisingDbContext>>();
-            services.AddDbContext<QPhisingDbContext>(options =>
+            services.RemoveAll<QPhisingDbContext>();
+
+            // Register a scoped QPhisingDbContext instance constructed with in-memory options.
+            // We avoid AddDbContext here because AddDbContext may register provider services
+            // that conflict with the application's provider (e.g. Npgsql) when present.
+            services.AddScoped<QPhisingDbContext>(sp =>
             {
-                options.UseInMemoryDatabase($"qphising-tests-{Guid.NewGuid():N}");
+                var options = new DbContextOptionsBuilder<QPhisingDbContext>()
+                    .UseInMemoryDatabase(_inMemoryDbName)
+                    .Options;
+
+                return new QPhisingDbContext(options);
             });
 
             services.AddAuthentication(options =>
