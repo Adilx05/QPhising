@@ -23,7 +23,16 @@ Every stored event contains:
 | `security.forbidden` | HTTP `403` responses | `forbidden` |
 | `security.rate_limited` | HTTP `429` responses | `throttled` |
 | `campaign.delete` | `DELETE /api/campaigns/{campaignId}` | `success` for 2xx, `failure` otherwise |
+| `campaign.start` | `POST /api/campaigns/{campaignId}/start` | `success` for 2xx, `failure` otherwise |
+| `campaign.pause` | `POST /api/campaigns/{campaignId}/pause` | `success` for 2xx, `failure` otherwise |
+| `campaign.complete` | `POST /api/campaigns/{campaignId}/complete` | `success` for 2xx, `failure` otherwise |
+| `campaign.cancel` | `POST /api/campaigns/{campaignId}/cancel` | `success` for 2xx, `failure` otherwise |
+| `template.save` | `POST /api/templates` and `PUT /api/templates/{templateId}` | `success` for 2xx, `failure` otherwise |
+| `template.delete` | `DELETE /api/templates/{templateId}` | `success` for 2xx, `failure` otherwise |
 | `template.publish` | `POST /api/templates/{templateId}/publish` | `success` for 2xx, `failure` otherwise |
+| `tracking.publish` | `POST /api/tracking/pages/{trackingPageId}/publish` | `success` for 2xx, `failure` otherwise |
+| `tracking.archive` | `POST /api/tracking/pages/{trackingPageId}/archive` | `success` for 2xx, `failure` otherwise |
+| `tracking.delete` | `DELETE /api/tracking/pages/{trackingPageId}` | `success` for 2xx, `failure` otherwise |
 
 ## Query Contract
 
