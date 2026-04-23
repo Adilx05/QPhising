@@ -18,6 +18,7 @@ using QPhising.Api.Services.ProxyValidation;
 using QPhising.Api.Services.Reporting;
 using QPhising.Api.Swagger;
 using QPhising.Application.Contracts.Abstractions.Authorization;
+using QPhising.Application.Contracts.Abstractions.Audit;
 using QPhising.Application.Contracts.Abstractions.Campaign;
 using QPhising.Application.Contracts.Abstractions.Gateway;
 using QPhising.Application.Contracts.Abstractions.Persistence;
@@ -279,6 +280,7 @@ builder.Services.AddScoped<ICampaignRepository, EfCoreCampaignRepository>();
 builder.Services.AddScoped<ITemplateRepository, EfCoreTemplateRepository>();
 builder.Services.AddScoped<ITrackingPageRepository, EfCoreTrackingPageRepository>();
 builder.Services.AddScoped<IVisitEventRepository, EfCoreVisitEventRepository>();
+builder.Services.AddScoped<IAuditLogReadRepository, EfCoreAuditLogReadRepository>();
 builder.Services.AddScoped<ITrackingReportExporter, TrackingReportExporter>();
 builder.Services.AddScoped<IProxyContractDriftValidator, FileTimestampProxyContractDriftValidator>();
 

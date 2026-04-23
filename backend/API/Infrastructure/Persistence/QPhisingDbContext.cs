@@ -18,6 +18,8 @@ public sealed class QPhisingDbContext : DbContext
 
     public DbSet<VisitEventEntity> VisitEvents => Set<VisitEventEntity>();
 
+    public DbSet<AuditLogEntryEntity> AuditLogEntries => Set<AuditLogEntryEntity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ArgumentNullException.ThrowIfNull(modelBuilder);
@@ -111,5 +113,22 @@ public sealed class QPhisingDbContext : DbContext
             .WithMany(x => x.VisitEvents)
             .HasForeignKey(x => x.TrackingPageId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        var auditLog = modelBuilder.Entity<AuditLogEntryEntity>();
+        auditLog.ToTable("audit_log_entries");
+        auditLog.HasKey(x => x.Id);
+        auditLog.Property(x => x.Id).HasColumnName("id");
+        auditLog.Property(x => x.TimestampUtc).HasColumnName("timestamp_utc").IsRequired();
+        auditLog.Property(x => x.Actor).HasColumnName("actor").HasMaxLength(128).IsRequired();
+        auditLog.Property(x => x.Action).HasColumnName("action").HasMaxLength(128).IsRequired();
+        auditLog.Property(x => x.Resource).HasColumnName("resource").HasMaxLength(512).IsRequired();
+        auditLog.Property(x => x.Outcome).HasColumnName("outcome").HasMaxLength(64).IsRequired();
+        auditLog.Property(x => x.OutcomeCode).HasColumnName("outcome_code").IsRequired();
+        auditLog.Property(x => x.CorrelationId).HasColumnName("correlation_id").HasMaxLength(128).IsRequired();
+        auditLog.Property(x => x.IpHash).HasColumnName("ip_hash").HasMaxLength(128);
+        auditLog.HasIndex(x => x.TimestampUtc);
+        auditLog.HasIndex(x => x.Actor);
+        auditLog.HasIndex(x => x.OutcomeCode);
+        auditLog.HasIndex(x => x.CorrelationId);
     }
 }

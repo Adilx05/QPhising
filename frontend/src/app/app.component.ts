@@ -57,6 +57,11 @@ import { AppLanguage, UserPreferencesService } from './core/ui/user-preferences.
             <span>{{ t('reports') }}</span>
           </a>
 
+          <a *ngIf="canViewAuditLogs()" routerLink="/audit-logs" routerLinkActive="is-active" class="nav-item">
+            <i class="pi pi-shield text-sm"></i>
+            <span>{{ t('auditLogs') }}</span>
+          </a>
+
           <a *ngIf="canViewTemplates()" routerLink="/templates" routerLinkActive="is-active" class="nav-item">
             <i class="pi pi-file-edit text-sm"></i>
             <span>{{ t('templates') }}</span>
@@ -76,6 +81,7 @@ import { AppLanguage, UserPreferencesService } from './core/ui/user-preferences.
               <a *ngIf="canViewCampaigns()" class="mobile-nav-item" routerLink="/campaigns" routerLinkActive="is-active">{{ t('campaigns') }}</a>
               <a *ngIf="canViewTemplates()" class="mobile-nav-item" routerLink="/templates" routerLinkActive="is-active">{{ t('templates') }}</a>
               <a *ngIf="canViewReports()" class="mobile-nav-item" routerLink="/reports" routerLinkActive="is-active">{{ t('reports') }}</a>
+              <a *ngIf="canViewAuditLogs()" class="mobile-nav-item" routerLink="/audit-logs" routerLinkActive="is-active">{{ t('auditLogs') }}</a>
             </nav>
 
             <div class="flex items-center gap-2">
@@ -121,6 +127,7 @@ export class AppComponent {
       campaigns: 'Senaryolar',
       templates: 'Şablonlar',
       reports: 'Raporlar',
+      auditLogs: 'Audit Kayıtları',
       language: 'Dil',
       darkMode: 'Koyu Mod',
       lightMode: 'Açık Mod',
@@ -135,6 +142,7 @@ export class AppComponent {
       campaigns: 'Campaigns',
       templates: 'Templates',
       reports: 'Reports',
+      auditLogs: 'Audit Logs',
       language: 'Language',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
@@ -209,6 +217,10 @@ export class AppComponent {
 
   protected canViewReports(): boolean {
     return this.authSessionService.hasRequiredRole('Viewer');
+  }
+
+  protected canViewAuditLogs(): boolean {
+    return this.authSessionService.hasRequiredRole('Operator');
   }
 
   protected isPublicLandingRoute(): boolean {
