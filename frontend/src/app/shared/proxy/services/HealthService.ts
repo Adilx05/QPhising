@@ -19,6 +19,7 @@ export class HealthService {
         401: `Unauthorized`,
         403: `Forbidden`,
         500: `Internal Server Error`,
+        503: `Service Unavailable`,
       },
     });
   }
