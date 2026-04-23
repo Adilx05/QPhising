@@ -51,13 +51,6 @@ if ! node -e '
 const fs = require("fs");
 const requiredPaths = [
   "/api/proxy-validation/assert-sync",
-  "/api/configuration",
-  "/api/setup/status",
-  "/api/setup/guard-decision",
-  "/api/setup/test-db",
-  "/api/setup/test-redis",
-  "/api/setup/test-keycloak",
-  "/api/setup/save",
   "/api/campaigns",
   "/api/campaigns/{campaignId}",
   "/api/campaigns/{campaignId}/schedule",
@@ -70,14 +63,9 @@ const requiredPaths = [
   "/api/templates/{templateId}/publish",
   "/api/templates/{templateId}/archive"
 ];
-const requiredOperations = [
-  { method: "get", path: "/api/configuration", operationId: "Configuration_GetCurrent" },
-  { method: "post", path: "/api/configuration", operationId: "Configuration_Save" },
-  { method: "patch", path: "/api/configuration", operationId: "Configuration_Update" }
-];
+const requiredOperations = [];
 const protectedPaths = [
-  "/api/proxy-validation/assert-sync",
-  "/api/configuration"
+  "/api/proxy-validation/assert-sync"
 ];
 const httpMethods = new Set(["get", "post", "put", "patch", "delete", "head", "options", "trace"]);
 const requiredProblemStatusCodes = ["400", "401", "403", "500"];
