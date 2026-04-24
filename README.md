@@ -174,6 +174,7 @@ docker compose up --build
 ```
 
 > `docker-compose.yml` no longer provisions PostgreSQL directly. Set `API_CONNECTION_STRING` to an existing PostgreSQL instance (local, managed, or external container).
+> In container networks, downstream host values must use the service name (for example `api`) rather than `localhost`.
 
 ### With Redis profile enabled
 

@@ -162,6 +162,7 @@ Phase 9 evidence:
 - [x] Move the System Health summary card from dashboard content into the sidebar bottom section with a compact read-only layout.
 
 Incremental evidence:
+- 2026-04-24: Kept gateway downstream health defaults in `backend/Gateway/appsettings.json` as localhost for local development, added Docker Compose gateway environment overrides for `HealthChecks__DownstreamApi__Host/Port/Scheme` (defaulting to `api:5050` over HTTP), and documented service-name-based downstream host requirement for container networks in `README.md`.
 - 2026-04-24: Updated root Docker Compose topology by removing built-in PostgreSQL from base stack, wiring API connection string from environment, adding API/Gateway readiness healthchecks with health-based dependency ordering, and adding a frontend container with runtime-injected gateway/auth configuration.
 - 2026-04-23: Fixed `TrackingEndpointsIntegrationTests` create-flow collisions by generating per-test unique campaign/tracking slugs and names, preventing cross-test data conflicts (`409 Conflict`) when integration fixtures reuse persisted state.
 - 2026-04-23: Hardened campaign integration-test setup with conflict-aware retry helper (`CreateCampaignWithUniqueSlugAsync`) so campaign-create tests self-heal from rare persisted slug collisions and keep lifecycle/delete assertions deterministic.
