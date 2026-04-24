@@ -160,8 +160,10 @@ Phase 9 evidence:
 - [x] Remove setup wizard and runtime configuration surfaces from frontend/backend, rely on appsettings-based Keycloak/PostgreSQL configuration, and always run EF Core migration checks on API startup.
 - [x] Split API/Gateway health model into liveness/readiness endpoints with standardized dependency payload, dependency-specific readiness probes (PostgreSQL, Redis optional degrade, Keycloak timeout probe), and admin dashboard readiness summary card.
 - [x] Move the System Health summary card from dashboard content into the sidebar bottom section with a compact read-only layout.
+- [x] Finalize frontend container runtime configuration flow with multi-stage build, Nginx SPA fallback, and env-driven `runtime-config.js` generation at startup.
 
 Incremental evidence:
+- 2026-04-24: Finalized frontend Docker runtime config flow by keeping a Node build + Nginx serve multi-stage Dockerfile, generating `/usr/share/nginx/html/runtime-config.js` from container env via `frontend/docker/entrypoint.sh`, loading runtime config in `index.html` before Angular bundles, and enforcing SPA fallback with `try_files $uri /index.html` in Nginx.
 - 2026-04-24: Kept gateway downstream health defaults in `backend/Gateway/appsettings.json` as localhost for local development, added Docker Compose gateway environment overrides for `HealthChecks__DownstreamApi__Host/Port/Scheme` (defaulting to `api:5050` over HTTP), and documented service-name-based downstream host requirement for container networks in `README.md`.
 - 2026-04-24: Updated root Docker Compose topology by removing built-in PostgreSQL from base stack, wiring API connection string from environment, adding API/Gateway readiness healthchecks with health-based dependency ordering, and adding a frontend container with runtime-injected gateway/auth configuration.
 - 2026-04-23: Fixed `TrackingEndpointsIntegrationTests` create-flow collisions by generating per-test unique campaign/tracking slugs and names, preventing cross-test data conflicts (`409 Conflict`) when integration fixtures reuse persisted state.
