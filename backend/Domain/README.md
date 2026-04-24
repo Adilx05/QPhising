@@ -3,18 +3,17 @@
 Bounded-context folders under this directory define domain ownership boundaries and keep module invariants isolated.
 
 Modules:
-- Shared
-- Setup
-- RuntimeConfiguration
-- Campaigns
+- Campaign
 - Templates
 - Tracking
-- Jobs
-- Analytics
-- Exports
 - Identity
 - Gateway
 - Persistence
+- Common
+- ApiConventions
+- Contracts
+
+Bu liste klasör yapısı değiştikçe güncellenmelidir.
 
 Contract-source rules are documented in `Contracts/ModuleContractBoundaries.md`.
 
