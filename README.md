@@ -173,17 +173,53 @@ cp deploy/env/.env.local.example .env
 docker compose up --build
 ```
 
+> `docker-compose.yml` no longer provisions PostgreSQL directly. Set `API_CONNECTION_STRING` to an existing PostgreSQL instance (local, managed, or external container).
+
 ### With Redis profile enabled
 
 ```bash
 docker compose --profile redis up --build
 ```
 
+### Optional local PostgreSQL snippet
+
+If you want Compose-managed PostgreSQL for local development, keep it in a local override (for example `docker-compose.override.yml`) instead of the shared base file.
+
+```yaml
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-qphising}
+      POSTGRES_USER: ${POSTGRES_USER:-qphising}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qphising-dev-password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - qphising-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qphising} -d ${POSTGRES_DB:-qphising}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    environment:
+      API_CONNECTION_STRING: Host=postgres;Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-qphising};Password=${POSTGRES_PASSWORD:-qphising-dev-password}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  qphising-postgres-data:
+```
+
 ### Exposed services
 
+- Frontend: `http://localhost:4200`
 - API: `http://localhost:5050`
 - Gateway: `http://localhost:8080`
-- PostgreSQL: `localhost:5432`
 - Redis (optional): `localhost:6379`
 
 ---
