@@ -68,6 +68,12 @@ function normalizeBaseUrl(value) {
   return value.endsWith('/') ? value.slice(0, -1) : value;
 }
 
+function ensureObject(value, message) {
+  if (!value || typeof value !== 'object') {
+    throw new Error(message);
+  }
+}
+
 function createRequestHeaders(token) {
   const headers = {
     Accept: 'application/json',
@@ -79,17 +85,6 @@ function createRequestHeaders(token) {
   }
 
   return headers;
-}
-
-function buildPayloadSuffix() {
-  const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14);
-  return `live-${timestamp}`;
-}
-
-function ensureTruthy(value, message) {
-  if (!value) {
-    throw new Error(message);
-  }
 }
 
 async function requestJson({ baseUrl, timeoutMs, token, method, path, body }) {
@@ -130,83 +125,69 @@ async function requestJson({ baseUrl, timeoutMs, token, method, path, body }) {
 }
 
 async function runLiveFlowChecks(options) {
-  const payloadSuffix = buildPayloadSuffix();
-
-  const setupPayload = {
-    databaseConnectionString: `Server=localhost;Database=qphising_setup_${payloadSuffix};User Id=sa;Password=P@ssw0rd!;TrustServerCertificate=true`,
-    redisConnectionString: `localhost:6379,password=redis-${payloadSuffix}`,
-    keycloakAuthority: `https://keycloak.${payloadSuffix}.local`,
-    keycloakRealm: `qphising-${payloadSuffix}`,
-    keycloakClientId: `setup-client-${payloadSuffix}`,
-    keycloakClientSecret: `setup-secret-${payloadSuffix}`
-  };
-
-  const runtimePayload = {
-    databaseConnectionString: `Server=localhost;Database=qphising_runtime_${payloadSuffix};User Id=sa;Password=P@ssw0rd!;TrustServerCertificate=true`,
-    redisConnectionString: `localhost:6379,password=runtime-${payloadSuffix}`,
-    keycloakAuthority: `https://runtime.${payloadSuffix}.local`,
-    keycloakRealm: `qphising-runtime-${payloadSuffix}`,
-    keycloakClientId: `runtime-client-${payloadSuffix}`,
-    keycloakClientSecret: `runtime-secret-${payloadSuffix}`
-  };
-
-  console.log('1) Persisting setup configuration via /api/setup/save ...');
-  await requestJson({
-    ...options,
-    method: 'POST',
-    path: '/api/setup/save',
-    body: setupPayload
-  });
-
-  console.log('2) Verifying setup status reflects persisted state ...');
-  const setupStatus = await requestJson({
+  console.log('1) Verifying gateway liveness via /health/live ...');
+  const liveHealth = await requestJson({
     ...options,
     method: 'GET',
-    path: '/api/setup/status'
+    path: '/health/live'
   });
 
-  ensureTruthy(setupStatus.isDatabaseConfigured, 'Expected setup status to report database as configured.');
-  ensureTruthy(setupStatus.isRedisConfigured, 'Expected setup status to report redis as configured.');
-  ensureTruthy(setupStatus.isKeycloakConfigured, 'Expected setup status to report keycloak as configured.');
+  ensureObject(liveHealth, 'Expected /health/live to return a JSON object payload.');
 
-  console.log('3) Persisting runtime configuration via /api/configuration ...');
-  await requestJson({
-    ...options,
-    method: 'POST',
-    path: '/api/configuration',
-    body: runtimePayload
-  });
-
-  console.log('4) Verifying runtime configuration readiness via /api/configuration ...');
-  const runtimeStatus = await requestJson({
+  console.log('2) Verifying gateway readiness via /health/ready ...');
+  const readyHealth = await requestJson({
     ...options,
     method: 'GET',
-    path: '/api/configuration'
+    path: '/health/ready'
   });
 
-  ensureTruthy(runtimeStatus.isDatabaseConfigured, 'Expected runtime status to report database as configured.');
-  ensureTruthy(runtimeStatus.isRedisConfigured, 'Expected runtime status to report redis as configured.');
-  ensureTruthy(runtimeStatus.isKeycloakConfigured, 'Expected runtime status to report keycloak as configured.');
-  ensureTruthy(runtimeStatus.updatedAtUtc, 'Expected runtime status to contain updatedAtUtc timestamp.');
+  ensureObject(readyHealth, 'Expected /health/ready to return a JSON object payload.');
 
-  console.log('5) Patching runtime configuration via /api/configuration ...');
-  await requestJson({
-    ...options,
-    method: 'PATCH',
-    path: '/api/configuration',
-    body: {
-      keycloakClientSecret: `${runtimePayload.keycloakClientSecret}-patched`
-    }
-  });
+  if (!options.token) {
+    console.log('3) Skipping authenticated runtime checks because no JWT token was provided.');
+    console.log('   Pass --token <jwt> to validate active campaign/tracking/gateway policy contracts.');
+    return;
+  }
 
-  console.log('6) Re-checking runtime status after patch ...');
-  const runtimeStatusAfterPatch = await requestJson({
+  console.log('3) Reading gateway route policies via /api/gateway/route-policies ...');
+  const routePolicies = await requestJson({
     ...options,
     method: 'GET',
-    path: '/api/configuration'
+    path: '/api/gateway/route-policies'
   });
 
-  ensureTruthy(runtimeStatusAfterPatch.isReadyForProtectedRuntime, 'Expected runtime status to remain ready after patch update.');
+  ensureObject(routePolicies, 'Expected gateway route policies response to be a JSON object.');
+
+  console.log('4) Reading campaign listing via /api/campaigns ...');
+  const campaigns = await requestJson({
+    ...options,
+    method: 'GET',
+    path: '/api/campaigns'
+  });
+
+  if (!Array.isArray(campaigns)) {
+    throw new Error('Expected /api/campaigns to return a JSON array.');
+  }
+
+  console.log('5) Reading tracking page listing via /api/tracking/pages ...');
+  const trackingPages = await requestJson({
+    ...options,
+    method: 'GET',
+    path: '/api/tracking/pages'
+  });
+
+  if (!Array.isArray(trackingPages)) {
+    throw new Error('Expected /api/tracking/pages to return a JSON array.');
+  }
+
+  console.log('6) Reading analytics overview via /api/tracking/analytics/overview ...');
+  const analyticsOverview = await requestJson({
+    ...options,
+    method: 'GET',
+    path: '/api/tracking/analytics/overview'
+  });
+
+  ensureObject(analyticsOverview, 'Expected /api/tracking/analytics/overview to return a JSON object.');
 }
 
 async function main() {
@@ -214,6 +195,7 @@ async function main() {
 
   if (parsed.help) {
     console.log('Usage: node scripts/check-frontend-live-flows.js [--base-url <url>] [--token <jwt>] [--timeout-ms <integer>]');
+    console.log('Checks active health/live-readiness endpoints and, optionally, authenticated gateway/campaign/tracking baseline flows.');
     return;
   }
 

@@ -8,7 +8,7 @@ It provides:
 - public tracking landing resolution (`/p/{slug}`),
 - visit ingestion with privacy-aware IP handling,
 - analytics dashboards (totals, uniques, trends, top pages, recent visits),
-- setup/runtime configuration flow,
+- health/readiness-first runtime operations (`/health/live`, `/health/ready`),
 - API contract-driven frontend integration through generated proxies.
 
 ---
@@ -99,11 +99,7 @@ It provides:
 
 ### 1) Configure runtime settings
 
-Create runtime overlays from templates when needed:
-
-- `backend/API/appsettings.runtime.json.example`
-- `backend/Gateway/appsettings.runtime.json.example`
-- `deploy/env/.env.local.example`
+Prepare environment/appsettings values (especially PostgreSQL + Keycloak) before startup.
 
 ### 2) Run API + Gateway locally
 
@@ -119,6 +115,12 @@ Swagger is available in development mode (or when explicitly enabled by feature 
 ### 3) Frontend
 
 Run the Angular app from `frontend/` and ensure gateway/API endpoints are reachable for generated proxy calls.
+
+### 4) Runtime probes
+
+- Gateway/API liveness: `GET /health/live`
+- Gateway/API readiness: `GET /health/ready`
+- API operational detail (authenticated): `GET /api/health`
 
 ---
 
@@ -176,7 +178,6 @@ dotnet ef migrations list
 
 ### Notes
 
-- `POST /api/setup/test-db` validates connectivity only.
 - Schema changes must be delivered via migrations, not ad-hoc runtime DDL.
 
 ---
@@ -244,7 +245,7 @@ Use the smoke checker scripts in `scripts/` to verify dashboard/tracking/campaig
 
 ## Operational Notes
 
-- Setup wizard governs first-run bootstrap and runtime configuration persistence.
+- Setup wizard/runtime configuration endpoints were removed on 2026-04-23; app startup now relies on static configuration sources.
 - Redis is optional unless explicitly required by a feature/profile.
 - Main management and analytics endpoints are protected; public tracking routes are intentionally constrained and rate-limited.
 - Correlation IDs are propagated API ↔ Gateway for traceability.
