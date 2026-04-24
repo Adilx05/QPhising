@@ -128,9 +128,31 @@ Prepare environment/appsettings values (especially PostgreSQL + Keycloak) before
 
 Swagger is available in development mode (or when explicitly enabled by feature flag).
 
-### 3) Frontend
+### 3) Frontend (`frontend/`)
 
-Run the Angular app from `frontend/` and ensure gateway/API endpoints are reachable for generated proxy calls.
+Use the following concrete flow from the repository root. The frontend smoke scripts expect the gateway to be reachable at `http://localhost:8080` unless you override the `--base-url` argument.
+
+- Windows (PowerShell/CMD):
+  - `cd frontend`
+  - `npm install`
+  - `npm run start` (development server; app calls gateway at `http://localhost:8080`)
+  - `npm run build` (production build output)
+  - `npm run smoke:gateway` (smoke check against gateway `http://localhost:8080`)
+  - `npm run smoke:live-flows` (live flow smoke check against gateway `http://localhost:8080`)
+
+- Bash users (Git Bash/WSL/Linux/macOS):
+  - `cd frontend`
+  - `npm install`
+  - `npm run start` (development server; app calls gateway at `http://localhost:8080`)
+  - `npm run build` (production build output)
+  - `npm run smoke:gateway` (smoke check against gateway `http://localhost:8080`)
+  - `npm run smoke:live-flows` (live flow smoke check against gateway `http://localhost:8080`)
+
+Notes:
+- If your gateway runs on another address, pass it explicitly, for example:
+  - `npm run smoke:gateway -- --base-url http://localhost:8080`
+  - `npm run smoke:live-flows -- --base-url http://localhost:8080`
+- Keep API + Gateway running before frontend smoke checks.
 
 ### 4) Runtime probes
 
