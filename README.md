@@ -35,27 +35,43 @@ It provides:
 
 ## Core Capabilities
 
-### Tracking & Campaigns
+### Campaign Lifecycle Management
 
-- Tracking page CRUD and lifecycle controls
-- Campaign-to-tracking-page linkage
-- Public landing via slug routes (`/p/{slug}`)
-- Campaign-state-aware public availability (non-active campaigns return 404)
+- Campaign CRUD and lifecycle transitions (`Draft`, `Active`, `Paused`, terminal states) are managed through authenticated campaign endpoints.
+- Campaign-to-tracking-page linkage is persisted, so each campaign can control a concrete public page surface.
+- Public slug resolution (`/p/{slug}`) is campaign-state-aware; non-active campaign windows are intentionally served as `404`.
+- Campaign detail workflows expose validity window and public-link context for operator-side orchestration.
 
-### Visit Collection
+### Tracking & Visit Collection
 
-- Public ingestion endpoints for tracking events
-- Deduplication/throttling protections
-- Optional bot filtering
-- UTM/referrer/device-aware event capture
+- Tracking pages are managed as first-class resources, then linked to campaign workflows where needed.
+- Public and slug-based visit ingestion endpoints collect click events without exposing admin contracts.
+- Ingestion applies deduplication/rate-limit guardrails and optional bot filtering for cleaner analytics.
+- Event capture supports UTM/referrer/user-agent/session/fingerprint context with privacy-aware IP policy handling.
 
-### Analytics
+### Template Management
 
-- Total visits
-- Unique visits (session/fingerprint/IP fallback strategy)
-- Top pages ranking
-- Time-based trends (hour/day/week)
-- Recent visit stream for operator visibility
+- HTML page templates are versioned and managed through dedicated template endpoints and UI workflows.
+- Campaign/tracking create flows can start from template-backed content or a blank page contract.
+- Template preview paths are integrated into operator flows so landing content can be validated before publish/lifecycle actions.
+
+### Audit Log Querying
+
+- Queryable audit-log endpoints support filtered access by actor, result, endpoint/action taxonomy, correlation id, and time window.
+- Admin/Operator consoles can inspect security-relevant and lifecycle-critical events without direct database access.
+- Audit records preserve outcome metadata (status, correlation, timestamp context) for incident review and traceability.
+
+### Analytics & Report Export (CSV/PDF)
+
+- Analytics pipelines provide totals, unique clicks, top pages, and trend windows (hour/day/week) from visit events.
+- Export endpoints generate CSV/PDF reports for global or selected tracking-page scope with summary/detailed levels.
+- Report payloads are contract-first and proxy-friendly, enabling frontend export workflows without handwritten API duplication.
+
+### Localization (TR/EN) & Theme Support
+
+- App-shell and feature surfaces support bilingual TR/EN experience with contract-aligned terminology.
+- Localization coverage includes auth, dashboard, tracking, templates, audit, and reporting flows.
+- Theme toggle support (including dark mode) is available from top-level navigation to keep operator UX consistent.
 
 ### Security & Reliability
 
