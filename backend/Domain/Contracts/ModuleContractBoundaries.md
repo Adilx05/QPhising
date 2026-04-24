@@ -14,16 +14,15 @@ This document defines module-level contract ownership boundaries for backend dom
 
 | Module | Domain Model Owner | Contract Source of Truth | Exposed Via |
 | --- | --- | --- | --- |
-| Setup | `Domain/Setup` | API OpenAPI (`/api/setup/*`) | Generated setup proxy |
-| Runtime Configuration | `Domain/RuntimeConfiguration` | API OpenAPI (`/api/configuration/*`) | Generated configuration proxy |
+| Health | `Domain/Health` | API OpenAPI (`/health/live`, `/health/ready`, `/api/health`) | Operational health payloads and dashboard status reads |
 | Campaign | `Domain/Campaigns` | API OpenAPI (`/api/campaigns/*`) | Generated campaign proxy |
 | Template | `Domain/Templates` | API OpenAPI (`/api/templates/*`) | Generated template proxy |
-| Tracking | `Domain/Tracking` | API OpenAPI (`/api/tracking/*`) | Generated tracking proxy |
-| Background Jobs | `Domain/Jobs` | API OpenAPI (`/api/jobs/*`) | Generated jobs proxy |
-| Analytics | `Domain/Analytics` | API OpenAPI (`/api/analytics/*`) | Generated analytics proxy |
-| Export | `Domain/Exports` | API OpenAPI (`/api/exports/*`) | Generated export proxy |
+| Tracking | `Domain/Tracking` | API OpenAPI (`/api/tracking/*`, `/p/{slug}`) | Generated tracking proxy + public landing route |
+| Analytics | `Domain/Analytics` | API OpenAPI (`/api/tracking/analytics/*`) | Generated analytics proxy |
+| Audit | `Domain/Audit` | API OpenAPI (`/api/audit/*`) | Generated audit proxy |
+| Gateway Mapping | `Domain/Gateway` | API OpenAPI (`/api/gateway/route-policies`) + gateway route contracts | Generated gateway proxy + Ocelot routing config |
 | Identity & Access | `Domain/Identity` | API OpenAPI (`/api/auth/*`) | Generated auth proxy |
-| Gateway Mapping | `Domain/Gateway` | Gateway/API route contracts | Gateway routing config |
+| Proxy Validation | `Domain/Contracts` | API OpenAPI (`/api/proxy-validation/*`) | Generated proxy validation surface |
 
 ## Invariants
 
