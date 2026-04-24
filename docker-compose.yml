@@ -49,6 +49,9 @@ services:
       Authentication__Jwt__Audience: ${JWT_AUDIENCE:-account}
       Authentication__Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
       Gateway__RoutePolicies__ForwardAccessToken: ${GATEWAY_FORWARD_ACCESS_TOKEN:-true}
+      HealthChecks__DownstreamApi__Host: ${GATEWAY_DOWNSTREAM_API_HOST:-api}
+      HealthChecks__DownstreamApi__Port: ${GATEWAY_DOWNSTREAM_API_PORT:-5050}
+      HealthChecks__DownstreamApi__Scheme: ${GATEWAY_DOWNSTREAM_API_SCHEME:-http}
       Setup__AllowRuntimeOverrides: ${SETUP_ALLOW_RUNTIME_OVERRIDES:-false}
     ports:
       - "${GATEWAY_PORT:-8080}:8080"
