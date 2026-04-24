@@ -1,23 +1,6 @@
 name: qphising
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-qphising}
-      POSTGRES_USER: ${POSTGRES_USER:-qphising}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qphising-dev-password}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-    volumes:
-      - qphising-postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qphising} -d ${POSTGRES_DB:-qphising}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   redis:
     image: redis:7-alpine
     restart: unless-stopped
@@ -31,16 +14,13 @@ services:
       context: .
       dockerfile: backend/API/Dockerfile
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
-      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-qphising};Password=${POSTGRES_PASSWORD:-qphising-dev-password}
+      ConnectionStrings__DefaultConnection: ${API_CONNECTION_STRING:-Host=localhost;Port=5432;Database=qphising;Username=qphising;Password=qphising-dev-password}
       Authentication__Jwt__Authority: ${JWT_AUTHORITY:-http://host.docker.internal:6060/realms/QPhising}
       Authentication__Jwt__Audience: ${JWT_AUDIENCE:-account}
       Authentication__Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
-      Redis__Configuration: redis:6379
+      Redis__Configuration: ${REDIS_CONFIGURATION:-redis:6379}
       Redis__InstanceName: ${REDIS_INSTANCE_NAME:-QPhising}
       FeatureFlags__SwaggerEnabled: ${API_SWAGGER_ENABLED:-true}
       Database__ApplyMigrationsOnStartup: ${API_APPLY_MIGRATIONS_ON_STARTUP:-true}
@@ -48,6 +28,12 @@ services:
       Setup__AllowRuntimeOverrides: ${SETUP_ALLOW_RUNTIME_OVERRIDES:-false}
     ports:
       - "${API_PORT:-5050}:5050"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5050/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
 
   gateway:
     build:
@@ -56,7 +42,7 @@ services:
     restart: unless-stopped
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       Authentication__Jwt__Authority: ${JWT_AUTHORITY:-http://host.docker.internal:6060/realms/QPhising}
@@ -66,6 +52,28 @@ services:
       Setup__AllowRuntimeOverrides: ${SETUP_ALLOW_RUNTIME_OVERRIDES:-false}
     ports:
       - "${GATEWAY_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
 
-volumes:
-  qphising-postgres-data:
+  frontend:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      gateway:
+        condition: service_healthy
+    environment:
+      QPHISING_API_BASE_URL: ${FRONTEND_API_BASE_URL:-http://localhost:8080}
+      QPHISING_AUTHORITY: ${FRONTEND_AUTHORITY:-http://localhost:6060}
+      QPHISING_REALM: ${FRONTEND_REALM:-QPhising}
+      QPHISING_CLIENT_ID: ${FRONTEND_CLIENT_ID:-qphising}
+      QPHISING_AUTH_SCOPE: ${FRONTEND_AUTH_SCOPE:-openid profile email}
+      QPHISING_AUTH_REDIRECT_URI: ${FRONTEND_AUTH_REDIRECT_URI:-http://localhost:4200/auth/callback}
+      QPHISING_POST_LOGOUT_REDIRECT_URI: ${FRONTEND_POST_LOGOUT_REDIRECT_URI:-http://localhost:4200/auth/unauthorized}
+    ports:
+      - "${FRONTEND_PORT:-4200}:80"
