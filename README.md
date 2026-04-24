@@ -256,9 +256,9 @@ Use the smoke checker scripts in `scripts/` to verify dashboard/tracking/campaig
 
 For deeper implementation details, start with:
 
-- `docs/architecture/`
-- `docs/api/`
-- `docs/operations/`
+- `docs/architecture/` — system design, architecture boundaries, and contract-oriented references
+- `docs/operations/` — runtime operations, runbooks, and incident handling guidance
+- `docs/adr/` — Architecture Decision Records (ADRs) and decision history
 
 ---
 
