@@ -173,8 +173,22 @@ cp deploy/env/.env.local.example .env
 docker compose up --build
 ```
 
-> `docker-compose.yml` no longer provisions PostgreSQL directly. Set `API_CONNECTION_STRING` to an existing PostgreSQL instance (local, managed, or external container).
+> Default compose stack expects **external PostgreSQL + external Keycloak**. The base file does not provision these services; you must point the API/Gateway to reachable instances.
 > In container networks, downstream host values must use the service name (for example `api`) rather than `localhost`.
+
+### Required environment variables
+
+At minimum, define:
+
+- `API_CONNECTION_STRING`
+- `JWT_AUTHORITY`
+- `JWT_AUDIENCE`
+
+Set these when your runtime scenario requires them:
+
+- `REDIS_CONFIGURATION`, `REDIS_INSTANCE_NAME` (if Redis profile/feature is enabled)
+- `API_SWAGGER_ENABLED`
+- `API_APPLY_MIGRATIONS_ON_STARTUP`
 
 ### With Redis profile enabled
 
@@ -182,9 +196,9 @@ docker compose up --build
 docker compose --profile redis up --build
 ```
 
-### Optional local PostgreSQL snippet
+### Opsiyonel olarak PostgreSQL/Keycloak’ı compose’a eklemek istersen aşağıdaki service bloklarını ekleyebilirsin
 
-If you want Compose-managed PostgreSQL for local development, keep it in a local override (for example `docker-compose.override.yml`) instead of the shared base file.
+If you want Compose-managed PostgreSQL/Keycloak for local development, keep them in a local override file (for example `docker-compose.override.yml`) instead of the shared base file.
 
 ```yaml
 services:
@@ -208,12 +222,45 @@ services:
   api:
     environment:
       API_CONNECTION_STRING: Host=postgres;Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-qphising};Password=${POSTGRES_PASSWORD:-qphising-dev-password}
+      Authentication__Jwt__Authority: http://keycloak:8080/realms/${KEYCLOAK_REALM:-QPhising}
     depends_on:
       postgres:
         condition: service_healthy
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    restart: unless-stopped
+    command: ["start-dev", "--http-port=8080"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB:-keycloak}
+      KC_DB_USERNAME: ${POSTGRES_USER:-qphising}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-qphising-dev-password}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    ports:
+      - "${KEYCLOAK_PORT:-6060}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  gateway:
+    environment:
+      Authentication__Jwt__Authority: http://keycloak:8080/realms/${KEYCLOAK_REALM:-QPhising}
+
 volumes:
   qphising-postgres-data:
+```
+
+### Health endpoint verification (Gateway + API)
+
+After the stack is up, verify both liveness and readiness endpoints:
+
+```bash
+curl -f http://localhost:5050/health/live
+curl -f http://localhost:5050/health/ready
+curl -f http://localhost:8080/health/live
+curl -f http://localhost:8080/health/ready
 ```
 
 ### Exposed services
