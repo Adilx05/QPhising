@@ -42,6 +42,12 @@ fi
 if ! git -C "${REPO_ROOT}" diff --quiet -- frontend/src/app/shared/proxy; then
   echo "Error: generated proxies are not in sync with ${SWAGGER_FIXTURE}." >&2
   echo "Review and commit updated files under frontend/src/app/shared/proxy." >&2
+  echo "Drift summary (git status):" >&2
+  git -C "${REPO_ROOT}" status --short -- frontend/src/app/shared/proxy >&2 || true
+  echo "Drift summary (numstat):" >&2
+  git -C "${REPO_ROOT}" diff --numstat -- frontend/src/app/shared/proxy >&2 || true
+  echo "Drift preview (first 200 lines):" >&2
+  git -C "${REPO_ROOT}" diff -- frontend/src/app/shared/proxy | sed -n '1,200p' >&2 || true
   exit 1
 fi
 
