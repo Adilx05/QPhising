@@ -142,8 +142,6 @@ export class AppComponent {
       reports: 'Raporlar',
       auditLogs: 'Audit Kayıtları',
       language: 'Dil',
-      darkMode: 'Koyu Mod',
-      lightMode: 'Açık Mod',
       sessionAuthenticated: 'Oturum Açık',
       sessionUnauthenticated: 'Oturum Kapalı',
       systemHealth: 'Sistem Sağlığı',
@@ -162,8 +160,6 @@ export class AppComponent {
       reports: 'Reports',
       auditLogs: 'Audit Logs',
       language: 'Language',
-      darkMode: 'Dark Mode',
-      lightMode: 'Light Mode',
       sessionAuthenticated: 'Authenticated Session',
       sessionUnauthenticated: 'Unauthenticated Session',
       systemHealth: 'System Health',
@@ -200,17 +196,11 @@ export class AppComponent {
     return this.userPreferencesService.language();
   }
 
-  protected isDarkTheme(): boolean {
-    return this.userPreferencesService.theme() === 'dark';
-  }
 
   protected setLanguage(language: AppLanguage): void {
     this.userPreferencesService.setLanguage(language);
   }
 
-  protected toggleTheme(): void {
-    this.userPreferencesService.toggleTheme();
-  }
 
   protected t(key: string): string {
     const language = this.userPreferencesService.language();

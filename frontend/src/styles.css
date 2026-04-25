@@ -60,34 +60,3 @@ body {
 .status-chip-warning {
   @apply border-amber-200 bg-amber-50 text-amber-700;
 }
-
-body.app-dark {
-  color: #e2e8f0;
-  background: radial-gradient(circle at top right, #0f172a 0%, #020617 60%);
-}
-
-body.app-dark .app-shell,
-body.app-dark .surface-card,
-body.app-dark .nav-item,
-body.app-dark .mobile-nav-item,
-body.app-dark .page-title,
-body.app-dark .page-subtitle {
-  color: inherit;
-}
-
-body.app-dark .surface-card {
-  @apply border-slate-700 bg-slate-900;
-}
-
-body.app-dark .nav-item {
-  @apply text-slate-300 hover:bg-slate-800 hover:text-white;
-}
-
-body.app-dark .nav-item.is-active,
-body.app-dark .mobile-nav-item.is-active {
-  @apply bg-slate-700 text-white;
-}
-
-body.app-dark .mobile-nav-item {
-  @apply text-slate-300;
-}

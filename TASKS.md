@@ -161,8 +161,10 @@ Phase 9 evidence:
 - [x] Split API/Gateway health model into liveness/readiness endpoints with standardized dependency payload, dependency-specific readiness probes (PostgreSQL, Redis optional degrade, Keycloak timeout probe), and admin dashboard readiness summary card.
 - [x] Move the System Health summary card from dashboard content into the sidebar bottom section with a compact read-only layout.
 - [x] Finalize frontend container runtime configuration flow with multi-stage build, Nginx SPA fallback, and env-driven `runtime-config.js` generation at startup.
+- [x] Remove frontend dark-mode support and theme-toggle behavior across shell/preferences/styles so application remains light-only.
 
 Incremental evidence:
+- 2026-04-25: Removed frontend dark-mode infrastructure end-to-end by deleting theme state/toggle methods from user preferences and app shell, removing PrimeNG dark-mode selector wiring, and deleting `body.app-dark` style overrides so UI runs in light mode only.
 - 2026-04-25: Fixed Docker Compose API startup health gating by making Keycloak readiness probe configurable (`HealthChecks:Keycloak:Enabled`) and setting Compose default to disabled, so `/health/ready` stays non-unhealthy when Keycloak is intentionally not part of local container stack; added unit coverage for disabled-probe degraded status.
 - 2026-04-24: Finalized frontend Docker runtime config flow by keeping a Node build + Nginx serve multi-stage Dockerfile, generating `/usr/share/nginx/html/runtime-config.js` from container env via `frontend/docker/entrypoint.sh`, loading runtime config in `index.html` before Angular bundles, and enforcing SPA fallback with `try_files $uri /index.html` in Nginx.
 - 2026-04-24: Kept gateway downstream health defaults in `backend/Gateway/appsettings.json` as localhost for local development, added Docker Compose gateway environment overrides for `HealthChecks__DownstreamApi__Host/Port/Scheme` (defaulting to `api:5050` over HTTP), and documented service-name-based downstream host requirement for container networks in `README.md`.
