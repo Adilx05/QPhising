@@ -1,395 +1,420 @@
 # QPhising
 
-QPhising is an enterprise-grade **Web Page Tracking & Visitor Analytics** platform built with a backend-first Clean Architecture approach.
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-19-DD0031?logo=angular&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![Gateway](https://img.shields.io/badge/Ocelot-Gateway-0A66C2)
+![License](https://img.shields.io/badge/License-QPhising%20Community%201.0-blue)
+
+QPhising is a backend-first **web tracking, visitor analytics, and campaign simulation operations platform** built with Clean Architecture.
 
 It provides:
 
-- secure campaign + tracking-page lifecycle management,
-- public tracking landing resolution (`/p/{slug}`),
-- visit ingestion with privacy-aware IP handling,
-- analytics dashboards (totals, uniques, trends, top pages, recent visits),
-- health/readiness-first runtime operations (`/health/live`, `/health/ready`),
-- API contract-driven frontend integration through generated proxies.
+- Public tracking pages (`/p/{slug}`) that can be resolved and monitored in real time,
+- Anonymous visit ingestion with deduplication and privacy controls,
+- Analytics dashboards (total visits, unique visitors, trends, top pages, recent visits),
+- CSV/PDF report export capabilities,
+- Role-based administrative management for campaigns, templates, tracking pages, and audit logs.
 
 ---
 
-## Repository Layout
+## Overview
 
-- `backend/`
-  - `Domain/` business rules and aggregates
-  - `Application/` CQRS handlers, contracts, validators
-  - `Infrastructure/` EF Core persistence, external integrations
-  - `API/` HTTP endpoints + Swagger + auth + rate limiting
-  - `Gateway/` Ocelot routing and edge concerns
-- `frontend/`
-  - Angular UI (PrimeNG + Tailwind)
-  - generated API proxies under `src/app/shared/proxy`
-- `docs/`
-  - architecture references, API contracts, operational runbooks
-- `scripts/`
-  - quality gates, proxy generation/validation, smoke checks
-- `deploy/env/`
-  - environment templates for local/staging/production
+QPhising is designed for awareness/simulation/monitoring use-cases where organizations need to:
+
+- Create and lifecycle-manage campaigns,
+- Bind campaigns to real tracking pages,
+- Track visitor behavior through public landing surfaces,
+- Observe analytics trends and operational health,
+- Export analytics evidence for reporting.
+
+The platform enforces backend contracts first (Swagger/OpenAPI), then consumes those contracts in Angular through generated proxies.
+
+> **Important:** This README reflects implemented behavior from the current repository state. Items marked as **(inferred)** are derived from code/config conventions where explicit docs are minimal.
 
 ---
 
-## Core Capabilities
+## Features
 
-### Campaign Lifecycle Management
-
-- Campaign CRUD and lifecycle transitions (`Draft`, `Active`, `Paused`, terminal states) are managed through authenticated campaign endpoints.
-- Campaign-to-tracking-page linkage is persisted, so each campaign can control a concrete public page surface.
-- Public slug resolution (`/p/{slug}`) is campaign-state-aware; non-active campaign windows are intentionally served as `404`.
-- Campaign detail workflows expose validity window and public-link context for operator-side orchestration.
-
-### Tracking & Visit Collection
-
-- Tracking pages are managed as first-class resources, then linked to campaign workflows where needed.
-- Public and slug-based visit ingestion endpoints collect click events without exposing admin contracts.
-- Ingestion applies deduplication/rate-limit guardrails and optional bot filtering for cleaner analytics.
-- Event capture supports UTM/referrer/user-agent/session/fingerprint context with privacy-aware IP policy handling.
-
-### Template Management
-
-- HTML page templates are versioned and managed through dedicated template endpoints and UI workflows.
-- Campaign/tracking create flows can start from template-backed content or a blank page contract.
-- Template preview paths are integrated into operator flows so landing content can be validated before publish/lifecycle actions.
-
-### Audit Log Querying
-
-- Queryable audit-log endpoints support filtered access by actor, result, endpoint/action taxonomy, correlation id, and time window.
-- Admin/Operator consoles can inspect security-relevant and lifecycle-critical events without direct database access.
-- Audit records preserve outcome metadata (status, correlation, timestamp context) for incident review and traceability.
-
-### Analytics & Report Export (CSV/PDF)
-
-- Analytics pipelines provide totals, unique clicks, top pages, and trend windows (hour/day/week) from visit events.
-- Export endpoints generate CSV/PDF reports for global or selected tracking-page scope with summary/detailed levels.
-- Report payloads are contract-first and proxy-friendly, enabling frontend export workflows without handwritten API duplication.
-
-### Localization (TR/EN) & Theme Support
-
-- App-shell and feature surfaces support bilingual TR/EN experience with contract-aligned terminology.
-- Localization coverage includes auth, dashboard, tracking, templates, audit, and reporting flows.
-- Theme toggle support (including dark mode) is available from top-level navigation to keep operator UX consistent.
-
-### Security & Reliability
-
-- JWT-based authentication + role-based authorization (`Admin`, `Operator`, `Viewer`)
-- Public endpoint rate limiting
-- ProblemDetails-based API errors
-- Correlation ID propagation (`X-Correlation-Id`)
-- Structured JSON logging
+- Campaign lifecycle management (`Draft`, `Scheduled`, `Active`, `Paused`, `Completed`, `Cancelled`)
+- Tracking page CRUD + publish/archive lifecycle
+- Public landing resolution via slug (`GET /p/{slug}`)
+- Anonymous visit ingestion by tracking-page ID and slug
+- Visit deduplication guard within configurable window
+- Visitor privacy controls (IP capture on/off and hash policy)
+- Bot traffic filtering toggle in analytics/report pipelines
+- Tracking analytics overview (global KPIs, top pages, trend buckets, recent stream)
+- Tracking analytics detail per page (summary, trend, filtered recent events)
+- Report center with CSV/PDF export (global or selected tracking page, summary/detailed)
+- Template management for HTML landing content
+- Audit log query UI/API for security and operational events
+- JWT authentication (Keycloak authority) + role-based authorization (`Admin`, `Operator`, `Viewer`)
+- API/Gateway health model with liveness/readiness endpoints
+- Structured JSON logging + correlation ID propagation
 - Soft-delete semantics for core entities
+- Contract quality gates (Swagger checks, proxy determinism, gateway/proxy consistency scripts)
+
+---
+
+## Architecture
+
+QPhising follows Clean Architecture boundaries:
+
+### Frontend (`frontend/`)
+
+- Angular 19 standalone app
+- Feature-based modules (dashboard, campaigns, tracking, templates, reports, audit)
+- Generated TypeScript clients under `src/app/shared/proxy`
+- Runtime-configurable API/auth endpoints injected at container startup (`runtime-config.js`)
+
+### API (`backend/API/`)
+
+- ASP.NET Core Web API
+- Controllers contain transport concerns only
+- CQRS orchestration via MediatR handlers in Application layer
+- ProblemDetails middleware for standardized API errors
+- Rate limiting on public tracking endpoints
+
+### Application (`backend/Application/`)
+
+- Use-cases: commands/queries + validators
+- Authorization behavior pipeline
+- DTO contracts for frontend/API boundaries
+- Reporting query orchestration and exporter abstraction
+
+### Domain (`backend/Domain/`)
+
+- Pure business rules for Campaign, Tracking, Template, Identity models
+- Aggregates, value objects, enums, policies
+- No infrastructure/framework dependencies
+
+### Infrastructure/Persistence (inside API project)
+
+- EF Core DbContext and repository implementations
+- PostgreSQL persistence mappings and migrations
+- Audit log persistence and health checks
+
+### Gateway (`backend/Gateway/`)
+
+- Ocelot API gateway
+- Route forwarding to downstream API
+- Auth forwarding / claim-to-header forwarding middleware
+- Independent liveness/readiness probes
+
+### Database
+
+- PostgreSQL with EF Core migration-based schema management
+- Core tables: `campaigns`, `tracking_pages`, `visit_events`, `templates`, `audit_log_entries`
 
 ---
 
 ## Tech Stack
 
-### Backend
-
-- .NET (Clean Architecture)
-- MediatR (CQRS)
-- FluentValidation
-- AutoMapper
-- EF Core + PostgreSQL
-- Ocelot Gateway
-
-### Frontend
-
-- Angular
-- PrimeNG
-- TailwindCSS
-- Generated TypeScript API clients (`openapi-typescript-codegen`)
-
-### DevOps
-
-- Docker + Docker Compose
-- GitHub Actions (CI + release baseline)
+| Area | Technologies |
+|---|---|
+| Backend | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper |
+| Data | EF Core, Npgsql, PostgreSQL |
+| Gateway | Ocelot |
+| Frontend | Angular 19, TypeScript, PrimeNG, TailwindCSS |
+| Auth | JWT Bearer (Keycloak authority) |
+| Reporting | QuestPDF, CSV generation |
+| Quality/Tooling | Node.js scripts, OpenAPI proxy generation (`openapi-typescript-codegen`) |
+| CI/CD | GitHub Actions (`ci.yml`, `release.yml`) |
+| Containers | Docker, Docker Compose, Nginx (frontend runtime) |
 
 ---
 
-## Local Development (Windows-native first, container optional)
+## Repository Structure
 
-> The project is optimized for local Windows-native multi-startup (API + Gateway), while containerized runtime is available for full-stack orchestration.
-
-### 1) Configure runtime settings
-
-Prepare environment/appsettings values (especially PostgreSQL + Keycloak) before startup.
-
-### 2) Run API + Gateway locally
-
-- API defaults
-  - HTTP: `http://localhost:5050`
-  - HTTPS: `https://localhost:7050`
-- Gateway defaults
-  - HTTP: `http://localhost:8080`
-  - HTTPS: `https://localhost:8443`
-
-Swagger is available in development mode (or when explicitly enabled by feature flag).
-
-### 3) Frontend (`frontend/`)
-
-Use the following concrete flow from the repository root. The frontend smoke scripts expect the gateway to be reachable at `http://localhost:8080` unless you override the `--base-url` argument.
-
-- Windows (PowerShell/CMD):
-  - `cd frontend`
-  - `npm install`
-  - `npm run start` (development server; app calls gateway at `http://localhost:8080`)
-  - `npm run build` (production build output)
-  - `npm run smoke:gateway` (smoke check against gateway `http://localhost:8080`)
-  - `npm run smoke:live-flows` (live flow smoke check against gateway `http://localhost:8080`)
-
-- Bash users (Git Bash/WSL/Linux/macOS):
-  - `cd frontend`
-  - `npm install`
-  - `npm run start` (development server; app calls gateway at `http://localhost:8080`)
-  - `npm run build` (production build output)
-  - `npm run smoke:gateway` (smoke check against gateway `http://localhost:8080`)
-  - `npm run smoke:live-flows` (live flow smoke check against gateway `http://localhost:8080`)
-
-Notes:
-- If your gateway runs on another address, pass it explicitly, for example:
-  - `npm run smoke:gateway -- --base-url http://localhost:8080`
-  - `npm run smoke:live-flows -- --base-url http://localhost:8080`
-- Keep API + Gateway running before frontend smoke checks.
-
-### 4) Runtime probes
-
-- Gateway/API liveness: `GET /health/live`
-- Gateway/API readiness: `GET /health/ready`
-- API operational detail (authenticated): `GET /api/health`
+```text
+.
+├─ backend/
+│  ├─ API/                # HTTP API, middleware, EF Core persistence, health checks
+│  ├─ Application/        # CQRS handlers, validators, contracts, mapping
+│  ├─ Domain/             # Aggregates, value objects, domain enums/policies
+│  ├─ Gateway/            # Ocelot gateway and edge middleware
+│  └─ API.Tests/          # Unit + integration tests
+├─ frontend/
+│  ├─ src/app/core/       # auth, guards, config, shared UI state
+│  ├─ src/app/features/   # dashboard, tracking, campaigns, templates, reports, audit
+│  ├─ src/app/shared/proxy/ # generated OpenAPI clients
+│  └─ docker/             # nginx + runtime-config entrypoint
+├─ docs/
+│  ├─ architecture/
+│  └─ operations/
+├─ deploy/env/            # local/staging/production env templates
+├─ scripts/               # quality gates, smoke checks, proxy generation
+├─ docker-compose.yml
+├─ QPhising.slnx
+└─ LICENSE.md
+```
 
 ---
 
-## Containerized Runtime
+## Getting Started
 
-Use root `docker-compose.yml`.
+### Requirements
 
-### Standard stack
+- .NET SDK 10.x
+- Node.js 20+ (Node 22 used in frontend Docker build)
+- npm
+- PostgreSQL 16+ (or compatible)
+- Keycloak realm/client for JWT issuance/validation
+- (Optional) Redis for optional readiness/degradation scenarios
+- Docker + Docker Compose (for containerized runs)
+
+### Local Development
+
+#### 1) Configure backend settings
+
+Update `backend/API/appsettings.Development.json` and `backend/Gateway/appsettings.Development.json` (or environment overrides) for:
+
+- PostgreSQL connection string,
+- JWT authority/audience,
+- Optional Redis,
+- CORS origins.
+
+#### 2) Run backend + gateway
+
+```bash
+dotnet restore QPhising.slnx
+dotnet build QPhising.slnx
+
+# Terminal 1
+dotnet run --project backend/API/QPhising.Api.csproj
+
+# Terminal 2
+dotnet run --project backend/Gateway/QPhising.Gateway.csproj
+```
+
+Default local endpoints:
+
+- API HTTP: `http://localhost:5050`
+- Gateway HTTP: `http://localhost:8080`
+
+#### 3) Run frontend
+
+```bash
+cd frontend
+npm ci
+npm run start
+```
+
+Frontend dev server defaults to Angular local runtime and targets gateway base URL from environment/runtime config.
+
+### Docker Setup
+
+#### Base stack
 
 ```bash
 cp deploy/env/.env.local.example .env
 docker compose up --build
 ```
 
-> Default compose stack expects **external PostgreSQL + external Keycloak**. The base file does not provision these services; you must point the API/Gateway to reachable instances.
-> In container networks, downstream host values must use the service name (for example `api`) rather than `localhost`.
+Services in base compose:
 
-### Required environment variables
+- `api`
+- `gateway`
+- `frontend`
+- `redis` (profile-based, optional)
 
-At minimum, define:
-
-- `API_CONNECTION_STRING`
-- `JWT_AUTHORITY`
-- `JWT_AUDIENCE`
-
-Set these when your runtime scenario requires them:
-
-- `REDIS_CONFIGURATION`, `REDIS_INSTANCE_NAME` (if Redis profile/feature is enabled)
-- `API_SWAGGER_ENABLED`
-- `API_APPLY_MIGRATIONS_ON_STARTUP`
-
-### With Redis profile enabled
+Run with Redis profile:
 
 ```bash
 docker compose --profile redis up --build
 ```
 
-### Opsiyonel olarak PostgreSQL/Keycloak’ı compose’a eklemek istersen aşağıdaki service bloklarını ekleyebilirsin
+> The base compose expects external PostgreSQL/Keycloak unless you add local overrides.
 
-If you want Compose-managed PostgreSQL/Keycloak for local development, keep them in a local override file (for example `docker-compose.override.yml`) instead of the shared base file.
+### Environment Variables
 
-```yaml
-services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-qphising}
-      POSTGRES_USER: ${POSTGRES_USER:-qphising}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qphising-dev-password}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-    volumes:
-      - qphising-postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-qphising} -d ${POSTGRES_DB:-qphising}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+Detected from `docker-compose.yml`, env templates, and frontend runtime entrypoint.
 
-  api:
-    environment:
-      API_CONNECTION_STRING: Host=postgres;Port=5432;Database=${POSTGRES_DB:-qphising};Username=${POSTGRES_USER:-qphising};Password=${POSTGRES_PASSWORD:-qphising-dev-password}
-      Authentication__Jwt__Authority: http://keycloak:8080/realms/${KEYCLOAK_REALM:-QPhising}
-    depends_on:
-      postgres:
-        condition: service_healthy
+| Variable | Used By | Purpose |
+|---|---|---|
+| `ASPNETCORE_ENVIRONMENT` | API, Gateway | Runtime environment (`Development`, `Staging`, `Production`) |
+| `API_CONNECTION_STRING` | API | EF Core/PostgreSQL connection string (`ConnectionStrings__DefaultConnection`) |
+| `JWT_AUTHORITY` | API, Gateway | OIDC/JWT authority URL |
+| `JWT_AUDIENCE` | API, Gateway | Expected JWT audience |
+| `JWT_REQUIRE_HTTPS_METADATA` | API, Gateway | Enables/disables metadata HTTPS requirement |
+| `API_HEALTHCHECK_KEYCLOAK_ENABLED` | API | Toggle Keycloak readiness probe |
+| `API_SWAGGER_ENABLED` | API | Enables Swagger outside development |
+| `API_APPLY_MIGRATIONS_ON_STARTUP` | API | Startup migration check/apply toggle |
+| `TRACKING_HASH_PEPPER` | API | Optional pepper for visitor IP hashing |
+| `REDIS_CONFIGURATION` | API | Redis endpoint |
+| `REDIS_INSTANCE_NAME` | API | Redis instance prefix |
+| `REDIS_PORT` | Compose | Redis host port mapping |
+| `API_PORT` | Compose | API exposed port |
+| `GATEWAY_PORT` | Compose | Gateway exposed port |
+| `FRONTEND_PORT` | Compose | Frontend exposed port |
+| `GATEWAY_FORWARD_ACCESS_TOKEN` | Gateway | Forward bearer token to downstream (policy setting) |
+| `GATEWAY_DOWNSTREAM_API_HOST` | Gateway | Downstream API host for readiness probe |
+| `GATEWAY_DOWNSTREAM_API_PORT` | Gateway | Downstream API port for readiness probe |
+| `GATEWAY_DOWNSTREAM_API_SCHEME` | Gateway | Downstream API scheme (`http`/`https`) |
+| `FRONTEND_API_BASE_URL` / `QPHISING_API_BASE_URL` | Frontend | API base URL injected into `runtime-config.js` |
+| `FRONTEND_AUTHORITY` / `QPHISING_AUTHORITY` | Frontend | OIDC authority base |
+| `FRONTEND_REALM` / `QPHISING_REALM` | Frontend | Keycloak realm |
+| `FRONTEND_CLIENT_ID` / `QPHISING_CLIENT_ID` | Frontend | OIDC client ID |
+| `FRONTEND_AUTH_SCOPE` / `QPHISING_AUTH_SCOPE` | Frontend | Requested OIDC scopes |
+| `FRONTEND_AUTH_REDIRECT_URI` / `QPHISING_AUTH_REDIRECT_URI` | Frontend | Login redirect URI |
+| `FRONTEND_POST_LOGOUT_REDIRECT_URI` / `QPHISING_POST_LOGOUT_REDIRECT_URI` | Frontend | Post logout redirect URI |
+| `SETUP_ALLOW_RUNTIME_OVERRIDES` | API, Gateway | Legacy guard flag still present in compose/env templates (inferred: compatibility) |
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:25.0
-    restart: unless-stopped
-    command: ["start-dev", "--http-port=8080"]
-    environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB:-keycloak}
-      KC_DB_USERNAME: ${POSTGRES_USER:-qphising}
-      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-qphising-dev-password}
-      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
-    ports:
-      - "${KEYCLOAK_PORT:-6060}:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
+---
 
-  gateway:
-    environment:
-      Authentication__Jwt__Authority: http://keycloak:8080/realms/${KEYCLOAK_REALM:-QPhising}
+## Database
 
-volumes:
-  qphising-postgres-data:
-```
+- Provider: PostgreSQL (Npgsql)
+- ORM: EF Core
+- Migration strategy: API performs migration check/apply during startup (`Database.Migrate()` in startup flow)
+- Current migration file in repo: `20260423120123_firstinity`
+- Soft delete is enforced on key write-side entities via `is_deleted` + global query filters
 
-### Health endpoint verification (Gateway + API)
-
-After the stack is up, verify both liveness and readiness endpoints:
+### Typical migration commands
 
 ```bash
-curl -f http://localhost:5050/health/live
-curl -f http://localhost:5050/health/ready
-curl -f http://localhost:8080/health/live
-curl -f http://localhost:8080/health/ready
+# from repo root
+dotnet ef migrations add <MigrationName> --project backend/API --startup-project backend/API
+dotnet ef database update --project backend/API --startup-project backend/API
 ```
 
-### Exposed services
-
-- Frontend: `http://localhost:4200`
-- API: `http://localhost:5050`
-- Gateway: `http://localhost:8080`
-- Redis (optional): `localhost:6379`
+> Seeding: no broad demo-data seed pipeline is defined in current startup path (inferred from startup/db configuration).
 
 ---
 
-## Database & Migrations
+## Authentication
 
-EF Core migrations are the source of truth for schema lifecycle.
+- API and Gateway use JWT Bearer authentication.
+- Authority/audience are read from configuration.
+- Role policies are mapped to:
+  - `AdminOnly`
+  - `OperatorOrAbove`
+  - `ViewerOrAbove`
+- Frontend uses OIDC Authorization Code + PKCE flow:
+  - Redirect to provider login,
+  - Handle callback at `/auth/callback`,
+  - Persist session in browser storage,
+  - Apply route guards by role.
 
-### Configure connection
+---
 
-Set `ConnectionStrings:DefaultConnection` in runtime settings or environment variables.
+## Usage
 
-Example:
+Typical operator/admin workflow:
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=qphising;Username=qphising;Password=change-me"
-  }
-}
-```
+1. Sign in through configured OIDC provider.
+2. Create/manage templates (optional HTML foundation).
+3. Create tracking pages (slug/title/privacy/options).
+4. Create campaigns linked to tracking pages.
+5. Start/operate campaign lifecycle as needed.
+6. Share public route (`/p/{slug}`) for monitored flow entry.
+7. Observe dashboard metrics and tracking analytics details.
+8. Export CSV/PDF reports from Report Center.
+9. Review audit logs for security/operations traceability.
 
-### Common commands (from `backend/API`)
+---
+
+## Reports & Analytics
+
+Implemented analytics surfaces include:
+
+- **Overview KPIs:** total visits, unique visitors
+- **Top pages:** ranking with total + unique counts
+- **Recent visit stream:** newest events with referrer/user agent context
+- **Trend buckets:** time-windowed aggregation (overview + page analytics)
+- **Filters:** date range, bot exclusion, trend bucket granularity, local UI filters for referrer/user-agent buckets
+- **Exports:**
+  - Scope: global or selected tracking page
+  - Detail level: summary/detailed
+  - Format: CSV/PDF
+  - Locale option: TR/EN
+
+---
+
+## Build & Production
+
+### Build locally
 
 ```bash
-dotnet ef migrations add <MigrationName> --output-dir Infrastructure/Persistence/Migrations
-dotnet ef database update
-dotnet ef migrations list
+# Backend
+dotnet restore QPhising.slnx
+dotnet build QPhising.slnx --configuration Release
+dotnet test backend/API.Tests/QPhising.Api.Tests.csproj --configuration Release
+
+# Frontend
+cd frontend
+npm ci
+npm run build
 ```
 
-### Notes
+### CI flow (`.github/workflows/ci.yml`)
 
-- Schema changes must be delivered via migrations, not ad-hoc runtime DDL.
+- Restore/build backend
+- Run backend tests with coverage
+- Build frontend
+- Run frontend UI smoke checks
+- Run Swagger quality gates
+- Validate proxy generation determinism
+- Verify gateway and proxy consistency
 
----
+### Release baseline (`.github/workflows/release.yml`)
 
-## API Contract, Swagger, and Proxy Workflow
+Manual dispatch with:
 
-Backend contracts are authoritative.
+- `target_environment` (`staging` or `production`)
+- `release_version` (`vMAJOR.MINOR.PATCH`)
 
-When API contracts change:
-
-1. Update backend domain/application/API.
-2. Ensure Swagger reflects the new contract.
-3. Regenerate frontend proxies.
-4. Fix frontend compile/runtime usage against generated clients.
-
-### Proxy generation
-
-- Linux/macOS:
-  - `./scripts/generate-proxy.sh`
-- Windows:
-  - `scripts\generate-proxy.bat`
-
-### Proxy determinism validation
-
-- Linux/macOS: `./scripts/validate-proxy-generation.sh`
-- Windows: `scripts\validate-proxy-generation.bat`
+Workflow builds/tests and creates an artifact bundle (`backend`, `frontend`, `docker-compose.yml`, `deploy/env`).
 
 ---
 
-## Quality Gates
+## Security Notes
 
-### Swagger quality gate
-
-- Linux/macOS: `./scripts/check-swagger-quality.sh`
-- Windows: `scripts\check-swagger-quality.bat`
-
-### Gateway ↔ Swagger alignment
-
-- Linux/macOS: `./scripts/check-gateway-swagger-alignment.sh`
-- Windows: `scripts\check-gateway-swagger-alignment.bat`
-
-### Proxy ↔ Gateway consistency
-
-- Linux/macOS: `./scripts/check-proxy-gateway-consistency.sh`
-- Windows: `scripts\check-proxy-gateway-consistency.bat`
-
-### Frontend UI smoke checks
-
-Use the smoke checker scripts in `scripts/` to verify dashboard/tracking/campaign core views are present and wired.
+- Enforce HTTPS and strict Keycloak metadata validation in non-local environments.
+- Keep JWT authority/audience consistent across API, gateway, and frontend runtime config.
+- Restrict CORS origins to known frontend hosts.
+- Use strong secrets for database/auth and do not commit real secrets.
+- Configure `TRACKING_HASH_PEPPER` in staging/production for stronger hash resilience.
+- Maintain rate limits on public tracking routes to reduce abuse risk.
+- Review audit logs (`/api/audit/logs`) regularly for 401/403/429 and sensitive operations.
 
 ---
 
-## CI/CD
+## Roadmap
 
-- `.github/workflows/ci.yml`
-  - backend restore/build/test
-  - frontend install/build
-  - contract/proxy/gateway checks
-- `.github/workflows/release.yml`
-  - environment-scoped release gating
-  - semantic version input checks
-  - pre-release build/test verification
+Potential next steps aligned with current architecture:
 
----
-
-## Operational Notes
-
-- Setup wizard/runtime configuration endpoints were removed on 2026-04-23; app startup now relies on static configuration sources.
-- Redis is optional unless explicitly required by a feature/profile.
-- Main management and analytics endpoints are protected; public tracking routes are intentionally constrained and rate-limited.
-- Correlation IDs are propagated API ↔ Gateway for traceability.
+- Add richer analytics visualizations (native chart components) across dashboards.
+- Expand export scheduler/automation (periodic report jobs).
+- Add retention enforcement/background cleanup jobs for visit data.
+- Introduce dedicated infrastructure project separation for persistence/integrations.
+- Add explicit deployment manifests (Kubernetes/Helm) when required.
+- Extend observability with tracing/metrics backends (OpenTelemetry) (inferred).
 
 ---
 
-## Documentation Index
+## Contributing
 
-For deeper implementation details, start with:
-
-- `docs/architecture/` — system design, architecture boundaries, and contract-oriented references
-- `docs/operations/` — runtime operations, runbooks, and incident handling guidance
-- `docs/adr/` — Architecture Decision Records (ADRs) and decision history
+1. Fork the repository and create a feature branch.
+2. Follow Clean Architecture boundaries and CQRS patterns already used.
+3. Keep API contracts authoritative; regenerate/check proxies when contracts change.
+4. Run local checks before PR:
+   - backend build/tests
+   - frontend build
+   - swagger/proxy/gateway validation scripts
+5. Submit a PR with clear implementation notes and impact scope.
 
 ---
 
-## Licensing
+## License
 
-QPhising is source-available under the QPhising Community License.
+This project is licensed under **QPhising Community License 1.0**.
 
-Commercial use requires a separate license.
+- Non-commercial use, modification, self-hosting, and redistribution are allowed.
+- Commercial use (selling, paid SaaS, paid embedding, monetized offerings) requires a separate commercial license.
+
 See:
-- LICENSE.md
-- TRADEMARK.md
-- COMMERCIAL.md
+
+- `LICENSE.md`
+- `COMMERCIAL.md`
+
