@@ -141,6 +141,23 @@ a {
   color: var(--accent);
   font-weight: 700;
   margin-bottom: 0.8rem;
+  margin: 0;
+}
+
+.brand-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 1.6rem;
+}
+
+.brand-logo {
+  width: 250px;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
 
 h1 {
