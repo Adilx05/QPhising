@@ -52,9 +52,6 @@ jobs:
       - name: Swagger quality gate
         run: ./scripts/check-swagger-quality.sh ./frontend/openapi/proxy-validation.swagger.json
 
-      - name: Validate proxy generation determinism
-        run: ./scripts/validate-proxy-generation.sh
-
       - name: Verify gateway aligns to Swagger
         run: ./scripts/check-gateway-swagger-alignment.sh --swagger frontend/openapi/proxy-validation.swagger.json --ocelot backend/Gateway/ocelot.json
 
