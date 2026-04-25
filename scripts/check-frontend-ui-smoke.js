@@ -23,9 +23,10 @@ function run() {
 
   assertIncludes(routes, "path: 'dashboard'", 'Missing dashboard route in app.routes.ts');
   assertIncludes(routes, "path: 'tracking'", 'Missing tracking route in app.routes.ts');
-  assertIncludes(routes, 'setupCompletionCanActivateGuard', 'Setup guard is not enforced on protected routes.');
+  assertIncludes(routes, 'authenticationCanActivateGuard', 'Authentication guard is missing on protected routes.');
+  assertIncludes(routes, 'authenticationCanMatchGuard', 'Authentication canMatch guard is missing on protected routes.');
 
-  assertIncludes(dashboardPage, 'Security Operations Dashboard', 'Dashboard smoke content not found.');
+  assertIncludes(dashboardPage, 'Application Dashboard', 'Dashboard smoke content not found.');
 
   assertIncludes(trackingPage, 'Tracking Pages Grid', 'Tracking grid section missing.');
   assertIncludes(trackingPage, 'Tracking Page Editor', 'Tracking editor section missing.');
