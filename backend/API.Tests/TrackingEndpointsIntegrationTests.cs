@@ -88,14 +88,17 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
 
         visitTwoResponse.EnsureSuccessStatusCode();
 
-        var analyticsResponse = await client.GetAsync($"/api/tracking/pages/{trackingPageId}/analytics?fromUtc={now.AddHours(-1):O}&toUtc={now.AddHours(1):O}&trendBucketSizeMinutes=60&recentVisitLimit=10");
+        var fromUtc = Uri.EscapeDataString(now.AddHours(-1).UtcDateTime.ToString("O"));
+        var toUtc = Uri.EscapeDataString(now.AddHours(1).UtcDateTime.ToString("O"));
+
+        var analyticsResponse = await client.GetAsync($"/api/tracking/pages/{trackingPageId}/analytics?fromUtc={fromUtc}&toUtc={toUtc}&trendBucketSizeMinutes=60&recentVisitLimit=10");
         analyticsResponse.EnsureSuccessStatusCode();
 
         var analyticsPayload = JsonNode.Parse(await analyticsResponse.Content.ReadAsStringAsync())!.AsObject();
         Assert.Equal(2, analyticsPayload["summary"]!["totalVisits"]!.GetValue<int>());
         Assert.Equal(2, analyticsPayload["summary"]!["uniqueVisitors"]!.GetValue<int>());
 
-        var overviewResponse = await client.GetAsync($"/api/tracking/analytics/overview?fromUtc={now.AddHours(-1):O}&toUtc={now.AddHours(1):O}&excludeBots=true&topPagesLimit=5&recentVisitLimit=10");
+        var overviewResponse = await client.GetAsync($"/api/tracking/analytics/overview?fromUtc={fromUtc}&toUtc={toUtc}&excludeBots=true&topPagesLimit=5&recentVisitLimit=10");
         overviewResponse.EnsureSuccessStatusCode();
 
         var overviewPayload = JsonNode.Parse(await overviewResponse.Content.ReadAsStringAsync())!.AsObject();
