@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
-      ConnectionStrings__DefaultConnection: ${API_CONNECTION_STRING:-Host=localhost;Port=5432;Database=qphising;Username=qphising;Password=qphising-dev-password}
+      ConnectionStrings__DefaultConnection: ${API_CONNECTION_STRING:-Host=host.docker.internal;Port=5432;Database=mydatabase;Username=myuser;Password=mypassword}
       Authentication__Jwt__Authority: ${JWT_AUTHORITY:-http://host.docker.internal:6060/realms/QPhising}
       Authentication__Jwt__Audience: ${JWT_AUDIENCE:-account}
       Authentication__Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
