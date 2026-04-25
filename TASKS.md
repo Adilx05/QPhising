@@ -165,6 +165,7 @@ Phase 9 evidence:
 - [x] Create a professional GitHub Pages static product website under `docs/` with light enterprise SaaS styling, architecture/feature sections, and deployment-ready assets.
 
 Incremental evidence:
+- 2026-04-25: Updated `scripts/check-frontend-ui-smoke.js` to validate authentication guards (`authenticationCanActivateGuard`/`authenticationCanMatchGuard`) on protected frontend routes after setup wizard/guard removal, preventing stale setup-guard assertion failures in UI smoke checks.
 - 2026-04-25: Removed frontend dark-mode infrastructure end-to-end by deleting theme state/toggle methods from user preferences and app shell, removing PrimeNG dark-mode selector wiring, and deleting `body.app-dark` style overrides so UI runs in light mode only.
 - 2026-04-25: Added a GitHub Pages-ready static marketing site in `docs/` (`index.html`, `styles.css`, `script.js`, and SVG assets) with light enterprise design, responsive navigation, product architecture/features/install sections, and documentation links mapped to current repository artifacts.
 - 2026-04-25: Cleaned up redundant standalone Swagger/proxy GitHub Actions workflows (checks remain covered by `ci.yml`) and added automated GitHub Pages deployment workflow (`.github/workflows/github-pages.yml`) that publishes the `docs/` directory on `main` pushes and manual dispatch.
