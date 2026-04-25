@@ -39,6 +39,9 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
         var created = JsonNode.Parse(await createResponse.Content.ReadAsStringAsync())!.AsObject();
         var trackingPageId = created["id"]!.GetValue<Guid>();
 
+        var publishResponse = await client.PostAsync($"/api/tracking/pages/{trackingPageId}/publish", content: null);
+        publishResponse.EnsureSuccessStatusCode();
+
         var publicLandingResponse = await client.GetAsync($"/p/{slug}");
         publicLandingResponse.EnsureSuccessStatusCode();
 
