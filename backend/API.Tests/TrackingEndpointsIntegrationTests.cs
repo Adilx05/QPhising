@@ -30,7 +30,8 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
             destinationUrl = "https://example.com/reports/q1",
             ownerId = "ops-admin",
             retentionDays = 30,
-            captureIpAddress = true,
+            captureIpAddress = false,
+            ipAddressHashPolicy = 0,
             enableBotFiltering = true,
             captureUtmParameters = true
         });
@@ -38,6 +39,9 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
         createResponse.EnsureSuccessStatusCode();
         var created = JsonNode.Parse(await createResponse.Content.ReadAsStringAsync())!.AsObject();
         var trackingPageId = created["id"]!.GetValue<Guid>();
+
+        var publishResponse = await client.PostAsync($"/api/tracking/pages/{trackingPageId}/publish", content: null);
+        publishResponse.EnsureSuccessStatusCode();
 
         var publicLandingResponse = await client.GetAsync($"/p/{slug}");
         publicLandingResponse.EnsureSuccessStatusCode();
@@ -50,7 +54,7 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
             visitorFingerprint = "visitor-001",
             userAgent = "Mozilla/5.0",
             referrerUrl = "https://search.example",
-            ipAddressHashPolicy = 2,
+            ipAddressHashPolicy = 0,
             deduplicationWindowSeconds = 180
         });
 
@@ -63,7 +67,7 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
             visitorFingerprint = "visitor-001",
             userAgent = "Mozilla/5.0",
             referrerUrl = "https://search.example",
-            ipAddressHashPolicy = 2,
+            ipAddressHashPolicy = 0,
             deduplicationWindowSeconds = 180
         });
 
@@ -78,20 +82,23 @@ public sealed class TrackingEndpointsIntegrationTests : IClassFixture<TestApiFac
             visitorFingerprint = "visitor-002",
             userAgent = "Mozilla/5.0",
             referrerUrl = "https://news.example",
-            ipAddressHashPolicy = 2,
+            ipAddressHashPolicy = 0,
             deduplicationWindowSeconds = 60
         });
 
         visitTwoResponse.EnsureSuccessStatusCode();
 
-        var analyticsResponse = await client.GetAsync($"/api/tracking/pages/{trackingPageId}/analytics?fromUtc={now.AddHours(-1):O}&toUtc={now.AddHours(1):O}&trendBucketSizeMinutes=60&recentVisitLimit=10");
+        var fromUtc = Uri.EscapeDataString(now.AddHours(-1).UtcDateTime.ToString("O"));
+        var toUtc = Uri.EscapeDataString(now.AddHours(1).UtcDateTime.ToString("O"));
+
+        var analyticsResponse = await client.GetAsync($"/api/tracking/pages/{trackingPageId}/analytics?fromUtc={fromUtc}&toUtc={toUtc}&trendBucketSizeMinutes=60&recentVisitLimit=10"); 
         analyticsResponse.EnsureSuccessStatusCode();
 
         var analyticsPayload = JsonNode.Parse(await analyticsResponse.Content.ReadAsStringAsync())!.AsObject();
         Assert.Equal(2, analyticsPayload["summary"]!["totalVisits"]!.GetValue<int>());
         Assert.Equal(2, analyticsPayload["summary"]!["uniqueVisitors"]!.GetValue<int>());
 
-        var overviewResponse = await client.GetAsync($"/api/tracking/analytics/overview?fromUtc={now.AddHours(-1):O}&toUtc={now.AddHours(1):O}&excludeBots=true&topPagesLimit=5&recentVisitLimit=10");
+        var overviewResponse = await client.GetAsync($"/api/tracking/analytics/overview?fromUtc={fromUtc}&toUtc={toUtc}&excludeBots=false&topPagesLimit=5&recentVisitLimit=10");
         overviewResponse.EnsureSuccessStatusCode();
 
         var overviewPayload = JsonNode.Parse(await overviewResponse.Content.ReadAsStringAsync())!.AsObject();
