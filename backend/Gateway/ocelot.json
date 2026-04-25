@@ -14,7 +14,7 @@
       "DownstreamHostAndPorts": [
         {
           // Change this service name / host if needed
-          "Host": "api",
+          "Host": "localhost",
           "Port": 5050
         }
       ]
@@ -27,7 +27,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "api",
+          "Host": "localhost",
           "Port": 5050
         }
       ]
@@ -40,7 +40,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "api",
+          "Host": "localhost",
           "Port": 5050
         }
       ],
@@ -57,7 +57,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "api",
+          "Host": "localhost",
           "Port": 5050
         }
       ]
