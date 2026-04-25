@@ -29,21 +29,13 @@ services:
       Setup__AllowRuntimeOverrides: ${SETUP_ALLOW_RUNTIME_OVERRIDES:-false}
     ports:
       - "${API_PORT:-5050}:5050"
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:5050/health/ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
-      start_period: 20s
 
   gateway:
     build:
       context: .
       dockerfile: backend/Gateway/Dockerfile
     restart: unless-stopped
-    depends_on:
-      api:
-        condition: service_healthy
+    
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       Authentication__Jwt__Authority: ${JWT_AUTHORITY:-http://host.docker.internal:6060/realms/QPhising}
@@ -56,21 +48,13 @@ services:
       Setup__AllowRuntimeOverrides: ${SETUP_ALLOW_RUNTIME_OVERRIDES:-false}
     ports:
       - "${GATEWAY_PORT:-8080}:8080"
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health/ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
-      start_period: 20s
 
   frontend:
     build:
       context: frontend/
       dockerfile: Dockerfile
     restart: unless-stopped
-    depends_on:
-      gateway:
-        condition: service_healthy
+    
     environment:
       QPHISING_API_BASE_URL: ${FRONTEND_API_BASE_URL:-http://localhost:8080}
       QPHISING_AUTHORITY: ${FRONTEND_AUTHORITY:-http://localhost:6060}
