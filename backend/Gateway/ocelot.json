@@ -1,28 +1,20 @@
 {
-  // IMPORTANT:
-  // Review and adjust these routes for your own environment.
-  // Update hosts, ports, schemes, and BaseUrl according to your current setup
-  // (local machine, Docker, Kubernetes, reverse proxy, domain, SSL, etc.).
-
   "Routes": [
     {
-      // Public tracking page route
       "UpstreamPathTemplate": "/p/{slug}",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "DownstreamPathTemplate": "/p/{slug}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          // Change this service name / host if needed
           "Host": "localhost",
           "Port": 5050
         }
       ]
     },
     {
-      // Public visit logging endpoint
       "UpstreamPathTemplate": "/api/tracking/pages/{slug}/visits",
-      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
+      "UpstreamHttpMethod": ["POST", "OPTIONS"],
       "DownstreamPathTemplate": "/api/tracking/pages/{slug}/visits",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -33,9 +25,8 @@
       ]
     },
     {
-      // Protected API gateway route
       "UpstreamPathTemplate": "/api/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
+      "UpstreamHttpMethod": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -50,9 +41,8 @@
       }
     },
     {
-      // Health check route
       "UpstreamPathTemplate": "/health/live",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamHttpMethod": ["GET"],
       "DownstreamPathTemplate": "/health/live",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -63,9 +53,7 @@
       ]
     }
   ],
-
   "GlobalConfiguration": {
-    // Update this URL for your own gateway address / domain
     "BaseUrl": "http://localhost:8080"
   }
 }
