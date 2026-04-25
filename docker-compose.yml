@@ -22,6 +22,7 @@ services:
       Authentication__Jwt__RequireHttpsMetadata: ${JWT_REQUIRE_HTTPS_METADATA:-false}
       Redis__Configuration: ${REDIS_CONFIGURATION:-redis:6379}
       Redis__InstanceName: ${REDIS_INSTANCE_NAME:-QPhising}
+      HealthChecks__Keycloak__Enabled: ${API_HEALTHCHECK_KEYCLOAK_ENABLED:-false}
       FeatureFlags__SwaggerEnabled: ${API_SWAGGER_ENABLED:-true}
       Database__ApplyMigrationsOnStartup: ${API_APPLY_MIGRATIONS_ON_STARTUP:-true}
       Tracking__VisitorPrivacy__HashPepper: ${TRACKING_HASH_PEPPER:-}

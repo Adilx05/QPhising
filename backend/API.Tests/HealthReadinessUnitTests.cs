@@ -69,6 +69,24 @@ public sealed class HealthReadinessUnitTests
     }
 
     [Fact]
+    public async Task KeycloakReadinessHealthCheck_ShouldReturnDegraded_WhenProbeDisabled()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["HealthChecks:Keycloak:Enabled"] = "false"
+            })
+            .Build();
+
+        var sut = new KeycloakReadinessHealthCheck(new FakeHttpClientFactory(_ => throw new InvalidOperationException("Should not be called.")), configuration);
+
+        var result = await sut.CheckHealthAsync(new HealthCheckContext());
+
+        Assert.Equal(HealthStatus.Degraded, result.Status);
+        Assert.Contains("disabled", result.Description, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task KeycloakReadinessHealthCheck_ShouldReturnUnhealthy_WhenAuthorityMissing()
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
