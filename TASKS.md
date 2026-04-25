@@ -165,6 +165,7 @@ Phase 9 evidence:
 - [x] Create a professional GitHub Pages static product website under `docs/` with light enterprise SaaS styling, architecture/feature sections, and deployment-ready assets.
 
 Incremental evidence:
+- 2026-04-25: Hardened `TrackingCrud_VisitIngestion_AnalyticsOverview_ShouldWorkWithRepresentativeDataset` visit-ingestion setup by disabling IP capture in test page settings and using `ipAddressHashPolicy = None` in visit payloads, preventing test-host `RemoteIpAddress` null behavior from triggering 400 validation failures.
 - 2026-04-25: Fixed `TrackingCrud_VisitIngestion_AnalyticsOverview_ShouldWorkWithRepresentativeDataset` integration flow by explicitly publishing the created tracking page before resolving `/p/{slug}`, aligning test setup with public accessibility rules and preventing false 404 failures on draft pages.
 - 2026-04-25: Removed frontend dark-mode infrastructure end-to-end by deleting theme state/toggle methods from user preferences and app shell, removing PrimeNG dark-mode selector wiring, and deleting `body.app-dark` style overrides so UI runs in light mode only.
 - 2026-04-25: Added a GitHub Pages-ready static marketing site in `docs/` (`index.html`, `styles.css`, `script.js`, and SVG assets) with light enterprise design, responsive navigation, product architecture/features/install sections, and documentation links mapped to current repository artifacts.
