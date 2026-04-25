@@ -7,6 +7,12 @@ public sealed class KeycloakReadinessHealthCheck(IHttpClientFactory httpClientFa
 {
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
+        var keycloakHealthCheckEnabled = configuration.GetValue("HealthChecks:Keycloak:Enabled", true);
+        if (!keycloakHealthCheckEnabled)
+        {
+            return HealthCheckResult.Degraded("Keycloak readiness probe is disabled by configuration.");
+        }
+
         var authority = configuration["Authentication:Jwt:Authority"]?.TrimEnd('/');
         if (string.IsNullOrWhiteSpace(authority))
         {
