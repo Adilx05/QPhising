@@ -165,7 +165,6 @@ Phase 9 evidence:
 - [x] Create a professional GitHub Pages static product website under `docs/` with light enterprise SaaS styling, architecture/feature sections, and deployment-ready assets.
 
 Incremental evidence:
-- 2026-04-25: Improved `scripts/validate-proxy-generation.sh` proxy drift failure diagnostics by emitting `git status`, `git diff --numstat`, and a capped diff preview for `frontend/src/app/shared/proxy`, making CI proxy-sync failures directly actionable.
 - 2026-04-25: Removed JSON comments from `backend/Gateway/ocelot.json` so gateway route configuration remains strict-JSON compliant for CI proxy/gateway consistency validation (`check-proxy-gateway-consistency.sh`).
 - 2026-04-25: Updated `scripts/check-frontend-ui-smoke.js` to validate authentication guards (`authenticationCanActivateGuard`/`authenticationCanMatchGuard`) on protected frontend routes after setup wizard/guard removal, preventing stale setup-guard assertion failures in UI smoke checks.
 - 2026-04-25: Removed frontend dark-mode infrastructure end-to-end by deleting theme state/toggle methods from user preferences and app shell, removing PrimeNG dark-mode selector wiring, and deleting `body.app-dark` style overrides so UI runs in light mode only.
