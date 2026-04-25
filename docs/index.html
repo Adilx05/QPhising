@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QPhising | Web Tracking & Visitor Analytics Platform</title>
+    <meta
+      name="description"
+      content="QPhising is a backend-first tracking and visitor analytics platform with campaign lifecycle management, reporting, and enterprise-grade security controls." />
+    <meta name="theme-color" content="#f8fafc" />
+
+    <meta property="og:title" content="QPhising | Web Tracking & Visitor Analytics Platform" />
+    <meta
+      property="og:description"
+      content="Explore QPhising features, architecture, setup, and product capabilities in a modern, enterprise-focused product website." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="./" />
+    <meta property="og:image" content="./assets/og-cover.svg" />
+
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header" id="top">
+      <div class="container nav-wrapper">
+        <a class="brand" href="#top" aria-label="QPhising home">
+          <img src="./assets/favicon.svg" alt="QPhising logo" width="28" height="28" />
+          <span>QPhising</span>
+        </a>
+
+        <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+
+        <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+          <a href="#features">Features</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#stack">Tech Stack</a>
+          <a href="#installation">Installation</a>
+          <a href="#documentation">Documentation</a>
+          <a href="#roadmap">Roadmap</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero section">
+        <div class="container hero-grid">
+          <div>
+            <p class="eyebrow">Enterprise Tracking Platform</p>
+            <h1>QPhising</h1>
+            <p class="hero-subtitle">Operational web tracking, campaign simulation workflows, and actionable visitor analytics in one contract-first platform.</p>
+            <p class="hero-description">
+              QPhising combines campaign lifecycle control, public landing telemetry, analytics dashboards, report exports, and security-aware auditability for teams that need reliable operational visibility.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#documentation">View Docs</a>
+              <a class="btn btn-secondary" href="#installation">Get Started</a>
+              <a class="btn btn-ghost" href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>
+            </div>
+          </div>
+          <div class="hero-preview" aria-label="QPhising dashboard preview mockup">
+            <div class="preview-card">
+              <h3>Analytics Overview</h3>
+              <div class="kpi-grid">
+                <article><span>Total Visits</span><strong>18,420</strong></article>
+                <article><span>Unique Visitors</span><strong>12,608</strong></article>
+                <article><span>Top Page CTR</span><strong>31.4%</strong></article>
+                <article><span>Active Campaigns</span><strong>14</strong></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="container">
+          <h2>Feature Highlights</h2>
+          <p class="section-intro">Built from real platform capabilities in this repository, designed for secure and traceable operations.</p>
+          <div class="card-grid">
+            <article class="card"><h3>Campaign Lifecycle Management</h3><p>Create, schedule, start, pause, complete, cancel, and soft-delete campaigns with role-based permissions.</p></article>
+            <article class="card"><h3>Tracking Page Operations</h3><p>Manage publish/archive lifecycle, metadata, validity windows, templates, and privacy settings per tracking page.</p></article>
+            <article class="card"><h3>Anonymous Visit Ingestion</h3><p>Capture visits by ID or slug endpoints with deduplication support, request limits, and abuse-aware rate limiting.</p></article>
+            <article class="card"><h3>Analytics & Trends</h3><p>Observe total/unique visits, top pages, recent traffic stream, and trend buckets with bot-exclusion controls.</p></article>
+            <article class="card"><h3>Report Center</h3><p>Export analytics as CSV or PDF with global/selected scope, detail-level options, and localization-ready output.</p></article>
+            <article class="card"><h3>Audit & Security Visibility</h3><p>Track operational and security-relevant events while enforcing JWT, role policies, and correlation-driven logging.</p></article>
+          </div>
+
+          <div class="preview-grid">
+            <article class="surface"><h3>Why QPhising</h3><p>QPhising is designed backend-first with Clean Architecture, CQRS workflows, and generated API clients to keep contracts authoritative from API to UI.</p></article>
+            <article class="surface"><h3>Reporting Preview</h3><p>Summary and detailed export modes provide executive-level views and operational detail for teams sharing evidence across stakeholders.</p></article>
+            <article class="surface"><h3>Admin Management Preview</h3><p>Operators and admins manage campaigns, templates, tracking pages, and audit logs from a single consistent interface.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-muted" id="architecture">
+        <div class="container">
+          <h2>Architecture</h2>
+          <p class="section-intro">Clean Architecture boundaries with a contract-first API and generated frontend proxies.</p>
+          <div class="architecture-grid">
+            <article class="arch-card"><h3>Frontend</h3><p>Angular + PrimeNG dashboard modules consume generated OpenAPI clients and runtime-configurable gateway/auth endpoints.</p></article>
+            <article class="arch-card"><h3>API</h3><p>ASP.NET Core API with MediatR CQRS handlers, validation, ProblemDetails middleware, and secure management endpoints.</p></article>
+            <article class="arch-card"><h3>Database</h3><p>PostgreSQL via EF Core migrations with soft-delete semantics and query filters for write-side entities.</p></article>
+            <article class="arch-card"><h3>Deployment</h3><p>Docker Compose stack for API, Gateway, frontend, and optional Redis profile with environment-driven startup configuration.</p></article>
+            <article class="arch-card"><h3>Authentication</h3><p>JWT/OIDC integration (Keycloak authority), policy-based role authorization, and authenticated routing for admin surfaces.</p></article>
+            <article class="arch-card"><h3>Tracking Engine</h3><p>Public `/p/{slug}` landing resolution plus anonymous visit capture, deduplication controls, and analytics/reporting pipelines.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="stack">
+        <div class="container">
+          <h2>Tech Stack</h2>
+          <div class="stack-grid">
+            <article class="stack-item"><h3>.NET 10</h3><p>ASP.NET Core API and gateway services.</p></article>
+            <article class="stack-item"><h3>Angular 19</h3><p>Modern standalone frontend architecture.</p></article>
+            <article class="stack-item"><h3>PostgreSQL 16</h3><p>Primary operational data storage.</p></article>
+            <article class="stack-item"><h3>Ocelot Gateway</h3><p>Edge routing and downstream forwarding.</p></article>
+            <article class="stack-item"><h3>Redis (Optional)</h3><p>Optional transient readiness/cache layer.</p></article>
+            <article class="stack-item"><h3>QuestPDF + CSV</h3><p>Professional reporting outputs.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-muted" id="installation">
+        <div class="container">
+          <h2>Installation</h2>
+          <div class="commands-grid">
+            <article class="command-card">
+              <h3>Local Run</h3>
+<pre><code>dotnet restore QPhising.slnx
+
+dotnet build QPhising.slnx
+
+# API
+
+dotnet run --project backend/API/QPhising.Api.csproj
+
+# Gateway
+
+dotnet run --project backend/Gateway/QPhising.Gateway.csproj
+
+# Frontend
+
+cd frontend
+npm ci
+npm run start</code></pre>
+            </article>
+            <article class="command-card">
+              <h3>Docker Compose</h3>
+<pre><code>cp deploy/env/.env.local.example .env
+docker compose up --build
+
+# optional Redis profile
+
+docker compose --profile redis up --build</code></pre>
+            </article>
+            <article class="command-card">
+              <h3>Build & Test</h3>
+<pre><code>dotnet build QPhising.slnx --configuration Release
+dotnet test backend/API.Tests/QPhising.Api.Tests.csproj --configuration Release
+
+cd frontend
+npm ci
+npm run build</code></pre>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="documentation">
+        <div class="container">
+          <h2>Documentation</h2>
+          <div class="doc-links">
+            <a class="doc-link" href="../README.md">Project README</a>
+            <a class="doc-link" href="./architecture/api-contracts-tracking.md">API Contracts</a>
+            <a class="doc-link" href="./architecture/tracking-analytics-architecture.md">Tracking Analytics Architecture</a>
+            <a class="doc-link" href="./operations/analytics-definitions-runbook.md">Analytics Definitions Runbook</a>
+            <a class="doc-link" href="./operations/audit-event-taxonomy.md">Audit Event Taxonomy</a>
+            <a class="doc-link" href="./operations/final-production-readiness-review.md">Production Readiness Review</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-muted" id="roadmap">
+        <div class="container">
+          <h2>Roadmap</h2>
+          <ul class="roadmap-list">
+            <li>Expanded native analytics visualizations and richer trend explorations.</li>
+            <li>Scheduled and automated report delivery workflows.</li>
+            <li>Retention enforcement and cleanup orchestration for visit-event data.</li>
+            <li>Extended observability integrations (metrics/tracing backends).</li>
+            <li>Optional deployment manifests for advanced runtime targets.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <p><strong>QPhising</strong> — Tracking & Visitor Analytics Platform</p>
+        <div>
+          <a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="../LICENSE.md">License</a>
+          <span>Built with ❤️ for reliable operations.</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
