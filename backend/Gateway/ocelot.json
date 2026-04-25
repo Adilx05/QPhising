@@ -1,37 +1,46 @@
 {
+  // IMPORTANT:
+  // Review and adjust these routes for your own environment.
+  // Update hosts, ports, schemes, and BaseUrl according to your current setup
+  // (local machine, Docker, Kubernetes, reverse proxy, domain, SSL, etc.).
+
   "Routes": [
     {
+      // Public tracking page route
       "UpstreamPathTemplate": "/p/{slug}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamPathTemplate": "/p/{slug}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          // Change this service name / host if needed
+          "Host": "api",
           "Port": 5050
         }
       ]
     },
     {
+      // Public visit logging endpoint
       "UpstreamPathTemplate": "/api/tracking/pages/{slug}/visits",
       "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
       "DownstreamPathTemplate": "/api/tracking/pages/{slug}/visits",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "api",
           "Port": 5050
         }
       ]
     },
     {
+      // Protected API gateway route
       "UpstreamPathTemplate": "/api/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" ],
       "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "api",
           "Port": 5050
         }
       ],
@@ -41,19 +50,22 @@
       }
     },
     {
+      // Health check route
       "UpstreamPathTemplate": "/health/live",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamPathTemplate": "/health/live",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "api",
           "Port": 5050
         }
       ]
     }
   ],
+
   "GlobalConfiguration": {
+    // Update this URL for your own gateway address / domain
     "BaseUrl": "http://localhost:8080"
   }
 }
