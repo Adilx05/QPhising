@@ -43,11 +43,11 @@ import { getCampaignById } from '../data-access';
 
       <div class="mt-4 grid gap-3 md:grid-cols-2">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Başlangıç (UTC)' : 'Starts At (UTC)' }}</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Başlangıç' : 'Starts At' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ resolveStartsAtUtc() }}</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Bitiş (UTC)' : 'Ends At (UTC)' }}</p>
+          <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Bitiş' : 'Ends At' }}</p>
           <p class="mt-1 text-sm text-slate-700">{{ resolveEndsAtUtc() }}</p>
         </div>
       </div>
@@ -193,12 +193,41 @@ export class CampaignDetailPageComponent implements OnDestroy {
 
   protected resolveStartsAtUtc(): string {
     const value = this.campaign()?.startsAtUtc ?? this.trackingPage()?.validFromUtc;
-    return value ?? (this.activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled');
+    if (!value) {
+      return this.activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled';
+    }
+    return this.formatDateTime(value);
   }
 
   protected resolveEndsAtUtc(): string {
     const value = this.campaign()?.endsAtUtc ?? this.trackingPage()?.validUntilUtc;
-    return value ?? (this.activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled');
+    if (!value) {
+      return this.activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled';
+    }
+    return this.formatDateTime(value);
+  }
+
+  private formatDateTime(dateStr: string): string {
+    try {
+      const date = new Date(dateStr);
+      const isValid = !isNaN(date.getTime());
+      if (!isValid) {
+        return dateStr;
+      }
+
+      const locale = this.activeLanguage() === 'tr' ? 'tr-TR' : 'en-US';
+      const formatted = new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+
+      return formatted;
+    } catch {
+      return dateStr;
+    }
   }
 
   private async loadTrackingPage(campaign: CampaignResult): Promise<void> {

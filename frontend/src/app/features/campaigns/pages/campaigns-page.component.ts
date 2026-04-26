@@ -206,6 +206,27 @@ export class CampaignsPageComponent implements OnDestroy {
     });
   }
 
+  protected formatDateTime(dateStr: string): string {
+    try {
+      const date = new Date(dateStr);
+      const isValid = !isNaN(date.getTime());
+      if (!isValid) {
+        return dateStr;
+      }
+
+      const locale = this.activeLanguage() === 'tr' ? 'tr-TR' : 'en-US';
+      return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    } catch {
+      return dateStr;
+    }
+  }
+
   protected stateLabel(state: CampaignLifecycleState | undefined): string {
     switch (state) {
       case CampaignLifecycleState._0:

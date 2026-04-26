@@ -123,13 +123,8 @@
 
     <div class="mt-4 grid gap-3 lg:grid-cols-3">
       <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-        <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Başlangıç (UTC)' : 'Starts At (UTC)' }}</p>
-        <p class="mt-1 text-sm text-slate-700">{{ campaign.startsAtUtc || (activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled') }}</p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-        <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Bitiş (UTC)' : 'Ends At (UTC)' }}</p>
-        <p class="mt-1 text-sm text-slate-700">{{ campaign.endsAtUtc || (activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled') }}</p>
+        <p class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Oluşturulma Tarihi' : 'Created At' }}</p>
+        <p class="mt-1 text-sm text-slate-700">{{ campaign.createdAtUtc ? formatDateTime(campaign.createdAtUtc) : (activeLanguage() === 'tr' ? 'Planlanmadı' : 'Not scheduled') }}</p>
       </div>
     </div>
 
