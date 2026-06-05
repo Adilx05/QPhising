@@ -107,7 +107,28 @@ const claimAsTrimmedString = (value: unknown): string | null =>
 export class AuthSessionService {
   public constructor(private readonly oidcAuthService: OidcAuthService) {}
 
+  private refreshPromise: Promise<boolean> | null = null;
+
   public getAccessToken(): string | null {
+    const session = this.oidcAuthService.getSession();
+
+    if (session === null) {
+      return null;
+    }
+
+    const refreshThreshold = 60;
+    const nowEpoch = Math.floor(Date.now() / 1000);
+
+    if (session.expiresAtEpochSeconds - nowEpoch > refreshThreshold) {
+      return session.accessToken;
+    }
+
+    if (this.refreshPromise === null) {
+      this.refreshPromise = this.oidcAuthService.refreshSession().finally(() => {
+        this.refreshPromise = null;
+      });
+    }
+
     return this.oidcAuthService.getSession()?.accessToken ?? null;
   }
 

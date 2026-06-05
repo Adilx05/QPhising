@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 export interface OidcSession {
   accessToken: string;
   expiresAtEpochSeconds: number;
+  refreshToken: string | null;
+  refreshExpiresAtEpochSeconds: number;
   tokenType: string;
   scope: string;
 }
@@ -234,6 +236,8 @@ export class OidcAuthService {
     const tokenPayload = (await tokenResponse.json()) as {
       access_token?: unknown;
       expires_in?: unknown;
+      refresh_token?: unknown;
+      refresh_expires_in?: unknown;
       token_type?: unknown;
       scope?: unknown;
     };
@@ -247,9 +251,22 @@ export class OidcAuthService {
         ? tokenPayload.expires_in
         : 300;
 
+    const refreshToken = typeof tokenPayload.refresh_token === 'string' && tokenPayload.refresh_token.length > 0
+      ? tokenPayload.refresh_token
+      : null;
+
+    const refreshExpiresIn =
+      typeof tokenPayload.refresh_expires_in === 'number' && tokenPayload.refresh_expires_in > 0
+        ? tokenPayload.refresh_expires_in
+        : 0;
+
     const session: OidcSession = {
       accessToken: tokenPayload.access_token,
       expiresAtEpochSeconds: Math.floor(Date.now() / 1000) + expiresIn,
+      refreshToken,
+      refreshExpiresAtEpochSeconds: refreshToken !== null
+        ? Math.floor(Date.now() / 1000) + refreshExpiresIn
+        : 0,
       tokenType: typeof tokenPayload.token_type === 'string' ? tokenPayload.token_type : 'Bearer',
       scope: typeof tokenPayload.scope === 'string' ? tokenPayload.scope : this.runtimeConfig.requestedScope
     };
@@ -274,6 +291,110 @@ export class OidcAuthService {
     const logoutUrl = `${discovery.end_session_endpoint}?post_logout_redirect_uri=${encodeQuery(this.runtimeConfig.postLogoutRedirectUri)}${currentSession ? `&client_id=${encodeQuery(this.runtimeConfig.clientId)}` : ''}`;
 
     globalThis.location.assign(logoutUrl);
+  }
+
+  public hasValidRefreshToken(): boolean {
+    const session = readJsonFromStorage<OidcSession>(globalThis.sessionStorage, oidcStorageKeys.session);
+
+    if (session === null || typeof session.refreshToken !== 'string' || session.refreshToken.length === 0) {
+      return false;
+    }
+
+    const nowEpoch = Math.floor(Date.now() / 1000);
+
+    if (session.refreshExpiresAtEpochSeconds > 0 && session.refreshExpiresAtEpochSeconds <= nowEpoch) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public async refreshSession(): Promise<boolean> {
+    const session = readJsonFromStorage<OidcSession>(globalThis.sessionStorage, oidcStorageKeys.session);
+
+    if (session === null || typeof session.refreshToken !== 'string' || session.refreshToken.length === 0) {
+      return false;
+    }
+
+    const nowEpoch = Math.floor(Date.now() / 1000);
+
+    if (session.refreshExpiresAtEpochSeconds > 0 && session.refreshExpiresAtEpochSeconds <= nowEpoch) {
+      this.clearSession();
+      return false;
+    }
+
+    const discovery = await this.resolveDiscoveryDocument();
+
+    if (!discovery.token_endpoint) {
+      return false;
+    }
+
+    try {
+      const tokenResponse = await fetch(discovery.token_endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          client_id: this.runtimeConfig.clientId,
+          refresh_token: session.refreshToken
+        })
+      });
+
+      if (!tokenResponse.ok) {
+        this.clearSession();
+        return false;
+      }
+
+      const tokenPayload = (await tokenResponse.json()) as {
+        access_token?: unknown;
+        expires_in?: unknown;
+        refresh_token?: unknown;
+        refresh_expires_in?: unknown;
+        token_type?: unknown;
+        scope?: unknown;
+      };
+
+      if (typeof tokenPayload.access_token !== 'string' || tokenPayload.access_token.length === 0) {
+        this.clearSession();
+        return false;
+      }
+
+      const expiresIn =
+        typeof tokenPayload.expires_in === 'number' && tokenPayload.expires_in > 0
+          ? tokenPayload.expires_in
+          : 300;
+
+      const newRefreshToken = typeof tokenPayload.refresh_token === 'string' && tokenPayload.refresh_token.length > 0
+        ? tokenPayload.refresh_token
+        : session.refreshToken;
+
+      const refreshExpiresIn =
+        typeof tokenPayload.refresh_expires_in === 'number' && tokenPayload.refresh_expires_in > 0
+          ? tokenPayload.refresh_expires_in
+          : session.refreshExpiresAtEpochSeconds > 0
+            ? session.refreshExpiresAtEpochSeconds - nowEpoch
+            : 0;
+
+      const updatedSession: OidcSession = {
+        accessToken: tokenPayload.access_token,
+        expiresAtEpochSeconds: Math.floor(Date.now() / 1000) + expiresIn,
+        refreshToken: newRefreshToken,
+        refreshExpiresAtEpochSeconds: refreshExpiresIn > 0
+          ? Math.floor(Date.now() / 1000) + refreshExpiresIn
+          : 0,
+        tokenType: typeof tokenPayload.token_type === 'string' ? tokenPayload.token_type : session.tokenType,
+        scope: typeof tokenPayload.scope === 'string' ? tokenPayload.scope : session.scope
+      };
+
+      globalThis.sessionStorage.setItem(oidcStorageKeys.session, JSON.stringify(updatedSession));
+
+      return true;
+    } catch {
+      this.clearSession();
+      return false;
+    }
   }
 
   public getTokenClaims(): Record<string, unknown> {
