@@ -4,5 +4,7 @@
 /* eslint-disable */
 export type UpdateCampaignRequest = {
   name?: string | null;
+  startsAtUtc?: string | null;
+  endsAtUtc?: string | null;
 };
 

@@ -3,4 +3,8 @@ using QPhising.Application.Contracts.Responses.Campaign;
 
 namespace QPhising.Application.CQRS.Commands.Campaign;
 
-public sealed record UpdateCampaignCommand(Guid CampaignId, string Name) : ITransactionalRequest<CampaignResult>;
+public sealed record UpdateCampaignCommand(
+    Guid CampaignId,
+    string Name,
+    DateTimeOffset? StartsAtUtc = null,
+    DateTimeOffset? EndsAtUtc = null) : ITransactionalRequest<CampaignResult>;

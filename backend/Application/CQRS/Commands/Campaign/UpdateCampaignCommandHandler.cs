@@ -21,6 +21,11 @@ public sealed class UpdateCampaignCommandHandler : IRequestHandler<UpdateCampaig
 
         aggregate.Rename(new CampaignName(request.Name));
 
+        if (request.StartsAtUtc.HasValue)
+        {
+            aggregate.SetSchedule(new CampaignScheduleWindow(request.StartsAtUtc.Value, request.EndsAtUtc));
+        }
+
         await _campaignRepository.SaveAsync(aggregate, cancellationToken);
 
         return CampaignResult.FromAggregate(aggregate);

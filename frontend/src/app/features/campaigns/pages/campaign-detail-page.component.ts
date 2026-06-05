@@ -1,8 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextarea } from 'primeng/inputtextarea';
 import { resolveApiError } from '../../../core/http/api-error-handler';
 import { AppLanguage, UserPreferencesService } from '../../../core/ui/user-preferences.service';
 import {
@@ -11,21 +15,25 @@ import {
   type TrackingPageAnalyticsResult,
   type CampaignResult,
   type TrackingLandingPageResult,
-  type TrackingPageResult
+  type TrackingPageResult,
+  type UpdateTrackingPageRequest
 } from '../../../shared/proxy';
-import { getCampaignById } from '../data-access';
+import { getCampaignById, updateCampaign } from '../data-access';
 
 @Component({
   selector: 'app-campaign-detail-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonModule],
+  imports: [CommonModule, FormsModule, RouterLink, ButtonModule, DialogModule, InputTextModule, InputTextarea],
   template: `
     <section class="mb-6 flex items-center justify-between gap-3">
       <div>
         <h1 class="page-title">{{ activeLanguage() === 'tr' ? 'Senaryo Detayı' : 'Campaign Detail' }}</h1>
         <p class="page-subtitle">{{ activeLanguage() === 'tr' ? 'Senaryo, bağlı takip sayfası, genel bağlantılar ve içerik önizlemesini görüntüleyebilirsiniz.' : 'View campaign, linked tracking page, public links, and content preview.' }}</p>
       </div>
-      <a pButton type="button" severity="secondary" [routerLink]="['/campaigns']" [label]="activeLanguage() === 'tr' ? 'Geri' : 'Back'"></a>
+      <div class="flex items-center gap-2">
+        <button pButton type="button" severity="secondary" [label]="activeLanguage() === 'tr' ? 'Düzenle' : 'Edit'" (click)="openEditModal()" [disabled]="!canEdit()"></button>
+        <a pButton type="button" severity="secondary" [routerLink]="['/campaigns']" [label]="activeLanguage() === 'tr' ? 'Geri' : 'Back'"></a>
+      </div>
     </section>
 
     <section *ngIf="campaign(); else loadingState" class="surface-card p-5">
@@ -98,6 +106,37 @@ import { getCampaignById } from '../data-access';
     <ng-template #loadingState>
       <section class="surface-card p-5 text-sm text-slate-500">{{ activeLanguage() === 'tr' ? 'Senaryo detayı yükleniyor...' : 'Campaign detail is loading...' }}</section>
     </ng-template>
+
+    <p-dialog
+      [(visible)]="editModalVisible"
+      [header]="activeLanguage() === 'tr' ? 'Senaryoyu Düzenle' : 'Edit Campaign'"
+      [modal]="true"
+      [style]="{ width: '600px' }"
+      [draggable]="false"
+      [resizable]="false">
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Senaryo Adı' : 'Campaign Name' }}</label>
+          <input pInputText type="text" [(ngModel)]="editForm.name" class="w-full" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Başlangıç (UTC)' : 'Starts At (UTC)' }}</label>
+          <input type="datetime-local" [(ngModel)]="editForm.startsAtUtc" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'Bitiş (UTC)' : 'Ends At (UTC)' }}</label>
+          <input type="datetime-local" [(ngModel)]="editForm.endsAtUtc" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'HTML İçerik' : 'HTML Content' }}</label>
+          <textarea pInputTextarea [(ngModel)]="editForm.htmlContent" class="w-full" rows="10"></textarea>
+        </div>
+      </div>
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button pButton type="button" severity="secondary" [label]="activeLanguage() === 'tr' ? 'İptal' : 'Cancel'" (click)="closeEditModal()"></button>
+        <button pButton type="button" [label]="activeLanguage() === 'tr' ? 'Kaydet' : 'Save'" (click)="saveEditModal()" [disabled]="editSaving()"></button>
+      </div>
+    </p-dialog>
   `
 })
 export class CampaignDetailPageComponent implements OnDestroy {
@@ -107,6 +146,16 @@ export class CampaignDetailPageComponent implements OnDestroy {
   protected readonly landingPage = signal<TrackingLandingPageResult | null>(null);
   protected readonly publicLinks = signal<{ slugUrl: string; idUrl: string } | null>(null);
   protected readonly feedback = signal<string | null>(null);
+  protected readonly editModalVisible = signal(false);
+  protected readonly editSaving = signal(false);
+
+  protected readonly editForm = {
+    name: '',
+    startsAtUtc: '',
+    endsAtUtc: '',
+    htmlContent: ''
+  };
+
   private readonly origin = typeof window !== 'undefined' ? window.location.origin : '';
   private readonly previewUrlCache = new Map<string, SafeResourceUrl>();
   private readonly objectUrls = new Set<string>();
@@ -125,10 +174,115 @@ export class CampaignDetailPageComponent implements OnDestroy {
     this.previewUrlCache.clear();
   }
 
-
   protected activeLanguage(): AppLanguage {
     return this.userPreferencesService.language();
   }
+
+  protected canEdit(): boolean {
+    const state = this.campaign()?.lifecycleState;
+    if (state === undefined || state === null) {
+      return false;
+    }
+    return state === 0 || state === 1 || state === 2 || state === 3;
+  }
+
+  protected openEditModal(): void {
+    const c = this.campaign();
+    if (!c) {
+      return;
+    }
+
+    this.editForm.name = c.name ?? '';
+    this.editForm.startsAtUtc = c.startsAtUtc ? this.toDatetimeLocalValue(c.startsAtUtc) : '';
+    this.editForm.endsAtUtc = c.endsAtUtc ? this.toDatetimeLocalValue(c.endsAtUtc) : '';
+    this.editForm.htmlContent = this.trackingPage()?.customHtmlContent ?? '';
+    this.editModalVisible.set(true);
+  }
+
+  protected closeEditModal(): void {
+    this.editModalVisible.set(false);
+  }
+
+  protected async saveEditModal(): Promise<void> {
+    const campaignId = this.route.snapshot.paramMap.get('campaignId');
+    if (!campaignId) {
+      return;
+    }
+
+    const name = this.editForm.name.trim();
+    if (!name) {
+      this.feedback.set(this.activeLanguage() === 'tr' ? 'Senaryo adı zorunludur.' : 'Campaign name is required.');
+      return;
+    }
+
+    this.editSaving.set(true);
+
+    try {
+      const startsAtUtc = this.editForm.startsAtUtc
+        ? new Date(this.editForm.startsAtUtc).toISOString()
+        : null;
+      const endsAtUtc = this.editForm.endsAtUtc
+        ? new Date(this.editForm.endsAtUtc).toISOString()
+        : null;
+
+      const updated = await updateCampaign({
+        campaignId,
+        name,
+        startsAtUtc,
+        endsAtUtc
+      });
+
+      this.campaign.set(updated);
+
+      const page = this.trackingPage();
+      if (page?.id) {
+        const trackingRequest: UpdateTrackingPageRequest = {
+          slug: page.slug,
+          title: page.title,
+          description: page.description,
+          templateId: page.templateId,
+          customHtmlContent: this.editForm.htmlContent || null,
+          validFromUtc: page.validFromUtc,
+          validUntilUtc: page.validUntilUtc,
+          retentionDays: page.settings?.retentionDays ?? null,
+          captureIpAddress: page.settings?.captureIpAddress ?? null,
+          ipAddressHashPolicy: page.settings?.ipAddressHashPolicy,
+          enableBotFiltering: page.settings?.enableBotFiltering ?? null,
+          captureUtmParameters: page.settings?.captureUtmParameters ?? null
+        };
+
+        const updatedPage = await TrackingService.trackingPageUpdate({
+          trackingPageId: page.id,
+          requestBody: trackingRequest
+        });
+
+        this.trackingPage.set(updatedPage);
+      }
+
+      this.editModalVisible.set(false);
+      this.feedback.set(this.activeLanguage() === 'tr'
+        ? 'Senaryo güncellendi.'
+        : 'Campaign updated.');
+    } catch (error) {
+      this.feedback.set(resolveApiError(error).message);
+    } finally {
+      this.editSaving.set(false);
+    }
+  }
+
+  private toDatetimeLocalValue(isoString: string): string {
+    try {
+      const date = new Date(isoString);
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      const pad = (n: number): string => n.toString().padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    } catch {
+      return '';
+    }
+  }
+
   private async load(): Promise<void> {
     const campaignId = this.route.snapshot.paramMap.get('campaignId');
     if (!campaignId) {

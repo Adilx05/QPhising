@@ -2,7 +2,8 @@ import {
   CampaignService,
   type CampaignResult,
   type CreateCampaignRequest,
-  type ScheduleCampaignRequest
+  type ScheduleCampaignRequest,
+  type UpdateCampaignRequest
 } from '../../../shared/proxy';
 
 export interface CreateCampaignInput {
@@ -19,6 +20,13 @@ export interface CreateCampaignInput {
 export interface ScheduleCampaignInput {
   campaignId: string;
   startsAtUtc: string;
+  endsAtUtc: string | null;
+}
+
+export interface UpdateCampaignInput {
+  campaignId: string;
+  name: string;
+  startsAtUtc: string | null;
   endsAtUtc: string | null;
 }
 
@@ -74,3 +82,18 @@ export const deleteCampaign = async (campaignId: string): Promise<void> =>
 
 export const getCampaignById = async (campaignId: string): Promise<CampaignResult> =>
   CampaignService.campaignGetById({ campaignId });
+
+export const updateCampaign = async (
+  input: UpdateCampaignInput
+): Promise<CampaignResult> => {
+  const request: UpdateCampaignRequest = {
+    name: input.name,
+    startsAtUtc: input.startsAtUtc,
+    endsAtUtc: input.endsAtUtc
+  };
+
+  return CampaignService.campaignUpdate({
+    campaignId: input.campaignId,
+    requestBody: request
+  });
+};

@@ -57,7 +57,7 @@ public sealed class CampaignController : ControllerBase
         [FromRoute] Guid campaignId,
         [FromBody] UpdateCampaignRequest request,
         CancellationToken cancellationToken) =>
-        _sender.Send(new UpdateCampaignCommand(campaignId, request.Name), cancellationToken);
+        _sender.Send(new UpdateCampaignCommand(campaignId, request.Name, request.StartsAtUtc, request.EndsAtUtc), cancellationToken);
 
     [HttpDelete("{campaignId:guid}", Name = "Campaign_Delete")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
