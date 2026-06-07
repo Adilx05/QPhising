@@ -184,7 +184,7 @@ export class OidcAuthService {
 
     const authorizeUrl = `${discovery.authorization_endpoint}?response_type=code&client_id=${encodeQuery(this.runtimeConfig.clientId)}&redirect_uri=${encodeQuery(this.runtimeConfig.redirectUri)}&scope=${encodeQuery(this.runtimeConfig.requestedScope)}&state=${encodeQuery(state)}&code_challenge=${encodeQuery(codeChallenge)}&code_challenge_method=S256`;
 
-    globalThis.location.assign(authorizeUrl);
+    this.navigate(authorizeUrl);
   }
 
   public async handleCallback(callbackUrl: URL): Promise<string> {
@@ -284,13 +284,13 @@ export class OidcAuthService {
     this.clearSession();
 
     if (!discovery.end_session_endpoint) {
-      globalThis.location.assign(this.runtimeConfig.postLogoutRedirectUri);
+      this.navigate(this.runtimeConfig.postLogoutRedirectUri);
       return;
     }
 
     const logoutUrl = `${discovery.end_session_endpoint}?post_logout_redirect_uri=${encodeQuery(this.runtimeConfig.postLogoutRedirectUri)}${currentSession ? `&client_id=${encodeQuery(this.runtimeConfig.clientId)}` : ''}`;
 
-    globalThis.location.assign(logoutUrl);
+    this.navigate(logoutUrl);
   }
 
   public hasValidRefreshToken(): boolean {
@@ -423,6 +423,10 @@ export class OidcAuthService {
     globalThis.crypto.getRandomValues(bytes);
 
     return normalizeBase64Url(bytes);
+  }
+
+  private navigate(url: string): void {
+    globalThis.location.assign(url);
   }
 
   private resolveDiscoveryDocument(): Promise<OidcDiscoveryDocument> {
