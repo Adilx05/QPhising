@@ -15,4 +15,5 @@ public sealed record CreateTrackingPageRequest(
     bool? CaptureIpAddress,
     IpAddressHashPolicy? IpAddressHashPolicy,
     bool? EnableBotFiltering,
-    bool? CaptureUtmParameters);
+    bool? CaptureUtmParameters,
+    bool? AllowScriptExecution);

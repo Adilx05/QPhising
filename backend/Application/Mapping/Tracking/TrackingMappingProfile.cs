@@ -29,7 +29,8 @@ public static class TrackingMappingProfile
                     aggregate.Settings.CaptureIpAddress,
                     aggregate.Settings.IpAddressHashPolicy,
                     aggregate.Settings.EnableBotFiltering,
-                    aggregate.Settings.CaptureUtmParameters),
+                    aggregate.Settings.CaptureUtmParameters,
+                    aggregate.Settings.AllowScriptExecution),
             CreatedAtUtc: aggregate.CreatedAtUtc,
             UpdatedAtUtc: aggregate.UpdatedAtUtc);
     }

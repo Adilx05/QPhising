@@ -14,4 +14,5 @@ public sealed record TrackingLandingPageResult(
     DateTimeOffset? ValidFromUtc,
     DateTimeOffset? ValidUntilUtc,
     bool CaptureIpAddress,
-    IpAddressHashPolicy IpAddressHashPolicy);
+    IpAddressHashPolicy IpAddressHashPolicy,
+    bool AllowScriptExecution);

@@ -75,6 +75,11 @@
       {{ activeLanguage() === 'tr' ? 'UTM parametrelerini kaydet' : 'Capture UTM parameters' }}
     </label>
 
+    <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+      <input type="checkbox" [(ngModel)]="createForm.allowScriptExecution" />
+      {{ activeLanguage() === 'tr' ? 'JavaScript çalıştırmaya izin ver' : 'Allow script execution' }}
+    </label>
+
     <div class="md:col-span-2">
       <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">{{ activeLanguage() === 'tr' ? 'HTML İçeriği (Opsiyonel)' : 'HTML Content (Optional)' }}</label>
       <textarea pInputTextarea [(ngModel)]="createForm.htmlContent" rows="8" class="w-full font-mono text-xs"></textarea>

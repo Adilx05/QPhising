@@ -9,5 +9,6 @@ export type TrackingPageSettingsResult = {
   ipAddressHashPolicy?: IpAddressHashPolicy;
   enableBotFiltering?: boolean;
   captureUtmParameters?: boolean;
+  allowScriptExecution?: boolean;
 };
 

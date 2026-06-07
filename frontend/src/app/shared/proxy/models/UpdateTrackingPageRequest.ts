@@ -16,5 +16,6 @@ export type UpdateTrackingPageRequest = {
   ipAddressHashPolicy?: IpAddressHashPolicy;
   enableBotFiltering?: boolean | null;
   captureUtmParameters?: boolean | null;
+  allowScriptExecution?: boolean | null;
 };
 

@@ -7,7 +7,7 @@ public sealed class PageSettings
     public const int MinRetentionDays = 1;
     public const int MaxRetentionDays = 3650;
 
-    public PageSettings(int retentionDays, bool captureIpAddress, IpAddressHashPolicy ipAddressHashPolicy, bool enableBotFiltering, bool captureUtmParameters)
+    public PageSettings(int retentionDays, bool captureIpAddress, IpAddressHashPolicy ipAddressHashPolicy, bool enableBotFiltering, bool captureUtmParameters, bool allowScriptExecution = true)
     {
         if (retentionDays is < MinRetentionDays or > MaxRetentionDays)
         {
@@ -29,6 +29,7 @@ public sealed class PageSettings
         IpAddressHashPolicy = ipAddressHashPolicy;
         EnableBotFiltering = enableBotFiltering;
         CaptureUtmParameters = captureUtmParameters;
+        AllowScriptExecution = allowScriptExecution;
     }
 
     public int RetentionDays { get; }
@@ -40,4 +41,6 @@ public sealed class PageSettings
     public bool EnableBotFiltering { get; }
 
     public bool CaptureUtmParameters { get; }
+
+    public bool AllowScriptExecution { get; }
 }

@@ -30,5 +30,7 @@ public sealed class TrackingPageEntity : BaseEntity
 
     public bool? CaptureUtmParameters { get; set; }
 
+    public bool? AllowScriptExecution { get; set; }
+
     public ICollection<VisitEventEntity> VisitEvents { get; set; } = new List<VisitEventEntity>();
 }

@@ -57,7 +57,8 @@ public sealed class TrackingController : ControllerBase
                 request.CaptureIpAddress,
                 request.IpAddressHashPolicy,
                 request.EnableBotFiltering,
-                request.CaptureUtmParameters),
+                request.CaptureUtmParameters,
+                request.AllowScriptExecution),
             cancellationToken);
 
     [HttpPut("{trackingPageId:guid}", Name = "TrackingPage_Update")]
@@ -83,7 +84,8 @@ public sealed class TrackingController : ControllerBase
                 request.CaptureIpAddress,
                 request.IpAddressHashPolicy,
                 request.EnableBotFiltering,
-                request.CaptureUtmParameters),
+                request.CaptureUtmParameters,
+                request.AllowScriptExecution),
             cancellationToken);
 
     [HttpPost("{trackingPageId:guid}/publish", Name = "TrackingPage_Publish")]

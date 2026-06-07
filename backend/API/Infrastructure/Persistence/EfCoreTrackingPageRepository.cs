@@ -80,6 +80,7 @@ public sealed class EfCoreTrackingPageRepository : ITrackingPageRepository
         existing.IpAddressHashPolicy = aggregate.Settings is null ? null : (int)aggregate.Settings.IpAddressHashPolicy;
         existing.EnableBotFiltering = aggregate.Settings?.EnableBotFiltering;
         existing.CaptureUtmParameters = aggregate.Settings?.CaptureUtmParameters;
+        existing.AllowScriptExecution = aggregate.Settings?.AllowScriptExecution;
         existing.CreatedAtUtc = aggregate.CreatedAtUtc;
         existing.UpdatedAtUtc = aggregate.UpdatedAtUtc;
         existing.IsDeleted = aggregate.IsDeleted;

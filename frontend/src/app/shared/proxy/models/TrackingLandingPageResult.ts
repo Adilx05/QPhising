@@ -16,5 +16,6 @@ export type TrackingLandingPageResult = {
   validUntilUtc?: string | null;
   captureIpAddress?: boolean;
   ipAddressHashPolicy?: IpAddressHashPolicy;
+  allowScriptExecution?: boolean;
 };
 

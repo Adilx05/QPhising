@@ -17,4 +17,5 @@ public sealed record UpdateTrackingPageCommand(
     bool? CaptureIpAddress,
     IpAddressHashPolicy? IpAddressHashPolicy,
     bool? EnableBotFiltering,
-    bool? CaptureUtmParameters) : ITransactionalRequest<TrackingPageResult>;
+    bool? CaptureUtmParameters,
+    bool? AllowScriptExecution) : ITransactionalRequest<TrackingPageResult>;

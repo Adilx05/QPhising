@@ -56,6 +56,11 @@ public static class AuditEventTaxonomy
             return "campaign.cancel";
         }
 
+        if (method == "PUT" && path.StartsWith("/api/campaigns/", StringComparison.OrdinalIgnoreCase))
+        {
+            return "campaign.update";
+        }
+
         if (method == "DELETE" && path.StartsWith("/api/campaigns/", StringComparison.OrdinalIgnoreCase))
         {
             return "campaign.delete";

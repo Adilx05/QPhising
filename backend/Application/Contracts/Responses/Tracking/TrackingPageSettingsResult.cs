@@ -7,4 +7,5 @@ public sealed record TrackingPageSettingsResult(
     bool CaptureIpAddress,
     IpAddressHashPolicy IpAddressHashPolicy,
     bool EnableBotFiltering,
-    bool CaptureUtmParameters);
+    bool CaptureUtmParameters,
+    bool AllowScriptExecution);

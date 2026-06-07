@@ -41,7 +41,7 @@ public sealed class UpdateTrackingPageCommandHandler : IRequestHandler<UpdateTra
             request.ValidFromUtc,
             request.ValidUntilUtc);
 
-        aggregate.ConfigureSettings(BuildSettings(request.RetentionDays, request.CaptureIpAddress, request.IpAddressHashPolicy, request.EnableBotFiltering, request.CaptureUtmParameters));
+        aggregate.ConfigureSettings(BuildSettings(request.RetentionDays, request.CaptureIpAddress, request.IpAddressHashPolicy, request.EnableBotFiltering, request.CaptureUtmParameters, request.AllowScriptExecution));
 
         await _trackingPageRepository.SaveAsync(aggregate, cancellationToken);
 
@@ -64,9 +64,9 @@ public sealed class UpdateTrackingPageCommandHandler : IRequestHandler<UpdateTra
         return template.Id;
     }
 
-    private static PageSettings? BuildSettings(int? retentionDays, bool? captureIpAddress, IpAddressHashPolicy? ipAddressHashPolicy, bool? enableBotFiltering, bool? captureUtmParameters)
+    private static PageSettings? BuildSettings(int? retentionDays, bool? captureIpAddress, IpAddressHashPolicy? ipAddressHashPolicy, bool? enableBotFiltering, bool? captureUtmParameters, bool? allowScriptExecution)
     {
-        if (!retentionDays.HasValue && !captureIpAddress.HasValue && !ipAddressHashPolicy.HasValue && !enableBotFiltering.HasValue && !captureUtmParameters.HasValue)
+        if (!retentionDays.HasValue && !captureIpAddress.HasValue && !ipAddressHashPolicy.HasValue && !enableBotFiltering.HasValue && !captureUtmParameters.HasValue && !allowScriptExecution.HasValue)
         {
             return null;
         }
@@ -76,6 +76,7 @@ public sealed class UpdateTrackingPageCommandHandler : IRequestHandler<UpdateTra
             captureIpAddress ?? true,
             ipAddressHashPolicy ?? IpAddressHashPolicy.Sha256,
             enableBotFiltering ?? true,
-            captureUtmParameters ?? true);
+            captureUtmParameters ?? true,
+            allowScriptExecution ?? true);
     }
 }

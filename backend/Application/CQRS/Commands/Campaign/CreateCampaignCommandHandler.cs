@@ -53,7 +53,8 @@ public sealed class CreateCampaignCommandHandler : IRequestHandler<CreateCampaig
             captureIpAddress: true,
             ipAddressHashPolicy: IpAddressHashPolicy.Sha256,
             enableBotFiltering: true,
-            captureUtmParameters: true));
+            captureUtmParameters: true,
+            allowScriptExecution: true));
 
         await _trackingPageRepository.SaveAsync(trackingPage, cancellationToken);
 

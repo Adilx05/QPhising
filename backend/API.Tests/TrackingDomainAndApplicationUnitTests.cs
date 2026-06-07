@@ -43,7 +43,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             null,
             null,
             null,
-            new PageSettings(30, captureIpAddress: true, ipAddressHashPolicy: IpAddressHashPolicy.Sha256, enableBotFiltering: true, captureUtmParameters: true));
+            new PageSettings(30, captureIpAddress: true, ipAddressHashPolicy: IpAddressHashPolicy.Sha256, enableBotFiltering: true, captureUtmParameters: true, allowScriptExecution: true));
 
         aggregate.Archive();
 
@@ -151,7 +151,8 @@ public sealed class TrackingDomainAndApplicationUnitTests
             CaptureIpAddress: true,
             IpAddressHashPolicy: IpAddressHashPolicy.Sha256,
             EnableBotFiltering: true,
-            CaptureUtmParameters: true);
+            CaptureUtmParameters: true,
+            AllowScriptExecution: true);
 
         var result = validator.Validate(command);
         Assert.Contains(result.Errors, error => error.PropertyName == nameof(CreateTrackingPageCommand.RetentionDays));
@@ -222,7 +223,7 @@ public sealed class TrackingDomainAndApplicationUnitTests
             null,
             null,
             null,
-            new PageSettings(90, captureIpAddress: true, ipAddressHashPolicy: IpAddressHashPolicy.Sha256, enableBotFiltering: false, captureUtmParameters: true));
+            new PageSettings(90, captureIpAddress: true, ipAddressHashPolicy: IpAddressHashPolicy.Sha256, enableBotFiltering: false, captureUtmParameters: true, allowScriptExecution: true));
 
         var result = aggregate.ToResult();
 

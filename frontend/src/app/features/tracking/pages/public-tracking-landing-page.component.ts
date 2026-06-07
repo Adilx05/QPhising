@@ -13,6 +13,7 @@ import { PublicTrackingService, TrackingService, type TrackingLandingPageResult 
       <iframe
         class="h-screen w-screen border-0"
         [src]="previewUrl(data.customHtmlContent || data.templateHtmlContent || tx('<p style=&quot;padding:12px&quot;>Açılış içeriği yapılandırılmadı.</p>', '<p style=&quot;padding:12px&quot;>Landing content not configured.</p>'))"
+        [attr.sandbox]="data.allowScriptExecution ? null : ''"
       ></iframe>
     </ng-container>
     <ng-template #missing>

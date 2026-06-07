@@ -71,7 +71,8 @@ export class CampaignsPageComponent implements OnDestroy {
     captureIpAddress: true,
     ipAddressHashPolicy: IpAddressHashPolicy._2,
     enableBotFiltering: true,
-    captureUtmParameters: true
+    captureUtmParameters: true,
+    allowScriptExecution: true
   };
 
   protected readonly templateOptions = computed(() =>
@@ -150,7 +151,8 @@ export class CampaignsPageComponent implements OnDestroy {
             captureIpAddress: this.createForm.captureIpAddress,
             ipAddressHashPolicy: this.createForm.captureIpAddress ? this.createForm.ipAddressHashPolicy : IpAddressHashPolicy._0,
             enableBotFiltering: this.createForm.enableBotFiltering,
-            captureUtmParameters: this.createForm.captureUtmParameters
+            captureUtmParameters: this.createForm.captureUtmParameters,
+            allowScriptExecution: this.createForm.allowScriptExecution
           }
         });
         await TrackingService.trackingPagePublish({ trackingPageId: created.trackingPageId });
@@ -173,6 +175,7 @@ export class CampaignsPageComponent implements OnDestroy {
       this.createForm.ipAddressHashPolicy = IpAddressHashPolicy._2;
       this.createForm.enableBotFiltering = true;
       this.createForm.captureUtmParameters = true;
+      this.createForm.allowScriptExecution = true;
       this.feedback.set(this.t('feedbackCreated'));
       this.campaigns.set(await listCampaigns());
     });

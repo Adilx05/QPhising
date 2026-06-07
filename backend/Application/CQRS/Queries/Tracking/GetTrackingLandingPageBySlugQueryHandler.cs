@@ -66,7 +66,8 @@ public sealed class GetTrackingLandingPageBySlugQueryHandler : IRequestHandler<G
             aggregate.ValidFromUtc,
             aggregate.ValidUntilUtc,
             aggregate.Settings?.CaptureIpAddress ?? true,
-            aggregate.Settings?.IpAddressHashPolicy ?? IpAddressHashPolicy.Sha256);
+            aggregate.Settings?.IpAddressHashPolicy ?? IpAddressHashPolicy.Sha256,
+            aggregate.Settings?.AllowScriptExecution ?? true);
     }
 
     private async Task<QPhising.Domain.Tracking.Aggregates.TrackingPageAggregate?> ResolveAggregateAsync(GetTrackingLandingPageBySlugQuery request, CancellationToken cancellationToken)

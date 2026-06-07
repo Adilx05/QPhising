@@ -18,7 +18,8 @@ public static class TrackingPersistenceMappingProfile
                 entity.CaptureIpAddress ?? true,
                 (IpAddressHashPolicy)(entity.IpAddressHashPolicy ?? (int)IpAddressHashPolicy.Sha256),
                 entity.EnableBotFiltering ?? true,
-                entity.CaptureUtmParameters ?? true)
+                entity.CaptureUtmParameters ?? true,
+                entity.AllowScriptExecution ?? true)
             : null;
 
         return TrackingPageAggregate.Rehydrate(
@@ -61,6 +62,7 @@ public static class TrackingPersistenceMappingProfile
             IpAddressHashPolicy = aggregate.Settings is null ? null : (int)aggregate.Settings.IpAddressHashPolicy,
             EnableBotFiltering = aggregate.Settings?.EnableBotFiltering,
             CaptureUtmParameters = aggregate.Settings?.CaptureUtmParameters,
+            AllowScriptExecution = aggregate.Settings?.AllowScriptExecution,
             CreatedAtUtc = aggregate.CreatedAtUtc,
             UpdatedAtUtc = aggregate.UpdatedAtUtc,
             IsDeleted = aggregate.IsDeleted,

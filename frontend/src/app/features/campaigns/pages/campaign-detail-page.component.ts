@@ -248,7 +248,8 @@ export class CampaignDetailPageComponent implements OnDestroy {
           captureIpAddress: page.settings?.captureIpAddress ?? null,
           ipAddressHashPolicy: page.settings?.ipAddressHashPolicy,
           enableBotFiltering: page.settings?.enableBotFiltering ?? null,
-          captureUtmParameters: page.settings?.captureUtmParameters ?? null
+          captureUtmParameters: page.settings?.captureUtmParameters ?? null,
+          allowScriptExecution: page.settings?.allowScriptExecution ?? null
         };
 
         const updatedPage = await TrackingService.trackingPageUpdate({

@@ -222,6 +222,9 @@ namespace QPhising.Api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<bool?>("AllowScriptExecution")
+                        .HasColumnType("boolean");
+
                     b.Property<bool?>("CaptureIpAddress")
                         .HasColumnType("boolean")
                         .HasColumnName("capture_ip_address");
